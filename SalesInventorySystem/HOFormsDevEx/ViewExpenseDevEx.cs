@@ -237,7 +237,7 @@ namespace SalesInventorySystem.HOFormsDevEx
         {
 
             LoadExpenseSummaryByStatus(
-                    "APPROVED",
+                    "POSTED",
                     datefromapproved.Text,
                     datetoapproved.Text,
                     gridControl1,

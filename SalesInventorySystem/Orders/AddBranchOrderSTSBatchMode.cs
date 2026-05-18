@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using DevExpress.XtraEditors;
 using DevExpress.XtraGrid.Views.Grid;
 using System.Data.SqlClient;
+using SalesInventorySystem.Classes;
 
 namespace SalesInventorySystem.Orders
 {
@@ -58,80 +59,126 @@ namespace SalesInventorySystem.Orders
                 XtraMessageBox.Show(ex.Message.ToString());
             }
         }
-        void ConfirmBranchOrder()
-        {
-            SqlConnection con = Database.getConnection();
-            con.Open();
-            string query = "sp_ConfirmBranchOrderSTS";
-            try
-            {
-                SqlCommand com = new SqlCommand(query, con);
-                com.Parameters.AddWithValue("@parmdevno", txtdevno.Text);
-                com.Parameters.AddWithValue("@parmrefno", txtrefno.Text);
-                com.Parameters.AddWithValue("@parmeffectivitydate", "");
-                com.Parameters.AddWithValue("@parmpono", txtponum.Text);
-                com.Parameters.AddWithValue("@parmbarcode", "");
-                com.Parameters.AddWithValue("@parmbranchcode", txtbrcode.Text);
-                com.Parameters.AddWithValue("@parmorigin", Login.assignedBranch);
-                com.Parameters.AddWithValue("@preparedby", Login.Fullname);
-                com.CommandType = CommandType.StoredProcedure;
-                com.CommandText = query;
-                com.ExecuteNonQuery();
-            }
-            catch (SqlException ex)
-            {
-                XtraMessageBox.Show(ex.Message);
-            }
-            con.Close();
-        }
+        //private void ConfirmBranchOrder()
+        //{
+        //    try
+        //    {
+        //        using (SqlConnection con = Database.getConnection())
+        //        using (SqlCommand cmd = new SqlCommand("dbo.sp_ConfirmBranchOrderSTS", con))
+        //        {
+        //            cmd.CommandType = CommandType.StoredProcedure;
+        //            cmd.CommandTimeout = 120;
 
-        void executeTransfer()
-        {
-            try
-            {
-                DataTable dtTransfer = new DataTable();
-                dtTransfer.Columns.Add("ProductCategoryCode", typeof(string));
-                dtTransfer.Columns.Add("ProductCode", typeof(string));
-                dtTransfer.Columns.Add("ProductName", typeof(string));
-                //dtTransfer.Columns.Add("Cost", typeof(decimal));
-                dtTransfer.Columns.Add("QtyRequested", typeof(decimal));
-                dtTransfer.Columns.Add("Qty", typeof(decimal));
-                //dtTransfer.Columns.Add("Barcode", typeof(string));
+        //            cmd.Parameters.Add("@parmdevno", SqlDbType.VarChar, 20).Value = txtdevno.Text.Trim();
+        //            cmd.Parameters.Add("@parmrefno", SqlDbType.VarChar, 10).Value = txtrefno.Text.Trim();
 
-                int[] selectedRows = gridView1.GetSelectedRows();
-                foreach (int rowHandle in selectedRows)
-                {
-                    DataRow dr = dtTransfer.NewRow();
-                    dr["ProductCategoryCode"] = Classes.Product.getProductCategoryCode(gridView1.GetRowCellValue(rowHandle, "Category").ToString());
-                    dr["ProductCode"] = gridView1.GetRowCellValue(rowHandle, "ProductCode").ToString();
-                    dr["ProductName"] = gridView1.GetRowCellValue(rowHandle, "ProductName").ToString();
-                    //dr["Cost"] = Convert.ToDecimal(gridView1.GetRowCellValue(rowHandle, "Cost"));
-                    dr["QtyRequested"] = Convert.ToDecimal(gridView1.GetRowCellValue(rowHandle, "QtyRequested"));
-                    dr["Qty"] = Convert.ToDecimal(gridView1.GetRowCellValue(rowHandle, "Qty"));
-                    //dr["Barcode"] = gridView1.GetRowCellValue(rowHandle, "Barcode").ToString();
-                    dtTransfer.Rows.Add(dr);
-                }
+        //            // ✅ date param: pass NULL (DBNull) if you want SQL to derive it from TransferOrderSummary
+        //            cmd.Parameters.Add("@parmeffectivitydate", SqlDbType.Date).Value = DBNull.Value;
 
-                using (SqlConnection conn = Database.getConnection())
-                using (SqlCommand cmd = new SqlCommand("sp_AddBranchOrderBatch", conn))
-                {
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@TransferItems", dtTransfer);
-                    cmd.Parameters.AddWithValue("@PONumber", txtponum.Text);
-                    cmd.Parameters.AddWithValue("@DeliveryNo", txtdevno.Text);
-                    cmd.Parameters.AddWithValue("@ReferenceNo", txtrefno.Text);
-                    cmd.Parameters.AddWithValue("@BranchCode", txtbrcode.Text);
-                    conn.Open();
-                    cmd.ExecuteNonQuery();
-                }
+        //            cmd.Parameters.Add("@parmpono", SqlDbType.VarChar, 10).Value = txtponum.Text.Trim();
 
-                isdone = true;
-            }
-            catch (SqlException ex)
-            {
-                XtraMessageBox.Show(ex.Message.ToString());
-            }
-        }
+        //            // ✅ barcode param: pass NULL unless you really use it
+        //            cmd.Parameters.Add("@parmbarcode", SqlDbType.VarChar, 50).Value = DBNull.Value;
+
+        //            cmd.Parameters.Add("@parmbranchcode", SqlDbType.VarChar, 10).Value = txtbrcode.Text.Trim();
+
+        //            // even if currently unused in SQL, keep passing it for compatibility
+        //            cmd.Parameters.Add("@parmorigin", SqlDbType.VarChar, 10).Value = Login.assignedBranch;
+
+        //            cmd.Parameters.Add("@preparedby", SqlDbType.VarChar, 30).Value = Login.Fullname;
+
+        //            con.Open();
+        //            cmd.ExecuteNonQuery();
+        //        }
+        //    }
+        //    catch (SqlException ex)
+        //    {
+        //        XtraMessageBox.Show(ex.Message, "Confirm Branch Order Failed",
+        //            MessageBoxButtons.OK, MessageBoxIcon.Error);
+        //    }
+        //}
+
+        //void ConfirmBranchOrder()
+        //{
+        //    SqlConnection con = Database.getConnection();
+        //    con.Open();
+        //    string query = "sp_ConfirmBranchOrderSTS";
+        //    try
+        //    {
+        //        SqlCommand com = new SqlCommand(query, con);
+        //        com.Parameters.AddWithValue("@parmdevno", txtdevno.Text);
+        //        com.Parameters.AddWithValue("@parmrefno", txtrefno.Text);
+        //        com.Parameters.AddWithValue("@parmeffectivitydate", "");
+        //        com.Parameters.AddWithValue("@parmpono", txtponum.Text);
+        //        com.Parameters.AddWithValue("@parmbarcode", "");
+        //        com.Parameters.AddWithValue("@parmbranchcode", txtbrcode.Text);
+        //        com.Parameters.AddWithValue("@parmorigin", Login.assignedBranch);
+        //        com.Parameters.AddWithValue("@preparedby", Login.Fullname);
+        //        com.CommandType = CommandType.StoredProcedure;
+        //        com.CommandText = query;
+        //        com.ExecuteNonQuery();
+        //    }
+        //    catch (SqlException ex)
+        //    {
+        //        XtraMessageBox.Show(ex.Message);
+        //    }
+        //    con.Close();
+        //}
+
+        //void executeTransfer()
+        //{
+        //    try
+        //    {
+        //        DataTable dtTransfer = new DataTable();
+        //        dtTransfer.Columns.Add("ProductCategoryCode", typeof(string));
+        //        dtTransfer.Columns.Add("ProductCode", typeof(string));
+        //        dtTransfer.Columns.Add("Qty", typeof(decimal));
+        //        dtTransfer.Columns.Add("Barcode", typeof(string));   // ✅ REQUIRED
+
+        //        int[] selectedRows = gridView1.GetSelectedRows();
+
+        //        foreach (int rowHandle in selectedRows)
+        //        {
+        //            if (rowHandle < 0) continue;
+
+        //            DataRow dr = dtTransfer.NewRow();
+        //            dr["ProductCategoryCode"] =
+        //                Classes.Product.getProductCategoryCode(
+        //                    gridView1.GetRowCellValue(rowHandle, "Category").ToString());
+
+        //            dr["ProductCode"] = gridView1.GetRowCellValue(rowHandle, "ProductCode").ToString();
+        //            dr["Qty"] = Convert.ToDecimal(gridView1.GetRowCellValue(rowHandle, "Qty"));
+
+        //            object barcodeObj = gridView1.GetRowCellValue(rowHandle, "Barcode");
+        //            dr["Barcode"] = barcodeObj == null || barcodeObj == DBNull.Value
+        //                ? (object)DBNull.Value
+        //                : barcodeObj.ToString();
+
+        //            //dr["Barcode"] = gridView1.GetRowCellValue(rowHandle, "Barcode") == null ? DBNull.Value: gridView1.GetRowCellValue(rowHandle, "Barcode").ToString();
+
+        //            dtTransfer.Rows.Add(dr);
+        //        }
+
+        //        using (SqlConnection conn = Database.getConnection())
+        //        using (SqlCommand cmd = new SqlCommand("sp_AddBranchOrderBatch", conn))
+        //        {
+        //            cmd.CommandType = CommandType.StoredProcedure;
+        //            cmd.Parameters.AddWithValue("@TransferItems", dtTransfer);
+        //            cmd.Parameters.AddWithValue("@PONumber", txtponum.Text);
+        //            cmd.Parameters.AddWithValue("@DeliveryNo", txtdevno.Text);
+        //            cmd.Parameters.AddWithValue("@ReferenceNo", txtrefno.Text);
+        //            cmd.Parameters.AddWithValue("@BranchCode", txtbrcode.Text);
+        //            conn.Open();
+        //            cmd.ExecuteNonQuery();
+        //        }
+
+        //        isdone = true;
+        //    }
+        //    catch (SqlException ex)
+        //    {
+        //        XtraMessageBox.Show(ex.Message.ToString());
+        //    }
+        //}
 
         //void executeTransfer()
         //{
@@ -168,42 +215,173 @@ namespace SalesInventorySystem.Orders
         //        XtraMessageBox.Show(ex.Message.ToString());
         //    }
         //}
+        private bool executeTransfer()
+        {
+            try
+            {
+                DataTable dtTransfer = new DataTable();
+                dtTransfer.Columns.Add("ProductCategoryCode", typeof(string));
+                dtTransfer.Columns.Add("ProductCode", typeof(string));
+                dtTransfer.Columns.Add("Qty", typeof(decimal));
+                dtTransfer.Columns.Add("Barcode", typeof(string));
 
+                int[] selectedRows = gridView1.GetSelectedRows();
+                if (selectedRows == null || selectedRows.Length == 0)
+                {
+                    XtraMessageBox.Show("No items selected.");
+                    return false;
+                }
+
+                foreach (int rowHandle in selectedRows)
+                {
+                    if (rowHandle < 0) continue;
+
+                    DataRow dr = dtTransfer.NewRow();
+                    dr["ProductCategoryCode"] =
+                        Classes.Product.getProductCategoryCode(
+                            Convert.ToString(gridView1.GetRowCellValue(rowHandle, "Category")));
+
+                    dr["ProductCode"] = Convert.ToString(gridView1.GetRowCellValue(rowHandle, "ProductCode"));
+                    dr["Qty"] = Convert.ToDecimal(gridView1.GetRowCellValue(rowHandle, "Qty"));
+
+                    object barcodeObj = gridView1.GetRowCellValue(rowHandle, "Barcode");
+                    dr["Barcode"] = (barcodeObj == null || barcodeObj == DBNull.Value)
+                        ? (object)DBNull.Value
+                        : barcodeObj.ToString();
+
+                    dtTransfer.Rows.Add(dr);
+                }
+
+                if (dtTransfer.Rows.Count == 0)
+                {
+                    XtraMessageBox.Show("No valid rows selected.");
+                    return false;
+                }
+
+                using (SqlConnection conn = Database.getConnection())
+                using (SqlCommand cmd = new SqlCommand("sp_AddBranchOrderBatch", conn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    // IMPORTANT: Structured TVP should be typed, not AddWithValue guessing.
+                    var p = cmd.Parameters.Add("@TransferItems", SqlDbType.Structured);
+                    p.TypeName = "dbo.TransferItemType";
+                    p.Value = dtTransfer;
+
+                    cmd.Parameters.Add("@PONumber", SqlDbType.VarChar, 10).Value = txtponum.Text.Trim();
+                    cmd.Parameters.Add("@DeliveryNo", SqlDbType.VarChar, 10).Value = txtdevno.Text.Trim();
+                    cmd.Parameters.Add("@ReferenceNo", SqlDbType.VarChar, 10).Value = txtrefno.Text.Trim();
+                    cmd.Parameters.Add("@BranchCode", SqlDbType.VarChar, 10).Value = txtbrcode.Text.Trim();
+
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                }
+
+                return true; // ✅ success
+            }
+            catch (SqlException ex)
+            {
+                XtraMessageBox.Show(ex.Message, "Transfer Failed",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false; // ✅ failure
+            }
+        }
+        private bool ConfirmBranchOrder()
+        {
+            try
+            {
+                using (SqlConnection con = Database.getConnection())
+                using (SqlCommand cmd = new SqlCommand("dbo.sp_ConfirmBranchOrderSTS", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandTimeout = 120;
+
+                    cmd.Parameters.Add("@parmdevno", SqlDbType.VarChar, 20).Value = txtdevno.Text.Trim();
+                    cmd.Parameters.Add("@parmrefno", SqlDbType.VarChar, 10).Value = txtrefno.Text.Trim();
+                    cmd.Parameters.Add("@parmeffectivitydate", SqlDbType.Date).Value = DBNull.Value;
+                    cmd.Parameters.Add("@parmpono", SqlDbType.VarChar, 10).Value = txtponum.Text.Trim();
+                    cmd.Parameters.Add("@parmbarcode", SqlDbType.VarChar, 50).Value = DBNull.Value;
+                    cmd.Parameters.Add("@parmbranchcode", SqlDbType.VarChar, 10).Value = txtbrcode.Text.Trim();
+                    cmd.Parameters.Add("@parmorigin", SqlDbType.VarChar, 10).Value = Login.assignedBranch;
+                    cmd.Parameters.Add("@preparedby", SqlDbType.VarChar, 30).Value = Login.Fullname;
+
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                }
+
+                return true;
+            }
+            catch (SqlException ex)
+            {
+                XtraMessageBox.Show(ex.Message, "Confirm Branch Order Failed",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+        }
         private void simpleButton2_Click(object sender, EventArgs e)
         {
-            int totalorders = Database.getCountData("SELECT TOP(1) COUNT(ProductNo) as Counter FROM DeliveryDetails with(nolock) WHERE PONumber=" + txtponum.Text + "", "Counter");
 
-            bool confirmRcv = HelperFunction.ConfirmDialog("Are you sure you want to save this Inventory?", "Confirm Inventory Entry");
-            if (confirmRcv)
-            {
-                executeTransfer();
-                if (totalorders != totalreceive)
-                {
-                    bool confirm = HelperFunction.ConfirmDialog("The System found out that there are remaining items in OrderDetails that you do not receive.. Are you sure you want to Continue", "Dscrepancy");
-                    if (confirm)
-                    {
-                        ConfirmBranchOrder();
-                        XtraMessageBox.Show("Successfully Added!");
-                        this.Close();
-                    }
-                    else
-                    {
-                        return;
-                    }
-                }
-                else
-                {
-                    ConfirmBranchOrder();
-                    isdone = true;
-                    XtraMessageBox.Show("Successfully Added!");
-                    this.Close();
-                }
-            }
-            else
-            {
+            int totalorders = Database.getCountData(
+                    "SELECT COUNT(ProductNo) as Counter FROM DeliveryDetails WHERE PONumber=" + txtponum.Text,
+                    "Counter");
+
+            if (!HelperFunction.ConfirmDialog("Are you sure you want to save this Inventory?", "Confirm Inventory Entry"))
                 return;
+
+            // ✅ Stop if executeTransfer fails
+            if (!executeTransfer())
+                return;
+
+            // discrepancy prompt
+            if (totalorders != totalreceive)
+            {
+                if (!HelperFunction.ConfirmDialog(
+                    "The System found out that there are remaining items in OrderDetails that you do not receive.. Are you sure you want to Continue",
+                    "Discrepancy"))
+                    return;
             }
+
+            // ✅ Stop if confirm fails
+            if (!ConfirmBranchOrder())
+                return;
+
             isdone = true;
+            BigAlert.Show("SUCCESS","Successfully Added!",MessageBoxIcon.Information);
+            this.Close();
+
+            //int totalorders = Database.getCountData("SELECT TOP(1) COUNT(ProductNo) as Counter FROM DeliveryDetails with(nolock) WHERE PONumber=" + txtponum.Text + "", "Counter");
+
+            //bool confirmRcv = HelperFunction.ConfirmDialog("Are you sure you want to save this Inventory?", "Confirm Inventory Entry");
+            //if (confirmRcv)
+            //{
+            //    executeTransfer();
+            //    if (totalorders != totalreceive)
+            //    {
+            //        bool confirm = HelperFunction.ConfirmDialog("The System found out that there are remaining items in OrderDetails that you do not receive.. Are you sure you want to Continue", "Dscrepancy");
+            //        if (confirm)
+            //        {
+            //            ConfirmBranchOrder();
+            //            XtraMessageBox.Show("Successfully Added!");
+            //            this.Close();
+            //        }
+            //        else
+            //        {
+            //            return;
+            //        }
+            //    }
+            //    else
+            //    {
+            //        ConfirmBranchOrder();
+            //        isdone = true;
+            //        XtraMessageBox.Show("Successfully Added!");
+            //        this.Close();
+            //    }
+            //}
+            //else
+            //{
+            //    return;
+            //}
+            //isdone = true;
         }
 
         private void gridView1_RowCellStyle(object sender, RowCellStyleEventArgs e)
