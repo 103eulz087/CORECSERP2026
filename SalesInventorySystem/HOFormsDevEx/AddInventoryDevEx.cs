@@ -242,23 +242,25 @@ namespace SalesInventorySystem.HOFormsDevEx
                 con.Close();
             }
         }
-        void uploadDB()
+
+        bool uploadDB()
         {
-            //addInventory();
-            //checkBatchUpload();
-            //if (iserror == true)
-            //{
-            //    display();
-            //    return;
-            //}
-            //else
-            //{
-            //    finalupdate();
-            //    isdone = true;
-            //}
-            finalupdate();
+            bool result = finalupdate();
+
+            if (!result)
+                return false;
+
             isdone = true;
+            return true;
         }
+
+
+        //void uploadDB()
+        //{
+
+        //    finalupdate();
+        //    isdone = true;
+        //}
 
         private void simpleButton2_Click(object sender, EventArgs e)
         {
@@ -276,32 +278,29 @@ namespace SalesInventorySystem.HOFormsDevEx
             bool confirmRcv = HelperFunction.ConfirmDialog("Are you sure you want to save this Inventory?","Confirm Inventory Entry");
             if (confirmRcv)
             {
+                bool proceed = true;
+
                 if (totalorders != totalreceive)
                 {
-                    bool confirm = HelperFunction.ConfirmDialog("The System found out that there are remaining items in OrderDetails that you do not receive.. Are you sure you want to Continue", "Dscrepancy");
-                    if (confirm)
-                    {
-                        uploadDB();
-                        BigAlert.Show(
-                        "SUCCESS",
-                        "Inventory Successfully Added!.. Please print now you PO Recieving Form",
-                        MessageBoxIcon.Information);
-                        this.Close();
-                    }
-                    else
-                    {
-                        return;
-                    }
+                    proceed = HelperFunction.ConfirmDialog(
+                        "The System found out that there are remaining items in OrderDetails that you do not receive.. Are you sure you want to Continue",
+                        "Discrepancy");
                 }
-                else
-                {
-                    uploadDB();
-                    BigAlert.Show(
-                       "SUCCESS",
-                       "Inventory Successfully Added!.. Please print now you PO Recieving Form",
-                       MessageBoxIcon.Information);
-                    this.Close();
-                }
+
+                if (!proceed)
+                    return;
+
+                bool success = uploadDB();
+
+                if (!success)
+                    return;
+
+                BigAlert.Show(
+                    "SUCCESS",
+                    "Inventory Successfully Added!.. Please print now your PO Receiving Form",
+                    MessageBoxIcon.Information);
+
+                this.Close();
             }
             else
             {
@@ -388,16 +387,16 @@ namespace SalesInventorySystem.HOFormsDevEx
             Classes.DevXGridViewSettings.ShowFooterTotal(gridView1, "Quantity");
         }
 
-     
-        void finalupdate()
+        bool finalupdate()
         {
             SqlConnection con = Database.getConnection();
             con.Open();
+
             try
             {
-                //string query = "spu_postInventory";
-                string query = "SP_POSTINVENTORY";
-                SqlCommand com = new SqlCommand(query, con);
+                SqlCommand com = new SqlCommand("SP_POSTINVENTORY", con);
+                com.CommandType = CommandType.StoredProcedure;
+
                 com.Parameters.AddWithValue("@parmshipmentno", txtshipmentno.Text);
                 com.Parameters.AddWithValue("@parmrefno", txtrefno.Text);
                 com.Parameters.AddWithValue("@parmuser", Login.isglobalUserID);
@@ -405,19 +404,50 @@ namespace SalesInventorySystem.HOFormsDevEx
                 com.Parameters.AddWithValue("@parminvoiceno", txtinvoiceno.Text);
                 com.Parameters.AddWithValue("@parminvoicedate", txtinvoicedate.Text);
                 com.Parameters.AddWithValue("@parmduedate", txtduedate.Text);
-                com.CommandType = CommandType.StoredProcedure;
-                com.CommandText = query;
+
                 com.ExecuteNonQuery();
+
+                return true; // ✅ success
             }
             catch (SqlException ex)
             {
-                XtraMessageBox.Show(ex.Message.ToString());
+                XtraMessageBox.Show(ex.Message);
+                return false; // ✅ fail
             }
             finally
             {
                 con.Close();
             }
         }
+        //void finalupdate()
+        //{
+        //    SqlConnection con = Database.getConnection();
+        //    con.Open();
+        //    try
+        //    {
+        //        //string query = "spu_postInventory";
+        //        string query = "SP_POSTINVENTORY";
+        //        SqlCommand com = new SqlCommand(query, con);
+        //        com.Parameters.AddWithValue("@parmshipmentno", txtshipmentno.Text);
+        //        com.Parameters.AddWithValue("@parmrefno", txtrefno.Text);
+        //        com.Parameters.AddWithValue("@parmuser", Login.isglobalUserID);
+        //        com.Parameters.AddWithValue("@parmbranch", Login.assignedBranch);
+        //        com.Parameters.AddWithValue("@parminvoiceno", txtinvoiceno.Text);
+        //        com.Parameters.AddWithValue("@parminvoicedate", txtinvoicedate.Text);
+        //        com.Parameters.AddWithValue("@parmduedate", txtduedate.Text);
+        //        com.CommandType = CommandType.StoredProcedure;
+        //        com.CommandText = query;
+        //        com.ExecuteNonQuery();
+        //    }
+        //    catch (SqlException ex)
+        //    {
+        //        XtraMessageBox.Show(ex.Message.ToString());
+        //    }
+        //    finally
+        //    {
+        //        con.Close();
+        //    }
+        //}
 
         int getLastTicketNumber()
         {

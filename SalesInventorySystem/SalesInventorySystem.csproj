@@ -228,6 +228,7 @@
     <Reference Include="DocumentFormat.OpenXml">
       <HintPath>..\..\..\..\..\Downloads\DocumentFormat.OpenXml.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Microsoft.Web.WebView2.Core">
       <HintPath>obj\Plugins\Microsoft.Web.WebView2.1.0.2478.35\lib\net45\Microsoft.Web.WebView2.Core.dll</HintPath>
     </Reference>
@@ -624,6 +625,7 @@
     <Compile Include="Classes\Branch.cs" />
     <Compile Include="Classes\ClientAccount.cs" />
     <Compile Include="Classes\CompanyProfile.cs" />
+    <Compile Include="Classes\ConnRegistry.cs" />
     <Compile Include="Classes\CurrencyConversion.cs" />
     <Compile Include="Classes\Customers.cs" />
     <Compile Include="Classes\Database.cs" />
@@ -641,6 +643,8 @@
     <Compile Include="Classes\Inventory.cs" />
     <Compile Include="Classes\ListItems.cs" />
     <Compile Include="Classes\Locations.cs" />
+    <Compile Include="Classes\PasswordHasher.cs" />
+    <Compile Include="Classes\PasswordPolicy.cs" />
     <Compile Include="Classes\PosDataDownloader.cs" />
     <Compile Include="Classes\PosDataUploader.cs" />
     <Compile Include="Classes\POSDownloadUpdates.cs" />
@@ -3180,6 +3184,7 @@
     <Compile Include="SearchProductItems.Designer.cs">
       <DependentUpon>SearchProductItems.cs</DependentUpon>
     </Compile>
+    <Compile Include="SingleInstanceApp.cs" />
     <Compile Include="SplashScreen1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -3209,6 +3214,12 @@
     </Compile>
     <Compile Include="SplashScreen5.Designer.cs">
       <DependentUpon>SplashScreen5.cs</DependentUpon>
+    </Compile>
+    <Compile Include="StartupForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StartupForm.Designer.cs">
+      <DependentUpon>StartupForm.cs</DependentUpon>
     </Compile>
     <Compile Include="StickerLabeling.cs">
       <SubType>Form</SubType>

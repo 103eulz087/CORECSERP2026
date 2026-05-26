@@ -137,11 +137,13 @@ namespace SalesInventorySystem
 
         private async void Login_Load(object sender, EventArgs e)
         {
-            //FOR STAND ALONE POS ONLY
-            if(GlobalConfig.Token== "MTQ2NzgwNjAz" || GlobalConfig.Token == "ODM1NTI0ODYz" 
-                || GlobalConfig.Token == "NjQwOTg4MzU1" || GlobalConfig.Token== "ODU2NDE4OTA3")
+
+            //FOR STAND ALONE POS ONLY ENZOSTORE,VROSSSTORE, KRAFT
+            if (GlobalConfig.Token== "MTQ2NzgwNjAz" || GlobalConfig.Token == "ODM1NTI0ODYz" 
+                || GlobalConfig.Token == "NjQwOTg4MzU1") 
             {
                 Database.RunLocalDatabaseMigrations();
+          
             }
             if(GlobalConfig.Token== "ODM1NTI0ODYz")//VROSS STORE
             {
@@ -149,6 +151,140 @@ namespace SalesInventorySystem
             }
             tryCheckUpdate(); //#tryCheckUpdateV1();
             labelversion.Text= HelperFunction.readFileVersion();
+
+            //////////////////////////////////////////////////////
+            ///////TEMPORARY ONLY FOR MIGRATION PURPOSES
+            /////////////////////////////////////////////////////////
+            try
+            {
+                regkey = Registry.CurrentUser.CreateSubKey(@"AAITCRE\ConnSettingsMain");
+                string migratedStamp = regkey.GetValue("db_migrated_to")?.ToString();
+                string targetStamp = "2026-NEWDB";
+
+                //FOR STAND ALONE POS ONLY ENZOSTORE,VROSSSTORE, KRAFT
+                if (GlobalConfig.Token == "MTQ2NzgwNjAz" || GlobalConfig.Token == "ODM1NTI0ODYz"
+                    || GlobalConfig.Token == "NjQwOTg4MzU1")
+                {
+                    migratedStamp = "";
+                    targetStamp = "";
+
+                    //WRITE REGISTRY INTO HKEYUSER/AAITCRE/CONSETTINSSERVER
+                    if(GlobalConfig.Token == "MTQ2NzgwNjAz") //ENZO STORE
+                    {
+                        ConnRegistry.SetTargetConnSettingsServer(
+                               serverNameWithPort: "erp.itcoreapps.com,4281",
+                               dbName: "CORECSERP_001",
+                               userId: "erp001_user",
+                               password: "$tr0ngP@ssw0rd2026!"
+                        );
+                    }
+                    else if(GlobalConfig.Token == "ODM1NTI0ODYz") //VROSS STORE
+                    {
+                        ConnRegistry.SetTargetConnSettingsServer(
+                               serverNameWithPort: "erp.itcoreapps.com,4281",
+                               dbName: "CORECSERP_003",
+                               userId: "erp003_user",
+                               password: "$tr0ngP@ssw0rd2026003!"
+                        );
+                    }
+                    else if(GlobalConfig.Token == "NjQwOTg4MzU1") //KRAFT STORE
+                    {
+                        ConnRegistry.SetTargetConnSettingsServer(
+                               serverNameWithPort: "erp.itcoreapps.com,4281",
+                               dbName: "CORECSERP_004",
+                               userId: "erp004_user",
+                               password: "$tr0ngP@ssw0rd2026004!"
+                        );
+                    }
+                   
+
+                    ConnRegistry.Set("db_migrated_to", targetStamp);
+                }
+
+                //VROSSACCTG, VROSSCORP, VROSSINV WRITE REGISTRY TO CONSETTINGSMAINLOCAL
+                if (GlobalConfig.Token == "ATk1NjU1NTU1" || GlobalConfig.Token == "MzEyNzU2Njk1"
+                                   || GlobalConfig.Token == "iTAyNjU5Mjk5")
+                {
+                    migratedStamp = "";
+                    targetStamp = "";
+                    ConnRegistry.SetTargetConnSettingsServer(
+                        serverNameWithPort: "erp.itcoreapps.com,4281",
+                        dbName: "CORECSERP_003",
+                        userId: "erp003_user",
+                        password: "$tr0ngP@ssw0rd2026003!"
+                    );
+
+                    ConnRegistry.Set("db_migrated_to", targetStamp);
+                }
+                if (regkey.GetValue("dbconn") == null)
+                {
+                    Connection C = new Connection();
+                    C.lblservername.Text = "Main Server";
+                    C.txtconnsettingsname.Text = @"AAITCRE\ConnSettingsMain";
+                    C.ShowDialog();
+                    this.Opacity = 0;
+                    return;
+                }
+
+                //NOT APPLICABLE FOR POS, SINCE POS SETUP IS ASSIGNED AS EMPTY VARIABLE OF 
+                //migratedStamp = "";
+                //targetStamp = "";
+                if (!string.Equals(migratedStamp, targetStamp, StringComparison.OrdinalIgnoreCase))
+                {
+                    // set your NEW DB details here (or fetch from a secure source)
+
+                    //TARGET TO CONSETTINGSMAIN
+                    if((GlobalConfig.Token == "ODU2NDE4OTA3" //ENZO
+                        || GlobalConfig.Token == "MzMyODgyODc0" //ENZOCOMM
+                        || GlobalConfig.Token == "HTQwNzExMTYx" //ENZOHRI
+                        || GlobalConfig.Token == "MjYxMjQ3MTkz"  //ENZOKIM
+                        || GlobalConfig.Token == "Nzc0Njk4NjY0") && String.IsNullOrEmpty(migratedStamp)) //ENZOSTAGING
+                    {
+                        //TARGET TO CONSETTINGSMAIN
+                        ConnRegistry.SetTarget(
+                               serverNameWithPort: "erp.itcoreapps.com,4281",
+                               dbName: "CORECSERP_001",
+                               userId: "erp001_user",
+                               password: "$tr0ngP@ssw0rd2026!"
+                           );
+                    }
+                    else if ((GlobalConfig.Token == "ATk1NjU1NTU1" //VROSSACCTG
+                        || GlobalConfig.Token == "MzEyNzU2Njk1" //VROSSCORP
+                        || GlobalConfig.Token == "iTAyNjU5Mjk5") && String.IsNullOrEmpty(migratedStamp)) //VROSSINV
+                    {
+                        //TARGET TO CONSETTINGSMAIN
+                        ConnRegistry.SetTarget(
+                               serverNameWithPort: "erp.itcoreapps.com,4281",
+                               dbName: "CORECSERP_003",
+                               userId: "erp003_user",
+                               password: "$tr0ngP@ssw0rd2026003!"
+                           );
+                    }
+                    
+
+                    ConnRegistry.Set("db_migrated_to", targetStamp);
+
+                    // Optional: reload variables you cache in Login.cs
+                    userid = ConnRegistry.Get("serverid");
+                    serverpassword = ConnRegistry.Get("serverpassword");
+                    dbname = ConnRegistry.Get("dbname");
+                    servername = ConnRegistry.Get("servername");
+
+                    // Optional: Restart if other parts cache the old connection early
+                    // Application.Restart();
+                    // return;
+                }
+
+                userid = regkey.GetValue("serverid").ToString();
+                serverpassword = regkey.GetValue("serverpassword").ToString();
+                dbname = regkey.GetValue("dbname").ToString();
+                servername = regkey.GetValue("servername").ToString();
+            }
+            catch (Exception ex)
+            {
+                DevExpress.XtraEditors.XtraMessageBox.Show(ex.Message);
+            }
+
         }
 
         static async Task<int> GetCTRVersion()
@@ -270,6 +406,7 @@ namespace SalesInventorySystem
             //}
 
             // 2. Basic UI Validation
+
             if (string.IsNullOrWhiteSpace(txtuserid.Text))
             {
                 XtraMessageBox.Show("User ID is required.");
@@ -281,17 +418,14 @@ namespace SalesInventorySystem
                 return;
             }
 
-            // 3. Lock the UI
             btnLogin.Enabled = false;
             btnLogin.Text = "Connecting...";
             Cursor = Cursors.WaitCursor;
 
             try
             {
-                // 4. Run the single, unified database check!
                 string loginStatus = await ProcessLoginAsync(txtuserid.Text.Trim(), txtpassword.Text);
 
-                // 5. Handle the result cleanly
                 if (loginStatus == "SUCCESS")
                 {
                     this.Hide();
@@ -301,59 +435,85 @@ namespace SalesInventorySystem
                 else if (loginStatus == "DEFAULT_PASSWORD")
                 {
                     XtraMessageBox.Show("The System found out that you have a default Password. Please Change your Password!");
-                    HOForms.ChangePassword pcusatfsmr = new HOForms.ChangePassword();
-                    pcusatfsmr.ShowDialog(this);
+                    HOForms.ChangePassword frm = new HOForms.ChangePassword();
+                    frm.ShowDialog(this);
+                }
+                else if (loginStatus == "PASSWORD_RESET_REQUIRED")
+                {
+                    //XtraMessageBox.Show("Your account needs a password reset. Please set a new password to continue.");
+                    BigAlert.Show("RESET PASSWORD", "Your account needs a password reset. Please set a new password to continue.", MessageBoxIcon.Warning);
+                    HOForms.ChangePassword frm = new HOForms.ChangePassword();
+                    frm.ShowDialog(this);
+                }
+                else if (loginStatus == "DATABASE_ERROR")
+                {
+                    XtraMessageBox.Show("Cannot connect to the database right now. Please try again or contact IT.");
+                }
+                else if (loginStatus == "UNEXPECTED_ERROR")
+                {
+                    XtraMessageBox.Show("Unexpected error occurred. Please contact IT.");
                 }
                 else
                 {
-                    // Fails (Wrong Password or Invalid User)
                     XtraMessageBox.Show(loginStatus, "IT Core Solutions Inc.", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     txtpassword.Focus();
                     txtpassword.SelectAll();
                 }
             }
-            catch (SqlException ex)
-            {
-                // Temporarily show the EXACT error from SQL Server so we can debug it
-                MessageBox.Show("SQL Error Details:\n\n" + ex.Message, "Debugging SQL Exception", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
             catch (Exception ex)
             {
+                // If ProcessLoginAsync throws (instead of returning codes), you'll land here
                 XtraMessageBox.Show("Error: " + ex.Message);
             }
             finally
             {
-                // Unlock UI
                 btnLogin.Enabled = true;
                 btnLogin.Text = "Login";
                 Cursor = Cursors.Default;
             }
 
+
         }
-        
         private async Task<string> ProcessLoginAsync(string userId, string inputPassword)
         {
-            using (SqlConnection con = Database.getConnection())
-            {
-                // Enforce the 3-second Fail Fast rule
-                SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder(con.ConnectionString) { ConnectTimeout = 3 };
-                con.ConnectionString = builder.ConnectionString;
-                await con.OpenAsync();
 
-                string encryptedDbPassword = null;
-
-                // --- PHASE 1: Fetch the User Data ---
-                using (SqlCommand cmd = new SqlCommand("SELECT TOP(1) * FROM dbo.Users WHERE UserID = @UserID", con))
+            try
+             {
+                using (SqlConnection con = Database.getConnection())
                 {
-                    cmd.Parameters.AddWithValue("@UserID", userId);
-                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
-                    {
-                        if (await reader.ReadAsync())
-                        {
-                            // Grab the encrypted password
-                            encryptedDbPassword = reader["Password"].ToString();
+                    // Fail fast
+                    var builder = new SqlConnectionStringBuilder(con.ConnectionString) { ConnectTimeout = 3 };
+                    con.ConnectionString = builder.ConnectionString;
 
-                            // Assign all your global variables here!
+                    await con.OpenAsync();
+
+                    byte[] passwordHash = null;
+                    byte[] passwordSalt = null;
+                    int iterations = 0;
+                    bool mustChangePassword = false;
+
+                    // --- PHASE 1: Fetch user row (avoid SELECT *)
+                    const string sql = @"
+                    SELECT TOP(1)
+                        UserID, FullName, isAdmin, isGlobalOfficer, isBranchOfficer, isWarehouseOfficer,
+                        isMaker, isChecker, isCashier, isApprover, AssignedBranch, CashInLimit, CashEndLimit,
+                        GLAccount, isAccounting,
+                        PasswordHash, PasswordSalt, PasswordIterations, MustChangePassword
+                    FROM dbo.Users
+                    WHERE UserID = @UserID;";
+
+                    using (SqlCommand cmd = new SqlCommand(sql, con))
+                    {
+                        cmd.Parameters.AddWithValue("@UserID", userId);
+
+                        using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                        {
+                            if (!await reader.ReadAsync())
+                            {
+                                return "Invalid User ID or Password given.";
+                            }
+
+                            // Your globals
                             user = userId;
                             Fullname = reader["FullName"].ToString();
                             isglobalAdmin = reader["isAdmin"].ToString();
@@ -370,66 +530,171 @@ namespace SalesInventorySystem
                             cashendlimit = reader["CashEndLimit"].ToString();
                             glacctcode = reader["GLAccount"].ToString();
                             isglobalAccounting = reader["isAccounting"].ToString();
-                            // ... (Add the rest of your variable assignments here: isMaker, isChecker, etc.)
+
+                            mustChangePassword = reader["MustChangePassword"] != DBNull.Value && (bool)reader["MustChangePassword"];
+
+                            // New hash fields
+                            passwordHash = reader["PasswordHash"] == DBNull.Value ? null : (byte[])reader["PasswordHash"];
+                            passwordSalt = reader["PasswordSalt"] == DBNull.Value ? null : (byte[])reader["PasswordSalt"];
+                            iterations = reader["PasswordIterations"] == DBNull.Value ? 0 : Convert.ToInt32(reader["PasswordIterations"]);
                         }
-                        else
+                    }
+
+                    // Optional: keep your existing company lookup if you need it
+                    // compname = Database.getSingleQuery("CompanyProfile", "CompanyName='JFC'", "CompanyName");
+
+                    // --- PHASE 2: Verify using PBKDF2 hash ---
+                    if (passwordHash == null || passwordSalt == null || iterations <= 0)
+                    {
+                        // Not migrated yet => force reset
+                        return "PASSWORD_RESET_REQUIRED";
+                    }
+
+                    bool ok = PasswordHasher.VerifyPassword(inputPassword, passwordSalt, iterations, passwordHash);
+
+                    // --- PHASE 3: Lockout handling + return ---
+                    if (ok)
+                    {
+                        using (SqlCommand cmd = new SqlCommand("DELETE FROM dbo.UsersLocked WHERE UserID = @UserID", con))
                         {
-                            return "Invalid User ID or Password given."; // User doesn't exist
+                            cmd.Parameters.AddWithValue("@UserID", userId);
+                            await cmd.ExecuteNonQueryAsync();
                         }
+
+                        if (mustChangePassword)   return "DEFAULT_PASSWORD";
+                        return "SUCCESS";
                     }
-                }
-                compname = Database.getSingleQuery("CompanyProfile", "CompanyName='JFC'", "CompanyName");
-                // --- PHASE 2: Decrypt the Password ---
-                // --- PHASE 2: Decrypt the Password ---
-                string decryptedPassword = null;
-
-                // We inject the encryptedDbPassword directly to ensure SQL treats it as VARCHAR,
-                // exactly matching your original code's behavior to keep the decryption happy!
-                string decryptQuery = $@"
-            DECLARE @pwd varchar(50); 
-            EXEC master..xp_aes_decrypt '{encryptedDbPassword}', '0123456789ABCDEF0123456789ABCDEF', @pwd OUTPUT; 
-            SELECT @pwd AS result;";
-
-                using (SqlCommand cmd = new SqlCommand(decryptQuery, con))
-                {
-                    var result = await cmd.ExecuteScalarAsync();
-                    decryptedPassword = result?.ToString();
-                }
-
-                // --- PHASE 3: Validate and Handle Locks ---
-                if (inputPassword == decryptedPassword)
-                {
-                    // SUCCESS: Clear any lockout records
-                    using (SqlCommand cmd = new SqlCommand("DELETE FROM dbo.UsersLocked WHERE UserID = @UserID", con))
+                    else
                     {
-                        cmd.Parameters.AddWithValue("@UserID", userId);
-                        await cmd.ExecuteNonQueryAsync();
+                        string lockQuery = @"
+IF EXISTS (SELECT 1 FROM dbo.UsersLocked WHERE UserID = @UserID)
+    UPDATE dbo.UsersLocked SET LoginAttempts = LoginAttempts + 1, dateLogin = @Date WHERE UserID = @UserID;
+ELSE
+    INSERT INTO dbo.UsersLocked (UserID, LoginAttempts, dateLogin) VALUES (@UserID, 1, @Date);";
+
+                        using (SqlCommand cmd = new SqlCommand(lockQuery, con))
+                        {
+                            cmd.Parameters.AddWithValue("@UserID", userId);
+                            cmd.Parameters.AddWithValue("@Date", DateTime.Now.ToShortDateString());
+                            await cmd.ExecuteNonQueryAsync();
+                        }
+
+                        return "Wrong Password.";
                     }
-
-                    if (inputPassword == "123456") return "DEFAULT_PASSWORD";
-                    return "SUCCESS";
-                }
-                else
-                {
-                    // FAILED: Update the lockout table (using an efficient IF EXISTS script)
-                    string lockQuery = @"
-                IF EXISTS (SELECT 1 FROM dbo.UsersLocked WHERE UserID = @UserID)
-                    UPDATE dbo.UsersLocked SET LoginAttempts = LoginAttempts + 1, dateLogin = @Date WHERE UserID = @UserID;
-                ELSE
-                    INSERT INTO dbo.UsersLocked (UserID, LoginAttempts, dateLogin) VALUES (@UserID, 1, @Date);";
-
-                    using (SqlCommand cmd = new SqlCommand(lockQuery, con))
-                    {
-                        cmd.Parameters.AddWithValue("@UserID", userId);
-                        cmd.Parameters.AddWithValue("@Date", DateTime.Now.ToShortDateString());
-                        await cmd.ExecuteNonQueryAsync();
-                    }
-
-                    return "Wrong Password.";
                 }
             }
+            catch (SqlException)
+            {
+                // You can log ex here if you want
+                return "DATABASE_ERROR";
+            }
+            catch (Exception)
+            {
+                return "UNEXPECTED_ERROR";
+            }
+
+            // Fallback (should never be hit, but guarantees CS0161 never happens)
+            // return "UNEXPECTED_ERROR";
         }
-     
+        //private async Task<string> ProcessLoginAsync(string userId, string inputPassword)
+        //{
+        //    using (SqlConnection con = Database.getConnection())
+        //    {
+        //        // Enforce the 3-second Fail Fast rule
+        //        SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder(con.ConnectionString) { ConnectTimeout = 3 };
+        //        con.ConnectionString = builder.ConnectionString;
+        //        await con.OpenAsync();
+
+        //        string encryptedDbPassword = null;
+
+        //        // --- PHASE 1: Fetch the User Data ---
+        //        using (SqlCommand cmd = new SqlCommand("SELECT TOP(1) * FROM dbo.Users WHERE UserID = @UserID", con))
+        //        {
+        //            cmd.Parameters.AddWithValue("@UserID", userId);
+        //            using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+        //            {
+        //                if (await reader.ReadAsync())
+        //                {
+        //                    // Grab the encrypted password
+        //                    encryptedDbPassword = reader["Password"].ToString();
+
+        //                    // Assign all your global variables here!
+        //                    user = userId;
+        //                    Fullname = reader["FullName"].ToString();
+        //                    isglobalAdmin = reader["isAdmin"].ToString();
+        //                    isglobalOfficer = reader["isGlobalOfficer"].ToString();
+        //                    isglobalBranchOfficer = reader["isBranchOfficer"].ToString();
+        //                    isglobalWarehouseOfficer = reader["isWarehouseOfficer"].ToString();
+        //                    isMaker = reader["isMaker"].ToString();
+        //                    isChecker = reader["isChecker"].ToString();
+        //                    isCashier = reader["isCashier"].ToString();
+        //                    isglobalApprover = reader["isApprover"].ToString();
+        //                    isglobalUserID = reader["UserID"].ToString();
+        //                    assignedBranch = reader["AssignedBranch"].ToString();
+        //                    cashinlimit = reader["CashInLimit"].ToString();
+        //                    cashendlimit = reader["CashEndLimit"].ToString();
+        //                    glacctcode = reader["GLAccount"].ToString();
+        //                    isglobalAccounting = reader["isAccounting"].ToString();
+        //                    // ... (Add the rest of your variable assignments here: isMaker, isChecker, etc.)
+        //                }
+        //                else
+        //                {
+        //                    return "Invalid User ID or Password given."; // User doesn't exist
+        //                }
+        //            }
+        //        }
+        //        compname = Database.getSingleQuery("CompanyProfile", "CompanyName='JFC'", "CompanyName");
+        //        // --- PHASE 2: Decrypt the Password ---
+        //        // --- PHASE 2: Decrypt the Password ---
+        //        string decryptedPassword = null;
+
+        //        // We inject the encryptedDbPassword directly to ensure SQL treats it as VARCHAR,
+        //        // exactly matching your original code's behavior to keep the decryption happy!
+        //        string decryptQuery = $@"
+        //    DECLARE @pwd varchar(50); 
+        //    EXEC master..xp_aes_decrypt '{encryptedDbPassword}', '0123456789ABCDEF0123456789ABCDEF', @pwd OUTPUT; 
+        //    SELECT @pwd AS result;";
+
+        //        using (SqlCommand cmd = new SqlCommand(decryptQuery, con))
+        //        {
+        //            var result = await cmd.ExecuteScalarAsync();
+        //            decryptedPassword = result?.ToString();
+        //        }
+
+        //        // --- PHASE 3: Validate and Handle Locks ---
+        //        if (inputPassword == decryptedPassword)
+        //        {
+        //            // SUCCESS: Clear any lockout records
+        //            using (SqlCommand cmd = new SqlCommand("DELETE FROM dbo.UsersLocked WHERE UserID = @UserID", con))
+        //            {
+        //                cmd.Parameters.AddWithValue("@UserID", userId);
+        //                await cmd.ExecuteNonQueryAsync();
+        //            }
+
+        //            if (inputPassword == "123456") return "DEFAULT_PASSWORD";
+        //            return "SUCCESS";
+        //        }
+        //        else
+        //        {
+        //            // FAILED: Update the lockout table (using an efficient IF EXISTS script)
+        //            string lockQuery = @"
+        //        IF EXISTS (SELECT 1 FROM dbo.UsersLocked WHERE UserID = @UserID)
+        //            UPDATE dbo.UsersLocked SET LoginAttempts = LoginAttempts + 1, dateLogin = @Date WHERE UserID = @UserID;
+        //        ELSE
+        //            INSERT INTO dbo.UsersLocked (UserID, LoginAttempts, dateLogin) VALUES (@UserID, 1, @Date);";
+
+        //            using (SqlCommand cmd = new SqlCommand(lockQuery, con))
+        //            {
+        //                cmd.Parameters.AddWithValue("@UserID", userId);
+        //                cmd.Parameters.AddWithValue("@Date", DateTime.Now.ToShortDateString());
+        //                await cmd.ExecuteNonQueryAsync();
+        //            }
+
+        //            return "Wrong Password.";
+        //        }
+        //    }
+        //}
+
         public void readMenu(string strMenu, RibbonPage currentPage)
         {
             if (strMenu == "<empty>")

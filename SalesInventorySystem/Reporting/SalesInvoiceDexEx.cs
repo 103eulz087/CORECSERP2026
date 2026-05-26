@@ -32,8 +32,9 @@ namespace SalesInventorySystem.Reporting
         void print()
         {
             //string vatablesales, vatexemptsales, vatamount, addvat;
+            bool isZeroRatedSale = Database.checkifExist($"SELECT TOP(1) 1 FROM dbo.BatchSalesSummary WHERE BranchCode='{Login.assignedBranch}' and ReferenceNo='{txtpono.Text}' AND ZeroRatedSale > 0");
             string remarks = Database.getSingleQuery($"SELECT TOP(1) Remarks FROM dbo.TransactionChargeSales WHERE ReferenceNo='{txtpono.Text}' AND BranchCode='{Login.assignedBranch}'","Remarks");
-            bool isOnetimeDiscount = Database.checkifExist($"SELECT TOP(1) OrderNo FROM dbo.SalesDiscount WHERE OrderNo='{txtpono.Text}' and isErrorCorrect=0 and BranchCode='{Login.assignedBranch}'");
+            bool isOnetimeDiscount = Database.checkifExist($"SELECT TOP(1) 1 FROM dbo.SalesDiscount WHERE OrderNo='{txtpono.Text}' and isErrorCorrect=0 and BranchCode='{Login.assignedBranch}'");
             string controlno = "";
             if (isOnetimeDiscount==true)
             {
@@ -83,6 +84,8 @@ namespace SalesInventorySystem.Reporting
             xct.xrterms.Text = trm;
             xct.xrpreparedby.Text = Login.Fullname;
             //xct.xrdate.Text = String.Format(DateTime.Now.ToShortDateString();
+            double zeroratedsales = 0.0;
+           
            
             xct.xrdate.Text = String.Format("{0:MMMM dd yyyy}", DateTime.Now);
 
@@ -97,6 +100,23 @@ namespace SalesInventorySystem.Reporting
             xct.xrlblamountdue.Text = String.Format("{0:0,0.00}", Convert.ToDouble(txtamountdue.Text));
             xct.xrlbladdvat.Text = String.Format("{0:0,0.00}", Convert.ToDouble(txtaddvat.Text));
             xct.xrlbltotalamountdue.Text = String.Format("{0:0,0.00}", Convert.ToDouble(txttotalamountdue.Text));
+
+            if (isZeroRatedSale)
+            {
+                zeroratedsales = Convert.ToDouble(txttotalamountdue.Text) / 1.12;
+
+                xct.xrlblvatablesales.Text = "0";
+                xct.xrlblvatexemptsales.Text = "0";
+
+                xct.xrlblzeroratedsales.Text = String.Format("{0:0,0.00}", Convert.ToDouble(txttotalamountdue.Text));
+                xct.xrlblvatamount.Text = "0";
+                xct.xrlbltotalsales.Text = String.Format("{0:0,0.00}", Convert.ToDouble(txttotalamountdue.Text));
+                xct.xrlbllessvat.Text = "0";
+                xct.xrlblnetofvat.Text = "0";
+                xct.xrlblamountdue.Text = String.Format("{0:0,0.00}", Convert.ToDouble(txttotalamountdue.Text));
+                xct.xrlbladdvat.Text = "0";
+                xct.xrlbltotalamountdue.Text = String.Format("{0:0,0.00}", Convert.ToDouble(txttotalamountdue.Text) / 1.12);
+            }
 
             xct.Bands[BandKind.Detail].Controls.Add(HelperFunction.CopyGridControl(this.gridControl4));
             xct.Bands[BandKind.Detail].Font = new System.Drawing.Font("Tahoma", 10);

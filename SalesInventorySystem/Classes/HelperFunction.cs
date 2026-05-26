@@ -220,7 +220,10 @@ namespace SalesInventorySystem
             str = String.Format("{0:0,0.00}", value); 
             return str;
         }
-
+        public static string convertToNumericFormat(decimal value)
+        {
+            return string.Format("{0:0,0.00}", value);
+        }
         public static string numericFormat(double value)
         {
             string str = "";

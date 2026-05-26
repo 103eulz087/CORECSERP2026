@@ -532,6 +532,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             }
             return dt;
         }
+
         private void PostSupplierPayment(List<PaymentLine> lines)
         {
             referenceno = IDGenerator.getIDNumberSP("sp_GetReferenceNumber", "ReferenceNumber"); //IDGenerator.getVoucherNumberSP(); //not used

@@ -114,38 +114,71 @@ namespace SalesInventorySystem
                     con.Open();
 
                     // You can safely stack as many CREATEs and ALTERs in here as you want!
-                //    --1.Create the new table if it doesn't exist
-                //IF NOT EXISTS(SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[NewCloudTable]') AND type in (N'U'))
-                //BEGIN
-                //    CREATE TABLE[dbo].[NewCloudTable](
-                //        [ID][int] IDENTITY(1, 1) NOT NULL PRIMARY KEY,
-                //        [DataValue] [varchar] (50) NULL
-                //    )
-                //END
+                    //    --1.Create the new table if it doesn't exist
+                    //IF NOT EXISTS(SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[NewCloudTable]') AND type in (N'U'))
+                    //BEGIN
+                    //    CREATE TABLE[dbo].[NewCloudTable](
+                    //        [ID][int] IDENTITY(1, 1) NOT NULL PRIMARY KEY,
+                    //        [DataValue] [varchar] (50) NULL
+                    //    )
+                    //END
 
-                //-- 2. Add the audit columns to DeliveryDetails if they are missing
+                    //-- 2. Add the audit columns to DeliveryDetails if they are missing
+
+                    //-- ✅ USERS PASSWORD MIGRATION
+
+                    //IF COL_LENGTH('dbo.Users', 'PasswordHash') IS NULL
+                    //        BEGIN
+                    //            ALTER TABLE dbo.Users ADD PasswordHash VARBINARY(32) NULL;
+                    //END
+
+                    //IF COL_LENGTH('dbo.Users', 'PasswordSalt') IS NULL
+                    //        BEGIN
+                    //            ALTER TABLE dbo.Users ADD PasswordSalt VARBINARY(16) NULL;
+                    //END
+
+                    //IF COL_LENGTH('dbo.Users', 'PasswordIterations') IS NULL
+                    //        BEGIN
+                    //            ALTER TABLE dbo.Users ADD PasswordIterations INT NULL;
+                    //END
+
+                    //IF COL_LENGTH('dbo.Users', 'PasswordAlgoVersion') IS NULL
+                    //        BEGIN
+                    //            ALTER TABLE dbo.Users ADD PasswordAlgoVersion TINYINT NULL;
+                    //END
+
+
+                    //IF COL_LENGTH('dbo.Users', 'MustChangePassword') IS NULL
+                    //        BEGIN
+                    //            ALTER TABLE dbo.Users ADD MustChangePassword BIT NOT NULL
+                    //                CONSTRAINT DF_Users_MustChangePassword DEFAULT(0) WITH VALUES;
+                    //END
+
+                    //-- ✅ Disable legacy trigger
+                    //IF EXISTS(
+                    //    SELECT 1 FROM sys.triggers WHERE name = 'uinsupd_EncryptPassword'
+                    //)
+                    //        BEGIN
+                    //            DISABLE TRIGGER[dbo].[uinsupd_EncryptPassword] ON dbo.Users;
+                    //END
+
+                    //-- ✅ SAFE update(no invalid column error)
+                    //        IF COL_LENGTH('dbo.Users', 'MustChangePassword') IS NOT NULL
+                    //        BEGIN
+                    //            EXEC('UPDATE dbo.Users SET MustChangePassword = 1 WHERE MustChangePassword = 0');
+                    //END
                     string migrationScript = @"
-            
-                        IF COL_LENGTH('dbo.POSType', 'isAutoSystemDeduct') IS NULL
-                        BEGIN
-                            ALTER TABLE dbo.POSType ADD isAutoSystemDeduct BIT NULL DEFAULT 0 WITH VALUES;
-                        END
 
-                        IF COL_LENGTH('dbo.POSCreditCardTransactions', 'isUpload') IS NULL
-                        BEGIN
-                            ALTER TABLE dbo.POSCreditCardTransactions ADD isUpload BIT NULL DEFAULT 0 WITH VALUES;
-                        END
+                            IF COL_LENGTH('dbo.POSType', 'isAutoSystemDeduct') IS NULL
+                            BEGIN
+                                ALTER TABLE dbo.POSType ADD isAutoSystemDeduct BIT NULL DEFAULT 0 WITH VALUES;
+                            END
 
-                        IF COL_LENGTH('dbo.POSZReadingTransactions', 'isUpload') IS NULL
-                        BEGIN
-                            ALTER TABLE dbo.POSZReadingTransactions ADD isUpload BIT NULL DEFAULT 0 WITH VALUES;
-                        END
-
-                        IF COL_LENGTH('dbo.EmailServer', 'SubjectTitle') IS NULL
-                        BEGIN
-                            ALTER TABLE dbo.EmailServer ADD SubjectTitle VARCHAR(100) NULL DEFAULT 'CORECSREPORT' WITH VALUES;
-                        END
-                    ";
+                            IF COL_LENGTH('dbo.POSCreditCardTransactions', 'isUpload') IS NULL
+                            BEGIN
+                                ALTER TABLE dbo.POSCreditCardTransactions ADD isUpload BIT NULL DEFAULT 0 WITH VALUES;
+                            END
+                        ";
 
                     using (SqlCommand com = new SqlCommand(migrationScript, con))
                     {

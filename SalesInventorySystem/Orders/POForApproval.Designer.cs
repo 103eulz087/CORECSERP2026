@@ -359,7 +359,7 @@
             // 
             this.btnForDelivSalesOrder.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnForDelivSalesOrder.ImageOptions.Image")));
             this.btnForDelivSalesOrder.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btnForDelivSalesOrder.Location = new System.Drawing.Point(399, 9);
+            this.btnForDelivSalesOrder.Location = new System.Drawing.Point(407, 9);
             this.btnForDelivSalesOrder.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnForDelivSalesOrder.Name = "btnForDelivSalesOrder";
             this.btnForDelivSalesOrder.Size = new System.Drawing.Size(100, 27);
@@ -371,7 +371,7 @@
             // 
             this.datetodelivered.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
             this.datetodelivered.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.datetodelivered.Location = new System.Drawing.Point(254, 9);
+            this.datetodelivered.Location = new System.Drawing.Point(262, 9);
             this.datetodelivered.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.datetodelivered.Name = "datetodelivered";
             this.datetodelivered.Size = new System.Drawing.Size(137, 27);
@@ -381,7 +381,7 @@
             // 
             this.datefromdelivered.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
             this.datefromdelivered.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.datefromdelivered.Location = new System.Drawing.Point(70, 9);
+            this.datefromdelivered.Location = new System.Drawing.Point(78, 9);
             this.datefromdelivered.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.datefromdelivered.Name = "datefromdelivered";
             this.datefromdelivered.Size = new System.Drawing.Size(137, 27);
@@ -391,7 +391,7 @@
             // 
             this.label7.AutoSize = true;
             this.label7.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
-            this.label7.Location = new System.Drawing.Point(215, 15);
+            this.label7.Location = new System.Drawing.Point(223, 15);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(37, 21);
             this.label7.TabIndex = 5;
@@ -518,7 +518,7 @@
             this.printDebitMemoChargesToolStripMenuItem,
             this.showItemsToolStripMenuItem});
             this.contextMenuForDelivery.Name = "contextMenuForDelivery";
-            this.contextMenuForDelivery.Size = new System.Drawing.Size(256, 212);
+            this.contextMenuForDelivery.Size = new System.Drawing.Size(256, 240);
             // 
             // confirmOrderToolStripMenuItem1
             // 
@@ -1089,7 +1089,7 @@
             // 
             this.btnfordelivsalesorderexcel.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.ExportToExcel_16x16;
             this.btnfordelivsalesorderexcel.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btnfordelivsalesorderexcel.Location = new System.Drawing.Point(506, 9);
+            this.btnfordelivsalesorderexcel.Location = new System.Drawing.Point(514, 9);
             this.btnfordelivsalesorderexcel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnfordelivsalesorderexcel.Name = "btnfordelivsalesorderexcel";
             this.btnfordelivsalesorderexcel.Size = new System.Drawing.Size(138, 27);
@@ -1266,7 +1266,7 @@
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "POForApproval";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "ORDERS";
+            this.Text = "ViewSalesOrder";
             this.Load += new System.EventHandler(this.POForApproval_Load);
             this.contextMenuStrip1.ResumeLayout(false);
             this.contextMenuApprovedG2.ResumeLayout(false);

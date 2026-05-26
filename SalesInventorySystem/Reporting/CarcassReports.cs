@@ -41,22 +41,26 @@ namespace SalesInventorySystem.Reporting
                 gridView1.GroupSummary.Clear();
                 gridView1.Columns.Clear();
                 gridControl1.DataSource = null;
-                Database.display("SELECT DateReceived,Description,SUM(Quantity) as Quantity,Cost,FORMAT((Quantity*Cost), 'N', 'en-us') as TotalCost " +
+                //Database.display("SELECT DateReceived,Description,SUM(Quantity) as Quantity,Cost,FORMAT((Quantity*Cost), 'N', 'en-us') as TotalCost " +
+                Database.display("SELECT Product,Description,SUM(Quantity) as Quantity,Cost,FORMAT(SUM(Quantity * Cost), 'N', 'en-us') AS TotalCost " +
                     "FROm dbo.Inventory with(nolock) " +
                     "WHERE ShipmentNo='" + BatchProcessMasterDevEx.shipmentno + "' " +
-                    "and Branch='"+Login.assignedBranch+ "' " +
+                    "and Branch='" + Login.assignedBranch + "' " +
                     "and isSource=1 " +
                     "and isProcess=0 " +
-                    "GROUP BY DateReceived,Description,Cost,Quantity", gridControl1, gridView1);
-                GridView viewz = gridControl1.FocusedView as GridView;
-                viewz.SortInfo.ClearAndAddRange(new GridColumnSortInfo[] {
-                new GridColumnSortInfo(viewz.Columns["Description"],DevExpress.Data.ColumnSortOrder.Ascending)
-                }, 1);
-                viewz.ExpandAllGroups();
+                    "GROUP BY Product, Description, Cost ORDER BY Description ASC", gridControl1, gridView1);
+                //GridView viewz = gridControl1.FocusedView as GridView;
+                //viewz.SortInfo.ClearAndAddRange(new GridColumnSortInfo[] {
+                //new GridColumnSortInfo(viewz.Columns["Description"],DevExpress.Data.ColumnSortOrder.Ascending)
+                //}, 1);
+                //viewz.ExpandAllGroups();
 
                 Classes.DevXGridViewSettings.ShowFooterTotal(gridView1, "Quantity");
                 Classes.DevXGridViewSettings.ShowFooterTotal(gridView1, "TotalCost");
                 gridControl1.EndUpdate();
+
+                //Database.display("SELECT * FROM view_PODETAILS WHERE ShipmentNo='" + BatchProcessMasterDevEx.shipmentno + "' ", gridControl1, gridView1);
+
             }
             if (raddetailed.Checked == true)
             {
@@ -135,7 +139,7 @@ namespace SalesInventorySystem.Reporting
             xct.Bands[BandKind.Detail].Controls.Add(HelperFunction.CopyGridControl(this.gridControl1));
             xct.Bands[BandKind.Detail].Font = new System.Drawing.Font("Tahoma", 10);
 
-            gridView1.Columns["Cost"].OptionsColumn.Printable = DevExpress.Utils.DefaultBoolean.False;
+            //gridView1.Columns["Cost"].OptionsColumn.Printable = DevExpress.Utils.DefaultBoolean.False;
 
             ReportPrintTool report = new ReportPrintTool(xct);
             report.ShowRibbonPreviewDialog();
