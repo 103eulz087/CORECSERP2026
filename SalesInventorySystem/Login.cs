@@ -78,58 +78,6 @@ namespace SalesInventorySystem
             return functionReturnValue;
         }
 
-
-        //// 1. Change the return type to Task<int> and add the 'async' keyword
-        //public static async Task<int> getCTRVersionAsAsync(String name)
-        //{
-        //    // 1. INSTANT CHECK: Is the computer even connected to a network?
-        //    // If there is no internet/network, instantly return -1 and skip the update check!
-        //    if (!NetworkInterface.GetIsNetworkAvailable())
-        //    {
-        //        return -1;
-        //    }
-
-        //    int num1 = -1;
-
-        //    try
-        //    {
-        //        using (SqlConnection connection = Database.getConnection(@"Enzo\ConnSettingsUpdater"))
-        //        {
-        //            // 2. THE 3-SECOND RULE (Fail Fast)
-        //            // By default, SQL waits 15 to 30 seconds. We change it to 3 seconds.
-        //            SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder(connection.ConnectionString);
-        //            builder.ConnectTimeout = 3;
-        //            connection.ConnectionString = builder.ConnectionString;
-
-        //            // Try to connect. If the server is unreachable, it will fail in exactly 3 seconds.
-        //            await connection.OpenAsync();
-
-        //            string query = "SELECT TOP 1 CAST(Versions as int) AS CC FROM UploaderLookUp WHERE Company = @CompanyName;";
-
-        //            using (SqlCommand command = new SqlCommand(query, connection))
-        //            {
-        //                command.Parameters.AddWithValue("@CompanyName", name);
-
-        //                using (SqlDataReader sqlDataReader = await command.ExecuteReaderAsync())
-        //                {
-        //                    if (sqlDataReader != null && await sqlDataReader.ReadAsync())
-        //                    {
-        //                        num1 = Convert.ToInt32(sqlDataReader["CC"]);
-        //                    }
-        //                }
-        //            }
-        //        }
-        //    }
-        //    catch (Exception)
-        //    {
-        //        // 3. SILENT FAIL
-        //        // If the 3 seconds run out, or the server is down, it safely lands here.
-        //        // It returns -1, skipping the update and letting the user log in normally!
-        //    }
-
-        //    return num1;
-        //}
-
         private void btnclose_Click(object sender, EventArgs e)
         {
             this.Dispose();
@@ -140,29 +88,34 @@ namespace SalesInventorySystem
 
             //FOR STAND ALONE POS ONLY ENZOSTORE,VROSSSTORE, KRAFT
             if (GlobalConfig.Token== "MTQ2NzgwNjAz" || GlobalConfig.Token == "ODM1NTI0ODYz" 
+                || GlobalConfig.Token == "1234567890XX"
+                || GlobalConfig.Token == "ONEzNTE4NjEx"
                 || GlobalConfig.Token == "NjQwOTg4MzU1") 
             {
                 Database.RunLocalDatabaseMigrations();
           
             }
-            if(GlobalConfig.Token== "ODM1NTI0ODYz")//VROSS STORE
+            if(GlobalConfig.Token== "ODM1NTI0ODYz" || GlobalConfig.Token == "1234567890XX")//VROSS STORE
             {
                 Database.ExecuteQuery("UPDATE POSType set isAutoSystemDeduct=1");
             }
             tryCheckUpdate(); //#tryCheckUpdateV1();
             labelversion.Text= HelperFunction.readFileVersion();
 
-            //////////////////////////////////////////////////////
-            ///////TEMPORARY ONLY FOR MIGRATION PURPOSES
-            /////////////////////////////////////////////////////////
+           
             try
             {
                 regkey = Registry.CurrentUser.CreateSubKey(@"AAITCRE\ConnSettingsMain");
+                //////////////////////////////////////////////////////
+                ///////TEMPORARY ONLY FOR MIGRATION PURPOSES
+                /////////////////////////////////////////////////////////
                 string migratedStamp = regkey.GetValue("db_migrated_to")?.ToString();
                 string targetStamp = "2026-NEWDB";
 
                 //FOR STAND ALONE POS ONLY ENZOSTORE,VROSSSTORE, KRAFT
-                if (GlobalConfig.Token == "MTQ2NzgwNjAz" || GlobalConfig.Token == "ODM1NTI0ODYz"
+                if (GlobalConfig.Token == "MTQ2NzgwNjAz" 
+                    || GlobalConfig.Token == "ODM1NTI0ODYz"
+                    || GlobalConfig.Token == "ONEzNTE4NjEx"
                     || GlobalConfig.Token == "NjQwOTg4MzU1")
                 {
                     migratedStamp = "";
@@ -196,13 +149,32 @@ namespace SalesInventorySystem
                                password: "$tr0ngP@ssw0rd2026004!"
                         );
                     }
+                    else if(GlobalConfig.Token == "1234567890XX") //ITCORE STORE
+                    {
+                        ConnRegistry.SetTargetConnSettingsServer(
+                               serverNameWithPort: "erp.itcoreapps.com,4281",
+                               dbName: "CORECSERP_001",
+                               userId: "erp001_user",
+                               password: "$tr0ngP@ssw0rd2026!"
+                        );
+                    }
+                    else if(GlobalConfig.Token == "ONEzNTE4NjEx") //ONELOVE STORE
+                    {
+                        ConnRegistry.SetTargetConnSettingsServer(
+                               serverNameWithPort: "erp.itcoreapps.com,4281",
+                               dbName: "CORECSERP_001",
+                               userId: "erp001_user",
+                               password: "$tr0ngP@ssw0rd2026!"
+                        );
+                    }
                    
 
                     ConnRegistry.Set("db_migrated_to", targetStamp);
                 }
 
-                //VROSSACCTG, VROSSCORP, VROSSINV WRITE REGISTRY TO CONSETTINGSMAINLOCAL
-                if (GlobalConfig.Token == "ATk1NjU1NTU1" || GlobalConfig.Token == "MzEyNzU2Njk1"
+                //VROSSACCTG, VROSSCORP, VROSSINV, WRITE REGISTRY TO CONSETTINGSMAINLOCAL
+                if (GlobalConfig.Token == "ATk1NjU1NTU1" 
+                    || GlobalConfig.Token == "MzEyNzU2Njk1" 
                                    || GlobalConfig.Token == "iTAyNjU5Mjk5")
                 {
                     migratedStamp = "";
@@ -238,6 +210,8 @@ namespace SalesInventorySystem
                         || GlobalConfig.Token == "MzMyODgyODc0" //ENZOCOMM
                         || GlobalConfig.Token == "HTQwNzExMTYx" //ENZOHRI
                         || GlobalConfig.Token == "MjYxMjQ3MTkz"  //ENZOKIM
+                        || GlobalConfig.Token == "OTQ1NDczOTYy"  //ENZOKIM
+                        || GlobalConfig.Token == "B2Y2NjYxMzY3"  //ENZOb2
                         || GlobalConfig.Token == "Nzc0Njk4NjY0") && String.IsNullOrEmpty(migratedStamp)) //ENZOSTAGING
                     {
                         //TARGET TO CONSETTINGSMAIN

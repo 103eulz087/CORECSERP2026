@@ -635,6 +635,7 @@
     <Compile Include="Classes\Departments.cs" />
     <Compile Include="Classes\DevExUtilities.cs" />
     <Compile Include="Classes\DevXGridViewSettings.cs" />
+    <Compile Include="Classes\EJournalGenerator.cs" />
     <Compile Include="Classes\EmailSetup.cs" />
     <Compile Include="Classes\FileObject.cs" />
     <Compile Include="Classes\GlobalVariables.cs" />
@@ -2326,6 +2327,12 @@
     </Compile>
     <Compile Include="POSDevEx\POSCreditCardMonitoring.Designer.cs">
       <DependentUpon>POSCreditCardMonitoring.cs</DependentUpon>
+    </Compile>
+    <Compile Include="POSDevEx\POSDataManagementAutomation.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="POSDevEx\POSDataManagementAutomation.Designer.cs">
+      <DependentUpon>POSDataManagementAutomation.cs</DependentUpon>
     </Compile>
     <Compile Include="POSDevEx\POSManagementReport.cs">
       <SubType>Form</SubType>
@@ -4291,6 +4298,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="POSDevEx\POSCreditCardMonitoring.resx">
       <DependentUpon>POSCreditCardMonitoring.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="POSDevEx\POSDataManagementAutomation.resx">
+      <DependentUpon>POSDataManagementAutomation.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="POSDevEx\POSManagementReport.resx">
       <DependentUpon>POSManagementReport.cs</DependentUpon>

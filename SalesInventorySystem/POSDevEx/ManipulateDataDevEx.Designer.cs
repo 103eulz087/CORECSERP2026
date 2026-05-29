@@ -33,6 +33,9 @@
             this.gridControl2 = new DevExpress.XtraGrid.GridControl();
             this.gridView3 = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.groupControl3 = new DevExpress.XtraEditors.GroupControl();
+            this.simpleButton2 = new DevExpress.XtraEditors.SimpleButton();
+            this.txtClosestDiff = new DevExpress.XtraEditors.TextEdit();
+            this.txtClosestAccumulated = new DevExpress.XtraEditors.TextEdit();
             this.simpleButton1 = new DevExpress.XtraEditors.SimpleButton();
             this.labelControl5 = new DevExpress.XtraEditors.LabelControl();
             this.textEdit1 = new DevExpress.XtraEditors.TextEdit();
@@ -62,6 +65,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.gridView3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.groupControl3)).BeginInit();
             this.groupControl3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.txtClosestDiff.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtClosestAccumulated.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.textEdit1.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtcalcres.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtcttrto.Properties)).BeginInit();
@@ -117,6 +122,9 @@
             // 
             this.groupControl3.Appearance.Font = new System.Drawing.Font("Arial", 9.25F);
             this.groupControl3.Appearance.Options.UseFont = true;
+            this.groupControl3.Controls.Add(this.simpleButton2);
+            this.groupControl3.Controls.Add(this.txtClosestDiff);
+            this.groupControl3.Controls.Add(this.txtClosestAccumulated);
             this.groupControl3.Controls.Add(this.simpleButton1);
             this.groupControl3.Controls.Add(this.labelControl5);
             this.groupControl3.Controls.Add(this.textEdit1);
@@ -144,6 +152,40 @@
             this.groupControl3.Name = "groupControl3";
             this.groupControl3.Size = new System.Drawing.Size(1589, 194);
             this.groupControl3.TabIndex = 4;
+            // 
+            // simpleButton2
+            // 
+            this.simpleButton2.Appearance.Font = new System.Drawing.Font("Arial", 10.25F);
+            this.simpleButton2.Appearance.Options.UseFont = true;
+            this.simpleButton2.Location = new System.Drawing.Point(559, 160);
+            this.simpleButton2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.simpleButton2.Name = "simpleButton2";
+            this.simpleButton2.Size = new System.Drawing.Size(92, 22);
+            this.simpleButton2.TabIndex = 50;
+            this.simpleButton2.Text = "Test";
+            this.simpleButton2.Click += new System.EventHandler(this.simpleButton2_Click);
+            // 
+            // txtClosestDiff
+            // 
+            this.txtClosestDiff.EditValue = "0";
+            this.txtClosestDiff.Location = new System.Drawing.Point(805, 109);
+            this.txtClosestDiff.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.txtClosestDiff.Name = "txtClosestDiff";
+            this.txtClosestDiff.Properties.Appearance.Font = new System.Drawing.Font("Segoe UI", 9.75F);
+            this.txtClosestDiff.Properties.Appearance.Options.UseFont = true;
+            this.txtClosestDiff.Size = new System.Drawing.Size(117, 28);
+            this.txtClosestDiff.TabIndex = 49;
+            // 
+            // txtClosestAccumulated
+            // 
+            this.txtClosestAccumulated.EditValue = "0";
+            this.txtClosestAccumulated.Location = new System.Drawing.Point(682, 110);
+            this.txtClosestAccumulated.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.txtClosestAccumulated.Name = "txtClosestAccumulated";
+            this.txtClosestAccumulated.Properties.Appearance.Font = new System.Drawing.Font("Segoe UI", 9.75F);
+            this.txtClosestAccumulated.Properties.Appearance.Options.UseFont = true;
+            this.txtClosestAccumulated.Size = new System.Drawing.Size(117, 28);
+            this.txtClosestAccumulated.TabIndex = 48;
             // 
             // simpleButton1
             // 
@@ -178,6 +220,7 @@
             this.textEdit1.Properties.Appearance.Options.UseFont = true;
             this.textEdit1.Size = new System.Drawing.Size(117, 28);
             this.textEdit1.TabIndex = 45;
+            this.textEdit1.EditValueChanged += new System.EventHandler(this.textEdit1_EditValueChanged);
             // 
             // labelControl4
             // 
@@ -408,6 +451,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.groupControl3)).EndInit();
             this.groupControl3.ResumeLayout(false);
             this.groupControl3.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.txtClosestDiff.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtClosestAccumulated.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.textEdit1.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtcalcres.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtcttrto.Properties)).EndInit();
@@ -450,5 +495,8 @@
         private DevExpress.XtraEditors.LabelControl labelControl5;
         public DevExpress.XtraEditors.TextEdit textEdit1;
         private DevExpress.XtraEditors.SimpleButton simpleButton1;
+        public DevExpress.XtraEditors.TextEdit txtClosestAccumulated;
+        public DevExpress.XtraEditors.TextEdit txtClosestDiff;
+        private DevExpress.XtraEditors.SimpleButton simpleButton2;
     }
 }

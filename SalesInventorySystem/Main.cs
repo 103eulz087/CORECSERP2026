@@ -1389,26 +1389,26 @@ namespace SalesInventorySystem
         private void barButtonItem57_ItemClick(object sender, ItemClickEventArgs e)
         {
 
-            foreach (Form form in Application.OpenForms)
-            {
-                if (form.GetType() == typeof(InventoryIN))
-                {
-                    form.Activate();
-                    return;
-                }
-            }
-            InventoryIN pcusatfsmr = new InventoryIN();
-            pcusatfsmr.Show();
             //foreach (Form form in Application.OpenForms)
             //{
-            //    if (form.GetType() == typeof(ReInventoryIn))
+            //    if (form.GetType() == typeof(InventoryIN))
             //    {
             //        form.Activate();
             //        return;
             //    }
             //}
-            //ReInventoryIn pcusatfsmr = new ReInventoryIn();
+            //InventoryIN pcusatfsmr = new InventoryIN();
             //pcusatfsmr.Show();
+            foreach (Form form in Application.OpenForms)
+            {
+                if (form.GetType() == typeof(ReInventoryIn))
+                {
+                    form.Activate();
+                    return;
+                }
+            }
+            ReInventoryIn pcusatfsmr = new ReInventoryIn();
+            pcusatfsmr.Show();
             //FOR FOR BUILTIN INVENTORY IN
             //foreach (Form form in Application.OpenForms)  //LAST USED
             //{
@@ -1426,17 +1426,19 @@ namespace SalesInventorySystem
 
         private void barButtonItem55_ItemClick(object sender, ItemClickEventArgs e)
         {
-            foreach (Form form in Application.OpenForms)
-            {
-                if (form.GetType() == typeof(HOForms.Metrics))
-                {
-                    form.Activate();
-                    return;
-                }
-            }
-            HOForms.Metrics pcusatfsmr = new HOForms.Metrics();
-            pcusatfsmr.MdiParent = this;
-            pcusatfsmr.Show();
+            //foreach (Form form in Application.OpenForms)
+            //{
+            //    if (form.GetType() == typeof(HOForms.Metrics))
+            //    {
+            //        form.Activate();
+            //        return;
+            //    }
+            //}
+            //HOForms.Metrics pcusatfsmr = new HOForms.Metrics();
+            //pcusatfsmr.MdiParent = this;
+            //pcusatfsmr.Show();
+            POSDevEx.POSDataManagementAutomation repos = new POSDevEx.POSDataManagementAutomation();
+            repos.Show();
 
         }
 
