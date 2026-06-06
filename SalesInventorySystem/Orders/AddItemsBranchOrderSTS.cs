@@ -305,8 +305,12 @@ namespace SalesInventorySystem.Orders
         private void gridView1_ShowingEditor(object sender, CancelEventArgs e)
         {
             GridView view = sender as GridView;
-            if (view.FocusedColumn.FieldName != "Quantity" )
+            if (view.FocusedColumn.FieldName != "Quantity" &&
+        view.FocusedColumn.FieldName != "Remarks")
+            {
                 e.Cancel = true;
+            }
+
         }
 
         private void gridView1_RowCellStyle(object sender, RowCellStyleEventArgs e)

@@ -39,6 +39,12 @@ namespace SalesInventorySystem.HOFormsDevEx
             if (chckpayfull.Checked == true) { txtamountpaid.Text = txtbalance.Text; } else { txtamountpaid.Text = "0"; }
         }
 
+        private void txtewtamount_EditValueChanged(object sender, EventArgs e)
+        {
+            decimal amountpaid = Convert.ToDecimal(txtbalance.Text) - Convert.ToDecimal(txtewtamount.Text);
+            txtamountpaid.Text = amountpaid.ToString();
+        }
+
         public SupplierAddPaymentDevEx()
         {
             InitializeComponent();

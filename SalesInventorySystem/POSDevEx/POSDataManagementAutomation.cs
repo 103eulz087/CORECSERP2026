@@ -121,22 +121,87 @@ namespace SalesInventorySystem.POSDevEx
                 decimal percentage = 0m;
                 decimal.TryParse(txtpercentage.Text, out percentage);
 
+                //for (int i = 0; i < _totalBatches; i++)
+                //{
+                //    ProcessingBatch batch = batches[i];
+
+                //    await ReplicateBatchAsync(batch);
+
+                //    // ✅ UPDATE PROGRESS UI
+                //    lblCurrentBatch.Text = $"{batch.BranchCode} | {batch.SalesDate:yyyy-MM-dd} | {batch.MachineUsed}";
+                //    //lblProgress.Text = $"{i + 1} / {_totalBatches}";
+
+                //    double percent = ((double)(i + 1) / _totalBatches) * 100;
+                //    lblProgress.Text = $"{i + 1} / {_totalBatches} ({percent:N1}%)";
+
+                //    Application.DoEvents(); // keep UI responsive (optional)
+
+                //    // ✅ VALIDATION
+                //    if (string.IsNullOrWhiteSpace(batch.BranchCode) ||
+                //        batch.SalesDate == DateTime.MinValue ||
+                //        string.IsNullOrWhiteSpace(batch.MachineUsed))
+                //    {
+                //        _skippedCount++;
+                //        continue;
+                //    }
+
+                //    DataTable dt = await LoadData2Async(
+                //        batch.BranchCode,
+                //        batch.SalesDate,
+                //        batch.MachineUsed);
+
+                //    if (dt == null || dt.Rows.Count == 0)
+                //    {
+                //        _skippedCount++;
+                //        continue;
+                //    }
+
+                //    // ✅ COMPUTE TARGET
+                //    decimal target = 0m;
+
+                //    if (radtypeall.Checked)
+                //    {
+                //        target = batch.TotalNetSales * percentage;
+                //    }
+                //    else if (radtypevatex.Checked)
+                //    {
+                //        target = batch.VatExemptSale * percentage;
+                //    }
+                //    else
+                //    {
+                //        target = batch.TotalNetSales * percentage;
+                //    }
+
+                //    // ✅ PROCESS
+                //    ProcessDataTable(dt, target);
+
+                //    // ✅ EXECUTE
+                //    await ExecuteAsync(dt, batch);
+                //    //PrintZRead(batch.BranchCode, batch.SalesDate.ToString("yyyy-MM-dd"), batch.MachineUsed);
+
+                //    // ✅ ENQUEUE PRINT (THIS IS THE RIGHT PLACE)
+                //    _printQueue.Enqueue(new PrintJob
+                //    {
+                //        BranchCode = batch.BranchCode,
+                //        DateExecute = batch.SalesDate.ToString("yyyy-MM-dd"),
+                //        MachineUsed = batch.MachineUsed
+                //    });
+
+                //    _processedCount++;
+                //}
                 for (int i = 0; i < _totalBatches; i++)
                 {
                     ProcessingBatch batch = batches[i];
 
                     await ReplicateBatchAsync(batch);
 
-                    // ✅ UPDATE PROGRESS UI
+                    // Update Progress UI
                     lblCurrentBatch.Text = $"{batch.BranchCode} | {batch.SalesDate:yyyy-MM-dd} | {batch.MachineUsed}";
-                    //lblProgress.Text = $"{i + 1} / {_totalBatches}";
-
                     double percent = ((double)(i + 1) / _totalBatches) * 100;
                     lblProgress.Text = $"{i + 1} / {_totalBatches} ({percent:N1}%)";
 
-                    Application.DoEvents(); // keep UI responsive (optional)
+                    // REMOVED: Application.DoEvents(); 
 
-                    // ✅ VALIDATION
                     if (string.IsNullOrWhiteSpace(batch.BranchCode) ||
                         batch.SalesDate == DateTime.MinValue ||
                         string.IsNullOrWhiteSpace(batch.MachineUsed))
@@ -145,10 +210,7 @@ namespace SalesInventorySystem.POSDevEx
                         continue;
                     }
 
-                    DataTable dt = await LoadData2Async(
-                        batch.BranchCode,
-                        batch.SalesDate,
-                        batch.MachineUsed);
+                    DataTable dt = await LoadData2Async(batch.BranchCode, batch.SalesDate, batch.MachineUsed);
 
                     if (dt == null || dt.Rows.Count == 0)
                     {
@@ -156,30 +218,17 @@ namespace SalesInventorySystem.POSDevEx
                         continue;
                     }
 
-                    // ✅ COMPUTE TARGET
-                    decimal target = 0m;
+                    // Compute Target
+                    decimal target = radtypeall.Checked ? batch.TotalNetSales * percentage :
+                                     radtypevatex.Checked ? batch.VatExemptSale * percentage :
+                                     batch.TotalNetSales * percentage;
 
-                    if (radtypeall.Checked)
-                    {
-                        target = batch.TotalNetSales * percentage;
-                    }
-                    else if (radtypevatex.Checked)
-                    {
-                        target = batch.VatExemptSale * percentage;
-                    }
-                    else
-                    {
-                        target = batch.TotalNetSales * percentage;
-                    }
+                    // Offload the synchronous data-crunching to a background thread to keep UI smooth
+                    await Task.Run(() => ProcessDataTable(dt, target));
 
-                    // ✅ PROCESS
-                    ProcessDataTable(dt, target);
-
-                    // ✅ EXECUTE
+                    // Execute SQL
                     await ExecuteAsync(dt, batch);
-                    //PrintZRead(batch.BranchCode, batch.SalesDate.ToString("yyyy-MM-dd"), batch.MachineUsed);
 
-                    // ✅ ENQUEUE PRINT (THIS IS THE RIGHT PLACE)
                     _printQueue.Enqueue(new PrintJob
                     {
                         BranchCode = batch.BranchCode,
@@ -911,6 +960,10 @@ ORDER BY x.TotalAmount DESC, x.ReferenceNo, x.SequenceNumber;";
             _printCts = new CancellationTokenSource(); // reset for next run
         }
 
+        private void POSDataManagementAutomation_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 
 }

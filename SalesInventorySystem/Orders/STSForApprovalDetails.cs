@@ -113,12 +113,21 @@ namespace SalesInventorySystem.Orders
             //gridView1.Columns["ProductName"].ColumnEdit = new DevExpress.XtraEditors.Repository.RepositoryItemMemoEdit();
 
 
+            gridView1.Columns["ProductCategoryCode"].OptionsColumn.Printable = DevExpress.Utils.DefaultBoolean.False;
+            gridView1.Columns["Category"].OptionsColumn.Printable = DevExpress.Utils.DefaultBoolean.False;
+            gridView1.Columns["ProductCode"].OptionsColumn.Printable = DevExpress.Utils.DefaultBoolean.False;
+            gridView1.Columns["Qty"].OptionsColumn.Printable = DevExpress.Utils.DefaultBoolean.False; 
+
             //this.gridView1.Columns["BranchCode"].Visible = false;
             this.gridView1.Columns["PONumber"].Visible = false;
             this.gridView1.Columns["Category"].Visible = false;
             this.gridView1.Columns["ProductCode"].Visible = false;
             this.gridView1.Columns["ProductCategoryCode"].Visible = false;
-            this.gridView1.Columns["Barcode"].Visible = false;
+            if (GlobalCache.CompanyName == "ENZO")
+            {
+                this.gridView1.Columns["Barcode"].Visible = false;
+            }
+           
             this.gridView1.Columns["Status"].Visible = false;
             //this.gridView1.Columns["Units"].Visible = false;
             //this.gridView1.Columns["DateRequested"].Visible = false;

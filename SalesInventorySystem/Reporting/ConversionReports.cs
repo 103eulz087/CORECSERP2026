@@ -560,6 +560,15 @@ namespace SalesInventorySystem.Reporting
             objbrcode = SearchLookUpClass.getSingleValue(txtbrcode, "BranchCode");
         }
 
+        private void btnforapprovalstsexcel_Click(object sender, EventArgs e)
+        {
+            if(gridView4.Focus())
+            {
+                string filename = "CONVERSION_SUMMARY_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_" + objbrcode;
+                HelperFunction.exporttoexcel(gridView4, filename);
+            }
+        }
+
         private void gridView1_DoubleClick(object sender, EventArgs e)
         {
             

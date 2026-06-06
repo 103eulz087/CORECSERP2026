@@ -163,6 +163,7 @@
             this.simpleButton2.Size = new System.Drawing.Size(92, 22);
             this.simpleButton2.TabIndex = 50;
             this.simpleButton2.Text = "Test";
+            this.simpleButton2.Visible = false;
             this.simpleButton2.Click += new System.EventHandler(this.simpleButton2_Click);
             // 
             // txtClosestDiff

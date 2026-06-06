@@ -58,39 +58,78 @@ namespace SalesInventorySystem.HOFormsDevEx
             else
             { return; }
         }
-
         private void ApproveExpense()
         {
             if (string.IsNullOrWhiteSpace(txtrefno.Text) ||
                 string.IsNullOrWhiteSpace(txtsuppid.Text) ||
                 string.IsNullOrWhiteSpace(txtinvoiceno.Text))
             {
-                throw new ApplicationException("Missing required expense information.");
+                XtraMessageBox.Show("Reference No., Supplier, and Invoice No. are required.",
+                    "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
             }
 
-            using (SqlConnection con = Database.getConnection())
-            using (SqlCommand cmd = new SqlCommand("dbo.sp_ApproveExpense", con))
+            try
             {
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.CommandTimeout = 60;
+                using (var con = Database.getConnection())
+                using (var cmd = new SqlCommand("dbo.sp_ApproveExpense", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandTimeout = 60;
 
-                cmd.Parameters.Add("@parmrefno", SqlDbType.VarChar, 10)
-                    .Value = txtrefno.Text.Trim();
+                    // NOTE: sp_ApproveExpense receives @parmsupplierid (the SupplierID,
+                    // not SupplierKey). The SP resolves SupplierKey internally.
+                    cmd.Parameters.Add("@parmrefno", SqlDbType.VarChar, 10).Value = txtrefno.Text.Trim();
+                    cmd.Parameters.Add("@parmsupplierid", SqlDbType.VarChar, 100).Value = txtsuppid.Text.Trim();
+                    cmd.Parameters.Add("@parminvoiceno", SqlDbType.VarChar, 150).Value = txtinvoiceno.Text.Trim();
+                    cmd.Parameters.Add("@parmuser", SqlDbType.VarChar, 50).Value = Login.Fullname;
 
-                cmd.Parameters.Add("@parmsupplierid", SqlDbType.VarChar, 100)
-                    .Value = txtsuppid.Text.Trim();
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                }
 
-                cmd.Parameters.Add("@parminvoiceno", SqlDbType.VarChar, 150)
-                    .Value = txtinvoiceno.Text.Trim();
-
-                cmd.Parameters.Add("@parmuser", SqlDbType.VarChar, 50)
-                    .Value = Login.Fullname;
-
-                con.Open();
-                cmd.ExecuteNonQuery();
-                BigAlert.Show("SUCCESS", "EXPENSE Entry Successfully Posted!..",MessageBoxIcon.Information);
+                BigAlert.Show("SUCCESS", "Expense approved and tickets generated.", MessageBoxIcon.Information);
+            }
+            catch (SqlException ex)
+            {
+                XtraMessageBox.Show(
+                    $"Approval failed ({ex.Number}): {ex.Message}",
+                    "Approve Expense Failed",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+        //private void ApproveExpense()
+        //{
+        //    if (string.IsNullOrWhiteSpace(txtrefno.Text) ||
+        //        string.IsNullOrWhiteSpace(txtsuppid.Text) ||
+        //        string.IsNullOrWhiteSpace(txtinvoiceno.Text))
+        //    {
+        //        throw new ApplicationException("Missing required expense information.");
+        //    }
+
+        //    using (SqlConnection con = Database.getConnection())
+        //    using (SqlCommand cmd = new SqlCommand("dbo.sp_ApproveExpense", con))
+        //    {
+        //        cmd.CommandType = CommandType.StoredProcedure;
+        //        cmd.CommandTimeout = 60;
+
+        //        cmd.Parameters.Add("@parmrefno", SqlDbType.VarChar, 10)
+        //            .Value = txtrefno.Text.Trim();
+
+        //        cmd.Parameters.Add("@parmsupplierid", SqlDbType.VarChar, 100)
+        //            .Value = txtsuppid.Text.Trim();
+
+        //        cmd.Parameters.Add("@parminvoiceno", SqlDbType.VarChar, 150)
+        //            .Value = txtinvoiceno.Text.Trim();
+
+        //        cmd.Parameters.Add("@parmuser", SqlDbType.VarChar, 50)
+        //            .Value = Login.Fullname;
+
+        //        con.Open();
+        //        cmd.ExecuteNonQuery();
+        //        BigAlert.Show("SUCCESS", "EXPENSE Entry Successfully Posted!..",MessageBoxIcon.Information);
+        //    }
+        //}
 
 
         //void updateExpense()

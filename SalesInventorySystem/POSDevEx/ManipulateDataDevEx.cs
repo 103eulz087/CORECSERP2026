@@ -201,8 +201,8 @@ namespace SalesInventorySystem.POSDevEx
 
             try
             {
-                //var tvp = BuildManipItemsTvpFromGrid();
-                var tvp = BuildManipItemsTvpFromDataTable(dtOriginal, brcode, Convert.ToDateTime(petsa));
+                var tvp = BuildManipItemsTvpFromGrid();
+                //var tvp = BuildManipItemsTvpFromDataTable(dtOriginal, brcode, Convert.ToDateTime(petsa));
 
                 if (tvp.Rows.Count == 0)
                 {

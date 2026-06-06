@@ -12759,7 +12759,6 @@ D:\MYGDRIVE\CORECS2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.POS.P
 D:\MYGDRIVE\CORECS2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.POS.POSInventoryMapping.resources
 D:\MYGDRIVE\CORECS2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.POS.POSLoader.resources
 D:\MYGDRIVE\CORECS2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.POS.POSMainRestoDashboard.resources
-D:\MYGDRIVE\CORECS2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.POS.POSMainWithDashboard.resources
 D:\MYGDRIVE\CORECS2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.POSOnHoldTransaction.resources
 D:\MYGDRIVE\CORECS2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.POS.POSPaymentDetails.resources
 D:\MYGDRIVE\CORECS2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.POS.POSPaytoMerchant.resources

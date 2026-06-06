@@ -583,7 +583,7 @@ namespace SalesInventorySystem.POS
                     $"FROM dbo.POSSalesSummary " +
                     $"Where BranchCode='{Login.assignedBranch}' " +
                     $"and CAST(DateOrder as date)='{txttransactiondate.Text}' AND MachineUsed='{GlobalVariables.computerName}' " +
-                    $"GROUP BY Description Order By Description ASC", gridControl2, gridView2);
+                    $"GROUP BY Description Order By SUM(SubTotal) DESC", gridControl2, gridView2);
 
                 string subject = "", body = "";
                 

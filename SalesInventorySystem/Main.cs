@@ -1399,16 +1399,34 @@ namespace SalesInventorySystem
             //}
             //InventoryIN pcusatfsmr = new InventoryIN();
             //pcusatfsmr.Show();
-            foreach (Form form in Application.OpenForms)
+            if(GlobalCache.CompanyName=="ENZO")
             {
-                if (form.GetType() == typeof(ReInventoryIn))
+                foreach (Form form in Application.OpenForms)
                 {
-                    form.Activate();
-                    return;
+                    if (form.GetType() == typeof(ReInventoryIn))
+                    {
+                        form.Activate();
+                        return;
+                    }
                 }
+                ReInventoryIn pcusatfsmr = new ReInventoryIn();
+                pcusatfsmr.Show();
+            }else if(GlobalCache.CompanyName == "VROSS")
+            {
+                foreach (Form form in Application.OpenForms)  //LAST USED
+                {
+                    if (form.GetType() == typeof(POS.POSInventoryIN))
+                    {
+                        form.Activate();
+                        return;
+                    }
+                }
+
+                POS.POSInventoryIN pcusatfsmr = new POS.POSInventoryIN();
+                pcusatfsmr.MdiParent = this;
+                pcusatfsmr.Show();
             }
-            ReInventoryIn pcusatfsmr = new ReInventoryIn();
-            pcusatfsmr.Show();
+
             //FOR FOR BUILTIN INVENTORY IN
             //foreach (Form form in Application.OpenForms)  //LAST USED
             //{

@@ -81,12 +81,13 @@ namespace SalesInventorySystem.HOFormsDevEx
                 XtraMessageBox.Show("Please Input Cost Field!");
                 return;
             }
-
-            if (string.IsNullOrWhiteSpace(txtpalletno.Text))
+           
+            if (GlobalCache.CompanyName == "ENZO" && string.IsNullOrWhiteSpace(txtpalletno.Text))
             {
                 BigAlert.Show("NO PALLET NUMBER", "Please Input Pallet Number!", MessageBoxIcon.Warning);
                 return;
             }
+            
 
             if (string.IsNullOrWhiteSpace(txtbarcode.Text))
             {
@@ -319,6 +320,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             //Database.displayDevComboBoxItems("select ProductCategory FROM view_PODETAILS WHERE ShipmentNo='" + txtshipmentno.Text + "' and OrderType='P' ", "ProductCategory", txtprodcat);
             Database.displaySearchlookupEdit($"SELECT * FROM dbo.funcview_populateProducts('{Login.assignedBranch}') " +
                 $"WHERE ProductCode in (Select distinct OrderCode FROM PODETAILS WHERE ShipmentNo='{txtshipmentno.Text}')", txtsrchprod,"Description","Description");
+            
         }
 
         private void getAvailablePort()

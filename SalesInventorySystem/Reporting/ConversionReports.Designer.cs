@@ -58,6 +58,7 @@
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.panelControl1 = new DevExpress.XtraEditors.PanelControl();
             this.panelControl2 = new DevExpress.XtraEditors.PanelControl();
+            this.btnforapprovalstsexcel = new DevExpress.XtraEditors.SimpleButton();
             ((System.ComponentModel.ISupportInitialize)(this.txtbrcode.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.searchLookUpEdit1View)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dateto.Properties.CalendarTimeProperties)).BeginInit();
@@ -414,6 +415,7 @@
             // 
             // panelControl1
             // 
+            this.panelControl1.Controls.Add(this.btnforapprovalstsexcel);
             this.panelControl1.Controls.Add(this.labelControl1);
             this.panelControl1.Controls.Add(this.txtbrcode);
             this.panelControl1.Controls.Add(this.labelControl2);
@@ -435,6 +437,18 @@
             this.panelControl2.Name = "panelControl2";
             this.panelControl2.Size = new System.Drawing.Size(1173, 550);
             this.panelControl2.TabIndex = 9;
+            // 
+            // btnforapprovalstsexcel
+            // 
+            this.btnforapprovalstsexcel.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.ExportToExcel_16x16;
+            this.btnforapprovalstsexcel.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
+            this.btnforapprovalstsexcel.Location = new System.Drawing.Point(499, 6);
+            this.btnforapprovalstsexcel.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
+            this.btnforapprovalstsexcel.Name = "btnforapprovalstsexcel";
+            this.btnforapprovalstsexcel.Size = new System.Drawing.Size(138, 53);
+            this.btnforapprovalstsexcel.TabIndex = 8;
+            this.btnforapprovalstsexcel.Text = "Export to Excel";
+            this.btnforapprovalstsexcel.Click += new System.EventHandler(this.btnforapprovalstsexcel_Click);
             // 
             // ConversionReports
             // 
@@ -508,5 +522,6 @@
         private System.Windows.Forms.TabPage SUMMARYDETAIL;
         private DevExpress.XtraGrid.GridControl gridControl4;
         private DevExpress.XtraGrid.Views.Grid.GridView gridView4;
+        private DevExpress.XtraEditors.SimpleButton btnforapprovalstsexcel;
     }
 }

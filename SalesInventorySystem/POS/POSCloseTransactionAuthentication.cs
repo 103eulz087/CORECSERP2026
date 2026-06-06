@@ -57,7 +57,8 @@ namespace SalesInventorySystem.POS
                 XtraMessageBox.Show("Password is required.", "ITCORE Solutions Inc.");
                 return;
             }
-            bool checkifexist = Database.checkifExist("SELECT TOP 1 UserID FROM SalesTransactionSummary WHERE BranchCode='" + Login.assignedBranch + "' " +
+            bool checkifexist = Database.checkifExist("SELECT TOP 1 UserID FROM SalesTransactionSummary " +
+                "WHERE BranchCode='" + Login.assignedBranch + "' " +
                 "AND DateOpen='" + DateTime.Today.ToShortDateString() + "' AND MachineUsed='"+Environment.MachineName.ToString()+"' AND isOpen=1 AND UserID='"+ txtuserid.Text.Trim() + "'");
             if (checkifexist)
             {

@@ -638,6 +638,7 @@
     <Compile Include="Classes\EJournalGenerator.cs" />
     <Compile Include="Classes\EmailSetup.cs" />
     <Compile Include="Classes\FileObject.cs" />
+    <Compile Include="Classes\GlobalCache.cs" />
     <Compile Include="Classes\GlobalVariables.cs" />
     <Compile Include="Classes\HelperFunction.cs" />
     <Compile Include="Classes\IDGenerator.cs" />
@@ -2598,12 +2599,6 @@
     <Compile Include="POS\POSMainRestoDashboard.Designer.cs">
       <DependentUpon>POSMainRestoDashboard.cs</DependentUpon>
     </Compile>
-    <Compile Include="POS\POSMainWithDashboard.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="POS\POSMainWithDashboard.Designer.cs">
-      <DependentUpon>POSMainWithDashboard.cs</DependentUpon>
-    </Compile>
     <Compile Include="POS\POSOnHoldTransaction.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -4434,9 +4429,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="POS\POSMainRestoDashboard.resx">
       <DependentUpon>POSMainRestoDashboard.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="POS\POSMainWithDashboard.resx">
-      <DependentUpon>POSMainWithDashboard.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="POS\POSOnHoldTransaction.resx">
       <DependentUpon>POSOnHoldTransaction.cs</DependentUpon>

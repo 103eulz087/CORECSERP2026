@@ -9,12 +9,21 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using DevExpress.XtraGrid.Views.Grid;
 using DevExpress.XtraEditors;
+using System.Data.SqlClient;
 
 namespace SalesInventorySystem.Reporting
 {
     public partial class AcctTicketReports : Form
     {
         //public static string debitvalue="", creditvalue = "";
+
+        //private Dictionary<object, bool> ticketColorMap = new Dictionary<object, bool>();
+        //private bool currentFlag = false;
+
+        private object lastTicket = null;
+        private bool alternate = false;
+
+
         public AcctTicketReports()
         {
             InitializeComponent();
@@ -30,26 +39,84 @@ namespace SalesInventorySystem.Reporting
             Database.displaySearchlookupEdit("SELECT BranchCode,BranchName FROM Branches", txtbrcode,"BranchCode","BranchCode");
         }
 
+
+        private void LoadTickets(
+           string brcode,
+           DateTime fromDate,
+           DateTime toDateExclusive,
+           DevExpress.XtraGrid.GridControl grid,
+           DevExpress.XtraGrid.Views.Grid.GridView view,
+           string dateColumn,
+           string orderByClause = "")
+        {
+            string sql = $@"
+        SELECT *
+        FROM view_AccountingTicketReports
+        WHERE BranchCode = @brcode
+          AND {dateColumn} >= @fromDate
+          AND {dateColumn} <  @toDateExclusive
+      
+        {orderByClause}";
+
+            try
+            {
+                Cursor.Current = Cursors.WaitCursor;
+                this.UseWaitCursor = true;
+
+                using (var con = Database.getConnection())
+                using (var cmd = new SqlCommand(sql, con))
+                {
+                    cmd.Parameters.Add("@brcode", SqlDbType.VarChar, 10).Value = brcode;
+                    cmd.Parameters.Add("@fromDate", SqlDbType.DateTime).Value = fromDate;
+                    cmd.Parameters.Add("@toDateExclusive", SqlDbType.DateTime).Value = toDateExclusive;
+                    
+
+                    // Use your overload that accepts SqlCommand
+                    Database.display(cmd, grid, view);
+                }
+
+                view.Focus();
+            }
+            finally
+            {
+                this.UseWaitCursor = false;
+                Cursor.Current = Cursors.Default;
+            }
+        }
         void populateRows()
         {
             try
-            { 
-                if(chcktickets.Checked==true)
+            {
+                DateTime from = txtdate.Value.Date;
+                DateTime toExclusive = txtdate.Value.Date.AddDays(1);
+
+                if (chcktickets.Checked==true)
                 {
-                    //Database.display("SELECT * FROM view_AccountingTicketReports WHERE BranchCode='" + txtbrcode.Text + "' AND TicketDate='" + txtdate.Text+ "' AND EnteredBy='"+Login.Fullname+"' ORDER BY TicketNumber", gridControl1, gridView1);
-                    string query = "SELECT * FROM view_AccountingTicketReports WHERE BranchCode='" + txtbrcode.Text + "' AND TicketDate='" + txtdate.Text + "' AND EnteredBy='" + Login.Fullname + "' ORDER BY TicketNumber ";
-                    HelperFunction.ShowWaitAndDisplay(query, gridControl1, gridView1, "Please wait", "Populating data into the database...");
-                    gridView1.Focus();
+                   
+                    LoadTickets(
+                        brcode: Login.assignedBranch,
+                        fromDate: from,
+                        toDateExclusive: toExclusive,
+                        grid: gridControl1,
+                        view: gridView1,
+                        dateColumn: "TicketDate",
+                        orderByClause: "ORDER BY TicketDate ASC"
+                    );
                 }
                 else
                 {
-                    //Database.display("SELECT * FROM view_AccountingTicketReports WHERE BranchCode='" + txtbrcode.Text + "' AND TicketDate='" + txtdate.Text+ "' ORDER BY TicketNumber", gridControl1, gridView1);
-                    string query = "SELECT * FROM view_AccountingTicketReports WHERE BranchCode='" + txtbrcode.Text + "' AND TicketDate='" + txtdate.Text + "' ORDER BY TicketNumber";
-                    HelperFunction.ShowWaitAndDisplay(query, gridControl1, gridView1, "Please wait", "Populating data into the database...");
-                    gridView1.Focus();
+
+                    LoadTickets(
+                        brcode: txtbrcode.Text,
+                        fromDate: from,
+                        toDateExclusive: toExclusive,
+                        grid: gridControl1,
+                        view: gridView1,
+                        dateColumn: "TicketDate",
+                        orderByClause: "ORDER BY TicketDate ASC"
+                    );
                 }
-                gridView1.Columns[0].Visible = false;
-                gridView1.Columns[1].Visible = false;
+                
             }
             catch (Exception ex)
             {
@@ -180,6 +247,28 @@ namespace SalesInventorySystem.Reporting
 
         private void groupControl1_Paint(object sender, PaintEventArgs e)
         {
+
+        }
+
+        private void gridView1_RowStyle(object sender, RowStyleEventArgs e)
+        {
+
+            if (e.RowHandle < 0) return;
+
+            var view = sender as DevExpress.XtraGrid.Views.Grid.GridView;
+            object ticket = view.GetRowCellValue(e.RowHandle, "TicketNumber");
+
+            if (ticket == null) return;
+
+            if (!ticket.Equals(lastTicket))
+            {
+                alternate = !alternate;
+                lastTicket = ticket;
+            }
+
+            if (alternate)
+                e.Appearance.BackColor = Color.LightBlue;
+
 
         }
     }

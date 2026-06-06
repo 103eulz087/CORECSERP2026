@@ -48,7 +48,7 @@
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.updateTicketToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupControl1 = new DevExpress.XtraEditors.GroupControl();
-            this.txtdate = new DevExpress.XtraEditors.DateEdit();
+            this.txtdate = new System.Windows.Forms.DateTimePicker();
             this.simpleButton1 = new DevExpress.XtraEditors.SimpleButton();
             ((System.ComponentModel.ISupportInitialize)(this.txtbrcode.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.searchLookUpEdit1View)).BeginInit();
@@ -58,8 +58,6 @@
             this.contextMenuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.groupControl1)).BeginInit();
             this.groupControl1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.txtdate.Properties.CalendarTimeProperties)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.txtdate.Properties)).BeginInit();
             this.SuspendLayout();
             // 
             // chcktickets
@@ -68,7 +66,7 @@
             this.chcktickets.Checked = true;
             this.chcktickets.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chcktickets.Location = new System.Drawing.Point(607, 41);
-            this.chcktickets.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.chcktickets.Margin = new System.Windows.Forms.Padding(4);
             this.chcktickets.Name = "chcktickets";
             this.chcktickets.Size = new System.Drawing.Size(196, 21);
             this.chcktickets.TabIndex = 14;
@@ -78,7 +76,7 @@
             // txtbrcode
             // 
             this.txtbrcode.Location = new System.Drawing.Point(149, 39);
-            this.txtbrcode.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtbrcode.Margin = new System.Windows.Forms.Padding(4);
             this.txtbrcode.Name = "txtbrcode";
             this.txtbrcode.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtbrcode.Properties.Appearance.Options.UseFont = true;
@@ -223,9 +221,9 @@
             this.groupBox2.Controls.Add(this.gridControl1);
             this.groupBox2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBox2.Location = new System.Drawing.Point(0, 114);
-            this.groupBox2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox2.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox2.Padding = new System.Windows.Forms.Padding(4);
             this.groupBox2.Size = new System.Drawing.Size(1712, 724);
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
@@ -233,10 +231,10 @@
             // gridControl1
             // 
             this.gridControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControl1.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gridControl1.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4);
             this.gridControl1.Location = new System.Drawing.Point(4, 19);
             this.gridControl1.MainView = this.gridView1;
-            this.gridControl1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gridControl1.Margin = new System.Windows.Forms.Padding(4);
             this.gridControl1.Name = "gridControl1";
             this.gridControl1.Size = new System.Drawing.Size(1704, 701);
             this.gridControl1.TabIndex = 19;
@@ -257,9 +255,11 @@
             this.gridView1.OptionsBehavior.ReadOnly = true;
             this.gridView1.OptionsView.ColumnAutoWidth = false;
             this.gridView1.OptionsView.RowAutoHeight = true;
+            this.gridView1.RowStyle += new DevExpress.XtraGrid.Views.Grid.RowStyleEventHandler(this.gridView1_RowStyle);
             // 
             // contextMenuStrip1
             // 
+            this.contextMenuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.updateTicketToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
@@ -290,7 +290,7 @@
             this.groupControl1.Controls.Add(this.label2);
             this.groupControl1.Dock = System.Windows.Forms.DockStyle.Top;
             this.groupControl1.Location = new System.Drawing.Point(0, 0);
-            this.groupControl1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupControl1.Margin = new System.Windows.Forms.Padding(4);
             this.groupControl1.Name = "groupControl1";
             this.groupControl1.Size = new System.Drawing.Size(1712, 114);
             this.groupControl1.TabIndex = 15;
@@ -298,17 +298,12 @@
             // 
             // txtdate
             // 
-            this.txtdate.EditValue = null;
-            this.txtdate.Location = new System.Drawing.Point(424, 39);
-            this.txtdate.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtdate.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
+            this.txtdate.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.txtdate.Location = new System.Drawing.Point(409, 38);
+            this.txtdate.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.txtdate.Name = "txtdate";
-            this.txtdate.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F);
-            this.txtdate.Properties.Appearance.Options.UseFont = true;
-            this.txtdate.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.txtdate.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.txtdate.Size = new System.Drawing.Size(175, 24);
+            this.txtdate.Size = new System.Drawing.Size(145, 27);
             this.txtdate.TabIndex = 16;
             // 
             // simpleButton1
@@ -318,7 +313,7 @@
             this.simpleButton1.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.Save_16x16__5_;
             this.simpleButton1.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.simpleButton1.Location = new System.Drawing.Point(821, 33);
-            this.simpleButton1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.simpleButton1.Margin = new System.Windows.Forms.Padding(4);
             this.simpleButton1.Name = "simpleButton1";
             this.simpleButton1.Size = new System.Drawing.Size(145, 58);
             this.simpleButton1.TabIndex = 15;
@@ -332,7 +327,7 @@
             this.ClientSize = new System.Drawing.Size(1712, 838);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupControl1);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "AcctTicketReports";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "AcctTicketReports";
@@ -347,8 +342,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.groupControl1)).EndInit();
             this.groupControl1.ResumeLayout(false);
             this.groupControl1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.txtdate.Properties.CalendarTimeProperties)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.txtdate.Properties)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -375,6 +368,6 @@
         private System.Windows.Forms.CheckBox chcktickets;
         private DevExpress.XtraEditors.GroupControl groupControl1;
         private DevExpress.XtraEditors.SimpleButton simpleButton1;
-        private DevExpress.XtraEditors.DateEdit txtdate;
+        private System.Windows.Forms.DateTimePicker txtdate;
     }
 }

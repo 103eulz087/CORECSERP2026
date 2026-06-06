@@ -35,20 +35,22 @@ namespace SalesInventorySystem.Reporting
 
         void display()
         {
-            if(radgroup.Checked==true)
+            if(radgroup.Checked==true) //GROUP
             {
                 gridControl1.BeginUpdate();
                 gridView1.GroupSummary.Clear();
                 gridView1.Columns.Clear();
                 gridControl1.DataSource = null;
-                //Database.display("SELECT DateReceived,Description,SUM(Quantity) as Quantity,Cost,FORMAT((Quantity*Cost), 'N', 'en-us') as TotalCost " +
-                Database.display("SELECT Product,Description,SUM(Quantity) as Quantity,Cost,FORMAT(SUM(Quantity * Cost), 'N', 'en-us') AS TotalCost " +
-                    "FROm dbo.Inventory with(nolock) " +
-                    "WHERE ShipmentNo='" + BatchProcessMasterDevEx.shipmentno + "' " +
-                    "and Branch='" + Login.assignedBranch + "' " +
-                    "and isSource=1 " +
-                    "and isProcess=0 " +
-                    "GROUP BY Product, Description, Cost ORDER BY Description ASC", gridControl1, gridView1);
+                Database.display($"SELECT * " +
+                    $"FROM dbo.func_viewInventoryReceivingReport_Group('{BatchProcessMasterDevEx.shipmentno}','{Login.assignedBranch}') ", 
+                    gridControl1, gridView1);
+                //Database.display("SELECT Product,Description,SUM(Quantity) as Quantity,Cost,FORMAT(SUM(Quantity * Cost), 'N', 'en-us') AS TotalCost " +
+                //    "FROm dbo.Inventory with(nolock) " +
+                //    "WHERE ShipmentNo='" + BatchProcessMasterDevEx.shipmentno + "' " +
+                //    "and Branch='" + Login.assignedBranch + "' " +
+                //    "and isSource=1 " +
+                //    "and isProcess=0 " +
+                //    "GROUP BY Product, Description, Cost ORDER BY Description ASC", gridControl1, gridView1);
                 //GridView viewz = gridControl1.FocusedView as GridView;
                 //viewz.SortInfo.ClearAndAddRange(new GridColumnSortInfo[] {
                 //new GridColumnSortInfo(viewz.Columns["Description"],DevExpress.Data.ColumnSortOrder.Ascending)
@@ -62,20 +64,25 @@ namespace SalesInventorySystem.Reporting
                 //Database.display("SELECT * FROM view_PODETAILS WHERE ShipmentNo='" + BatchProcessMasterDevEx.shipmentno + "' ", gridControl1, gridView1);
 
             }
-            if (raddetailed.Checked == true)
+            if (raddetailed.Checked == true) //DETAILED
             {
                 
                 gridControl1.BeginUpdate();
                 gridView1.GroupSummary.Clear();
                 gridView1.Columns.Clear();
                 gridControl1.DataSource = null;
-                //Database.display("SELECT DateReceived,Barcode,PalletNo,Description,TipWeight,Quantity AS ActualWeight,ROUND((TipWeight-Quantity),2) AS Variance,Cost FROm TempInventoryBatchUpload WHERE ShipmentNo='" + BatchProcessMasterDevEx.shipmentno + "' and Branch='"+Login.assignedBranch+"' and isSource=1 ORDER BY Description,PalletNo,Cost", gridControl1, gridView1); 
-                Database.display("SELECT SequenceNumber,DateReceived,Barcode,Description,Quantity,Cost " +
-                    "From dbo.Inventory with(nolock) " +
-                    "WHERE ShipmentNo='" + BatchProcessMasterDevEx.shipmentno + "' " +
-                    "and Branch='" + Login.assignedBranch + "' " +
-                    "and isProcess=0 " +
-                    "ORDER BY Description ASC", gridControl1, gridView1);
+                Database.display($"SELECT *" +
+                    $" FROM dbo.func_viewInventoryReceivingReport_Detail('{BatchProcessMasterDevEx.shipmentno}','{Login.assignedBranch}') ",
+                    gridControl1, gridView1);
+                //Database.display("SELECT SequenceNumber,DateReceived,Barcode,Description,Quantity,Cost " +
+                //    "From dbo.Inventory with(nolock) " +
+                //    "WHERE ShipmentNo='" + BatchProcessMasterDevEx.shipmentno + "' " +
+                //    "and Branch='" + Login.assignedBranch + "' " +
+                //    "and isProcess=0 " +
+                //    "ORDER BY Description ASC", gridControl1, gridView1);
+
+                gridView1.Columns["SequenceNumber"].OptionsColumn.Printable = DevExpress.Utils.DefaultBoolean.False;
+
                 GridView view = gridControl1.FocusedView as GridView;
                 view.SortInfo.ClearAndAddRange(new GridColumnSortInfo[] {
             
@@ -118,6 +125,7 @@ namespace SalesInventorySystem.Reporting
             string caption2 = row["Caption2"].ToString();
 
             string suppliername = Database.getSingleQuery("Supplier", "SupplierID='" + BatchProcessMasterDevEx.supplierid + "'", "SupplierName");
+            string datereceived = Database.getSingleQuery("POSUMMARY", "SupplierID='" + BatchProcessMasterDevEx.supplierid + "' AND ShipmentNo='"+ BatchProcessMasterDevEx.shipmentno + "'", "TargetDate");
             DevExReportTemplate.ShipmentReport xct = new DevExReportTemplate.ShipmentReport();
 
             Classes.Utilities.GetImageDevEx(xct.xrPictureBox1, "ReportHeaderSettings", "ReportName='ShipmentReport'", "ImageLogo");
@@ -134,12 +142,14 @@ namespace SalesInventorySystem.Reporting
             xct.lblshipment.Text = BatchProcessMasterDevEx.shipmentno;
             xct.xrsuppliername.Text = suppliername;
             xct.xrinvoiceno.Text = BatchProcessMasterDevEx.invoinceno;
+            xct.xrdatereceived.Text = Convert.ToDateTime(datereceived).ToShortDateString();
             xct.preparedby.Text = Login.Fullname;
            
             xct.Bands[BandKind.Detail].Controls.Add(HelperFunction.CopyGridControl(this.gridControl1));
             xct.Bands[BandKind.Detail].Font = new System.Drawing.Font("Tahoma", 10);
 
             //gridView1.Columns["Cost"].OptionsColumn.Printable = DevExpress.Utils.DefaultBoolean.False;
+
 
             ReportPrintTool report = new ReportPrintTool(xct);
             report.ShowRibbonPreviewDialog();

@@ -17,7 +17,12 @@ using System.Globalization;
 namespace SalesInventorySystem.HOFormsDevEx
 {
     public partial class SupplierPaymentDevEx : DevExpress.XtraEditors.XtraForm
-    {
+    { // ── State ────────────────────────────────────────────────────────────
+        private string _referenceNo = "";
+        private string _voucherId = "";
+        private string _voucherType = "";
+        private string _payMethod = "";  // "PURCHASE" | "EXPENSE"
+
         // ✅ Put this near the top with your fields (referenceno, voucherid, etc.)
         private class PaymentLine
         {
@@ -27,6 +32,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             public string InvoiceNo { get; set; }
             public string SequenceReferenceNumber { get; set; }
             public DateTime InvoiceDate { get; set; }
+            public decimal ActualCost { get; set; }
             public decimal AmountPaid { get; set; }
             public decimal Balance { get; set; }
             public decimal DiscountAmount { get; set; }
@@ -44,7 +50,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             for (int i = 0; i < gridViewMaster.RowCount; i++)
             {
                 bool pay = ToBool(gridViewMaster.GetRowCellValue(i, "Pay"));
-                    if (!pay) continue;
+                if (!pay) continue;
 
                 lines.Add(new PaymentLine
                 {
@@ -54,7 +60,8 @@ namespace SalesInventorySystem.HOFormsDevEx
                     InvoiceNo = Convert.ToString(gridViewMaster.GetRowCellValue(i, "InvoiceNo") ?? ""),
                     SequenceReferenceNumber = Convert.ToString(gridViewMaster.GetRowCellValue(i, "SequenceReferenceNumber") ?? ""),
                     InvoiceDate = Convert.ToDateTime(gridViewMaster.GetRowCellValue(i, "InvoiceDate") ?? DateTime.MinValue),
-                    AmountPaid = Convert.ToDecimal(gridViewMaster.GetRowCellValue(i, "AmountPaid") ?? 0m),
+                    ActualCost = Convert.ToDecimal(gridViewMaster.GetRowCellValue(i, "ActualCost") ?? 0m), //NET
+                    AmountPaid = Convert.ToDecimal(gridViewMaster.GetRowCellValue(i, "AmountPaid") ?? 0m), //NET
                     Balance = SafeToDecimal(gridViewMaster.GetRowCellValue(i, "Balance")),
                     DiscountAmount = Convert.ToDecimal(gridViewMaster.GetRowCellValue(i, "DiscountAmount") ?? 0m),
                     EWTAmount = Convert.ToDecimal(gridViewMaster.GetRowCellValue(i, "EWTAmount") ?? 0m),
@@ -96,7 +103,7 @@ namespace SalesInventorySystem.HOFormsDevEx
         string voucherid;
         string vouchertype = "";
         string status = "";
-        public static bool isdone = false,forliquidation=false;
+        public static bool isdone = false, forliquidation = false;
         public SupplierPaymentDevEx()
         {
             InitializeComponent();
@@ -104,7 +111,7 @@ namespace SalesInventorySystem.HOFormsDevEx
 
         void radChanged()
         {
-            if(radCashVoucher.Checked==true)
+            if (radCashVoucher.Checked == true)
             {
                 panelCheckVoucher.Visible = false;
             }
@@ -163,7 +170,7 @@ namespace SalesInventorySystem.HOFormsDevEx
         //            }
         //        }
         //    }
-           
+
         //}
 
         private void btnadd_Click(object sender, EventArgs e)
@@ -215,7 +222,7 @@ namespace SalesInventorySystem.HOFormsDevEx
         //            ctr += 1;
         //            //break;
         //        }
-               
+
         //    }
 
         //    if (ctr == 0)
@@ -243,7 +250,7 @@ namespace SalesInventorySystem.HOFormsDevEx
         //    //referenceno = IDGenerator.getIDNumberSP("sp_GetReferenceNumber", "ReferenceNumber"); //last used, generate new referencenumber
         //    referenceno = IDGenerator.getIDNumberSP("sp_GetReferenceNumber", "ReferenceNumber"); //IDGenerator.getVoucherNumberSP(); //not used
         //    int lastvoucherid = 0;
-           
+
         //    if (radCheckVoucher.Checked==true)
         //    {
         //        lastvoucherid = Database.getLastID("CheckVoucher", "SupplierID='" + txtsupplierid.Text + "'", "VoucherID") + 1;
@@ -399,66 +406,108 @@ namespace SalesInventorySystem.HOFormsDevEx
         //        con.Close();
         //    }
         //}
-        void populate()
+        private void populate()
         {
-            // Ensure date values are parsed properly. If you use DevExpress DateEdits, 
-            // it's highly recommended to use dateFrom.DateTime instead of parsing Text.
-            DateTime fromDate;
-            DateTime toDate;
-            DateTime.TryParse(dateFrom.Text, out fromDate);
-            DateTime.TryParse(dateTo.Text, out toDate);
+            if (!DateTime.TryParse(dateFrom.Text, out var fromDate)) fromDate = DateTime.Today.AddMonths(-1);
+            if (!DateTime.TryParse(dateTo.Text, out var toDate)) toDate = DateTime.Today;
 
-           
-            // Using blocks ensure Sql objects are properly closed and disposed of.
-            using (SqlConnection con = Database.getConnection())
-            using (SqlCommand com = new SqlCommand("splist_Accounts", con))
+            using (var con = Database.getConnection())
+            using (var cmd = new SqlCommand("splist_Accounts", con)
+            { CommandType = CommandType.StoredProcedure, CommandTimeout = 3600 })
             {
-                com.CommandType = CommandType.StoredProcedure;
-                com.CommandTimeout = 3600;
+                cmd.Parameters.Add("@parmdatefrom", SqlDbType.Date).Value = fromDate;
+                cmd.Parameters.Add("@parmdateto", SqlDbType.Date).Value = toDate;
+                cmd.Parameters.Add("@parmsupplierid", SqlDbType.VarChar, 30).Value = txtsupplierid.Text.Trim();
+                cmd.Parameters.Add("@parmispurchase", SqlDbType.Bit).Value = radioButtonPurchase.Checked;
+                cmd.Parameters.Add("@parmisexpense", SqlDbType.Bit).Value = radioButtonExpense.Checked;
 
-                // Pass direct values and booleans
-                com.Parameters.AddWithValue("@parmdatefrom", fromDate);
-                com.Parameters.AddWithValue("@parmdateto", toDate);
-                com.Parameters.AddWithValue("@parmsupplierid", txtsupplierid.Text);
-                com.Parameters.AddWithValue("@parmispurchase", radioButtonPurchase.Checked);
-                com.Parameters.AddWithValue("@parmisexpense", radioButtonExpense.Checked);
-
-                DataTable table = new DataTable();
-
+                var table = new DataTable();
                 try
                 {
                     Cursor.Current = Cursors.WaitCursor;
-                    this.UseWaitCursor = true;
-
+                    UseWaitCursor = true;
                     con.Open();
-                    using (SqlDataAdapter adapter = new SqlDataAdapter(com))
-                    {
-                        adapter.Fill(table);
-                    }
+                    new SqlDataAdapter(cmd).Fill(table);
 
                     gridControlMaster.BeginUpdate();
-
-                    // Clear and bind
                     gridViewMaster.Columns.Clear();
                     gridControlMaster.DataSource = table;
-
-                    // Apply formatting on the DevExpress side now that SQL returns raw Decimals
                     gridViewMaster.BestFitColumns();
                     FormatGridColumns();
                 }
                 catch (SqlException ex)
                 {
-                    // Providing an icon and title to the DevExpress Message box makes it look more native
-                    XtraMessageBox.Show($"Error retrieving accounts: {ex.Message}", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    XtraMessageBox.Show($"Error retrieving accounts: {ex.Message}",
+                        "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 finally
                 {
                     gridControlMaster.EndUpdate();
-                    this.UseWaitCursor = false;
+                    UseWaitCursor = false;
                     Cursor.Current = Cursors.Default;
                 }
             }
-        }
+        }   
+        //void populate()
+        //{
+        //    // Ensure date values are parsed properly. If you use DevExpress DateEdits, 
+        //    // it's highly recommended to use dateFrom.DateTime instead of parsing Text.
+        //    DateTime fromDate;
+        //    DateTime toDate;
+        //    DateTime.TryParse(dateFrom.Text, out fromDate);
+        //    DateTime.TryParse(dateTo.Text, out toDate);
+
+
+        //    // Using blocks ensure Sql objects are properly closed and disposed of.
+        //    using (SqlConnection con = Database.getConnection())
+        //    using (SqlCommand com = new SqlCommand("splist_Accounts", con))
+        //    {
+        //        com.CommandType = CommandType.StoredProcedure;
+        //        com.CommandTimeout = 3600;
+
+        //        // Pass direct values and booleans
+        //        com.Parameters.AddWithValue("@parmdatefrom", fromDate);
+        //        com.Parameters.AddWithValue("@parmdateto", toDate);
+        //        com.Parameters.AddWithValue("@parmsupplierid", txtsupplierid.Text);
+        //        com.Parameters.AddWithValue("@parmispurchase", radioButtonPurchase.Checked);
+        //        com.Parameters.AddWithValue("@parmisexpense", radioButtonExpense.Checked);
+
+        //        DataTable table = new DataTable();
+
+        //        try
+        //        {
+        //            Cursor.Current = Cursors.WaitCursor;
+        //            this.UseWaitCursor = true;
+
+        //            con.Open();
+        //            using (SqlDataAdapter adapter = new SqlDataAdapter(com))
+        //            {
+        //                adapter.Fill(table);
+        //            }
+
+        //            gridControlMaster.BeginUpdate();
+
+        //            // Clear and bind
+        //            gridViewMaster.Columns.Clear();
+        //            gridControlMaster.DataSource = table;
+
+        //            // Apply formatting on the DevExpress side now that SQL returns raw Decimals
+        //            gridViewMaster.BestFitColumns();
+        //            FormatGridColumns();
+        //        }
+        //        catch (SqlException ex)
+        //        {
+        //            // Providing an icon and title to the DevExpress Message box makes it look more native
+        //            XtraMessageBox.Show($"Error retrieving accounts: {ex.Message}", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        //        }
+        //        finally
+        //        {
+        //            gridControlMaster.EndUpdate();
+        //            this.UseWaitCursor = false;
+        //            Cursor.Current = Cursors.Default;
+        //        }
+        //    }
+        //}
 
         // Helper method to handle DevExpress UI formatting
         private void FormatGridColumns()
@@ -509,6 +558,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             dt.Columns.Add("InvoiceDate", typeof(DateTime));
             dt.Columns.Add("SequenceReferenceNumber", typeof(string));
             dt.Columns.Add("BatchReferenceID", typeof(long));
+            dt.Columns.Add("ActualCost", typeof(decimal));
             dt.Columns.Add("AmountPaid", typeof(decimal));
             dt.Columns.Add("EWTAmount", typeof(decimal));
             dt.Columns.Add("DiscountAmount", typeof(decimal));
@@ -523,75 +573,128 @@ namespace SalesInventorySystem.HOFormsDevEx
                     ln.InvoiceDate,
                     ln.SequenceNumber,          // note: string
                     ln.BatchReferenceID,
+                    ln.ActualCost,
                     ln.AmountPaid,
                     ln.EWTAmount,
                     ln.DiscountAmount,
                     ln.ReturnAllowances,
                     ln.Description
                 );
+              
+
             }
             return dt;
         }
-
         private void PostSupplierPayment(List<PaymentLine> lines)
         {
-            referenceno = IDGenerator.getIDNumberSP("sp_GetReferenceNumber", "ReferenceNumber"); //IDGenerator.getVoucherNumberSP(); //not used
+            // Generate IDs
+            _referenceNo = IDGenerator.getIDNumberSP("sp_GetReferenceNumber", "ReferenceNumber");
+            _voucherId = IDGenerator.getIDNumberSP("sp_GetVoucherNumber", "TicketNumber");
+            _voucherType = radCheckVoucher.Checked ? "CHECK" : "CASH";
+            _payMethod = radioButtonPurchase.Checked ? "PURCHASE" : "EXPENSE";
 
-            if (radCheckVoucher.Checked == true)
-            {
-                //lastvoucherid = Database.getLastID("CheckVoucher", "SupplierID='" + txtsupplierid.Text + "'", "VoucherID") + 1;
-                voucherid =  IDGenerator.getIDNumberSP("sp_GetVoucherNumber", "TicketNumber"); //IDGenerator.getVoucherNumberSP(); //not used
-                vouchertype = "CHECK";
-            }
-            else
-            {
-                //lastvoucherid = Database.getLastID("CashVoucher", "SupplierID='" + txtsupplierid.Text + "'", "VoucherID") + 1;
-                voucherid =  IDGenerator.getIDNumberSP("sp_GetVoucherNumber", "TicketNumber"); //IDGenerator.getVoucherNumberSP(); //not used
-                vouchertype = "CASH";
-            }
-            if (radioButtonPurchase.Checked == true) { status = "PURCHASE"; }
-            if (radioButtonExpense.Checked == true) { status = "EXPENSE"; }
             using (var con = Database.getConnection())
-            using (var cmd = new SqlCommand("sp_AddPaymentSupplierUnified", con))
-            //using (var cmd = new SqlCommand("sp_AddPaymentSupplier", con))
+            using (var cmd = new SqlCommand("sp_AddPaymentSupplierCompound", con))
             {
                 cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandTimeout = 180;
 
-                cmd.Parameters.Add("@parmrefno", SqlDbType.VarChar, 10).Value = referenceno;
-                cmd.Parameters.Add("@parmvoucherid", SqlDbType.VarChar, 10).Value = voucherid;
+                // ── scalar parameters ─────────────────────────────────────
+                cmd.Parameters.Add("@parmrefno", SqlDbType.VarChar, 10).Value = _referenceNo;
+                cmd.Parameters.Add("@parmvoucherid", SqlDbType.VarChar, 10).Value = _voucherId;
                 cmd.Parameters.Add("@parmsupplierid", SqlDbType.VarChar, 50).Value = txtsupplierid.Text.Trim();
                 cmd.Parameters.Add("@parmsuppliername", SqlDbType.VarChar, 150).Value = txtsuppliername.Text.Trim();
-
-                //cmd.Parameters.Add("@parmcheckamount", SqlDbType.Decimal)
-                //              .Value = SafeToDecimal(txtamounttopay.Text);
-
-                decimal amount = decimal.Parse(txtamounttopay.Text.Replace(",", ""),
-                    CultureInfo.InvariantCulture
-                );
-
-                cmd.Parameters.Add("@parmcheckamount", SqlDbType.Decimal).Value = amount;
-
+                cmd.Parameters.Add("@parmcheckamount", SqlDbType.Decimal).Value =
+                    decimal.Parse(txtamounttopay.Text.Replace(",", ""), CultureInfo.InvariantCulture);
                 cmd.Parameters.Add("@parmcheckno", SqlDbType.VarChar, 50).Value = txtcheckno.Text.Trim();
                 cmd.Parameters.Add("@parmcheckdate", SqlDbType.Date).Value =
-                    string.IsNullOrWhiteSpace(txtcheckdate.Text) ? (object)DBNull.Value : Convert.ToDateTime(txtcheckdate.Text);
+                    string.IsNullOrWhiteSpace(txtcheckdate.Text)
+                        ? (object)DBNull.Value
+                        : DateTime.Parse(txtcheckdate.Text);
                 cmd.Parameters.Add("@parmcheckremarks", SqlDbType.VarChar, 2000).Value = txtremakrs.Text.Trim();
                 cmd.Parameters.Add("@parmpreparedby", SqlDbType.VarChar, 30).Value = Login.Fullname;
                 cmd.Parameters.Add("@parmglcode", SqlDbType.VarChar, 30).Value = searchLookUpEdit1.Text.Trim();
-                cmd.Parameters.Add("@parmpaymethod", SqlDbType.VarChar, 20).Value =
-                    radioButtonPurchase.Checked ? "PURCHASE" : "EXPENSE"; // PURCHASE / EXPENSE
+                cmd.Parameters.Add("@parmpaymethod", SqlDbType.VarChar, 20).Value = _payMethod;
                 cmd.Parameters.Add("@parmforliquidation", SqlDbType.Bit).Value = checkforliquidation.Checked;
-                cmd.Parameters.Add("@parmvouchertype", SqlDbType.VarChar, 10).Value = vouchertype;  // CHECK / CASH
+                cmd.Parameters.Add("@parmvouchertype", SqlDbType.VarChar, 10).Value = _voucherType;
 
-                var tvp = BuildPaymentLinesTVP(lines);
-                var p = cmd.Parameters.AddWithValue("@Lines", tvp);
-                p.SqlDbType = SqlDbType.Structured;
-                p.TypeName = "dbo.AP_PaymentLineTVP";
-                con.Open();
-                cmd.ExecuteNonQuery();
-                BigAlert.Show("SUCCESS", "Payment Successfully Posted", MessageBoxIcon.Information);
+                // ── TVP parameter ─────────────────────────────────────────
+                var tvpParam = cmd.Parameters.AddWithValue("@Lines", BuildPaymentLinesTVP(lines));
+                tvpParam.SqlDbType = SqlDbType.Structured;
+                tvpParam.TypeName = "dbo.AP_PaymentLineTVP";
+
+                try
+                {
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                    BigAlert.Show("SUCCESS", "Payment successfully posted.", MessageBoxIcon.Information);
+                }
+                catch (SqlException ex)
+                {
+                    XtraMessageBox.Show($"Payment failed:\n{ex.Message}", "Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
-
         }
+        //private void PostSupplierPayment(List<PaymentLine> lines)
+        //{
+        //    referenceno = IDGenerator.getIDNumberSP("sp_GetReferenceNumber", "ReferenceNumber"); //IDGenerator.getVoucherNumberSP(); //not used
+
+        //    if (radCheckVoucher.Checked == true)
+        //    {
+        //        //lastvoucherid = Database.getLastID("CheckVoucher", "SupplierID='" + txtsupplierid.Text + "'", "VoucherID") + 1;
+        //        voucherid = IDGenerator.getIDNumberSP("sp_GetVoucherNumber", "TicketNumber"); //IDGenerator.getVoucherNumberSP(); //not used
+        //        vouchertype = "CHECK";
+        //    }
+        //    else
+        //    {
+        //        //lastvoucherid = Database.getLastID("CashVoucher", "SupplierID='" + txtsupplierid.Text + "'", "VoucherID") + 1;
+        //        voucherid = IDGenerator.getIDNumberSP("sp_GetVoucherNumber", "TicketNumber"); //IDGenerator.getVoucherNumberSP(); //not used
+        //        vouchertype = "CASH";
+        //    }
+        //    if (radioButtonPurchase.Checked == true) { status = "PURCHASE"; }
+        //    if (radioButtonExpense.Checked == true) { status = "EXPENSE"; }
+        //    using (var con = Database.getConnection())
+        //    using (var cmd = new SqlCommand("sp_AddPaymentSupplierUnified", con))
+        //    //using (var cmd = new SqlCommand("sp_AddPaymentSupplier", con))
+        //    {
+        //        cmd.CommandType = CommandType.StoredProcedure;
+
+        //        cmd.Parameters.Add("@parmrefno", SqlDbType.VarChar, 10).Value = referenceno;
+        //        cmd.Parameters.Add("@parmvoucherid", SqlDbType.VarChar, 10).Value = voucherid;
+        //        cmd.Parameters.Add("@parmsupplierid", SqlDbType.VarChar, 50).Value = txtsupplierid.Text.Trim();
+        //        cmd.Parameters.Add("@parmsuppliername", SqlDbType.VarChar, 150).Value = txtsuppliername.Text.Trim();
+
+        //        //cmd.Parameters.Add("@parmcheckamount", SqlDbType.Decimal)
+        //        //              .Value = SafeToDecimal(txtamounttopay.Text);
+
+        //        decimal amount = decimal.Parse(txtamounttopay.Text.Replace(",", ""),
+        //            CultureInfo.InvariantCulture
+        //        );
+
+        //        cmd.Parameters.Add("@parmcheckamount", SqlDbType.Decimal).Value = amount;
+
+        //        cmd.Parameters.Add("@parmcheckno", SqlDbType.VarChar, 50).Value = txtcheckno.Text.Trim();
+        //        cmd.Parameters.Add("@parmcheckdate", SqlDbType.Date).Value =
+        //            string.IsNullOrWhiteSpace(txtcheckdate.Text) ? (object)DBNull.Value : Convert.ToDateTime(txtcheckdate.Text);
+        //        cmd.Parameters.Add("@parmcheckremarks", SqlDbType.VarChar, 2000).Value = txtremakrs.Text.Trim();
+        //        cmd.Parameters.Add("@parmpreparedby", SqlDbType.VarChar, 30).Value = Login.Fullname;
+        //        cmd.Parameters.Add("@parmglcode", SqlDbType.VarChar, 30).Value = searchLookUpEdit1.Text.Trim();
+        //        cmd.Parameters.Add("@parmpaymethod", SqlDbType.VarChar, 20).Value =
+        //            radioButtonPurchase.Checked ? "PURCHASE" : "EXPENSE"; // PURCHASE / EXPENSE
+        //        cmd.Parameters.Add("@parmforliquidation", SqlDbType.Bit).Value = checkforliquidation.Checked;
+        //        cmd.Parameters.Add("@parmvouchertype", SqlDbType.VarChar, 10).Value = vouchertype;  // CHECK / CASH
+
+        //        var tvp = BuildPaymentLinesTVP(lines);
+        //        var p = cmd.Parameters.AddWithValue("@Lines", tvp);
+        //        p.SqlDbType = SqlDbType.Structured;
+        //        p.TypeName = "dbo.AP_PaymentLineTVP";
+        //        con.Open();
+        //        cmd.ExecuteNonQuery();
+        //        BigAlert.Show("SUCCESS", "Payment Successfully Posted", MessageBoxIcon.Information);
+        //    }
+
+        //}
 
         private static bool ToBool(object value)
         {
@@ -791,9 +894,9 @@ namespace SalesInventorySystem.HOFormsDevEx
         private void btnextract_Click(object sender, EventArgs e)
         {
             populate();
-           
+
             gridViewMaster.Columns[0].Visible = false;
-           // gridViewMaster.Columns[1].Visible = false;
+            // gridViewMaster.Columns[1].Visible = false;
             Classes.DevXGridViewSettings.ShowFooterTotal(gridViewMaster, "ActualCost");
             //if (radioButtonExpense.Checked == true)
             //{
@@ -811,7 +914,7 @@ namespace SalesInventorySystem.HOFormsDevEx
                 //Classes.DevXGridViewSettings.ShowFooterTotal(gridViewMaster, "OffsetAmount");
             }
             else
-            { 
+            {
             }
         }
 
@@ -824,8 +927,8 @@ namespace SalesInventorySystem.HOFormsDevEx
 
                 string companyname = row["Heading"].ToString();
                 string imagewidth = row["ImageWidth"].ToString();
-                string imageheight = row["ImageHeight"].ToString(); 
-                string caption1 = row["Caption1"].ToString(); 
+                string imageheight = row["ImageHeight"].ToString();
+                string caption1 = row["Caption1"].ToString();
                 string caption2 = row["Caption2"].ToString();
 
                 DevExReportTemplate.CheckVoucher xct = new DevExReportTemplate.CheckVoucher();
@@ -845,7 +948,7 @@ namespace SalesInventorySystem.HOFormsDevEx
 
                 string paytype = "";
                 if (radioButtonPurchase.Checked == true) { paytype = "PURCHASE"; } else { paytype = "EXPENSE"; }
-               
+
                 xct.xrcheckdate.Text = txtcheckdate.Text;
                 xct.xrpaytype.Text = paytype;
                 xct.xrpaidto.Text = txtsuppliername.Text;
@@ -860,7 +963,12 @@ namespace SalesInventorySystem.HOFormsDevEx
                 gridViewMaster.Columns["Balance"].Visible = false;
                 gridViewMaster.Columns["BranchCode"].Visible = false;
                 //gridViewMaster.Columns["ReferenceNo"].Visible = false;
-                gridViewMaster.Columns["BatchReferenceID"].Visible = false;
+                if (paytype == "EXPENSE")
+                {
+                    gridViewMaster.Columns["BatchReferenceID"].Visible = false;
+                    gridViewMaster.Columns["BatchReferenceID"].OptionsColumn.ShowInCustomizationForm = true;
+                }
+
                 //gridViewMaster.Columns["EWTAmount"].Visible = false;
                 //gridViewMaster.Columns["DiscountAmount"].Visible = false;
                 //gridViewMaster.Columns["ReturnAllowances"].Visible = false;
@@ -869,7 +977,7 @@ namespace SalesInventorySystem.HOFormsDevEx
                 gridViewMaster.Columns["Balance"].OptionsColumn.ShowInCustomizationForm = true;
                 gridViewMaster.Columns["BranchCode"].OptionsColumn.ShowInCustomizationForm = true;
                 //gridViewMaster.Columns["ReferenceNo"].OptionsColumn.ShowInCustomizationForm = true;
-                gridViewMaster.Columns["BatchReferenceID"].OptionsColumn.ShowInCustomizationForm = true;
+
                 //gridViewMaster.Columns["EWTAmount"].OptionsColumn.ShowInCustomizationForm = true;
                 //gridViewMaster.Columns["DiscountAmount"].OptionsColumn.ShowInCustomizationForm = true;
                 //gridViewMaster.Columns["ReturnAllowances"].OptionsColumn.ShowInCustomizationForm = true;
@@ -878,7 +986,7 @@ namespace SalesInventorySystem.HOFormsDevEx
                 //gridViewMaster.Columns["Description"].Visible = false;
                 //gridViewMaster.Columns["Type"].Visible = false;
                 gridViewMaster.Columns["Pay"].Visible = false;
-                    //gridViewMaster.Columns["OffsetAmount"].Visible = false;
+                //gridViewMaster.Columns["OffsetAmount"].Visible = false;
                 //gridViewMaster.Columns["OffsetDebitGLCode"].Visible = false;
                 //gridViewMaster.Columns["OffsetCreditGLCode"].Visible = false;
                 //gridViewMaster.Columns["Variance"].Visible = false;
@@ -929,7 +1037,7 @@ namespace SalesInventorySystem.HOFormsDevEx
                 //xct.Margins = new System.Drawing.Printing.Margins(100, 100, 100, 100);
                 double amounttopay = Convert.ToDouble(txtamounttopay.Text);
 
-                
+
                 xct.xrcheckdate.Text = txtcheckdate.Text;
                 xct.xrpaidto.Text = txtsuppliername.Text;
                 xct.xrparticular.Text = txtremakrs.Text;
@@ -971,11 +1079,12 @@ namespace SalesInventorySystem.HOFormsDevEx
 
         private void btnprint_Click(object sender, EventArgs e)
         {
-            if(radCashVoucher.Checked==true)
+            ClearUncheckedPayRows();
+            if (radCashVoucher.Checked == true)
             {
                 printCashVoucher();
             }
-            else if(radCheckVoucher.Checked==true)
+            else if (radCheckVoucher.Checked == true)
             {
                 if (String.IsNullOrEmpty(txtcheckno.Text) || String.IsNullOrEmpty(txtcheckdate.Text))
                 {
@@ -983,23 +1092,15 @@ namespace SalesInventorySystem.HOFormsDevEx
                 }
                 else
                 {
-                    
-                    for(int i=0;i<=gridViewMaster.RowCount-1;i++)
-                    {
-                        if(gridViewMaster.GetRowCellValue(i,"Pay").ToString()=="")
-                        {
-                            clearUncheckPayStatus();
-                        }
-                    }
                     printVoucher();
                 }
             }
-          
+
         }
 
         private void gridViewMaster_Click(object sender, EventArgs e)
         {
-            
+
         }
 
         private void radCashVoucher_CheckedChanged(object sender, EventArgs e)
@@ -1014,14 +1115,14 @@ namespace SalesInventorySystem.HOFormsDevEx
 
         private void contextMenuStrip4_MouseUp(object sender, MouseEventArgs e)
         {
-            
+
         }
 
         private void removeToolStripMenuItem_Click(object sender, EventArgs e)
         {
             string refno = gridViewMaster.GetRowCellValue(gridViewMaster.FocusedRowHandle, "ReferenceNo").ToString();
             string invoiceno = gridViewMaster.GetRowCellValue(gridViewMaster.FocusedRowHandle, "InvoiceNo").ToString();
-            if(radioButtonExpense.Checked == true && gridViewMaster.RowCount > 0)
+            if (radioButtonExpense.Checked == true && gridViewMaster.RowCount > 0)
             {
                 //bool checkifNotYetProcessed = Database.checkifExist("SELECT TOP(1) InvoiceNo " +
                 //"FROM dbo.ExpenseMaster " +
@@ -1037,7 +1138,7 @@ namespace SalesInventorySystem.HOFormsDevEx
                 "AND SupplierID='" + txtsupplierid.Text + "' " +
                 "AND ReferenceNumber='" + refno + "' " +
                 "AND Status='APPROVED' ");
-                
+
                 if (checkifNotYetProcessed)
                 {
                     bool confirm = HelperFunction.ConfirmDialog("Are you sure you want to Execute as ErrorCorrect this Transaction? ", "Confirm Error Correct");
@@ -1075,26 +1176,38 @@ namespace SalesInventorySystem.HOFormsDevEx
                 contextMenuStrip1.Show(gridControlMaster, e.Location);
         }
 
-        void clearUncheckPayStatus()
+        void ClearUncheckedPayRows()
         {
-            for (int i = 0; i <= gridViewMaster.RowCount - 1; i++)
+            for (int i = gridViewMaster.RowCount - 1; i >= 0; i--)
             {
-                //string sss = gridViewMaster.GetRowCellValue(i, "Pay").ToString();
-                if (gridViewMaster.GetRowCellValue(i, "Pay").ToString() == "NONE" || gridViewMaster.GetRowCellValue(i, "Pay").ToString() == "")
+                var val = gridViewMaster.GetRowCellValue(i, "Pay")?.ToString();
+
+                if (string.IsNullOrEmpty(val) || val == "NONE")
                 {
                     gridViewMaster.DeleteRow(i);
-
-                    for (int j = 0; j <= gridViewMaster.RowCount - 1; j++)
-                    {
-                        if (gridViewMaster.GetRowCellValue(j, "Pay").ToString() == "NONE" || gridViewMaster.GetRowCellValue(j, "Pay").ToString() == "")
-                        {
-                            gridViewMaster.DeleteRow(j);
-                        }
-                    }
-
                 }
             }
         }
+        //void clearUncheckPayStatus()
+        //{
+        //    for (int i = 0; i <= gridViewMaster.RowCount - 1; i++)
+        //    {
+        //        //string sss = gridViewMaster.GetRowCellValue(i, "Pay").ToString();
+        //        if (gridViewMaster.GetRowCellValue(i, "Pay").ToString() == "NONE" || gridViewMaster.GetRowCellValue(i, "Pay").ToString() == "")
+        //        {
+        //            gridViewMaster.DeleteRow(i);
+
+        //            for (int j = 0; j <= gridViewMaster.RowCount - 1; j++)
+        //            {
+        //                if (gridViewMaster.GetRowCellValue(j, "Pay").ToString() == "NONE" || gridViewMaster.GetRowCellValue(j, "Pay").ToString() == "")
+        //                {
+        //                    gridViewMaster.DeleteRow(j);
+        //                }
+        //            }
+
+        //        }
+        //    }
+        //}
 
         private void gridViewMaster_CellValueChanging(object sender, DevExpress.XtraGrid.Views.Base.CellValueChangedEventArgs e)
         {
@@ -1122,11 +1235,15 @@ namespace SalesInventorySystem.HOFormsDevEx
 
         }
 
+        private void panelControl1_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
         private void btnfilter_Click(object sender, EventArgs e)
         {
-            clearUncheckPayStatus();
+            ClearUncheckedPayRows();
+            //clearUncheckPayStatus();
         }
     }
- 
-
 }

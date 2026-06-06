@@ -31,6 +31,14 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(POSDataManagementAutomation));
             this.groupControl1 = new DevExpress.XtraEditors.GroupControl();
+            this.lblProgress = new DevExpress.XtraEditors.LabelControl();
+            this.lblCurrentBatch = new DevExpress.XtraEditors.LabelControl();
+            this.lblStatus = new DevExpress.XtraEditors.LabelControl();
+            this.labelControl3 = new DevExpress.XtraEditors.LabelControl();
+            this.labelControl2 = new DevExpress.XtraEditors.LabelControl();
+            this.labelControl1 = new DevExpress.XtraEditors.LabelControl();
+            this.btnStop = new DevExpress.XtraEditors.SimpleButton();
+            this.btnStart = new DevExpress.XtraEditors.SimpleButton();
             this.txtpercentage = new DevExpress.XtraEditors.SpinEdit();
             this.labelControl4 = new DevExpress.XtraEditors.LabelControl();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -41,14 +49,6 @@
             this.gridControl2 = new DevExpress.XtraGrid.GridControl();
             this.gridView3 = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.btnStart = new DevExpress.XtraEditors.SimpleButton();
-            this.btnStop = new DevExpress.XtraEditors.SimpleButton();
-            this.labelControl1 = new DevExpress.XtraEditors.LabelControl();
-            this.labelControl2 = new DevExpress.XtraEditors.LabelControl();
-            this.labelControl3 = new DevExpress.XtraEditors.LabelControl();
-            this.lblStatus = new DevExpress.XtraEditors.LabelControl();
-            this.lblCurrentBatch = new DevExpress.XtraEditors.LabelControl();
-            this.lblProgress = new DevExpress.XtraEditors.LabelControl();
             ((System.ComponentModel.ISupportInitialize)(this.groupControl1)).BeginInit();
             this.groupControl1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtpercentage.Properties)).BeginInit();
@@ -77,6 +77,98 @@
             this.groupControl1.Name = "groupControl1";
             this.groupControl1.Size = new System.Drawing.Size(1148, 143);
             this.groupControl1.TabIndex = 0;
+            // 
+            // lblProgress
+            // 
+            this.lblProgress.Appearance.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblProgress.Appearance.Options.UseFont = true;
+            this.lblProgress.Location = new System.Drawing.Point(580, 95);
+            this.lblProgress.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.lblProgress.Name = "lblProgress";
+            this.lblProgress.Size = new System.Drawing.Size(64, 21);
+            this.lblProgress.TabIndex = 54;
+            this.lblProgress.Text = "Progress:";
+            // 
+            // lblCurrentBatch
+            // 
+            this.lblCurrentBatch.Appearance.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblCurrentBatch.Appearance.Options.UseFont = true;
+            this.lblCurrentBatch.Location = new System.Drawing.Point(594, 66);
+            this.lblCurrentBatch.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.lblCurrentBatch.Name = "lblCurrentBatch";
+            this.lblCurrentBatch.Size = new System.Drawing.Size(78, 21);
+            this.lblCurrentBatch.TabIndex = 53;
+            this.lblCurrentBatch.Text = "Processing:";
+            // 
+            // lblStatus
+            // 
+            this.lblStatus.Appearance.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblStatus.Appearance.Options.UseFont = true;
+            this.lblStatus.Location = new System.Drawing.Point(562, 37);
+            this.lblStatus.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.lblStatus.Name = "lblStatus";
+            this.lblStatus.Size = new System.Drawing.Size(46, 21);
+            this.lblStatus.TabIndex = 52;
+            this.lblStatus.Text = "Status:";
+            // 
+            // labelControl3
+            // 
+            this.labelControl3.Appearance.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelControl3.Appearance.Options.UseFont = true;
+            this.labelControl3.Location = new System.Drawing.Point(510, 95);
+            this.labelControl3.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.labelControl3.Name = "labelControl3";
+            this.labelControl3.Size = new System.Drawing.Size(64, 21);
+            this.labelControl3.TabIndex = 51;
+            this.labelControl3.Text = "Progress:";
+            // 
+            // labelControl2
+            // 
+            this.labelControl2.Appearance.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelControl2.Appearance.Options.UseFont = true;
+            this.labelControl2.Location = new System.Drawing.Point(510, 66);
+            this.labelControl2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.labelControl2.Name = "labelControl2";
+            this.labelControl2.Size = new System.Drawing.Size(78, 21);
+            this.labelControl2.TabIndex = 50;
+            this.labelControl2.Text = "Processing:";
+            // 
+            // labelControl1
+            // 
+            this.labelControl1.Appearance.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelControl1.Appearance.Options.UseFont = true;
+            this.labelControl1.Location = new System.Drawing.Point(510, 37);
+            this.labelControl1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.labelControl1.Name = "labelControl1";
+            this.labelControl1.Size = new System.Drawing.Size(46, 21);
+            this.labelControl1.TabIndex = 49;
+            this.labelControl1.Text = "Status:";
+            // 
+            // btnStop
+            // 
+            this.btnStop.Appearance.Font = new System.Drawing.Font("Arial", 10.25F);
+            this.btnStop.Appearance.Options.UseFont = true;
+            this.btnStop.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnStop.ImageOptions.Image")));
+            this.btnStop.Location = new System.Drawing.Point(403, 37);
+            this.btnStop.Margin = new System.Windows.Forms.Padding(2, 5, 2, 5);
+            this.btnStop.Name = "btnStop";
+            this.btnStop.Size = new System.Drawing.Size(102, 43);
+            this.btnStop.TabIndex = 48;
+            this.btnStop.Text = "STOP";
+            this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
+            // 
+            // btnStart
+            // 
+            this.btnStart.Appearance.Font = new System.Drawing.Font("Arial", 10.25F);
+            this.btnStart.Appearance.Options.UseFont = true;
+            this.btnStart.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnStart.ImageOptions.Image")));
+            this.btnStart.Location = new System.Drawing.Point(290, 37);
+            this.btnStart.Margin = new System.Windows.Forms.Padding(2, 5, 2, 5);
+            this.btnStart.Name = "btnStart";
+            this.btnStart.Size = new System.Drawing.Size(109, 43);
+            this.btnStart.TabIndex = 47;
+            this.btnStart.Text = "START";
+            this.btnStart.Click += new System.EventHandler(this.btnStart_Click);
             // 
             // txtpercentage
             // 
@@ -199,98 +291,6 @@
             // 
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
-            // btnStart
-            // 
-            this.btnStart.Appearance.Font = new System.Drawing.Font("Arial", 10.25F);
-            this.btnStart.Appearance.Options.UseFont = true;
-            this.btnStart.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("simpleButton1.ImageOptions.Image")));
-            this.btnStart.Location = new System.Drawing.Point(290, 37);
-            this.btnStart.Margin = new System.Windows.Forms.Padding(2, 5, 2, 5);
-            this.btnStart.Name = "btnStart";
-            this.btnStart.Size = new System.Drawing.Size(109, 43);
-            this.btnStart.TabIndex = 47;
-            this.btnStart.Text = "START";
-            this.btnStart.Click += new System.EventHandler(this.btnStart_Click);
-            // 
-            // btnStop
-            // 
-            this.btnStop.Appearance.Font = new System.Drawing.Font("Arial", 10.25F);
-            this.btnStop.Appearance.Options.UseFont = true;
-            this.btnStop.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("simpleButton2.ImageOptions.Image")));
-            this.btnStop.Location = new System.Drawing.Point(403, 37);
-            this.btnStop.Margin = new System.Windows.Forms.Padding(2, 5, 2, 5);
-            this.btnStop.Name = "btnStop";
-            this.btnStop.Size = new System.Drawing.Size(102, 43);
-            this.btnStop.TabIndex = 48;
-            this.btnStop.Text = "STOP";
-            this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
-            // 
-            // labelControl1
-            // 
-            this.labelControl1.Appearance.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelControl1.Appearance.Options.UseFont = true;
-            this.labelControl1.Location = new System.Drawing.Point(510, 37);
-            this.labelControl1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.labelControl1.Name = "labelControl1";
-            this.labelControl1.Size = new System.Drawing.Size(46, 21);
-            this.labelControl1.TabIndex = 49;
-            this.labelControl1.Text = "Status:";
-            // 
-            // labelControl2
-            // 
-            this.labelControl2.Appearance.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelControl2.Appearance.Options.UseFont = true;
-            this.labelControl2.Location = new System.Drawing.Point(510, 66);
-            this.labelControl2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.labelControl2.Name = "labelControl2";
-            this.labelControl2.Size = new System.Drawing.Size(78, 21);
-            this.labelControl2.TabIndex = 50;
-            this.labelControl2.Text = "Processing:";
-            // 
-            // labelControl3
-            // 
-            this.labelControl3.Appearance.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelControl3.Appearance.Options.UseFont = true;
-            this.labelControl3.Location = new System.Drawing.Point(510, 95);
-            this.labelControl3.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.labelControl3.Name = "labelControl3";
-            this.labelControl3.Size = new System.Drawing.Size(64, 21);
-            this.labelControl3.TabIndex = 51;
-            this.labelControl3.Text = "Progress:";
-            // 
-            // lblStatus
-            // 
-            this.lblStatus.Appearance.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblStatus.Appearance.Options.UseFont = true;
-            this.lblStatus.Location = new System.Drawing.Point(562, 37);
-            this.lblStatus.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.lblStatus.Name = "lblStatus";
-            this.lblStatus.Size = new System.Drawing.Size(46, 21);
-            this.lblStatus.TabIndex = 52;
-            this.lblStatus.Text = "Status:";
-            // 
-            // lblCurrentBatch
-            // 
-            this.lblCurrentBatch.Appearance.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblCurrentBatch.Appearance.Options.UseFont = true;
-            this.lblCurrentBatch.Location = new System.Drawing.Point(594, 66);
-            this.lblCurrentBatch.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.lblCurrentBatch.Name = "lblCurrentBatch";
-            this.lblCurrentBatch.Size = new System.Drawing.Size(78, 21);
-            this.lblCurrentBatch.TabIndex = 53;
-            this.lblCurrentBatch.Text = "Processing:";
-            // 
-            // lblProgress
-            // 
-            this.lblProgress.Appearance.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblProgress.Appearance.Options.UseFont = true;
-            this.lblProgress.Location = new System.Drawing.Point(580, 95);
-            this.lblProgress.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.lblProgress.Name = "lblProgress";
-            this.lblProgress.Size = new System.Drawing.Size(64, 21);
-            this.lblProgress.TabIndex = 54;
-            this.lblProgress.Text = "Progress:";
-            // 
             // POSDataManagementAutomation
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
@@ -300,6 +300,7 @@
             this.Controls.Add(this.groupControl1);
             this.Name = "POSDataManagementAutomation";
             this.Text = "POSDataManagementAutomation";
+            this.Load += new System.EventHandler(this.POSDataManagementAutomation_Load);
             ((System.ComponentModel.ISupportInitialize)(this.groupControl1)).EndInit();
             this.groupControl1.ResumeLayout(false);
             this.groupControl1.PerformLayout();

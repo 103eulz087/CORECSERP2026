@@ -123,14 +123,18 @@ namespace SalesInventorySystem.Reporting
             gridView1.OptionsSelection.MultiSelect = false;
             gridView1.OptionsSelection.MultiSelectMode = DevExpress.XtraGrid.Views.Grid.GridMultiSelectMode.RowSelect;
 
-
+            if(GlobalCache.CompanyName=="VROSS")
+            {
+                gridView1.Columns["ProductCode"].OptionsColumn.Printable = DevExpress.Utils.DefaultBoolean.False;
+                gridView1.Columns["QtyReceived"].OptionsColumn.Printable = DevExpress.Utils.DefaultBoolean.False;
+            }
 
             gridView1.Columns["SeqNo"].OptionsColumn.Printable = DevExpress.Utils.DefaultBoolean.False;
-            gridView1.Columns["BarcodeNo"].OptionsColumn.Printable = DevExpress.Utils.DefaultBoolean.False;
+            //gridView1.Columns["BarcodeNo"].OptionsColumn.Printable = DevExpress.Utils.DefaultBoolean.False;
          
-            gridView1.Columns["Variance"].OptionsColumn.Printable = DevExpress.Utils.DefaultBoolean.False;
+            //gridView1.Columns["Variance"].OptionsColumn.Printable = DevExpress.Utils.DefaultBoolean.False;
             gridView1.Columns["Cost"].OptionsColumn.Printable = DevExpress.Utils.DefaultBoolean.False;
-            gridView1.Columns["TotalCost"].OptionsColumn.Printable = DevExpress.Utils.DefaultBoolean.False;
+            //gridView1.Columns["TotalCost"].OptionsColumn.Printable = DevExpress.Utils.DefaultBoolean.False;
 
             ReportPrintTool report = new ReportPrintTool(xct);
             report.ShowRibbonPreviewDialog();
