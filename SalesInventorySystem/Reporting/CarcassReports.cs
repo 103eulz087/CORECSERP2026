@@ -125,7 +125,7 @@ namespace SalesInventorySystem.Reporting
             string caption2 = row["Caption2"].ToString();
 
             string suppliername = Database.getSingleQuery("Supplier", "SupplierID='" + BatchProcessMasterDevEx.supplierid + "'", "SupplierName");
-            string datereceived = Database.getSingleQuery("POSUMMARY", "SupplierID='" + BatchProcessMasterDevEx.supplierid + "' AND ShipmentNo='"+ BatchProcessMasterDevEx.shipmentno + "'", "TargetDate");
+            string datereceived = Database.getSingleQuery("POSUMMARY", "SupplierID='" + BatchProcessMasterDevEx.supplierid + "' AND ShipmentNo='"+ BatchProcessMasterDevEx.shipmentno + "'", "ReceivedDate");
             DevExReportTemplate.ShipmentReport xct = new DevExReportTemplate.ShipmentReport();
 
             Classes.Utilities.GetImageDevEx(xct.xrPictureBox1, "ReportHeaderSettings", "ReportName='ShipmentReport'", "ImageLogo");

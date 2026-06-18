@@ -59,7 +59,15 @@ namespace SalesInventorySystem.HOForms
                 //radchanged();
 
                 Database.displayComboBoxItems("SELECT Description FROM ProductCategory with(nolock)", "Description", txtprodcat);
-                Database.displaySearchlookupEdit($"Select ProductCode,Description,ProductCategoryCode FROM dbo.Products with(nolock) WHERE BranchCode='{Login.assignedBranch}' AND ProductCategoryCode IN (10,11,12) ", txtsrchprod, "Description", "Description");
+                if(GlobalCache.CompanyName=="ENZO")
+                {
+                    Database.displaySearchlookupEdit($"Select ProductCode,Description,ProductCategoryCode FROM dbo.Products with(nolock) WHERE BranchCode='{Login.assignedBranch}' AND ProductCategoryCode IN (10,11,12) ", txtsrchprod, "Description", "Description");
+                }
+                else
+                {
+                    Database.displaySearchlookupEdit($"Select ProductCode,Description,ProductCategoryCode FROM dbo.Products with(nolock) WHERE BranchCode='{Login.assignedBranch}'  ", txtsrchprod, "Description", "Description");
+
+                }
                 getAvailablePort();
 
                 isprimalcuts.Checked = true;

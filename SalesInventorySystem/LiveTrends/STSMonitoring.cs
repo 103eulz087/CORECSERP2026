@@ -85,6 +85,7 @@ namespace SalesInventorySystem.LiveTrends
             }
             catch (Exception ex)
             {
+                ex.Message.ToString();
                 // Catch any other unexpected errors
                 this.Text = "Error - Retrying...";
                 this.ForeColor = Color.Red;
@@ -132,6 +133,7 @@ namespace SalesInventorySystem.LiveTrends
             }
             catch (Exception ex)
             {
+                ex.Message.ToString();
                 // Catch any other unexpected errors
                 this.Text = "Error - Retrying...";
                 this.ForeColor = Color.Red;

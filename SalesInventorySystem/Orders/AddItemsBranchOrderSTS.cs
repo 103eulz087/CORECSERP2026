@@ -19,6 +19,7 @@ namespace SalesInventorySystem.Orders
     public partial class AddItemsBranchOrderSTS : DevExpress.XtraEditors.XtraForm
     {
         RepositoryItemSpinEdit repoQuantity;
+        RepositoryItemComboBox repoUnit;
         public int Quantity { get; set; }
         int totalrowhandle = 0;
         HashSet<string> selectedProductCodes = new HashSet<string>();
@@ -46,6 +47,29 @@ namespace SalesInventorySystem.Orders
             repoQuantity.MaxValue = 99999;
             repoQuantity.IsFloatValue = false;
             gridControl1.RepositoryItems.Add(repoQuantity);
+
+
+            // Unit editor
+            repoUnit = new RepositoryItemComboBox();
+            repoUnit.Items.AddRange(new object[]
+            {
+                    "pcs",
+                    "piece",
+                    "grams",
+                    "kilograms",
+                    "kgs",
+                    "g",
+                    "kg",
+                    "liters",
+                    "ml",
+                    "box",
+                    "pack",
+                    "set"
+            });
+
+            // Optional: prevent typing values not in list
+            repoUnit.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;
+            gridControl1.RepositoryItems.Add(repoUnit);
         }
 
 
@@ -78,19 +102,42 @@ namespace SalesInventorySystem.Orders
 
                     string productCode = Convert.ToString(gridView1.GetRowCellValue(rowHandle, "ProductCode"))?.Trim();
                     string desc = Convert.ToString(gridView1.GetRowCellValue(rowHandle, "Description"))?.Trim();
+                    string unit = Convert.ToString(gridView1.GetRowCellValue(rowHandle, "Units"))?.Trim();
                     string remarks = Convert.ToString(gridView1.GetRowCellValue(rowHandle, "Remarks"))?.Trim();
 
                     if (string.IsNullOrWhiteSpace(productCode)) continue;
+                    if (GlobalCache.CompanyName == "VROSS")
+                    {
+                        if (string.IsNullOrWhiteSpace(unit)) unit = "pcs";
+                    }
+                    else if (GlobalCache.CompanyName == "ENZO")
+                    {
+                        if (string.IsNullOrWhiteSpace(unit)) unit = "kgs";
+                    }
 
-                    dt.Rows.Add(
+                        //dt.Rows.Add(
+                        //    txtpono.Text.Trim(),
+                        //    productCode,
+                        //    desc,
+                        //    qty,
+                        //    "kgs",
+                        //    true,
+                        //    remarks ?? ""
+                        //);
+
+
+
+
+                        dt.Rows.Add(
                         txtpono.Text.Trim(),
                         productCode,
                         desc,
                         qty,
-                        "kgs",
+                        unit,
                         true,
                         remarks ?? ""
                     );
+
                 }
             }
             finally
@@ -229,7 +276,7 @@ namespace SalesInventorySystem.Orders
 
                     string description = gridView1.GetRowCellValue(i, "Description").ToString();
                     string quantity = gridView1.GetRowCellValue(i, "Quantity").ToString();
-                    //string units = gridView1.GetRowCellValue(rowHandle, "Units").ToString();
+                    string units = gridView1.GetRowCellValue(i, "Units").ToString();
                     string remarks = gridView1.GetRowCellValue(i, "Remarks").ToString();
 
                     bool checkifexists = Database.checkifExist(
@@ -259,7 +306,7 @@ namespace SalesInventorySystem.Orders
                             ",'" + gridView1.GetRowCellValue(i, "ProductCode").ToString() + "'" +
                             ",'" + description + "'" +
                             ",'" + quantity + "'" +
-                            ",'kgs'" +
+                            ",'" + units + "'" +
                             ",'1'" +
                             ",'" + remarks + "') ");
                         }
@@ -300,16 +347,49 @@ namespace SalesInventorySystem.Orders
             string query = $"SELECT * FROM dbo.funcview_STSProductAndInventory('{Login.assignedBranch}','{catid}') ";
             HelperFunction.ShowWaitAndDisplayNonAsync(query, gridControl1, gridView1, "Please wait", "Populating data into the database...");
             gridView1.Focus();
+
+
+            // Assign editors after data binding
+            if (gridView1.Columns["Quantity"] != null)
+            {
+                gridView1.Columns["Quantity"].ColumnEdit = repoQuantity;
+                gridView1.Columns["Quantity"].Caption = "QTY";
+            }
+
+            if (gridView1.Columns["Units"] != null)
+            {
+                gridView1.Columns["Units"].ColumnEdit = repoUnit;
+                gridView1.Columns["Units"].Caption = "UNIT";
+                gridView1.Columns["Units"].Visible = true;
+                gridView1.Columns["Units"].VisibleIndex = gridView1.Columns["Quantity"].VisibleIndex + 1;
+            }
+
+            if (gridView1.Columns["Remarks"] != null)
+            {
+                gridView1.Columns["Remarks"].Caption = "REMARKS";
+            }
+
         }
 
         private void gridView1_ShowingEditor(object sender, CancelEventArgs e)
         {
+            //    GridView view = sender as GridView;
+            //    if (view.FocusedColumn.FieldName != "Quantity" &&
+            //view.FocusedColumn.FieldName != "Remarks")
+            //    {
+            //        e.Cancel = true;
+            //    }
+
+
             GridView view = sender as GridView;
             if (view.FocusedColumn.FieldName != "Quantity" &&
-        view.FocusedColumn.FieldName != "Remarks")
+                view.FocusedColumn.FieldName != "Units" &&
+                view.FocusedColumn.FieldName != "Remarks")
             {
                 e.Cancel = true;
             }
+
+
 
         }
 

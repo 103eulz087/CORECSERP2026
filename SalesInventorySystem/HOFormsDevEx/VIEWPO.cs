@@ -479,10 +479,9 @@ namespace SalesInventorySystem.HOFormsDevEx
             string waitCaption = "Please wait",
             string waitMessage = "Loading data...")
         {
+
             try
             {
-                this.Enabled = false;
-                // Wait cursor (simple + reliable)
                 Cursor.Current = Cursors.WaitCursor;
                 this.UseWaitCursor = true;
 
@@ -490,15 +489,15 @@ namespace SalesInventorySystem.HOFormsDevEx
                 using (var cmd = new SqlCommand(sql, con))
                 {
                     cmd.CommandType = CommandType.Text;
-                    cmd.CommandTimeout = 120; // adjust if needed
+                    cmd.CommandTimeout = 120;
 
                     bindParams?.Invoke(cmd);
 
-                    // Uses your Database.display(SqlCommand, GridControl, GridView)
                     Database.display(cmd, grid, view);
                 }
 
                 view.Focus();
+                this.Activate();  // ✅ KEEP FORM FRONT
             }
             catch (SqlException ex)
             {
@@ -509,8 +508,8 @@ namespace SalesInventorySystem.HOFormsDevEx
             {
                 this.UseWaitCursor = false;
                 Cursor.Current = Cursors.Default;
-                this.Enabled = true;
             }
+
         }
 
         private void LoadPOByStatus(

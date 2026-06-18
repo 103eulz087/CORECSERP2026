@@ -331,6 +331,36 @@
     <Compile Include="AccountingDevEx\BalanceSheetDevEx.Designer.cs">
       <DependentUpon>BalanceSheetDevEx.cs</DependentUpon>
     </Compile>
+    <Compile Include="AccountingDevEx\BankReconFormV1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AccountingDevEx\BankReconFormV1.Designer.cs">
+      <DependentUpon>BankReconFormV1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AccountingDevEx\BankReconForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AccountingDevEx\BankReconForm.Designer.cs">
+      <DependentUpon>BankReconForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AccountingDevEx\BankReconItemForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AccountingDevEx\BankReconItemForm.Designer.cs">
+      <DependentUpon>BankReconItemForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AccountingDevEx\ManualTicketFormV1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AccountingDevEx\ManualTicketFormV1.Designer.cs">
+      <DependentUpon>ManualTicketFormV1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AccountingDevEx\ManualTicketForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AccountingDevEx\ManualTicketForm.Designer.cs">
+      <DependentUpon>ManualTicketForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="AccountingDevEx\ViewCheckVoucherDetailsDevEx.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -2834,6 +2864,12 @@
     <Compile Include="Reporting\AccountingReportingDetails.Designer.cs">
       <DependentUpon>AccountingReportingDetails.cs</DependentUpon>
     </Compile>
+    <Compile Include="Reporting\AccountingReportsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Reporting\AccountingReportsForm.Designer.cs">
+      <DependentUpon>AccountingReportsForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Reporting\AccountReconDevEx.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -2941,6 +2977,12 @@
     </Compile>
     <Compile Include="Reporting\BIR\VATInput.Designer.cs">
       <DependentUpon>VATInput.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reporting\BranchInventoryTransfer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Reporting\BranchInventoryTransfer.Designer.cs">
+      <DependentUpon>BranchInventoryTransfer.cs</DependentUpon>
     </Compile>
     <Compile Include="Reporting\CarcassReports.cs">
       <SubType>Form</SubType>
@@ -3306,6 +3348,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="AccountingDevEx\BalanceSheetDevEx.resx">
       <DependentUpon>BalanceSheetDevEx.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AccountingDevEx\BankReconFormV1.resx">
+      <DependentUpon>BankReconFormV1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AccountingDevEx\BankReconForm.resx">
+      <DependentUpon>BankReconForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AccountingDevEx\ManualTicketFormV1.resx">
+      <DependentUpon>ManualTicketFormV1.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="AccountingDevEx\ViewCheckVoucherDetailsDevEx.resx">
       <DependentUpon>ViewCheckVoucherDetailsDevEx.cs</DependentUpon>
@@ -4551,6 +4602,9 @@
     <EmbeddedResource Include="Reporting\AccountingReportingDetails.resx">
       <DependentUpon>AccountingReportingDetails.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Reporting\AccountingReportsForm.resx">
+      <DependentUpon>AccountingReportsForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Reporting\AccountReconDevEx.resx">
       <DependentUpon>AccountReconDevEx.cs</DependentUpon>
     </EmbeddedResource>
@@ -4604,6 +4658,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Reporting\BIR\VATInput.resx">
       <DependentUpon>VATInput.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reporting\BranchInventoryTransfer.resx">
+      <DependentUpon>BranchInventoryTransfer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Reporting\CarcassReports.resx">
       <DependentUpon>CarcassReports.cs</DependentUpon>

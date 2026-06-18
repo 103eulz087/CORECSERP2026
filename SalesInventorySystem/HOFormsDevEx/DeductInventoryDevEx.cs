@@ -67,8 +67,11 @@ namespace SalesInventorySystem.HOFormsDevEx
                
                 string sp = "sp_Analyze";
                 SqlCommand com = new SqlCommand(sp, con);
-                com.Parameters.AddWithValue("@parmbranchcode", txtbranch.Text);
-                com.Parameters.AddWithValue("@parmtransdate", txtdate.Text);
+                //com.Parameters.AddWithValue("@parmbranchcode", txtbranch.Text);
+                //com.Parameters.AddWithValue("@parmtransdate", txtdate.Text);
+
+                com.Parameters.Add("@parmbranchcode", SqlDbType.VarChar).Value = txtbranch.Text;
+                com.Parameters.Add("@parmtransdate", SqlDbType.Date).Value = (DateTime)txtdate.Value.Date;
                 //com.Parameters.AddWithValue("@parmispercashier", false);
                 //com.Parameters.AddWithValue("@parmprocessby", Login.isglobalUserID);
                 com.CommandType = CommandType.StoredProcedure;
@@ -301,11 +304,18 @@ namespace SalesInventorySystem.HOFormsDevEx
                         com.CommandTimeout = 3600; // 1 Hour limit
 
                         // Add parameters cleanly
-                        com.Parameters.AddWithValue("@parmtransdate", txtdate.Text);
-                        com.Parameters.AddWithValue("@parmbranchcode", txtbranch.Text);
-                        com.Parameters.AddWithValue("@parmprodcode", "");
-                        com.Parameters.AddWithValue("@parmqty", "");
-                        com.Parameters.AddWithValue("@parmoption", "2");
+                        //com.Parameters.AddWithValue("@parmtransdate", txtdate.Text);
+                        //com.Parameters.AddWithValue("@parmbranchcode", txtbranch.Text);
+                       
+                        com.Parameters.Add("@parmbranchcode", SqlDbType.Date).Value = (DateTime)txtdate.Value.Date;
+                        com.Parameters.Add("@parmtransdate", SqlDbType.VarChar).Value = txtbranch.Text;
+                        com.Parameters.Add("@parmprodcode", SqlDbType.VarChar).Value = "";
+                        com.Parameters.Add("@parmqty", SqlDbType.VarChar).Value = "";
+                        com.Parameters.Add("@parmoption", SqlDbType.VarChar).Value = "2";
+
+                        //com.Parameters.AddWithValue("@parmprodcode", "");
+                        //com.Parameters.AddWithValue("@parmqty", "");
+                        //com.Parameters.AddWithValue("@parmoption", "2");
 
                         // 2. THIS IS THE MAGIC. 
                         // The UI is released to the user while SQL does the heavy lifting!

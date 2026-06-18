@@ -31,6 +31,7 @@ namespace SalesInventorySystem
 
         }
 
+    
         public static NpgsqlConnection getPgConnection()
         {
             // Accessing the registry for the Postgres string
@@ -46,6 +47,7 @@ namespace SalesInventorySystem
             }
             catch (NpgsqlException ex)
             {
+                ex.Message.ToString();
                 // Log the error or handle it
                 return null;
             }

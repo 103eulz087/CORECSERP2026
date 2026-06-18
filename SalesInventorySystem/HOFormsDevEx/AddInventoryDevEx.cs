@@ -21,11 +21,8 @@ namespace SalesInventorySystem.HOFormsDevEx
     public partial class AddInventoryDevEx : DevExpress.XtraEditors.XtraForm
     {
         bool iserror = false;
-        //DataTable table = null;
-        //string productcategorycode;
         public delegate void AddDataDelegate(String myString);
-        public AddDataDelegate myDelegate;
-        // private String weight;
+        public AddDataDelegate myDelegate; 
         public string wieght2 = "";
         public static bool isdone = false;
         object productcode,categorycode,productname;
@@ -38,16 +35,14 @@ namespace SalesInventorySystem.HOFormsDevEx
 
         private void AddInventoryDevEx_Load(object sender, EventArgs e)
         {
-            getAvailablePort();
-            //txtshipmentno.Text = ViewShipmentDashboard.shipmentno;
-            //txtrefno.Text = IDGenerator.getReferenceNumber();
-
+            getAvailablePort(); 
             txtrefno.Text = IDGenerator.getIDNumberSP("sp_GetReferenceNumber", "ReferenceNumber");
             loadgridview1();
             txtdestination.Text = "Commissary";
             txtinvoicedate.Text = DateTime.Today.ToShortDateString();
             txtduedate.Text = DateTime.Today.AddYears(1).ToShortDateString();
             populateProductCategory();
+            if (GlobalCache.CompanyName == "VROSS") { chckboxbarcode.Checked = false; chckboxUseBarcode.Checked = false; }
         }
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
@@ -361,32 +356,46 @@ namespace SalesInventorySystem.HOFormsDevEx
 
         private void display()
         {
-            Database.display("SELECT PalletNo,Product,Description,Barcode,Quantity,Cost,IsVat,(Quantity*Cost) as TotalCost " +
-                "FROM dbo.TempInventory WHERE ShipmentNo='" + txtshipmentno.Text + "' AND isProcess=0 " +
-                "ORDER BY SequenceNumber DESC", gridControl1, gridView1);
+            // Base query
+            string sql = "SELECT PalletNo,Product,Description,Barcode,Quantity,Cost,IsVat,(Quantity*Cost) as TotalCost " +
+                         "FROM dbo.TempInventory " +
+                         "WHERE ShipmentNo='" + txtshipmentno.Text + "' AND isProcess=0 ";
 
-            GridView view = gridControl1.FocusedView as GridView;
-            view.SortInfo.ClearAndAddRange(new GridColumnSortInfo[] {
+            // Decide sort direction
+            string sortDirection = (GlobalCache.CompanyName == "ENZO") ? "DESC" : "ASC";
+
+            // Append ORDER BY
+            sql += "ORDER BY SequenceNumber " + sortDirection;
+
+            // Execute once
+            Database.display(sql, gridControl1, gridView1);
+
+
+            if (GlobalCache.CompanyName == "ENZO")
+            {
+                GridView view = gridControl1.FocusedView as GridView;
+                view.SortInfo.ClearAndAddRange(new GridColumnSortInfo[] {
                 new GridColumnSortInfo(view.Columns["Description"],DevExpress.Data.ColumnSortOrder.Ascending)
                 }, 1);
-            gridView1.ExpandAllGroups();
+                gridView1.ExpandAllGroups();
 
-            GridGroupSummaryItem itemCount = new GridGroupSummaryItem();
-            itemCount.FieldName = "PalletNo";
-            itemCount.SummaryType = DevExpress.Data.SummaryItemType.Count;
-            itemCount.ShowInGroupColumnFooter = gridView1.Columns["PalletNo"];
-            gridView1.GroupSummary.Add(itemCount);
-            gridView1.Focus();
+                GridGroupSummaryItem itemCount = new GridGroupSummaryItem();
+                itemCount.FieldName = "PalletNo";
+                itemCount.SummaryType = DevExpress.Data.SummaryItemType.Count;
+                itemCount.ShowInGroupColumnFooter = gridView1.Columns["PalletNo"];
+                gridView1.GroupSummary.Add(itemCount);
+                gridView1.Focus();
 
-            GridGroupSummaryItem ite = new GridGroupSummaryItem();
-            ite.FieldName = "Quantity";
-            ite.SummaryType = DevExpress.Data.SummaryItemType.Sum;
-            ite.ShowInGroupColumnFooter = gridView1.Columns["Quantity"];
-            gridView1.GroupSummary.Add(ite);
-            gridView1.Focus();
+                GridGroupSummaryItem ite = new GridGroupSummaryItem();
+                ite.FieldName = "Quantity";
+                ite.SummaryType = DevExpress.Data.SummaryItemType.Sum;
+                ite.ShowInGroupColumnFooter = gridView1.Columns["Quantity"];
+                gridView1.GroupSummary.Add(ite);
+                gridView1.Focus();
 
-            Classes.DevXGridViewSettings.ShowFooterCountTotal(gridView1, "PalletNo");
-            Classes.DevXGridViewSettings.ShowFooterTotal(gridView1, "Quantity");
+                Classes.DevXGridViewSettings.ShowFooterCountTotal(gridView1, "PalletNo");
+                Classes.DevXGridViewSettings.ShowFooterTotal(gridView1, "Quantity");
+            }
         }
 
         bool finalupdate()
@@ -421,35 +430,6 @@ namespace SalesInventorySystem.HOFormsDevEx
                 con.Close();
             }
         }
-        //void finalupdate()
-        //{
-        //    SqlConnection con = Database.getConnection();
-        //    con.Open();
-        //    try
-        //    {
-        //        //string query = "spu_postInventory";
-        //        string query = "SP_POSTINVENTORY";
-        //        SqlCommand com = new SqlCommand(query, con);
-        //        com.Parameters.AddWithValue("@parmshipmentno", txtshipmentno.Text);
-        //        com.Parameters.AddWithValue("@parmrefno", txtrefno.Text);
-        //        com.Parameters.AddWithValue("@parmuser", Login.isglobalUserID);
-        //        com.Parameters.AddWithValue("@parmbranch", Login.assignedBranch);
-        //        com.Parameters.AddWithValue("@parminvoiceno", txtinvoiceno.Text);
-        //        com.Parameters.AddWithValue("@parminvoicedate", txtinvoicedate.Text);
-        //        com.Parameters.AddWithValue("@parmduedate", txtduedate.Text);
-        //        com.CommandType = CommandType.StoredProcedure;
-        //        com.CommandText = query;
-        //        com.ExecuteNonQuery();
-        //    }
-        //    catch (SqlException ex)
-        //    {
-        //        XtraMessageBox.Show(ex.Message.ToString());
-        //    }
-        //    finally
-        //    {
-        //        con.Close();
-        //    }
-        //}
 
         int getLastTicketNumber()
         {
@@ -558,52 +538,6 @@ namespace SalesInventorySystem.HOFormsDevEx
             {
                 XtraMessageBox.Show("Error generating barcode: " + ex.Message);
             }
-            //try
-            //{
-            //    decimal quantity;
-            //    string strquantity;
-
-            //    if (checkBox2.Checked == true)
-            //    {
-            //        if (txtcomport.Text == "" || txtcomport.Text == null)
-            //        {
-            //            XtraMessageBox.Show("Please Select COM-PORT!");
-            //            txtcomport.Focus();
-            //        }
-            //        else
-            //        {
-
-            //            txtweight.Invoke(this.myDelegate, new Object[] { wieght2 });
-            //            quantity = Decimal.Parse(txtweight.Text);
-            //            strquantity = String.Format("{0:00.000}", quantity);
-
-            //            string barcode = Database.getSingleResultSet($"SELECT dbo.func_GenerateBarcode" +
-            //    $"('{Login.assignedBranch}',0,'{txtshipmentno.Text}','{productcode.ToString()}','{strquantity}','1') ");
-
-            //            txtbarcode.Text = barcode;
-
-
-            //            simpleButton1.Focus();
-            //        }
-            //    }
-            //    else
-            //    {
-
-            //        quantity = Decimal.Parse(txtweight.Text);
-            //        strquantity = String.Format("{0:00.000}", quantity); 
-
-
-            //        string barcode = Database.getSingleResultSet($"SELECT dbo.func_GenerateBarcode" +
-            //$"('{Login.assignedBranch}',0,'{txtshipmentno.Text}','{productcode.ToString()}','{strquantity}','1') ");
-            //        txtbarcode.Text = barcode;
-
-            //        simpleButton1.Focus();
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    XtraMessageBox.Show(ex.Message.ToString());
-            //}
         }
 
         private void txtweight_KeyDown(object sender, KeyEventArgs e)
@@ -652,41 +586,6 @@ namespace SalesInventorySystem.HOFormsDevEx
             // just ensure txtbarcode.Text is fully generated and trimmed.
 
             PrintQr(txtbarcode.Text);
-
-            //Barcode.BarcodePrinting bprint = new Barcode.BarcodePrinting();
-            //bprint.xrshipno.Text = txtshipmentno.Text.Trim();
-            //bprint.lblmanufdate.Text = DateTime.Now.ToShortDateString();
-            //bprint.lblprodtype.Text = productname.ToString().Trim();
-            //bprint.lbltotalkilos.Text = txtweight.Text.Trim();
-            //bprint.xrpalletno.Text = txtpalletno.Text.Trim();
-            //bprint.xrsku.Text = productcode.ToString().Trim();
-
-            //if (DateTime.TryParse(txtduedate.Text, out DateTime dueDate))
-            //{
-            //    bprint.lblxpirydate.Text = dueDate.ToShortDateString();
-            //}
-
-            //bprint.xrBarCode2.Text = txtbarcode.Text.Trim();
-
-            //ReportPrintTool report = new ReportPrintTool(bprint);
-            //report.Print();
-
-
-
-            //Barcode.BarcodePrinting bprint = new Barcode.BarcodePrinting();
-            //bprint.xrshipno.Text = txtshipmentno.Text;
-            //bprint.lblmanufdate.Text = DateTime.Now.ToShortDateString();
-            //bprint.lblprodtype.Text = productname.ToString();
-            //bprint.lbltotalkilos.Text = txtweight.Text;
-            //bprint.xrpalletno.Text = txtpalletno.Text;
-            //bprint.xrsku.Text = productcode.ToString();
-            //bprint.lblxpirydate.Text = Convert.ToDateTime(txtduedate.Text).ToShortDateString();//DateTime.Now.AddYears(1).ToShortDateString();
-            //bprint.xrBarCode2.Text = txtbarcode.Text.Trim(); //productcategorycode + primalcode + txtweight.Text.Remove(2, 1);
-
-            //ReportPrintTool report = new ReportPrintTool(bprint);
-            ////report.ShowRibbonPreviewDialog();
-            ////report.PrintDialog();
-            //report.Print();
         }
 
         private void checkBox3_CheckedChanged(object sender, EventArgs e)

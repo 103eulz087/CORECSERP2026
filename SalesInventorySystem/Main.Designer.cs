@@ -303,6 +303,7 @@
             this.barButtonItem103 = new DevExpress.XtraBars.BarButtonItem();
             this.barButtonItem1 = new DevExpress.XtraBars.BarButtonItem();
             this.barButtonItem5 = new DevExpress.XtraBars.BarButtonItem();
+            this.btnBranchInterBranchTransfer = new DevExpress.XtraBars.BarButtonItem();
             ((System.ComponentModel.ISupportInitialize)(this.ribbonControl)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.popupMenuInvTransfer)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.popupMenu1)).BeginInit();
@@ -540,10 +541,11 @@
             this.btnPurchaseCosting,
             this.btnInventoryBranchSummary,
             this.btnBranchInventoryIN,
-            this.btnInventoryINAdjustment});
+            this.btnInventoryINAdjustment,
+            this.btnBranchInterBranchTransfer});
             this.ribbonControl.Location = new System.Drawing.Point(0, 0);
             this.ribbonControl.Margin = new System.Windows.Forms.Padding(1, 4, 1, 4);
-            this.ribbonControl.MaxItemId = 226;
+            this.ribbonControl.MaxItemId = 227;
             this.ribbonControl.Name = "ribbonControl";
             this.ribbonControl.PageHeaderItemLinks.Add(this.barStaticItem2);
             this.ribbonControl.Pages.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPage[] {
@@ -2864,6 +2866,7 @@
             this.ribbonPageGroup11.ItemLinks.Add(this.btnInventoryCostRep);
             this.ribbonPageGroup11.ItemLinks.Add(this.barbtncomparativeB);
             this.ribbonPageGroup11.ItemLinks.Add(this.btnTransferInventoryHO);
+            this.ribbonPageGroup11.ItemLinks.Add(this.btnBranchInterBranchTransfer);
             this.ribbonPageGroup11.Name = "ribbonPageGroup11";
             this.ribbonPageGroup11.Text = "INVENTORY REPORTS";
             // 
@@ -3070,6 +3073,13 @@
             this.barButtonItem5.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("barButtonItem5.ImageOptions.Image")));
             this.barButtonItem5.Name = "barButtonItem5";
             this.barButtonItem5.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
+            // 
+            // btnBranchInterBranchTransfer
+            // 
+            this.btnBranchInterBranchTransfer.Caption = "Branch Inventory Transfer";
+            this.btnBranchInterBranchTransfer.Id = 226;
+            this.btnBranchInterBranchTransfer.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("btnBranchInterBranchTransfer.ImageOptions.SvgImage")));
+            this.btnBranchInterBranchTransfer.Name = "btnBranchInterBranchTransfer";
             // 
             // Main
             // 
@@ -3386,5 +3396,6 @@
         private DevExpress.XtraBars.BarButtonItem btnInventoryBranchSummary;
         private DevExpress.XtraBars.BarButtonItem btnBranchInventoryIN;
         private DevExpress.XtraBars.BarButtonItem btnInventoryINAdjustment;
+        private DevExpress.XtraBars.BarButtonItem btnBranchInterBranchTransfer;
     }
 }

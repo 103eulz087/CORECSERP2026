@@ -56,7 +56,7 @@ namespace SalesInventorySystem.Reporting
             gridView1.Columns["Barcode"].OptionsColumn.Printable = DevExpress.Utils.DefaultBoolean.False;
             gridView1.Columns["ProductCategory"].OptionsColumn.Printable = DevExpress.Utils.DefaultBoolean.False;
             gridView1.Columns["Unit"].OptionsColumn.Printable = DevExpress.Utils.DefaultBoolean.False;
-            gridView1.Columns["Quantity"].OptionsColumn.Printable = DevExpress.Utils.DefaultBoolean.False;
+            //gridView1.Columns["Quantity"].OptionsColumn.Printable = DevExpress.Utils.DefaultBoolean.False;
             gridView1.Columns["Cost"].OptionsColumn.Printable = DevExpress.Utils.DefaultBoolean.False;
             gridView1.Columns["TotalCost"].OptionsColumn.Printable = DevExpress.Utils.DefaultBoolean.False;
             

@@ -592,6 +592,8 @@
             this.gridViewMaster.GridControl = this.gridControlMaster;
             this.gridViewMaster.LevelIndent = 0;
             this.gridViewMaster.Name = "gridViewMaster";
+            this.gridViewMaster.OptionsBehavior.EditorShowMode = DevExpress.Utils.EditorShowMode.MouseDown;
+            this.gridViewMaster.OptionsNavigation.EnterMoveNextColumn = true;
             this.gridViewMaster.OptionsView.ColumnAutoWidth = false;
             this.gridViewMaster.OptionsView.RowAutoHeight = true;
             this.gridViewMaster.OptionsView.ShowFooter = true;
@@ -600,8 +602,7 @@
             this.gridViewMaster.CustomRowCellEdit += new DevExpress.XtraGrid.Views.Grid.CustomRowCellEditEventHandler(this.gridViewMaster_CustomRowCellEdit);
             this.gridViewMaster.ShowingEditor += new System.ComponentModel.CancelEventHandler(this.gridViewMaster_ShowingEditor);
             this.gridViewMaster.CellValueChanged += new DevExpress.XtraGrid.Views.Base.CellValueChangedEventHandler(this.gridViewMaster_CellValueChanged);
-            this.gridViewMaster.CellValueChanging += new DevExpress.XtraGrid.Views.Base.CellValueChangedEventHandler(this.gridViewMaster_CellValueChanging);
-            this.gridViewMaster.Click += new System.EventHandler(this.gridViewMaster_Click);
+            this.gridViewMaster.KeyDown += new System.Windows.Forms.KeyEventHandler(this.gridViewMaster_KeyDown); 
             // 
             // repositoryItemComboBox5
             // 
@@ -758,8 +759,7 @@
             this.contextMenuStrip4.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripMenuItem3});
             this.contextMenuStrip4.Name = "contextMenuStrip1";
-            this.contextMenuStrip4.Size = new System.Drawing.Size(208, 28);
-            this.contextMenuStrip4.MouseUp += new System.Windows.Forms.MouseEventHandler(this.contextMenuStrip4_MouseUp);
+            this.contextMenuStrip4.Size = new System.Drawing.Size(208, 28); 
             // 
             // toolStripMenuItem3
             // 

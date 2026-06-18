@@ -45,9 +45,41 @@ namespace SalesInventorySystem.HOFormsDevEx
             txtamountpaid.Text = amountpaid.ToString();
         }
 
+        private void chckewt_CheckedChanged(object sender, EventArgs e)
+        {
+            if(chckewt.Checked==true)
+            {
+                groupBox1.Enabled = true;
+            }
+            else
+            {
+                groupBox1.Enabled = false;
+            }
+        }
+
         public SupplierAddPaymentDevEx()
         {
             InitializeComponent();
+        }
+
+        private void rad1perc_CheckedChanged(object sender, EventArgs e)
+        {
+            ewtCheckChanged();
+        }
+
+        private void rad2perc_CheckedChanged(object sender, EventArgs e)
+        {
+            ewtCheckChanged();
+        }
+
+        private void rad5perc_CheckedChanged(object sender, EventArgs e)
+        {
+            ewtCheckChanged();
+        }
+
+        private void rad10perc_CheckedChanged(object sender, EventArgs e)
+        {
+            ewtCheckChanged();
         }
 
         private void btnSave_Click(object sender, EventArgs e)
@@ -89,6 +121,76 @@ namespace SalesInventorySystem.HOFormsDevEx
             //    this.Close();
             //}
         }
+
+        //decimal ewtCheckChanged()
+        //{
+        //    decimal ewtamt = 0m;
+
+        //    if (rad1perc.Checked)
+        //    {
+        //        if (decimal.TryParse(txtbalance.Text, out decimal balance))
+        //        {
+        //            ewtamt = (balance / 1.12m) * 0.01m;
+        //        }
+        //    }else if(rad2perc.Checked)
+        //    {
+        //        if (decimal.TryParse(txtbalance.Text, out decimal balance))
+        //        {
+        //            ewtamt = (balance / 1.12m) * 0.02m;
+        //        }
+        //    }else if(rad5perc.Checked)
+        //    {
+        //        if (decimal.TryParse(txtbalance.Text, out decimal balance))
+        //        {
+        //            ewtamt = (balance / 1.12m) * 0.05m;
+        //        }
+        //    }else if(rad10perc.Checked)
+        //    {
+        //        if (decimal.TryParse(txtbalance.Text, out decimal balance))
+        //        {
+        //            ewtamt = (balance / 1.12m) * 0.1m;
+        //        }
+        //    }
+
+        //    return ewtamt;
+        //}
+        void ewtCheckChanged()
+        {
+            decimal ewtamt = 0m;
+
+            // Safely parse balance
+            if (!decimal.TryParse(txtbalance.Text, out decimal balance))
+            {
+                txtewtamount.Text = "0.00";
+                return;
+            }
+
+            // Decide calculation based on which radio is checked
+            if (rad1perc.Checked)
+            {
+                // Example: 1% of net of VAT
+                ewtamt = (balance / 1.12m) * 0.01m;
+            }
+            else if (rad2perc.Checked)
+            {
+                // Example: 2% of gross
+                ewtamt = (balance / 1.12m) * 0.02m;
+            }
+            else if (rad5perc.Checked)
+            {
+                // Example: fixed 500 deduction
+                ewtamt = (balance / 1.12m) * 0.05m;
+            }
+            else if (rad10perc.Checked)
+            {
+                // Example: 5% of net
+                ewtamt = (balance / 1.12m) * 0.1m;
+            }
+
+            // Show result
+            txtewtamount.Text = ewtamt.ToString("N2");
+        }
+
 
         private void SupplierAddPaymentDevEx_Load(object sender, EventArgs e)
         {
