@@ -31,6 +31,7 @@ namespace SalesInventorySystem
         bool isFifo = Database.checkifExist("SELECT isFifo FROM InventorySettings WHERE isFifo=1");
         bool isusedSearch = false;
         object objprodcode = null;
+        object objshipmentno = null;
         // string reamrks = "", specialprice = "", sellingprice = "";
         public AddBranchOrder()
         {
@@ -171,6 +172,7 @@ namespace SalesInventorySystem
             SqlConnection con = Database.getConnection();
             con.Open();
             string query = "sp_AddBranchOrderHRI";
+            if (GlobalCache.CompanyName == "JFC") { query = "sp_AddBranchOrderHRI_JFC"; }
             try
             {
                 SqlCommand com = new SqlCommand(query, con);
@@ -179,6 +181,9 @@ namespace SalesInventorySystem
                 com.Parameters.AddWithValue("@parmpono", txtponum.Text);
                 com.Parameters.AddWithValue("@parmprodcatcode", productcategorycode);
                 com.Parameters.AddWithValue("@parmprodcode", primalproductcode);
+
+                if (GlobalCache.CompanyName == "JFC") { com.Parameters.AddWithValue("@parmshipmentno", objshipmentno.ToString()); }
+                
                 com.Parameters.AddWithValue("@parmqty", txtweight.Text);
                 com.Parameters.AddWithValue("@parmbarcode", txtsku.Text);
 
@@ -1107,6 +1112,8 @@ namespace SalesInventorySystem
         private void txtsearchlookupproduct_EditValueChanged(object sender, EventArgs e)
         {
             objprodcode = SearchLookUpClass.getSingleValue(txtsearchlookupproduct, "ProductCode");
+            if (GlobalCache.CompanyName == "JFC") { objshipmentno = SearchLookUpClass.getSingleValue(txtsearchlookupproduct, "ShipmentNo"); }
+           
             globalproductcode = objprodcode.ToString();
             txtweight.Focus();
         }

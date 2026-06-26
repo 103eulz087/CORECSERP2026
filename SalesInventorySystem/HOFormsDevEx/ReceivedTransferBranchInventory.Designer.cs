@@ -84,7 +84,7 @@
             this.tabMain.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.tabMain.Name = "tabMain";
             this.tabMain.SelectedTabPage = this.tabForReceiving;
-            this.tabMain.Size = new System.Drawing.Size(1434, 731);
+            this.tabMain.Size = new System.Drawing.Size(1255, 731);
             this.tabMain.TabIndex = 8;
             this.tabMain.TabPages.AddRange(new DevExpress.XtraTab.XtraTabPage[] {
             this.tabForReceiving,
@@ -96,7 +96,7 @@
             this.tabForReceiving.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("tabForReceiving.ImageOptions.Image")));
             this.tabForReceiving.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.tabForReceiving.Name = "tabForReceiving";
-            this.tabForReceiving.Size = new System.Drawing.Size(1432, 699);
+            this.tabForReceiving.Size = new System.Drawing.Size(1253, 699);
             this.tabForReceiving.Text = "For Receiving";
             // 
             // groupBox1
@@ -108,7 +108,7 @@
             this.groupBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.groupBox1.Size = new System.Drawing.Size(1432, 699);
+            this.groupBox1.Size = new System.Drawing.Size(1253, 699);
             this.groupBox1.TabIndex = 9;
             this.groupBox1.TabStop = false;
             // 
@@ -120,7 +120,7 @@
             this.gridControlForReceiving.MainView = this.gridViewForReceiving;
             this.gridControlForReceiving.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.gridControlForReceiving.Name = "gridControlForReceiving";
-            this.gridControlForReceiving.Size = new System.Drawing.Size(1426, 614);
+            this.gridControlForReceiving.Size = new System.Drawing.Size(1247, 614);
             this.gridControlForReceiving.TabIndex = 3;
             this.gridControlForReceiving.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewForReceiving});
@@ -154,7 +154,7 @@
             this.groupBox3.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.groupBox3.Size = new System.Drawing.Size(1426, 61);
+            this.groupBox3.Size = new System.Drawing.Size(1247, 61);
             this.groupBox3.TabIndex = 8;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Filter Date";
@@ -163,10 +163,10 @@
             // 
             this.btnforrcvng.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnforrcvng.ImageOptions.Image")));
             this.btnforrcvng.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btnforrcvng.Location = new System.Drawing.Point(395, 21);
+            this.btnforrcvng.Location = new System.Drawing.Point(346, 21);
             this.btnforrcvng.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnforrcvng.Name = "btnforrcvng";
-            this.btnforrcvng.Size = new System.Drawing.Size(100, 28);
+            this.btnforrcvng.Size = new System.Drawing.Size(88, 28);
             this.btnforrcvng.TabIndex = 7;
             this.btnforrcvng.Text = "Generate";
             this.btnforrcvng.Click += new System.EventHandler(this.btnforrcvng_Click);
@@ -175,27 +175,27 @@
             // 
             this.txtdatetoforrcvng.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
             this.txtdatetoforrcvng.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.txtdatetoforrcvng.Location = new System.Drawing.Point(252, 21);
+            this.txtdatetoforrcvng.Location = new System.Drawing.Point(220, 21);
             this.txtdatetoforrcvng.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtdatetoforrcvng.Name = "txtdatetoforrcvng";
-            this.txtdatetoforrcvng.Size = new System.Drawing.Size(137, 27);
+            this.txtdatetoforrcvng.Size = new System.Drawing.Size(120, 27);
             this.txtdatetoforrcvng.TabIndex = 3;
             // 
             // txtdatefromforrcvng
             // 
             this.txtdatefromforrcvng.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
             this.txtdatefromforrcvng.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.txtdatefromforrcvng.Location = new System.Drawing.Point(68, 21);
+            this.txtdatefromforrcvng.Location = new System.Drawing.Point(60, 21);
             this.txtdatefromforrcvng.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtdatefromforrcvng.Name = "txtdatefromforrcvng";
-            this.txtdatefromforrcvng.Size = new System.Drawing.Size(137, 27);
+            this.txtdatefromforrcvng.Size = new System.Drawing.Size(120, 27);
             this.txtdatefromforrcvng.TabIndex = 2;
             // 
             // label5
             // 
             this.label5.AutoSize = true;
             this.label5.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
-            this.label5.Location = new System.Drawing.Point(212, 27);
+            this.label5.Location = new System.Drawing.Point(186, 27);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(37, 21);
             this.label5.TabIndex = 1;
@@ -205,7 +205,7 @@
             // 
             this.label6.AutoSize = true;
             this.label6.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
-            this.label6.Location = new System.Drawing.Point(9, 27);
+            this.label6.Location = new System.Drawing.Point(8, 27);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(60, 21);
             this.label6.TabIndex = 0;
@@ -216,7 +216,7 @@
             this.tabReceived.Controls.Add(this.groupBox2);
             this.tabReceived.Controls.Add(this.panelControl7);
             this.tabReceived.Name = "tabReceived";
-            this.tabReceived.Size = new System.Drawing.Size(1432, 699);
+            this.tabReceived.Size = new System.Drawing.Size(1253, 699);
             this.tabReceived.Text = "Received Items";
             // 
             // groupBox2
@@ -227,7 +227,7 @@
             this.groupBox2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.groupBox2.Size = new System.Drawing.Size(1432, 647);
+            this.groupBox2.Size = new System.Drawing.Size(1253, 647);
             this.groupBox2.TabIndex = 10;
             this.groupBox2.TabStop = false;
             // 
@@ -239,7 +239,7 @@
             this.gridControlMyReq.MainView = this.gridViewMyReq;
             this.gridControlMyReq.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.gridControlMyReq.Name = "gridControlMyReq";
-            this.gridControlMyReq.Size = new System.Drawing.Size(1426, 623);
+            this.gridControlMyReq.Size = new System.Drawing.Size(1247, 623);
             this.gridControlMyReq.TabIndex = 3;
             this.gridControlMyReq.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewMyReq});
@@ -272,17 +272,17 @@
             this.panelControl7.Location = new System.Drawing.Point(0, 0);
             this.panelControl7.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.panelControl7.Name = "panelControl7";
-            this.panelControl7.Size = new System.Drawing.Size(1432, 52);
+            this.panelControl7.Size = new System.Drawing.Size(1253, 52);
             this.panelControl7.TabIndex = 9;
             // 
             // btnMyReqExcel
             // 
             this.btnMyReqExcel.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.ExportToExcel_16x16;
             this.btnMyReqExcel.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btnMyReqExcel.Location = new System.Drawing.Point(514, 10);
+            this.btnMyReqExcel.Location = new System.Drawing.Point(450, 10);
             this.btnMyReqExcel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnMyReqExcel.Name = "btnMyReqExcel";
-            this.btnMyReqExcel.Size = new System.Drawing.Size(138, 28);
+            this.btnMyReqExcel.Size = new System.Drawing.Size(121, 28);
             this.btnMyReqExcel.TabIndex = 14;
             this.btnMyReqExcel.Text = "Export to Excel";
             // 
@@ -290,10 +290,10 @@
             // 
             this.btnMyReq.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnMyReq.ImageOptions.Image")));
             this.btnMyReq.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btnMyReq.Location = new System.Drawing.Point(407, 10);
+            this.btnMyReq.Location = new System.Drawing.Point(356, 10);
             this.btnMyReq.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnMyReq.Name = "btnMyReq";
-            this.btnMyReq.Size = new System.Drawing.Size(100, 28);
+            this.btnMyReq.Size = new System.Drawing.Size(88, 28);
             this.btnMyReq.TabIndex = 11;
             this.btnMyReq.Text = "Generate";
             this.btnMyReq.Click += new System.EventHandler(this.btnMyReq_Click);
@@ -302,7 +302,7 @@
             // 
             this.label8.AutoSize = true;
             this.label8.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
-            this.label8.Location = new System.Drawing.Point(12, 16);
+            this.label8.Location = new System.Drawing.Point(10, 16);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(60, 21);
             this.label8.TabIndex = 4;
@@ -312,27 +312,27 @@
             // 
             this.datetorcvd.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
             this.datetorcvd.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.datetorcvd.Location = new System.Drawing.Point(262, 10);
+            this.datetorcvd.Location = new System.Drawing.Point(229, 10);
             this.datetorcvd.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.datetorcvd.Name = "datetorcvd";
-            this.datetorcvd.Size = new System.Drawing.Size(137, 27);
+            this.datetorcvd.Size = new System.Drawing.Size(120, 27);
             this.datetorcvd.TabIndex = 7;
             // 
             // datefromrcvd
             // 
             this.datefromrcvd.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
             this.datefromrcvd.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.datefromrcvd.Location = new System.Drawing.Point(78, 10);
+            this.datefromrcvd.Location = new System.Drawing.Point(68, 10);
             this.datefromrcvd.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.datefromrcvd.Name = "datefromrcvd";
-            this.datefromrcvd.Size = new System.Drawing.Size(137, 27);
+            this.datefromrcvd.Size = new System.Drawing.Size(120, 27);
             this.datefromrcvd.TabIndex = 6;
             // 
             // label7
             // 
             this.label7.AutoSize = true;
             this.label7.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
-            this.label7.Location = new System.Drawing.Point(223, 16);
+            this.label7.Location = new System.Drawing.Point(195, 16);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(37, 21);
             this.label7.TabIndex = 5;
@@ -370,9 +370,9 @@
             // 
             // ReceivedTransferBranchInventory
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1434, 731);
+            this.ClientSize = new System.Drawing.Size(1255, 731);
             this.Controls.Add(this.tabMain);
             this.Name = "ReceivedTransferBranchInventory";
             this.Text = "ReceivedTransferBranchInventory";

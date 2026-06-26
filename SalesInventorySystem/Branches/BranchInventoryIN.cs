@@ -2,6 +2,8 @@
 using DevExpress.XtraEditors;
 using DevExpress.XtraEditors.Mask;
 using DevExpress.XtraEditors.Repository;
+using DevExpress.XtraGrid;
+using DevExpress.XtraGrid.Columns;
 using DevExpress.XtraGrid.Views.Grid;
 using SalesInventorySystem.Classes;
 using System;
@@ -17,7 +19,7 @@ using System.Windows.Forms;
 
 namespace SalesInventorySystem.Branches
 {
-    public partial class BranchInventoryIN : Form
+    public partial class BranchInventoryIN : XtraForm
     {
         public BranchInventoryIN()
         {
@@ -58,6 +60,28 @@ namespace SalesInventorySystem.Branches
         void display()
         {
             Database.display($"SELECT * FROM dbo.funcview_BranchInventoryIN('{Login.assignedBranch}') ORDER BY Category,ProductCode,Ending DESC", gridControlRcvd, gridViewRcvd);
+
+
+            GridView view = gridControlRcvd.FocusedView as GridView;
+            view.SortInfo.ClearAndAddRange(new GridColumnSortInfo[] {
+                new GridColumnSortInfo(view.Columns["Category"],DevExpress.Data.ColumnSortOrder.Ascending)
+                }, 1);
+            gridViewRcvd.ExpandAllGroups();
+
+            GridGroupSummaryItem itemCount = new GridGroupSummaryItem();
+            itemCount.FieldName = "PalletNo";
+            itemCount.SummaryType = DevExpress.Data.SummaryItemType.Count;
+            itemCount.ShowInGroupColumnFooter = gridViewRcvd.Columns["NewQty"];
+            gridViewRcvd.GroupSummary.Add(itemCount);
+            gridViewRcvd.Focus();
+
+            GridGroupSummaryItem ite = new GridGroupSummaryItem();
+            ite.FieldName = "Quantity";
+            ite.SummaryType = DevExpress.Data.SummaryItemType.Sum;
+            ite.ShowInGroupColumnFooter = gridViewRcvd.Columns["Variance"];
+            gridViewRcvd.GroupSummary.Add(ite);
+            gridViewRcvd.Focus();
+
             DevXGridViewSettings.ShowFooterCountTotal(gridViewRcvd, "BranchCode");
             DevXGridViewSettings.ShowFooterTotal(gridViewRcvd, "Ending");
             DevXGridViewSettings.ShowFooterTotal(gridViewRcvd, "NewQty");

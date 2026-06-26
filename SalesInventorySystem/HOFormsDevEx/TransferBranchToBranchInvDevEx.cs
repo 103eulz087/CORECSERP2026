@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
+using System.Drawing.Printing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -118,12 +119,26 @@ namespace SalesInventorySystem.HOFormsDevEx
             bprint.xrpalletno.Text = "n/a";
             bprint.xrsku.Text = globalprodcode;
             bprint.lblxpirydate.Text = DateTime.Now.AddYears(1).ToShortDateString();
-            bprint.xrBarCode2.Text = txtsku.Text.Trim(); //productcategorycode + primalcode + txtweight.Text.Remove(2, 1);
+            bprint.xrBarCode2.Text = txtsku.Text.Trim();
 
             ReportPrintTool report = new ReportPrintTool(bprint);
-            //report.ShowRibbonPreviewDialog();
-            //report.PrintDialog();
-            report.Print();
+
+            // Trap if no printer is installed
+            if (PrinterSettings.InstalledPrinters.Count > 0)
+            {
+                try
+                {
+                    report.Print();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Printing failed: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            else
+            {
+                MessageBox.Show("No printer available. Printing skipped.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
         }
 
         private void btngetweight_Click(object sender, EventArgs e)

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DevExpress.XtraEditors;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -10,7 +11,7 @@ using System.Windows.Forms;
 
 namespace SalesInventorySystem
 {
-    public partial class ReInventoryINRecovery : Form
+    public partial class ReInventoryINRecovery : XtraForm
     {
         public static string id = "";
         public static bool isdone = false;

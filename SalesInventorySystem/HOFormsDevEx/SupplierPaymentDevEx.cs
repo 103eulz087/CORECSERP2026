@@ -55,6 +55,7 @@ namespace SalesInventorySystem.HOFormsDevEx
 
             //DateTime checkDate = Convert.ToDateTime(txtcheckdate.EditValue);
             int year = checkDate.Year;
+            int month = checkDate.Month;
 
             // 2 & 3. Get the 2-digit Year and 2-digit Month
             string yy = checkDate.ToString("yy"); // e.g., "26"
@@ -64,7 +65,8 @@ namespace SalesInventorySystem.HOFormsDevEx
             // We only query the database if the year changes to prevent UI lag
             if (_loadedYear != year)
             {
-                _currentYearSequence = GetNextSequenceForYear(year);
+                //_currentYearSequence = GetNextSequenceForYear(year);
+                _currentYearSequence = GetNextSequenceForMonth(year,month);
                 _loadedYear = year;
             }
             string seq = _currentYearSequence.ToString("D3"); // Pads to 3 digits, e.g., "006"
@@ -81,7 +83,8 @@ namespace SalesInventorySystem.HOFormsDevEx
             string actualCheck = GetLastCheckNo();
 
             // 7. Assemble the final string
-            txtcheckno.Text = $"CV{yy}{mm}-{seq}{bank}{actualCheck}";
+            txtcheckcoding.Text = $"CV{yy}{mm}-{seq}{bank}";
+            txtcheckno.Text = $"{actualCheck}";
         }
         private string GetLastCheckNo()
         {
@@ -112,6 +115,35 @@ namespace SalesInventorySystem.HOFormsDevEx
                     using (var cmd = new SqlCommand(query, con))
                     {
                         cmd.Parameters.AddWithValue("@Year", year);
+                        con.Open();
+
+                        object result = cmd.ExecuteScalar();
+                        int currentCount = (result != null && result != DBNull.Value) ? Convert.ToInt32(result) : 0;
+
+                        // Return the next available number
+                        return currentCount + 1;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                XtraMessageBox.Show($"Error fetching check sequence: {ex.Message}", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return 1; // Default to 1 if it fails
+            }
+        }
+        private int GetNextSequenceForMonth(int year,int month)
+        {
+            try
+            {
+                using (var con = Database.getConnection())
+                {
+                    // Counts all checks issued in the selected year based on your CheckVoucher table
+                    string query = "SELECT COUNT(*) FROM CheckVoucher WHERE YEAR(CheckDate)=@Year AND MONTH(CheckDate) = @Month";
+
+                    using (var cmd = new SqlCommand(query, con))
+                    {
+                        cmd.Parameters.AddWithValue("@Year", year);
+                        cmd.Parameters.AddWithValue("@Month", month);
                         con.Open();
 
                         object result = cmd.ExecuteScalar();
@@ -258,7 +290,13 @@ namespace SalesInventorySystem.HOFormsDevEx
             }
 
             PostSupplierPayment(lines); // ONE call
-            populate(); 
+            populate();
+
+            txtlastchecknum.Text = "";
+            txtcheckno.Text = "";
+            txtcheckcoding.Text = "";
+            txtcheckdate.Text = "";
+            searchLookUpEdit1.Text = "";
         }
 
         
@@ -401,6 +439,7 @@ namespace SalesInventorySystem.HOFormsDevEx
                 cmd.Parameters.Add("@parmsuppliername", SqlDbType.VarChar, 150).Value = txtsuppliername.Text.Trim();
                 cmd.Parameters.Add("@parmcheckamount", SqlDbType.Decimal).Value =
                     decimal.Parse(txtamounttopay.Text.Replace(",", ""), CultureInfo.InvariantCulture);
+                cmd.Parameters.Add("@parmcheckcoding", SqlDbType.VarChar, 50).Value = txtcheckcoding.Text.Trim()+txtcheckno.Text.Trim();
                 cmd.Parameters.Add("@parmcheckno", SqlDbType.VarChar, 50).Value = txtcheckno.Text.Trim();
                 cmd.Parameters.Add("@parmcheckdate", SqlDbType.Date).Value =
                     string.IsNullOrWhiteSpace(txtcheckdate.Text)
@@ -413,6 +452,7 @@ namespace SalesInventorySystem.HOFormsDevEx
                 cmd.Parameters.Add("@parmforliquidation", SqlDbType.Bit).Value = checkforliquidation.Checked;
                 cmd.Parameters.Add("@parmvouchertype", SqlDbType.VarChar, 10).Value = _voucherType;
 
+                cmd.Parameters.Add("@parmPayingBranch", SqlDbType.VarChar, 10).Value = Login.assignedBranch;
                 // ── TVP parameter ─────────────────────────────────────────
                 var tvpParam = cmd.Parameters.AddWithValue("@Lines", BuildPaymentLinesTVP(lines));
                 tvpParam.SqlDbType = SqlDbType.Structured;
@@ -899,7 +939,12 @@ namespace SalesInventorySystem.HOFormsDevEx
             }
 
         }
-        
+
+        private void labelControl6_Click(object sender, EventArgs e)
+        {
+
+        }
+
         private void btnfilter_Click(object sender, EventArgs e)
         {
             ClearUncheckedPayRows();

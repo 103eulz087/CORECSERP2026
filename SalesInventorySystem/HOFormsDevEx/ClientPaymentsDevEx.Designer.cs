@@ -40,7 +40,6 @@
             this.repositoryItemSearchLookUpEdit1View = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.repositoryItemSearchLookUpEditOffsetGLCode = new DevExpress.XtraEditors.Repository.RepositoryItemSearchLookUpEdit();
             this.gridView1 = new DevExpress.XtraGrid.Views.Grid.GridView();
-            this.repositoryItemCheckEditStatus = new DevExpress.XtraEditors.Repository.RepositoryItemCheckEdit();
             this.repositoryItemSearchLookUpEditOffsetCreditGLCode = new DevExpress.XtraEditors.Repository.RepositoryItemSearchLookUpEdit();
             this.gridView4 = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.repositoryItemSearchLookUpEditEWTDebitGLCode = new DevExpress.XtraEditors.Repository.RepositoryItemSearchLookUpEdit();
@@ -159,7 +158,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.repositoryItemSearchLookUpEdit1View)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.repositoryItemSearchLookUpEditOffsetGLCode)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.repositoryItemCheckEditStatus)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.repositoryItemSearchLookUpEditOffsetCreditGLCode)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView4)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.repositoryItemSearchLookUpEditEWTDebitGLCode)).BeginInit();
@@ -242,12 +240,11 @@
             this.repositoryItemComboBox1,
             this.repositoryItemSearchLookUpEditglcode,
             this.repositoryItemSearchLookUpEditOffsetGLCode,
-            this.repositoryItemCheckEditStatus,
             this.repositoryItemSearchLookUpEditOffsetCreditGLCode,
             this.repositoryItemSearchLookUpEditEWTDebitGLCode,
             this.repositoryItemSearchLookUpEditEWTCreditGLCode,
             this.repositoryItemCheckEditPayCharge});
-            this.gridControl2.Size = new System.Drawing.Size(1457, 255);
+            this.gridControl2.Size = new System.Drawing.Size(1732, 255);
             this.gridControl2.TabIndex = 6;
             this.gridControl2.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView2,
@@ -263,6 +260,7 @@
             this.gridView2.DetailHeight = 431;
             this.gridView2.GridControl = this.gridControl2;
             this.gridView2.Name = "gridView2";
+            this.gridView2.OptionsBehavior.EditorShowMode = DevExpress.Utils.EditorShowMode.MouseDown;
             this.gridView2.OptionsView.ColumnAutoWidth = false;
             this.gridView2.OptionsView.RowAutoHeight = true;
             this.gridView2.OptionsView.ShowFooter = true;
@@ -270,7 +268,8 @@
             this.gridView2.CustomRowCellEdit += new DevExpress.XtraGrid.Views.Grid.CustomRowCellEditEventHandler(this.gridView2_CustomRowCellEdit);
             this.gridView2.ShowingEditor += new System.ComponentModel.CancelEventHandler(this.gridView2_ShowingEditor);
             this.gridView2.CellValueChanged += new DevExpress.XtraGrid.Views.Base.CellValueChangedEventHandler(this.gridView2_CellValueChanged);
-            this.gridView2.Click += new System.EventHandler(this.gridView2_Click);
+            this.gridView2.CellValueChanging += new DevExpress.XtraGrid.Views.Base.CellValueChangedEventHandler(this.gridView2_CellValueChanging);
+            this.gridView2.ValidatingEditor += new DevExpress.XtraEditors.Controls.BaseContainerValidateEditorEventHandler(this.gridView2_ValidatingEditor);
             // 
             // repositoryItemComboBox1
             // 
@@ -311,13 +310,6 @@
             this.gridView1.Name = "gridView1";
             this.gridView1.OptionsSelection.EnableAppearanceFocusedCell = false;
             this.gridView1.OptionsView.ShowGroupPanel = false;
-            // 
-            // repositoryItemCheckEditStatus
-            // 
-            this.repositoryItemCheckEditStatus.AutoHeight = false;
-            this.repositoryItemCheckEditStatus.Name = "repositoryItemCheckEditStatus";
-            this.repositoryItemCheckEditStatus.ValueChecked = "True";
-            this.repositoryItemCheckEditStatus.ValueUnchecked = "False";
             // 
             // repositoryItemSearchLookUpEditOffsetCreditGLCode
             // 
@@ -397,7 +389,7 @@
             this.repositoryItemSearchLookUpEdit3,
             this.repositoryItemSearchLookUpEdit4,
             this.repositoryItemSearchLookUpEdit5});
-            this.gridControl1.Size = new System.Drawing.Size(1502, 771);
+            this.gridControl1.Size = new System.Drawing.Size(1734, 529);
             this.gridControl1.TabIndex = 7;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView9,
@@ -519,7 +511,7 @@
             this.xtraTabControl1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.xtraTabControl1.Name = "xtraTabControl1";
             this.xtraTabControl1.SelectedTabPage = this.xtraTabPage1;
-            this.xtraTabControl1.Size = new System.Drawing.Size(1465, 680);
+            this.xtraTabControl1.Size = new System.Drawing.Size(1740, 680);
             this.xtraTabControl1.TabIndex = 0;
             this.xtraTabControl1.TabPages.AddRange(new DevExpress.XtraTab.XtraTabPage[] {
             this.xtraTabPage1,
@@ -530,7 +522,7 @@
             this.xtraTabPage1.Controls.Add(this.panel1);
             this.xtraTabPage1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.xtraTabPage1.Name = "xtraTabPage1";
-            this.xtraTabPage1.Size = new System.Drawing.Size(1463, 648);
+            this.xtraTabPage1.Size = new System.Drawing.Size(1738, 648);
             this.xtraTabPage1.Text = "Invoice w/Balances";
             // 
             // panel1
@@ -541,7 +533,7 @@
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(1463, 648);
+            this.panel1.Size = new System.Drawing.Size(1738, 648);
             this.panel1.TabIndex = 0;
             // 
             // groupBox2
@@ -553,7 +545,7 @@
             this.groupBox2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.groupBox2.Size = new System.Drawing.Size(1463, 279);
+            this.groupBox2.Size = new System.Drawing.Size(1738, 279);
             this.groupBox2.TabIndex = 20;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Transaction with Balances";
@@ -600,7 +592,7 @@
             this.groupBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.groupBox1.Size = new System.Drawing.Size(1463, 369);
+            this.groupBox1.Size = new System.Drawing.Size(1738, 369);
             this.groupBox1.TabIndex = 19;
             this.groupBox1.TabStop = false;
             // 
@@ -635,9 +627,9 @@
             this.groupCreditCardDetails.Controls.Add(this.label28);
             this.groupCreditCardDetails.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.25F);
             this.groupCreditCardDetails.Location = new System.Drawing.Point(839, 80);
-            this.groupCreditCardDetails.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupCreditCardDetails.Margin = new System.Windows.Forms.Padding(4);
             this.groupCreditCardDetails.Name = "groupCreditCardDetails";
-            this.groupCreditCardDetails.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupCreditCardDetails.Padding = new System.Windows.Forms.Padding(4);
             this.groupCreditCardDetails.Size = new System.Drawing.Size(476, 111);
             this.groupCreditCardDetails.TabIndex = 468;
             this.groupCreditCardDetails.TabStop = false;
@@ -650,7 +642,7 @@
             "MASTERCARD",
             "VISA"});
             this.txtcardtype.Location = new System.Drawing.Point(172, 275);
-            this.txtcardtype.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtcardtype.Margin = new System.Windows.Forms.Padding(4);
             this.txtcardtype.Name = "txtcardtype";
             this.txtcardtype.Size = new System.Drawing.Size(273, 26);
             this.txtcardtype.TabIndex = 15;
@@ -671,7 +663,7 @@
             // 
             this.txtexpirydate.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F);
             this.txtexpirydate.Location = new System.Drawing.Point(203, 138);
-            this.txtexpirydate.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtexpirydate.Margin = new System.Windows.Forms.Padding(4);
             this.txtexpirydate.Name = "txtexpirydate";
             this.txtexpirydate.Size = new System.Drawing.Size(243, 27);
             this.txtexpirydate.TabIndex = 13;
@@ -692,7 +684,7 @@
             // 
             this.txtccrefno.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F);
             this.txtccrefno.Location = new System.Drawing.Point(172, 26);
-            this.txtccrefno.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtccrefno.Margin = new System.Windows.Forms.Padding(4);
             this.txtccrefno.Name = "txtccrefno";
             this.txtccrefno.Size = new System.Drawing.Size(273, 27);
             this.txtccrefno.TabIndex = 11;
@@ -722,7 +714,7 @@
             // 
             this.txtccbank.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F);
             this.txtccbank.Location = new System.Drawing.Point(172, 61);
-            this.txtccbank.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtccbank.Margin = new System.Windows.Forms.Padding(4);
             this.txtccbank.Name = "txtccbank";
             this.txtccbank.Size = new System.Drawing.Size(273, 27);
             this.txtccbank.TabIndex = 6;
@@ -731,7 +723,7 @@
             // 
             this.txtccname.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F);
             this.txtccname.Location = new System.Drawing.Point(172, 335);
-            this.txtccname.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtccname.Margin = new System.Windows.Forms.Padding(4);
             this.txtccname.Name = "txtccname";
             this.txtccname.Size = new System.Drawing.Size(273, 27);
             this.txtccname.TabIndex = 5;
@@ -741,7 +733,7 @@
             // 
             this.txtccnumber.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F);
             this.txtccnumber.Location = new System.Drawing.Point(172, 304);
-            this.txtccnumber.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtccnumber.Margin = new System.Windows.Forms.Padding(4);
             this.txtccnumber.Name = "txtccnumber";
             this.txtccnumber.Size = new System.Drawing.Size(273, 27);
             this.txtccnumber.TabIndex = 4;
@@ -751,7 +743,7 @@
             // 
             this.txtccmerchant.FormattingEnabled = true;
             this.txtccmerchant.Location = new System.Drawing.Point(172, 169);
-            this.txtccmerchant.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtccmerchant.Margin = new System.Windows.Forms.Padding(4);
             this.txtccmerchant.Name = "txtccmerchant";
             this.txtccmerchant.Size = new System.Drawing.Size(273, 26);
             this.txtccmerchant.TabIndex = 9;
@@ -800,6 +792,7 @@
             this.txtcreditdesc.Properties.ReadOnly = true;
             this.txtcreditdesc.Size = new System.Drawing.Size(255, 24);
             this.txtcreditdesc.TabIndex = 467;
+            this.txtcreditdesc.Visible = false;
             // 
             // txtdebitdesc
             // 
@@ -912,6 +905,7 @@
             this.label20.Size = new System.Drawing.Size(94, 19);
             this.label20.TabIndex = 457;
             this.label20.Text = "Description:";
+            this.label20.Visible = false;
             // 
             // label19
             // 
@@ -953,6 +947,7 @@
             this.label16.Size = new System.Drawing.Size(465, 16);
             this.label16.TabIndex = 448;
             this.label16.Text = "Note: If Credit GL Code is Empty Value this Transaction is default to AR-Trade";
+            this.label16.Visible = false;
             // 
             // lblcrno
             // 
@@ -979,6 +974,7 @@
             this.txtcreditglcode.Properties.ValueMember = "SupplierName";
             this.txtcreditglcode.Size = new System.Drawing.Size(204, 24);
             this.txtcreditglcode.TabIndex = 450;
+            this.txtcreditglcode.Visible = false;
             this.txtcreditglcode.EditValueChanged += new System.EventHandler(this.searchLookUpEditcreditglcode_EditValueChanged);
             // 
             // gridView3
@@ -997,6 +993,7 @@
             this.label17.Size = new System.Drawing.Size(117, 19);
             this.label17.TabIndex = 449;
             this.label17.Text = "Credit GLCode:";
+            this.label17.Visible = false;
             // 
             // panelOnline
             // 
@@ -1378,7 +1375,7 @@
             this.xtraTabPage2.Controls.Add(this.panel2);
             this.xtraTabPage2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.xtraTabPage2.Name = "xtraTabPage2";
-            this.xtraTabPage2.Size = new System.Drawing.Size(1506, 890);
+            this.xtraTabPage2.Size = new System.Drawing.Size(1738, 648);
             this.xtraTabPage2.Text = "FullyPaid Invoice";
             // 
             // panel2
@@ -1389,7 +1386,7 @@
             this.panel2.Location = new System.Drawing.Point(0, 0);
             this.panel2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(1506, 890);
+            this.panel2.Size = new System.Drawing.Size(1738, 648);
             this.panel2.TabIndex = 1;
             // 
             // groupControl2
@@ -1399,7 +1396,7 @@
             this.groupControl2.Location = new System.Drawing.Point(0, 89);
             this.groupControl2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.groupControl2.Name = "groupControl2";
-            this.groupControl2.Size = new System.Drawing.Size(1506, 801);
+            this.groupControl2.Size = new System.Drawing.Size(1738, 559);
             this.groupControl2.TabIndex = 1;
             // 
             // groupControl1
@@ -1414,7 +1411,7 @@
             this.groupControl1.Location = new System.Drawing.Point(0, 0);
             this.groupControl1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.groupControl1.Name = "groupControl1";
-            this.groupControl1.Size = new System.Drawing.Size(1506, 89);
+            this.groupControl1.Size = new System.Drawing.Size(1738, 89);
             this.groupControl1.TabIndex = 0;
             // 
             // simpleButton5
@@ -1528,7 +1525,6 @@
             this.refreshDisplayToolStripMenuItem.Name = "refreshDisplayToolStripMenuItem";
             this.refreshDisplayToolStripMenuItem.Size = new System.Drawing.Size(219, 26);
             this.refreshDisplayToolStripMenuItem.Text = "Refresh Display";
-            this.refreshDisplayToolStripMenuItem.Click += new System.EventHandler(this.refreshDisplayToolStripMenuItem_Click);
             // 
             // showSalesItemsToolStripMenuItem
             // 
@@ -1536,13 +1532,12 @@
             this.showSalesItemsToolStripMenuItem.Name = "showSalesItemsToolStripMenuItem";
             this.showSalesItemsToolStripMenuItem.Size = new System.Drawing.Size(219, 26);
             this.showSalesItemsToolStripMenuItem.Text = "Show Invoice Details";
-            this.showSalesItemsToolStripMenuItem.Click += new System.EventHandler(this.showSalesItemsToolStripMenuItem_Click);
             // 
             // ClientPaymentsDevEx
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1465, 680);
+            this.ClientSize = new System.Drawing.Size(1740, 680);
             this.Controls.Add(this.xtraTabControl1);
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "ClientPaymentsDevEx";
@@ -1558,7 +1553,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.repositoryItemSearchLookUpEdit1View)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.repositoryItemSearchLookUpEditOffsetGLCode)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.repositoryItemCheckEditStatus)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.repositoryItemSearchLookUpEditOffsetCreditGLCode)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView4)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.repositoryItemSearchLookUpEditEWTDebitGLCode)).EndInit();
@@ -1643,7 +1637,7 @@
         private DevExpress.XtraGrid.Views.Grid.GridView repositoryItemSearchLookUpEdit1View;
         private DevExpress.XtraEditors.Repository.RepositoryItemSearchLookUpEdit repositoryItemSearchLookUpEditOffsetGLCode;
         private DevExpress.XtraGrid.Views.Grid.GridView gridView1;
-        private DevExpress.XtraEditors.Repository.RepositoryItemCheckEdit repositoryItemCheckEditStatus;
+        //private DevExpress.XtraEditors.Repository.RepositoryItemCheckEdit repositoryItemCheckEditStatus;
         private DevExpress.XtraEditors.Repository.RepositoryItemSearchLookUpEdit repositoryItemSearchLookUpEditOffsetCreditGLCode;
         private DevExpress.XtraGrid.Views.Grid.GridView gridView4;
         private DevExpress.XtraEditors.Repository.RepositoryItemSearchLookUpEdit repositoryItemSearchLookUpEditEWTDebitGLCode;

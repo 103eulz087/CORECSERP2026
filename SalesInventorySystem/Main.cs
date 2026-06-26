@@ -20,6 +20,7 @@ using DevExpress.XtraReports.UI;
 using System.Threading.Tasks;
 using System.Reflection;
 using System.Net.Http;
+using SalesInventorySystem.Reporting;
 
 namespace SalesInventorySystem
 {
@@ -3484,6 +3485,54 @@ namespace SalesInventorySystem
         {
             InventoryIN pcusatfsmr = new InventoryIN();
             pcusatfsmr.ShowDialog(this);
+        }
+
+        private void btnPurchaseOrderReceivingConso_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            BatchProcessMasterDevEx pcusatfsmr = new BatchProcessMasterDevEx();
+            pcusatfsmr.Show(this);
+        }
+
+        private void btnDelivReportRepConso_ItemClick(object sender, ItemClickEventArgs e)
+        {
+
+            DeliveryReportsFrm pcusatfsmr = new DeliveryReportsFrm();
+            pcusatfsmr.Show(this);
+
+        }
+
+        private void btnConversionRepConso_ItemClick(object sender, ItemClickEventArgs e)
+        {
+
+            ConversionReports pcusatfsmr = new ConversionReports();
+            pcusatfsmr.Show(this);
+        }
+
+        private void btnReturnTransferRepConso_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            OpenMdiForm<HOFormsDevEx.ReceivedTransferBranchInventory>();
+        }
+
+        private void btnReturnToSupplierConso_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            OpenMdiForm<HOFormsDevEx.ReceivedTransferBranchInventory>();
+        }
+
+        private void btnBOReportsConso_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            OpenMdiForm<HOFormsDevEx.ReceivedTransferBranchInventory>();
+        }
+
+        private void btnMonthEndCountConso_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            InventoryMonthEndReInventory pcusatfsmr = new InventoryMonthEndReInventory();
+            pcusatfsmr.Show(this);
+        }
+
+        private void btnSummaryInventoryConso_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            InventoryMonthlyActivityPivot pcusatfsmr = new InventoryMonthlyActivityPivot();
+            pcusatfsmr.Show(this);
         }
 
         private void Main_FormClosing(object sender, FormClosingEventArgs e)

@@ -288,8 +288,8 @@ namespace SalesInventorySystem
 
         private void simpleButton3_Click(object sender, EventArgs e)
         {
-            //Database.ExecuteQuery("DELETE FROM TempInventoryIN WHERE SequenceNumber='" + gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "SequenceNumber").ToString() + "'");
-            Database.ExecuteQuery("DELETE FROM InventoryIN WHERE SequenceNumber='" + gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "SequenceNumber").ToString() + "'");
+             //Database.ExecuteQuery("DELETE FROM InventoryIN WHERE SequenceNumber='" + gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "SequenceNumber").ToString() + "'");
+            Database.ExecuteQuery("DELETE FROM InventoryINMonthEnd WHERE SequenceNumber='" + gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "SequenceNumber").ToString() + "'");
             display();
             txtbarcodescanning.Focus();
         }
@@ -300,10 +300,10 @@ namespace SalesInventorySystem
             revin.ShowDialog(this);
             if (ReInventoryINRecovery.isdone == true)
             {
-                bool checkfirst = Database.checkifExist("SELECT ID FROM InventoryIN WHERE ID = '" + ReInventoryINRecovery.id + "'");
+                bool checkfirst = Database.checkifExist("SELECT ID FROM [InventoryINMonthEnd] WHERE ID = '" + ReInventoryINRecovery.id + "'");
                 if (checkfirst)
                 {
-                    Database.display("SELECT * FROM InventoryIN WHERE ID='" + ReInventoryINRecovery.id + "'", gridControl1, gridView1);
+                    Database.display("SELECT * FROM [InventoryINMonthEnd] WHERE ID='" + ReInventoryINRecovery.id + "'", gridControl1, gridView1);
                     txtid.Text = ReInventoryINRecovery.id;
                 }
                 else
@@ -369,8 +369,20 @@ namespace SalesInventorySystem
             XtraMessageBox.Show("Successfully Added!");
             this.Dispose();
         }
+
+        void export()
+        {
+            if (gridView1.Focus())
+            {
+                string filename = "MONTHEND_REINVENTORY" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_" + txtid.Text;
+                HelperFunction.exporttoexcel(gridView1, filename);
+                BigAlert.Show("SUCCESS", "SUCCESFULLY EXPORTED!, Please check in Drive C:/MyFiles/", MessageBoxIcon.Information);
+            }
+        }
+
         private void simpleButton2_Click(object sender, EventArgs e)
         {
+            export();
             Commit();
         }
 
@@ -639,29 +651,6 @@ namespace SalesInventorySystem
 
         async void AddEntryNew() //STAGING
         {
-            //bool ifExists = Database.checkifExist($"SELECT 1 FROM dbo.Inventory WHERE Branch='{Login.assignedBranch}' AND Barcode='{txtbarcodescanning.Text.Trim()}' ");
-            //var rowz = Database.getMultipleQuery($"SELECT TOP(1) Branch,Product,Description,Barcode,Quantity,Available " +
-            //    $"FROM dbo.Inventory with(nolock) WHERE Branch='{Login.assignedBranch}' AND Barcode='{txtbarcodescanning.Text.Trim()}'",
-            //    "Branch,Product,Description,Barcode,Quantity,Available");
-            //string Branch, Product, Description, Barcode, Quantity, Available;
-            //Branch = rowz["Branch"].ToString();
-            //Product = rowz["Product"].ToString();
-            //Description = rowz["Description"].ToString();
-            //Barcode = rowz["Barcode"].ToString();
-            //Quantity = rowz["Quantity"].ToString();
-            //Available = rowz["Available"].ToString();
-
-            //Database.ExecuteQuery("INSERT INTO dbo.TempInventoryIN (ID,Branch,DateReceived,ExpiryDate,Product,Description,Barcode,Quantity,Cost,isWarehouse,isVat,isDone,DateEncode,EncodeBy) " +
-            //    "VALUES('" + txtid.Text + "'" +
-            //    $",'888'" +
-            //    $",'{txtdatereceived.Text}'" +
-            //    $",'{txtxpirydate.Text}'" +
-            //    $",'{Product}'" +
-            //    $",'{Description}'" +
-            //    $",'{Barcode}'" +
-            //    $",'{Quantity}'" +
-            //    $",'{DateTime.Now.ToString()}'" +
-            //    $",'{Login.isglobalUserID}')", "Succesfully Added");
             if (string.IsNullOrWhiteSpace(txtbarcodescanning.Text))
             {
                 //XtraMessageBox.Show("Please scan or enter a barcode.");

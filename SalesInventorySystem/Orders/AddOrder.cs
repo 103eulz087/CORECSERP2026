@@ -371,17 +371,39 @@ namespace SalesInventorySystem
 
                 for (int i = 0; i <= gridView1.RowCount - 1; i++)
                 {
-                    Database.ExecuteQuery("INSERT INTO PurchaseOrderDetails VALUES( '" + ctr + "','" + textEdit1.Text + "','" + gridView1.GetRowCellValue(i, "ProductCode").ToString() + "','" + gridView1.GetRowCellValue(i, "ProductName").ToString() + "','" + gridView1.GetRowCellValue(i, "Qty").ToString() + "','" + gridView1.GetRowCellValue(i, "Units").ToString() + "','0','" + gridView1.GetRowCellValue(i, "Remarks").ToString() + "','" + gridView1.GetRowCellValue(i, "SellingPrice").ToString() + "')");
+                    Database.ExecuteQuery("INSERT INTO PurchaseOrderDetails VALUES( '" + ctr + "','" + textEdit1.Text + "'," +
+                        "'" + gridView1.GetRowCellValue(i, "ProductCode").ToString() + "'," +
+                        "'" + gridView1.GetRowCellValue(i, "ProductName").ToString() + "'," +
+                        "'" + gridView1.GetRowCellValue(i, "Qty").ToString() + "'," +
+                        "'" + gridView1.GetRowCellValue(i, "Units").ToString() + "'," +
+                        "'0'," +
+                        "'" + gridView1.GetRowCellValue(i, "Remarks").ToString() + "'," +
+                        "'" + gridView1.GetRowCellValue(i, "SellingPrice").ToString() + "')");
                     totalqty += Convert.ToDouble(gridView1.GetRowCellValue(i, "Qty").ToString());
                     ctr += 1;
                 }
+
+               
+                string stat = "FOR APPROVAL";
+                if (GlobalCache.CompanyName == "JFC")
+                {
+                    bool isAutoApproved = false;
+                    isAutoApproved = Database.checkifExist("SELECT 1 FROM dbo.ApprovalSettings " +
+                        "WHERE Module='AddSalesOrder' and isAuto=1");
+                    if (isAutoApproved)
+                    {
+                        stat = "APPROVED";
+                    }
+                }
+
+
                 Database.ExecuteQuery("UPDATE PurchaseOrderDetails SET Remarks=Replace(replace(Remarks, char(10), ''), char(13), '') WHERE PONumber='" + textEdit1.Text + "' ");
                 //Database.ExecuteQuery("INSERT INTO PurchaseOrderSummary VALUES('" + textEdit1.Text + "', '" + txtcustomer.Text + "','" + Login.assignedBranch + "','" + totalqty + "','Kg','" + approvalstatus + "','" + String.Format("{0:MM/dd/yyyy}", dt) + "','" + txteffectivedate.Text + "','" + Login.Fullname + "','" + approvedby + "','" + dateapproved + "','" + txtnote.Text + "','','0','0','"+ordertype.Text+"','"+reqtype+"','"+txtpaytype.Text+"')", "Request Successfully Updated!");
                 Database.ExecuteQuery("INSERT INTO PurchaseOrderSummary (PONumber, Customer, BranchCode, Qty, Status, Dateadded, EffectivityDate, RequestedBy, ApprovedBy, DateApproved, Notes, Remarks, isProcess, OrderType, PaymentType)" +
                     " VALUES('" + textEdit1.Text + "', " +
                     "'" + custkey+ "'," +
                     "'" + Login.assignedBranch + "'," +
-                    "'" + totalqty + "','FOR APPROVAL'," +
+                    "'" + totalqty + "','"+ stat + "'," +
                     "'" + DateTime.Now.ToString() + "'," +
                     "'" + txteffectivedate.Text + "'," +
                     "'" + Login.Fullname + "'," +
@@ -395,7 +417,8 @@ namespace SalesInventorySystem
                 table.Clear();
                 gridControl1.DataSource = null;
                 gridView1.Columns.Clear();
-             
+
+               
                 Isconnected = "OK";
                 if(chckfinal.Checked.Equals(true))
                 {

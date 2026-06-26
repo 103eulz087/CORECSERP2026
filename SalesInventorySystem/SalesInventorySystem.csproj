@@ -692,6 +692,8 @@
     <Compile Include="Classes\ScannedAsset.cs" />
     <Compile Include="Classes\SearchLookUpClass.cs" />
     <Compile Include="Classes\SoundPlayer.cs" />
+    <Compile Include="Classes\StockOutItem.cs" />
+    <Compile Include="Classes\StockOutService.cs" />
     <Compile Include="Classes\Suppliers.cs" />
     <Compile Include="Classes\User.cs" />
     <Compile Include="Classes\Utilities.cs" />
@@ -839,6 +841,12 @@
     </Compile>
     <Compile Include="DevExReportTemplate\StatementOfAccount.Designer.cs">
       <DependentUpon>StatementOfAccount.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DevExReportTemplate\StockOutReturn.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="DevExReportTemplate\StockOutReturn.Designer.cs">
+      <DependentUpon>StockOutReturn.cs</DependentUpon>
     </Compile>
     <Compile Include="DevExReportTemplate\StockOutRep.cs">
       <SubType>Component</SubType>
@@ -3056,6 +3064,12 @@
     <Compile Include="Reporting\InventoryCostingRep.Designer.cs">
       <DependentUpon>InventoryCostingRep.cs</DependentUpon>
     </Compile>
+    <Compile Include="Reporting\InventoryMonthlyActivityPivot.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Reporting\InventoryMonthlyActivityPivot.Designer.cs">
+      <DependentUpon>InventoryMonthlyActivityPivot.cs</DependentUpon>
+    </Compile>
     <Compile Include="Reporting\InventoryDailyActivityPivot.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -3079,6 +3093,12 @@
     </Compile>
     <Compile Include="Reporting\PurchaseOrderRepDetailsDevEx.Designer.cs">
       <DependentUpon>PurchaseOrderRepDetailsDevEx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reporting\InventoryMonthEndReInventory.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Reporting\InventoryMonthEndReInventory.Designer.cs">
+      <DependentUpon>InventoryMonthEndReInventory.cs</DependentUpon>
     </Compile>
     <Compile Include="Reporting\PurchaseOrderRepDevEx.cs">
       <SubType>Form</SubType>
@@ -3574,6 +3594,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="DevExReportTemplate\StatementOfAccount.resx">
       <DependentUpon>StatementOfAccount.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DevExReportTemplate\StockOutReturn.resx">
+      <DependentUpon>StockOutReturn.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="DevExReportTemplate\StockOutRep.resx">
       <DependentUpon>StockOutRep.cs</DependentUpon>
@@ -4702,6 +4725,9 @@
     <EmbeddedResource Include="Reporting\InventoryCostingRep.resx">
       <DependentUpon>InventoryCostingRep.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Reporting\InventoryMonthlyActivityPivot.resx">
+      <DependentUpon>InventoryMonthlyActivityPivot.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Reporting\InventoryDailyActivityPivot.resx">
       <DependentUpon>InventoryDailyActivityPivot.cs</DependentUpon>
     </EmbeddedResource>
@@ -4717,6 +4743,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Reporting\PurchaseOrderRepDetailsDevEx.resx">
       <DependentUpon>PurchaseOrderRepDetailsDevEx.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reporting\InventoryMonthEndReInventory.resx">
+      <DependentUpon>InventoryMonthEndReInventory.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Reporting\PurchaseOrderRepDevEx.resx">
       <DependentUpon>PurchaseOrderRepDevEx.cs</DependentUpon>

@@ -1,6 +1,6 @@
 ﻿namespace SalesInventorySystem.Reporting
 {
-    partial class InventoryDailyActivityPivot
+    partial class InventoryMonthlyActivityPivot
     {
         /// <summary>
         /// Required designer variable.
@@ -44,7 +44,6 @@
             this.xtraTabPage1 = new DevExpress.XtraTab.XtraTabPage();
             this.xtraTabPage2 = new DevExpress.XtraTab.XtraTabPage();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.pivotGridControl2 = new DevExpress.XtraPivotGrid.PivotGridControl();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.cmbToYear = new DevExpress.XtraEditors.ComboBoxEdit();
             this.cmbToMonth = new DevExpress.XtraEditors.ComboBoxEdit();
@@ -70,8 +69,6 @@
             this.xtraTabControl1.SuspendLayout();
             this.xtraTabPage1.SuspendLayout();
             this.xtraTabPage2.SuspendLayout();
-            this.groupBox3.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pivotGridControl2)).BeginInit();
             this.groupBox4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.cmbToYear.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.cmbToMonth.Properties)).BeginInit();
@@ -255,8 +252,7 @@
             this.xtraTabControl1.Size = new System.Drawing.Size(1343, 761);
             this.xtraTabControl1.TabIndex = 8;
             this.xtraTabControl1.TabPages.AddRange(new DevExpress.XtraTab.XtraTabPage[] {
-            this.xtraTabPage1,
-            this.xtraTabPage2});
+            this.xtraTabPage1});
             // 
             // xtraTabPage1
             // 
@@ -265,7 +261,7 @@
             this.xtraTabPage1.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.xtraTabPage1.Name = "xtraTabPage1";
             this.xtraTabPage1.Size = new System.Drawing.Size(1341, 726);
-            this.xtraTabPage1.Text = "DAILY";
+            this.xtraTabPage1.Text = "SUMMARY";
             // 
             // xtraTabPage2
             // 
@@ -274,56 +270,14 @@
             this.xtraTabPage2.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.xtraTabPage2.Name = "xtraTabPage2";
             this.xtraTabPage2.Size = new System.Drawing.Size(1341, 726);
-            this.xtraTabPage2.Text = "MONTHLY";
             // 
             // groupBox3
             // 
-            this.groupBox3.Controls.Add(this.pivotGridControl2);
-            this.groupBox3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox3.Location = new System.Drawing.Point(0, 82);
-            this.groupBox3.Margin = new System.Windows.Forms.Padding(2);
+            this.groupBox3.Location = new System.Drawing.Point(0, 0);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Padding = new System.Windows.Forms.Padding(2);
-            this.groupBox3.Size = new System.Drawing.Size(1341, 644);
-            this.groupBox3.TabIndex = 9;
+            this.groupBox3.Size = new System.Drawing.Size(200, 100);
+            this.groupBox3.TabIndex = 0;
             this.groupBox3.TabStop = false;
-            // 
-            // pivotGridControl2
-            // 
-            this.pivotGridControl2.Appearance.ColumnHeaderArea.Font = new System.Drawing.Font("Tahoma", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.pivotGridControl2.Appearance.ColumnHeaderArea.Options.UseFont = true;
-            this.pivotGridControl2.Appearance.DataHeaderArea.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(0)))));
-            this.pivotGridControl2.Appearance.DataHeaderArea.Options.UseForeColor = true;
-            this.pivotGridControl2.Appearance.FieldHeader.ForeColor = System.Drawing.Color.DarkGreen;
-            this.pivotGridControl2.Appearance.FieldHeader.Options.UseForeColor = true;
-            this.pivotGridControl2.Appearance.FieldValue.ForeColor = System.Drawing.Color.Maroon;
-            this.pivotGridControl2.Appearance.FieldValue.Options.UseForeColor = true;
-            this.pivotGridControl2.Appearance.FieldValueGrandTotal.Font = new System.Drawing.Font("Tahoma", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.pivotGridControl2.Appearance.FieldValueGrandTotal.ForeColor = System.Drawing.Color.DarkBlue;
-            this.pivotGridControl2.Appearance.FieldValueGrandTotal.Options.UseFont = true;
-            this.pivotGridControl2.Appearance.FieldValueGrandTotal.Options.UseForeColor = true;
-            this.pivotGridControl2.Appearance.FieldValueTotal.BackColor = System.Drawing.Color.Gray;
-            this.pivotGridControl2.Appearance.FieldValueTotal.Font = new System.Drawing.Font("Tahoma", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.pivotGridControl2.Appearance.FieldValueTotal.Options.UseBackColor = true;
-            this.pivotGridControl2.Appearance.FieldValueTotal.Options.UseFont = true;
-            this.pivotGridControl2.Appearance.GrandTotalCell.ForeColor = System.Drawing.Color.Red;
-            this.pivotGridControl2.Appearance.GrandTotalCell.Options.UseForeColor = true;
-            this.pivotGridControl2.Appearance.RowHeaderArea.Font = new System.Drawing.Font("Tahoma", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.pivotGridControl2.Appearance.RowHeaderArea.ForeColor = System.Drawing.Color.DarkOliveGreen;
-            this.pivotGridControl2.Appearance.RowHeaderArea.Options.UseFont = true;
-            this.pivotGridControl2.Appearance.RowHeaderArea.Options.UseForeColor = true;
-            this.pivotGridControl2.Appearance.TotalCell.Font = new System.Drawing.Font("Tahoma", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.pivotGridControl2.Appearance.TotalCell.ForeColor = System.Drawing.Color.Navy;
-            this.pivotGridControl2.Appearance.TotalCell.Options.UseFont = true;
-            this.pivotGridControl2.Appearance.TotalCell.Options.UseForeColor = true;
-            this.pivotGridControl2.DataMember = "CustomSqlQuery";
-            this.pivotGridControl2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pivotGridControl2.Location = new System.Drawing.Point(2, 18);
-            this.pivotGridControl2.Margin = new System.Windows.Forms.Padding(2);
-            this.pivotGridControl2.Name = "pivotGridControl2";
-            this.pivotGridControl2.OptionsBehavior.BestFitMode = ((DevExpress.XtraPivotGrid.PivotGridBestFitMode)((DevExpress.XtraPivotGrid.PivotGridBestFitMode.FieldValue | DevExpress.XtraPivotGrid.PivotGridBestFitMode.FieldHeader)));
-            this.pivotGridControl2.Size = new System.Drawing.Size(1337, 624);
-            this.pivotGridControl2.TabIndex = 0;
             // 
             // groupBox4
             // 
@@ -391,9 +345,8 @@
             this.labelControl2.Location = new System.Drawing.Point(316, 50);
             this.labelControl2.Margin = new System.Windows.Forms.Padding(2);
             this.labelControl2.Name = "labelControl2";
-            this.labelControl2.Size = new System.Drawing.Size(20, 16);
+            this.labelControl2.Size = new System.Drawing.Size(0, 16);
             this.labelControl2.TabIndex = 8;
-            this.labelControl2.Text = "To:";
             // 
             // txtbranchmonthly
             // 
@@ -422,9 +375,8 @@
             this.labelControl4.Location = new System.Drawing.Point(12, 22);
             this.labelControl4.Margin = new System.Windows.Forms.Padding(2);
             this.labelControl4.Name = "labelControl4";
-            this.labelControl4.Size = new System.Drawing.Size(83, 16);
+            this.labelControl4.Size = new System.Drawing.Size(0, 16);
             this.labelControl4.TabIndex = 6;
-            this.labelControl4.Text = "Select Branch:";
             // 
             // simpleButton3
             // 
@@ -433,35 +385,30 @@
             this.simpleButton3.Name = "simpleButton3";
             this.simpleButton3.Size = new System.Drawing.Size(83, 52);
             this.simpleButton3.TabIndex = 5;
-            this.simpleButton3.Text = "Print";
             // 
             // labelControl5
             // 
             this.labelControl5.Location = new System.Drawing.Point(12, 50);
             this.labelControl5.Margin = new System.Windows.Forms.Padding(2);
             this.labelControl5.Name = "labelControl5";
-            this.labelControl5.Size = new System.Drawing.Size(65, 16);
+            this.labelControl5.Size = new System.Drawing.Size(0, 16);
             this.labelControl5.TabIndex = 3;
-            this.labelControl5.Text = "Date From:";
             // 
             // simpleButton4
             // 
-            this.simpleButton4.Location = new System.Drawing.Point(559, 17);
-            this.simpleButton4.Margin = new System.Windows.Forms.Padding(2);
+            this.simpleButton4.Location = new System.Drawing.Point(0, 0);
             this.simpleButton4.Name = "simpleButton4";
-            this.simpleButton4.Size = new System.Drawing.Size(83, 52);
-            this.simpleButton4.TabIndex = 2;
-            this.simpleButton4.Text = "Extract";
-            this.simpleButton4.Click += new System.EventHandler(this.simpleButton4_Click);
+            this.simpleButton4.Size = new System.Drawing.Size(94, 29);
+            this.simpleButton4.TabIndex = 13;
             // 
-            // InventoryDailyActivityPivot
+            // InventoryMonthlyActivityPivot
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1343, 761);
             this.Controls.Add(this.xtraTabControl1);
             this.Margin = new System.Windows.Forms.Padding(2);
-            this.Name = "InventoryDailyActivityPivot";
+            this.Name = "InventoryMonthlyActivityPivot";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "InventoryDailyActivityPivot";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
@@ -480,8 +427,6 @@
             this.xtraTabControl1.ResumeLayout(false);
             this.xtraTabPage1.ResumeLayout(false);
             this.xtraTabPage2.ResumeLayout(false);
-            this.groupBox3.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pivotGridControl2)).EndInit();
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.cmbToYear.Properties)).EndInit();
@@ -511,8 +456,7 @@
         private DevExpress.XtraTab.XtraTabControl xtraTabControl1;
         private DevExpress.XtraTab.XtraTabPage xtraTabPage1;
         private DevExpress.XtraTab.XtraTabPage xtraTabPage2;
-        private System.Windows.Forms.GroupBox groupBox3;
-        private DevExpress.XtraPivotGrid.PivotGridControl pivotGridControl2;
+        private System.Windows.Forms.GroupBox groupBox3; 
         private System.Windows.Forms.GroupBox groupBox4;
         private DevExpress.XtraEditors.LabelControl labelControl2;
         private DevExpress.XtraEditors.SearchLookUpEdit txtbranchmonthly;

@@ -29,22 +29,16 @@ namespace SalesInventorySystem
     {
         public static string compname, assignedBranch, Fullname, isMaker, isChecker, isglobalPOS, isglobalAccounting, iscashBegin, isglobalUserID, isglobalAdmin, isglobalOfficer, isglobalBranchOfficer, isglobalWarehouseOfficer, isCashier, isglobalApprover, glacctcode, cashinlimit, cashendlimit;
         RegistryKey regkey;
-        string password;
-        string encryptedpassword;
-        string decryptedpassword;
-        //string strmenuInventory;
-        //String constr;
+        
         public static string userid;
         public static string serverpassword;
         public static string servername;
         public static string dbname;
-        public static string connsettings;
-        private int passwordctr = 0;
+        public static string connsettings; 
         string user = "";
-
-        private static string localhost = "http://itcore-apps.com:1101/";
+         
         private static FileObject file = new FileObject(Application.StartupPath + "\\checkVersion.txt");
-        //bool isRequiredToUpdate = false;
+
         private void pictureBox1_Click(object sender, EventArgs e)
         {
 
@@ -106,88 +100,7 @@ namespace SalesInventorySystem
             try
             {
                 regkey = Registry.CurrentUser.CreateSubKey(@"AAITCRE\ConnSettingsMain");
-                //////////////////////////////////////////////////////
-                ///////TEMPORARY ONLY FOR MIGRATION PURPOSES
-                /////////////////////////////////////////////////////////
-                string migratedStamp = regkey.GetValue("db_migrated_to")?.ToString();
-                string targetStamp = "2026-NEWDB";
-
-                //FOR STAND ALONE POS ONLY ENZOSTORE,VROSSSTORE, KRAFT
-                if (GlobalConfig.Token == "MTQ2NzgwNjAz" 
-                    || GlobalConfig.Token == "ODM1NTI0ODYz"
-                    || GlobalConfig.Token == "ONEzNTE4NjEx"
-                    || GlobalConfig.Token == "NjQwOTg4MzU1")
-                {
-                    migratedStamp = "";
-                    targetStamp = "";
-
-                    //WRITE REGISTRY INTO HKEYUSER/AAITCRE/CONSETTINSSERVER
-                    if(GlobalConfig.Token == "MTQ2NzgwNjAz") //ENZO STORE
-                    {
-                        ConnRegistry.SetTargetConnSettingsServer(
-                               serverNameWithPort: "erp.itcoreapps.com,4281",
-                               dbName: "CORECSERP_001",
-                               userId: "erp001_user",
-                               password: "$tr0ngP@ssw0rd2026!"
-                        );
-                    }
-                    else if(GlobalConfig.Token == "ODM1NTI0ODYz") //VROSS STORE
-                    {
-                        ConnRegistry.SetTargetConnSettingsServer(
-                               serverNameWithPort: "erp.itcoreapps.com,4281",
-                               dbName: "CORECSERP_003",
-                               userId: "erp003_user",
-                               password: "$tr0ngP@ssw0rd2026003!"
-                        );
-                    }
-                    else if(GlobalConfig.Token == "NjQwOTg4MzU1") //KRAFT STORE
-                    {
-                        ConnRegistry.SetTargetConnSettingsServer(
-                               serverNameWithPort: "erp.itcoreapps.com,4281",
-                               dbName: "CORECSERP_004",
-                               userId: "erp004_user",
-                               password: "$tr0ngP@ssw0rd2026004!"
-                        );
-                    }
-                    else if(GlobalConfig.Token == "1234567890XX") //ITCORE STORE
-                    {
-                        ConnRegistry.SetTargetConnSettingsServer(
-                               serverNameWithPort: "erp.itcoreapps.com,4281",
-                               dbName: "CORECSERP_001",
-                               userId: "erp001_user",
-                               password: "$tr0ngP@ssw0rd2026!"
-                        );
-                    }
-                    else if(GlobalConfig.Token == "ONEzNTE4NjEx") //ONELOVE STORE
-                    {
-                        ConnRegistry.SetTargetConnSettingsServer(
-                               serverNameWithPort: "erp.itcoreapps.com,4281",
-                               dbName: "CORECSERP_001",
-                               userId: "erp001_user",
-                               password: "$tr0ngP@ssw0rd2026!"
-                        );
-                    }
-                   
-
-                    ConnRegistry.Set("db_migrated_to", targetStamp);
-                }
-
-                //VROSSACCTG, VROSSCORP, VROSSINV, WRITE REGISTRY TO CONSETTINGSMAINLOCAL
-                if (GlobalConfig.Token == "ATk1NjU1NTU1" 
-                    || GlobalConfig.Token == "MzEyNzU2Njk1" 
-                                   || GlobalConfig.Token == "iTAyNjU5Mjk5")
-                {
-                    migratedStamp = "";
-                    targetStamp = "";
-                    ConnRegistry.SetTargetConnSettingsServer(
-                        serverNameWithPort: "erp.itcoreapps.com,4281",
-                        dbName: "CORECSERP_003",
-                        userId: "erp003_user",
-                        password: "$tr0ngP@ssw0rd2026003!"
-                    );
-
-                    ConnRegistry.Set("db_migrated_to", targetStamp);
-                }
+              
                 if (regkey.GetValue("dbconn") == null)
                 {
                     Connection C = new Connection();
@@ -196,57 +109,6 @@ namespace SalesInventorySystem
                     C.ShowDialog();
                     this.Opacity = 0;
                     return;
-                }
-
-                //NOT APPLICABLE FOR POS, SINCE POS SETUP IS ASSIGNED AS EMPTY VARIABLE OF 
-                //migratedStamp = "";
-                //targetStamp = "";
-                if (!string.Equals(migratedStamp, targetStamp, StringComparison.OrdinalIgnoreCase))
-                {
-                    // set your NEW DB details here (or fetch from a secure source)
-
-                    //TARGET TO CONSETTINGSMAIN
-                    if((GlobalConfig.Token == "ODU2NDE4OTA3" //ENZO
-                        || GlobalConfig.Token == "MzMyODgyODc0" //ENZOCOMM
-                        || GlobalConfig.Token == "HTQwNzExMTYx" //ENZOHRI
-                        || GlobalConfig.Token == "MjYxMjQ3MTkz"  //ENZOKIM
-                        || GlobalConfig.Token == "OTQ1NDczOTYy"  //ENZOKIM
-                        || GlobalConfig.Token == "B2Y2NjYxMzY3"  //ENZOb2
-                        || GlobalConfig.Token == "Nzc0Njk4NjY0") && String.IsNullOrEmpty(migratedStamp)) //ENZOSTAGING
-                    {
-                        //TARGET TO CONSETTINGSMAIN
-                        ConnRegistry.SetTarget(
-                               serverNameWithPort: "erp.itcoreapps.com,4281",
-                               dbName: "CORECSERP_001",
-                               userId: "erp001_user",
-                               password: "$tr0ngP@ssw0rd2026!"
-                           );
-                    }
-                    else if ((GlobalConfig.Token == "ATk1NjU1NTU1" //VROSSACCTG
-                        || GlobalConfig.Token == "MzEyNzU2Njk1" //VROSSCORP
-                        || GlobalConfig.Token == "iTAyNjU5Mjk5") && String.IsNullOrEmpty(migratedStamp)) //VROSSINV
-                    {
-                        //TARGET TO CONSETTINGSMAIN
-                        ConnRegistry.SetTarget(
-                               serverNameWithPort: "erp.itcoreapps.com,4281",
-                               dbName: "CORECSERP_003",
-                               userId: "erp003_user",
-                               password: "$tr0ngP@ssw0rd2026003!"
-                           );
-                    }
-                    
-
-                    ConnRegistry.Set("db_migrated_to", targetStamp);
-
-                    // Optional: reload variables you cache in Login.cs
-                    userid = ConnRegistry.Get("serverid");
-                    serverpassword = ConnRegistry.Get("serverpassword");
-                    dbname = ConnRegistry.Get("dbname");
-                    servername = ConnRegistry.Get("servername");
-
-                    // Optional: Restart if other parts cache the old connection early
-                    // Application.Restart();
-                    // return;
                 }
 
                 userid = regkey.GetValue("serverid").ToString();
@@ -781,3 +643,184 @@ ELSE
         }
     }
 }
+
+
+/*
+ private async void Login_Load(object sender, EventArgs e)
+        {
+
+            //FOR STAND ALONE POS ONLY ENZOSTORE,VROSSSTORE, KRAFT
+            if (GlobalConfig.Token== "MTQ2NzgwNjAz" || GlobalConfig.Token == "ODM1NTI0ODYz" 
+                || GlobalConfig.Token == "1234567890XX"
+                || GlobalConfig.Token == "ONEzNTE4NjEx"
+                || GlobalConfig.Token == "NjQwOTg4MzU1") 
+            {
+                Database.RunLocalDatabaseMigrations();
+          
+            }
+            if(GlobalConfig.Token== "ODM1NTI0ODYz" || GlobalConfig.Token == "1234567890XX")//VROSS STORE
+            {
+                Database.ExecuteQuery("UPDATE POSType set isAutoSystemDeduct=1");
+            }
+            tryCheckUpdate(); //#tryCheckUpdateV1();
+            labelversion.Text= HelperFunction.readFileVersion();
+
+           
+            try
+            {
+                regkey = Registry.CurrentUser.CreateSubKey(@"AAITCRE\ConnSettingsMain");
+                //////////////////////////////////////////////////////
+                ///////TEMPORARY ONLY FOR MIGRATION PURPOSES
+                /////////////////////////////////////////////////////////
+                string migratedStamp = regkey.GetValue("db_migrated_to")?.ToString();
+                string targetStamp = "2026-NEWDB";
+
+                //FOR STAND ALONE POS ONLY ENZOSTORE,VROSSSTORE, KRAFT
+                if (GlobalConfig.Token == "MTQ2NzgwNjAz" 
+                    || GlobalConfig.Token == "ODM1NTI0ODYz"
+                    || GlobalConfig.Token == "ONEzNTE4NjEx"
+                    || GlobalConfig.Token == "NjQwOTg4MzU1")
+                {
+                    migratedStamp = "";
+                    targetStamp = "";
+
+                    //WRITE REGISTRY INTO HKEYUSER/AAITCRE/CONSETTINSSERVER
+                    if(GlobalConfig.Token == "MTQ2NzgwNjAz") //ENZO STORE
+                    {
+                        ConnRegistry.SetTargetConnSettingsServer(
+                               serverNameWithPort: "erp.itcoreapps.com,4281",
+                               dbName: "CORECSERP_001",
+                               userId: "erp001_user",
+                               password: "$tr0ngP@ssw0rd2026!"
+                        );
+                    }
+                    else if(GlobalConfig.Token == "ODM1NTI0ODYz") //VROSS STORE
+                    {
+                        ConnRegistry.SetTargetConnSettingsServer(
+                               serverNameWithPort: "erp.itcoreapps.com,4281",
+                               dbName: "CORECSERP_003",
+                               userId: "erp003_user",
+                               password: "$tr0ngP@ssw0rd2026003!"
+                        );
+                    }
+                    else if(GlobalConfig.Token == "NjQwOTg4MzU1") //KRAFT STORE
+                    {
+                        ConnRegistry.SetTargetConnSettingsServer(
+                               serverNameWithPort: "erp.itcoreapps.com,4281",
+                               dbName: "CORECSERP_004",
+                               userId: "erp004_user",
+                               password: "$tr0ngP@ssw0rd2026004!"
+                        );
+                    }
+                    else if(GlobalConfig.Token == "1234567890XX") //ITCORE STORE
+                    {
+                        ConnRegistry.SetTargetConnSettingsServer(
+                               serverNameWithPort: "erp.itcoreapps.com,4281",
+                               dbName: "CORECSERP_001",
+                               userId: "erp001_user",
+                               password: "$tr0ngP@ssw0rd2026!"
+                        );
+                    }
+                    else if(GlobalConfig.Token == "ONEzNTE4NjEx") //ONELOVE STORE
+                    {
+                        ConnRegistry.SetTargetConnSettingsServer(
+                               serverNameWithPort: "erp.itcoreapps.com,4281",
+                               dbName: "CORECSERP_001",
+                               userId: "erp001_user",
+                               password: "$tr0ngP@ssw0rd2026!"
+                        );
+                    }
+                   
+
+                    ConnRegistry.Set("db_migrated_to", targetStamp);
+                }
+
+                //VROSSACCTG, VROSSCORP, VROSSINV, WRITE REGISTRY TO CONSETTINGSMAINLOCAL
+                if (GlobalConfig.Token == "ATk1NjU1NTU1" 
+                    || GlobalConfig.Token == "MzEyNzU2Njk1" 
+                                   || GlobalConfig.Token == "iTAyNjU5Mjk5")
+                {
+                    migratedStamp = "";
+                    targetStamp = "";
+                    ConnRegistry.SetTargetConnSettingsServer(
+                        serverNameWithPort: "erp.itcoreapps.com,4281",
+                        dbName: "CORECSERP_003",
+                        userId: "erp003_user",
+                        password: "$tr0ngP@ssw0rd2026003!"
+                    );
+
+                    ConnRegistry.Set("db_migrated_to", targetStamp);
+                }
+                if (regkey.GetValue("dbconn") == null)
+                {
+                    Connection C = new Connection();
+                    C.lblservername.Text = "Main Server";
+                    C.txtconnsettingsname.Text = @"AAITCRE\ConnSettingsMain";
+                    C.ShowDialog();
+                    this.Opacity = 0;
+                    return;
+                }
+
+                //NOT APPLICABLE FOR POS, SINCE POS SETUP IS ASSIGNED AS EMPTY VARIABLE OF 
+                //migratedStamp = "";
+                //targetStamp = "";
+                if (!string.Equals(migratedStamp, targetStamp, StringComparison.OrdinalIgnoreCase))
+                {
+                    // set your NEW DB details here (or fetch from a secure source)
+
+                    //TARGET TO CONSETTINGSMAIN
+                    if((GlobalConfig.Token == "ODU2NDE4OTA3" //ENZO
+                        || GlobalConfig.Token == "MzMyODgyODc0" //ENZOCOMM
+                        || GlobalConfig.Token == "HTQwNzExMTYx" //ENZOHRI
+                        || GlobalConfig.Token == "MjYxMjQ3MTkz"  //ENZOKIM
+                        || GlobalConfig.Token == "OTQ1NDczOTYy"  //ENZOKIM
+                        || GlobalConfig.Token == "B2Y2NjYxMzY3"  //ENZOb2
+                        || GlobalConfig.Token == "Nzc0Njk4NjY0") && String.IsNullOrEmpty(migratedStamp)) //ENZOSTAGING
+                    {
+                        //TARGET TO CONSETTINGSMAIN
+                        ConnRegistry.SetTarget(
+                               serverNameWithPort: "erp.itcoreapps.com,4281",
+                               dbName: "CORECSERP_001",
+                               userId: "erp001_user",
+                               password: "$tr0ngP@ssw0rd2026!"
+                           );
+                    }
+                    else if ((GlobalConfig.Token == "ATk1NjU1NTU1" //VROSSACCTG
+                        || GlobalConfig.Token == "MzEyNzU2Njk1" //VROSSCORP
+                        || GlobalConfig.Token == "iTAyNjU5Mjk5") && String.IsNullOrEmpty(migratedStamp)) //VROSSINV
+                    {
+                        //TARGET TO CONSETTINGSMAIN
+                        ConnRegistry.SetTarget(
+                               serverNameWithPort: "erp.itcoreapps.com,4281",
+                               dbName: "CORECSERP_003",
+                               userId: "erp003_user",
+                               password: "$tr0ngP@ssw0rd2026003!"
+                           );
+                    }
+                    
+
+                    ConnRegistry.Set("db_migrated_to", targetStamp);
+
+                    // Optional: reload variables you cache in Login.cs
+                    userid = ConnRegistry.Get("serverid");
+                    serverpassword = ConnRegistry.Get("serverpassword");
+                    dbname = ConnRegistry.Get("dbname");
+                    servername = ConnRegistry.Get("servername");
+
+                    // Optional: Restart if other parts cache the old connection early
+                    // Application.Restart();
+                    // return;
+                }
+
+                userid = regkey.GetValue("serverid").ToString();
+                serverpassword = regkey.GetValue("serverpassword").ToString();
+                dbname = regkey.GetValue("dbname").ToString();
+                servername = regkey.GetValue("servername").ToString();
+            }
+            catch (Exception ex)
+            {
+                DevExpress.XtraEditors.XtraMessageBox.Show(ex.Message);
+            }
+
+        }
+     */

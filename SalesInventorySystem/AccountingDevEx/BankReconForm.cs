@@ -696,7 +696,7 @@ namespace SalesInventorySystem.AccountingDevEx
                 cmd.Parameters.Add("@BranchCode", SqlDbType.VarChar, 5).Value = _branch;
                 cmd.Parameters.Add("@AccountCode", SqlDbType.VarChar, 20).Value = _account;
                 cmd.Parameters.Add("@PeriodEnd", SqlDbType.Date).Value = _period;
-                cmd.Parameters.Add("@ShowResolved", SqlDbType.Bit).Value = false;
+                //cmd.Parameters.Add("@ShowResolved", SqlDbType.Bit).Value = false;
                 con.Open();
                 var dt = new DataTable();
                 new SqlDataAdapter(cmd).Fill(dt);

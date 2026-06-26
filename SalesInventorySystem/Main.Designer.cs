@@ -185,7 +185,7 @@
             this.btnAccountingAging = new DevExpress.XtraBars.BarButtonItem();
             this.btnAddStafffrwdng = new DevExpress.XtraBars.BarButtonItem();
             this.btnPassbookBalances = new DevExpress.XtraBars.BarButtonItem();
-            this.btnBanks = new DevExpress.XtraBars.BarButtonItem();
+            this.btnPurchaseOrderReceivingConso = new DevExpress.XtraBars.BarButtonItem();
             this.btCounterReceipt = new DevExpress.XtraBars.BarButtonItem();
             this.btnAcctgSettings = new DevExpress.XtraBars.BarButtonItem();
             this.popupMenuAcctgSettings = new DevExpress.XtraBars.PopupMenu(this.components);
@@ -256,6 +256,7 @@
             this.btnInventoryBranchSummary = new DevExpress.XtraBars.BarButtonItem();
             this.btnBranchInventoryIN = new DevExpress.XtraBars.BarButtonItem();
             this.btnInventoryINAdjustment = new DevExpress.XtraBars.BarButtonItem();
+            this.btnBranchInterBranchTransfer = new DevExpress.XtraBars.BarButtonItem();
             this.ribbonPage1 = new DevExpress.XtraBars.Ribbon.RibbonPage();
             this.ribbonPageGroup20 = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             this.ribbonPageGroup2 = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
@@ -303,7 +304,15 @@
             this.barButtonItem103 = new DevExpress.XtraBars.BarButtonItem();
             this.barButtonItem1 = new DevExpress.XtraBars.BarButtonItem();
             this.barButtonItem5 = new DevExpress.XtraBars.BarButtonItem();
-            this.btnBranchInterBranchTransfer = new DevExpress.XtraBars.BarButtonItem();
+            this.btnInventoryConsoReport = new DevExpress.XtraBars.BarButtonItem();
+            this.popupMenuInventoryConsoReport = new DevExpress.XtraBars.PopupMenu(this.components);
+            this.btnDelivReportRepConso = new DevExpress.XtraBars.BarButtonItem();
+            this.btnConversionRepConso = new DevExpress.XtraBars.BarButtonItem();
+            this.btnReturnTransferRepConso = new DevExpress.XtraBars.BarButtonItem();
+            this.btnReturnToSupplierConso = new DevExpress.XtraBars.BarButtonItem();
+            this.btnBOReportsConso = new DevExpress.XtraBars.BarButtonItem();
+            this.btnMonthEndCountConso = new DevExpress.XtraBars.BarButtonItem();
+            this.btnSummaryInventoryConso = new DevExpress.XtraBars.BarButtonItem();
             ((System.ComponentModel.ISupportInitialize)(this.ribbonControl)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.popupMenuInvTransfer)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.popupMenu1)).BeginInit();
@@ -314,6 +323,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.popupMenuBIRSalesReport)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.barAndDockingController1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.xtraTabbedMdiManager1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.popupMenuInventoryConsoReport)).BeginInit();
             this.SuspendLayout();
             // 
             // ribbonControl
@@ -473,7 +483,7 @@
             this.btnAccountingAging,
             this.btnAddStafffrwdng,
             this.btnPassbookBalances,
-            this.btnBanks,
+            this.btnPurchaseOrderReceivingConso,
             this.btCounterReceipt,
             this.btnAcctgSettings,
             this.btnCosting,
@@ -542,10 +552,18 @@
             this.btnInventoryBranchSummary,
             this.btnBranchInventoryIN,
             this.btnInventoryINAdjustment,
-            this.btnBranchInterBranchTransfer});
+            this.btnBranchInterBranchTransfer,
+            this.btnInventoryConsoReport,
+            this.btnDelivReportRepConso,
+            this.btnConversionRepConso,
+            this.btnReturnTransferRepConso,
+            this.btnReturnToSupplierConso,
+            this.btnBOReportsConso,
+            this.btnMonthEndCountConso,
+            this.btnSummaryInventoryConso});
             this.ribbonControl.Location = new System.Drawing.Point(0, 0);
             this.ribbonControl.Margin = new System.Windows.Forms.Padding(1, 4, 1, 4);
-            this.ribbonControl.MaxItemId = 227;
+            this.ribbonControl.MaxItemId = 235;
             this.ribbonControl.Name = "ribbonControl";
             this.ribbonControl.PageHeaderItemLinks.Add(this.barStaticItem2);
             this.ribbonControl.Pages.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPage[] {
@@ -1972,14 +1990,15 @@
             this.btnPassbookBalances.Name = "btnPassbookBalances";
             this.btnPassbookBalances.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnPassbookBalances_ItemClick);
             // 
-            // btnBanks
+            // btnPurchaseOrderReceivingConso
             // 
-            this.btnBanks.Caption = "Banks";
-            this.btnBanks.CategoryGuid = new System.Guid("6ffddb2b-9015-4d97-a4c1-91613e0ef537");
-            this.btnBanks.Id = 157;
-            this.btnBanks.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnBanks.ImageOptions.Image")));
-            this.btnBanks.Name = "btnBanks";
-            this.btnBanks.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnBanks_ItemClick);
+            this.btnPurchaseOrderReceivingConso.Caption = "Purchase Order Receiving";
+            this.btnPurchaseOrderReceivingConso.CategoryGuid = new System.Guid("6ffddb2b-9015-4d97-a4c1-91613e0ef537");
+            this.btnPurchaseOrderReceivingConso.Id = 157;
+            this.btnPurchaseOrderReceivingConso.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnBanks.ImageOptions.Image")));
+            this.btnPurchaseOrderReceivingConso.ImageOptions.LargeImage = ((System.Drawing.Image)(resources.GetObject("btnBanks.ImageOptions.LargeImage")));
+            this.btnPurchaseOrderReceivingConso.Name = "btnPurchaseOrderReceivingConso";
+            this.btnPurchaseOrderReceivingConso.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnPurchaseOrderReceivingConso_ItemClick);
             // 
             // btCounterReceipt
             // 
@@ -2014,7 +2033,7 @@
             this.popupMenuAcctgSettings.ItemLinks.Add(this.btnLiquidationList);
             this.popupMenuAcctgSettings.ItemLinks.Add(this.btnLiquidationMapping);
             this.popupMenuAcctgSettings.ItemLinks.Add(this.btnPassbookBalances);
-            this.popupMenuAcctgSettings.ItemLinks.Add(this.btnBanks);
+            this.popupMenuAcctgSettings.ItemLinks.Add(this.btnPurchaseOrderReceivingConso);
             this.popupMenuAcctgSettings.MenuCaption = "Accounting Settings";
             this.popupMenuAcctgSettings.Name = "popupMenuAcctgSettings";
             this.popupMenuAcctgSettings.Ribbon = this.ribbonControl;
@@ -2609,6 +2628,13 @@
             this.btnInventoryINAdjustment.Name = "btnInventoryINAdjustment";
             this.btnInventoryINAdjustment.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnInventoryINAdjustment_ItemClick);
             // 
+            // btnBranchInterBranchTransfer
+            // 
+            this.btnBranchInterBranchTransfer.Caption = "Branch Inventory Transfer";
+            this.btnBranchInterBranchTransfer.Id = 226;
+            this.btnBranchInterBranchTransfer.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("btnBranchInterBranchTransfer.ImageOptions.SvgImage")));
+            this.btnBranchInterBranchTransfer.Name = "btnBranchInterBranchTransfer";
+            // 
             // ribbonPage1
             // 
             this.ribbonPage1.Groups.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPageGroup[] {
@@ -2867,6 +2893,7 @@
             this.ribbonPageGroup11.ItemLinks.Add(this.barbtncomparativeB);
             this.ribbonPageGroup11.ItemLinks.Add(this.btnTransferInventoryHO);
             this.ribbonPageGroup11.ItemLinks.Add(this.btnBranchInterBranchTransfer);
+            this.ribbonPageGroup11.ItemLinks.Add(this.btnInventoryConsoReport);
             this.ribbonPageGroup11.Name = "ribbonPageGroup11";
             this.ribbonPageGroup11.Text = "INVENTORY REPORTS";
             // 
@@ -3074,12 +3101,95 @@
             this.barButtonItem5.Name = "barButtonItem5";
             this.barButtonItem5.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
             // 
-            // btnBranchInterBranchTransfer
+            // btnInventoryConsoReport
             // 
-            this.btnBranchInterBranchTransfer.Caption = "Branch Inventory Transfer";
-            this.btnBranchInterBranchTransfer.Id = 226;
-            this.btnBranchInterBranchTransfer.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("btnBranchInterBranchTransfer.ImageOptions.SvgImage")));
-            this.btnBranchInterBranchTransfer.Name = "btnBranchInterBranchTransfer";
+            this.btnInventoryConsoReport.ActAsDropDown = true;
+            this.btnInventoryConsoReport.ButtonStyle = DevExpress.XtraBars.BarButtonStyle.DropDown;
+            this.btnInventoryConsoReport.Caption = "Consolidated Reports";
+            this.btnInventoryConsoReport.DropDownControl = this.popupMenuInventoryConsoReport;
+            this.btnInventoryConsoReport.Id = 227;
+            this.btnInventoryConsoReport.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnInventoryConsoReport.ImageOptions.Image")));
+            this.btnInventoryConsoReport.ImageOptions.LargeImage = ((System.Drawing.Image)(resources.GetObject("btnInventoryConsoReport.ImageOptions.LargeImage")));
+            this.btnInventoryConsoReport.Name = "btnInventoryConsoReport";
+            this.btnInventoryConsoReport.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
+            // 
+            // popupMenuInventoryConsoReport
+            // 
+            this.popupMenuInventoryConsoReport.ItemLinks.Add(this.btnPurchaseOrderReceivingConso);
+            this.popupMenuInventoryConsoReport.ItemLinks.Add(this.btnDelivReportRepConso);
+            this.popupMenuInventoryConsoReport.ItemLinks.Add(this.btnConversionRepConso);
+            this.popupMenuInventoryConsoReport.ItemLinks.Add(this.btnReturnTransferRepConso);
+            this.popupMenuInventoryConsoReport.ItemLinks.Add(this.btnReturnToSupplierConso);
+            this.popupMenuInventoryConsoReport.ItemLinks.Add(this.btnBOReportsConso);
+            this.popupMenuInventoryConsoReport.ItemLinks.Add(this.btnMonthEndCountConso);
+            this.popupMenuInventoryConsoReport.ItemLinks.Add(this.btnSummaryInventoryConso);
+            this.popupMenuInventoryConsoReport.MenuCaption = "Accounting Settings";
+            this.popupMenuInventoryConsoReport.Name = "popupMenuInventoryConsoReport";
+            this.popupMenuInventoryConsoReport.Ribbon = this.ribbonControl;
+            this.popupMenuInventoryConsoReport.ShowCaption = true;
+            // 
+            // btnDelivReportRepConso
+            // 
+            this.btnDelivReportRepConso.Caption = "Delivery Reports - STS";
+            this.btnDelivReportRepConso.Id = 228;
+            this.btnDelivReportRepConso.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnDelivReportRepConso.ImageOptions.Image")));
+            this.btnDelivReportRepConso.ImageOptions.LargeImage = ((System.Drawing.Image)(resources.GetObject("btnDelivReportRepConso.ImageOptions.LargeImage")));
+            this.btnDelivReportRepConso.Name = "btnDelivReportRepConso";
+            this.btnDelivReportRepConso.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnDelivReportRepConso_ItemClick);
+            // 
+            // btnConversionRepConso
+            // 
+            this.btnConversionRepConso.Caption = "Conversion";
+            this.btnConversionRepConso.Id = 229;
+            this.btnConversionRepConso.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnConversionRepConso.ImageOptions.Image")));
+            this.btnConversionRepConso.ImageOptions.LargeImage = ((System.Drawing.Image)(resources.GetObject("btnConversionRepConso.ImageOptions.LargeImage")));
+            this.btnConversionRepConso.Name = "btnConversionRepConso";
+            this.btnConversionRepConso.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnConversionRepConso_ItemClick);
+            // 
+            // btnReturnTransferRepConso
+            // 
+            this.btnReturnTransferRepConso.Caption = "Return / Transfer";
+            this.btnReturnTransferRepConso.Id = 230;
+            this.btnReturnTransferRepConso.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnReturnTransferRepConso.ImageOptions.Image")));
+            this.btnReturnTransferRepConso.ImageOptions.LargeImage = ((System.Drawing.Image)(resources.GetObject("btnReturnTransferRepConso.ImageOptions.LargeImage")));
+            this.btnReturnTransferRepConso.Name = "btnReturnTransferRepConso";
+            this.btnReturnTransferRepConso.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnReturnTransferRepConso_ItemClick);
+            // 
+            // btnReturnToSupplierConso
+            // 
+            this.btnReturnToSupplierConso.Caption = "Return to Supplier";
+            this.btnReturnToSupplierConso.Id = 231;
+            this.btnReturnToSupplierConso.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnReturnToSupplierConso.ImageOptions.Image")));
+            this.btnReturnToSupplierConso.ImageOptions.LargeImage = ((System.Drawing.Image)(resources.GetObject("btnReturnToSupplierConso.ImageOptions.LargeImage")));
+            this.btnReturnToSupplierConso.Name = "btnReturnToSupplierConso";
+            this.btnReturnToSupplierConso.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnReturnToSupplierConso_ItemClick);
+            // 
+            // btnBOReportsConso
+            // 
+            this.btnBOReportsConso.Caption = "BO Reports";
+            this.btnBOReportsConso.Id = 232;
+            this.btnBOReportsConso.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnBOReportsConso.ImageOptions.Image")));
+            this.btnBOReportsConso.ImageOptions.LargeImage = ((System.Drawing.Image)(resources.GetObject("btnBOReportsConso.ImageOptions.LargeImage")));
+            this.btnBOReportsConso.Name = "btnBOReportsConso";
+            this.btnBOReportsConso.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnBOReportsConso_ItemClick);
+            // 
+            // btnMonthEndCountConso
+            // 
+            this.btnMonthEndCountConso.Caption = "Inventory MonthEnd Count";
+            this.btnMonthEndCountConso.Id = 233;
+            this.btnMonthEndCountConso.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnMonthEndCountConso.ImageOptions.Image")));
+            this.btnMonthEndCountConso.ImageOptions.LargeImage = ((System.Drawing.Image)(resources.GetObject("btnMonthEndCountConso.ImageOptions.LargeImage")));
+            this.btnMonthEndCountConso.Name = "btnMonthEndCountConso";
+            this.btnMonthEndCountConso.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnMonthEndCountConso_ItemClick);
+            // 
+            // btnSummaryInventoryConso
+            // 
+            this.btnSummaryInventoryConso.Caption = "Summary Inventory";
+            this.btnSummaryInventoryConso.Id = 234;
+            this.btnSummaryInventoryConso.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnSummaryInventoryConso.ImageOptions.Image")));
+            this.btnSummaryInventoryConso.ImageOptions.LargeImage = ((System.Drawing.Image)(resources.GetObject("btnSummaryInventoryConso.ImageOptions.LargeImage")));
+            this.btnSummaryInventoryConso.Name = "btnSummaryInventoryConso";
+            this.btnSummaryInventoryConso.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnSummaryInventoryConso_ItemClick);
             // 
             // Main
             // 
@@ -3112,6 +3222,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.popupMenuBIRSalesReport)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.barAndDockingController1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.xtraTabbedMdiManager1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.popupMenuInventoryConsoReport)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -3312,7 +3423,7 @@
         private DevExpress.XtraBars.BarButtonItem btnAccountingAging;
         private DevExpress.XtraBars.BarButtonItem btnAddStafffrwdng;
         private DevExpress.XtraBars.BarButtonItem btnPassbookBalances;
-        private DevExpress.XtraBars.BarButtonItem btnBanks;
+        private DevExpress.XtraBars.BarButtonItem btnPurchaseOrderReceivingConso;
         private DevExpress.XtraBars.BarButtonItem btCounterReceipt;
         private DevExpress.XtraBars.BarButtonItem btnAcctgSettings;
         private DevExpress.XtraBars.PopupMenu popupMenuAcctgSettings;
@@ -3397,5 +3508,14 @@
         private DevExpress.XtraBars.BarButtonItem btnBranchInventoryIN;
         private DevExpress.XtraBars.BarButtonItem btnInventoryINAdjustment;
         private DevExpress.XtraBars.BarButtonItem btnBranchInterBranchTransfer;
+        private DevExpress.XtraBars.BarButtonItem btnInventoryConsoReport;
+        private DevExpress.XtraBars.PopupMenu popupMenuInventoryConsoReport;
+        private DevExpress.XtraBars.BarButtonItem btnDelivReportRepConso;
+        private DevExpress.XtraBars.BarButtonItem btnConversionRepConso;
+        private DevExpress.XtraBars.BarButtonItem btnReturnTransferRepConso;
+        private DevExpress.XtraBars.BarButtonItem btnReturnToSupplierConso;
+        private DevExpress.XtraBars.BarButtonItem btnBOReportsConso;
+        private DevExpress.XtraBars.BarButtonItem btnMonthEndCountConso;
+        private DevExpress.XtraBars.BarButtonItem btnSummaryInventoryConso;
     }
 }

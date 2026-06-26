@@ -11,6 +11,7 @@ using DevExpress.XtraGrid.Views.Grid;
 using DevExpress.XtraGrid.Columns;
 using DevExpress.XtraGrid;
 using System.Data.SqlClient;
+using SalesInventorySystem.Classes;
 
 // ALL VIEWS
 //view_POSummary - FOR APPROVAL gridview1, APPROVED REQUEST gridview2, REJECTED REQUEST gridview 3
@@ -204,12 +205,9 @@ namespace SalesInventorySystem
                 bool isInvoiceUpdated = Database.checkifExist("Select isInvoiceUpdate FROM DeliverySummary WHERE PONumber='" + gridView4.GetRowCellValue(gridView4.FocusedRowHandle, "PONumber").ToString() + "' and isInvoiceUpdate=1");
                 if (isInvoiceUpdated == false)
                 {
-                    XtraMessageBox.Show("Invoice Number must be updated first..please go to Print Delivery Receipt Option!...");
-                    return;
-                }
-                bool ok = HelperFunction.ConfirmDialog("Are you sure you want to Confirm this Order?", "Confirm Order");
-                if (!ok)
-                {
+                    BigAlert.Show("UPDATE INVOICE",
+                        "Invoice Number must be updated first..please go to Print Delivery Receipt Option!...",
+                        MessageBoxIcon.Warning);
                     return;
                 }
                 else

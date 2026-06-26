@@ -55,16 +55,16 @@
             this.panelControl1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelControl1.Location = new System.Drawing.Point(0, 0);
             this.panelControl1.Name = "panelControl1";
-            this.panelControl1.Size = new System.Drawing.Size(1080, 65);
+            this.panelControl1.Size = new System.Drawing.Size(1161, 65);
             this.panelControl1.TabIndex = 0;
             // 
             // simpleButton1
             // 
             this.simpleButton1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("simpleButton1.ImageOptions.Image")));
-            this.simpleButton1.Location = new System.Drawing.Point(5, 13);
+            this.simpleButton1.Location = new System.Drawing.Point(4, 13);
             this.simpleButton1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.simpleButton1.Name = "simpleButton1";
-            this.simpleButton1.Size = new System.Drawing.Size(110, 44);
+            this.simpleButton1.Size = new System.Drawing.Size(96, 44);
             this.simpleButton1.TabIndex = 95;
             this.simpleButton1.Text = "Preview";
             this.simpleButton1.Click += new System.EventHandler(this.simpleButton1_Click);
@@ -73,33 +73,33 @@
             // 
             this.btnforapprovalstsexcel.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.ExportToExcel_16x16;
             this.btnforapprovalstsexcel.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btnforapprovalstsexcel.Location = new System.Drawing.Point(121, 13);
+            this.btnforapprovalstsexcel.Location = new System.Drawing.Point(106, 13);
             this.btnforapprovalstsexcel.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.btnforapprovalstsexcel.Name = "btnforapprovalstsexcel";
-            this.btnforapprovalstsexcel.Size = new System.Drawing.Size(138, 44);
+            this.btnforapprovalstsexcel.Size = new System.Drawing.Size(121, 44);
             this.btnforapprovalstsexcel.TabIndex = 94;
             this.btnforapprovalstsexcel.Text = "Export to Excel";
             this.btnforapprovalstsexcel.Click += new System.EventHandler(this.btnforapprovalstsexcel_Click);
             // 
             // txtid
             // 
-            this.txtid.Location = new System.Drawing.Point(414, 27);
+            this.txtid.Location = new System.Drawing.Point(362, 27);
             this.txtid.Margin = new System.Windows.Forms.Padding(4);
             this.txtid.Name = "txtid";
             this.txtid.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtid.Properties.Appearance.Options.UseFont = true;
             this.txtid.Properties.MaxLength = 13;
             this.txtid.Properties.ReadOnly = true;
-            this.txtid.Size = new System.Drawing.Size(99, 30);
+            this.txtid.Size = new System.Drawing.Size(87, 30);
             this.txtid.TabIndex = 93;
             // 
             // simpleButton2
             // 
             this.simpleButton2.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.Save_16x16__5_;
-            this.simpleButton2.Location = new System.Drawing.Point(265, 14);
+            this.simpleButton2.Location = new System.Drawing.Point(232, 14);
             this.simpleButton2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.simpleButton2.Name = "simpleButton2";
-            this.simpleButton2.Size = new System.Drawing.Size(142, 43);
+            this.simpleButton2.Size = new System.Drawing.Size(124, 43);
             this.simpleButton2.TabIndex = 92;
             this.simpleButton2.Text = "Save";
             this.simpleButton2.Click += new System.EventHandler(this.simpleButton2_Click);
@@ -110,7 +110,7 @@
             this.panelControl2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelControl2.Location = new System.Drawing.Point(0, 65);
             this.panelControl2.Name = "panelControl2";
-            this.panelControl2.Size = new System.Drawing.Size(1080, 606);
+            this.panelControl2.Size = new System.Drawing.Size(1161, 606);
             this.panelControl2.TabIndex = 1;
             // 
             // gridControlRcvd
@@ -121,7 +121,7 @@
             this.gridControlRcvd.MainView = this.gridViewRcvd;
             this.gridControlRcvd.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.gridControlRcvd.Name = "gridControlRcvd";
-            this.gridControlRcvd.Size = new System.Drawing.Size(1076, 602);
+            this.gridControlRcvd.Size = new System.Drawing.Size(1157, 602);
             this.gridControlRcvd.TabIndex = 5;
             this.gridControlRcvd.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewRcvd});
@@ -145,9 +145,9 @@
             // 
             // BranchInventoryIN
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1080, 671);
+            this.ClientSize = new System.Drawing.Size(1161, 671);
             this.Controls.Add(this.panelControl2);
             this.Controls.Add(this.panelControl1);
             this.Name = "BranchInventoryIN";

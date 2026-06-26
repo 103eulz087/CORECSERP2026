@@ -16,7 +16,7 @@ using DevExpress.XtraGrid.Columns;
 
 namespace SalesInventorySystem.Reporting
 {
-    public partial class DeliveryReportsFrm : Form
+    public partial class DeliveryReportsFrm : XtraForm
     {
         public static string ponum,devno;
         public static string branchcode, effectivitydate, requestedby;

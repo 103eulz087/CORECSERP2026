@@ -11,6 +11,7 @@ using DevExpress.XtraEditors;
 using System.Data.SqlClient;
 using DevExpress.XtraGrid;
 using DevExpress.XtraGrid.Views.Grid;
+using SalesInventorySystem.Classes;
 
 namespace SalesInventorySystem.HOFormsDevEx
 {
@@ -29,11 +30,15 @@ namespace SalesInventorySystem.HOFormsDevEx
 
         private void simpleButton1_Click(object sender, EventArgs e)
         {
-             bool confirm = HelperFunction.ConfirmDialog("Are you sure that all data is correct?", "Confirm Order");
-            if (confirm)
+            DialogResult confirm = BigAlert.Show(
+               "CONFIRM ORDER",
+               "Are you sure you want to Confirm this Order?",
+               MessageBoxIcon.Warning,
+               MessageBoxButtons.YesNo);
+            if (confirm == DialogResult.Yes)
             {
                 confirmOrder();
-                XtraMessageBox.Show("Successfully Updated!...");
+                BigAlert.Show("SUCESS", "Successfully Updated!...", MessageBoxIcon.Information);
                 isdone = true;
                 this.Close();
             }

@@ -1,49 +1,46 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-using System.Text;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using DevExpress.XtraEditors;
 using System.Data.SqlClient;
 using DevExpress.XtraGrid.Views.Grid;
-using DevExpress.XtraGrid;
 using DevExpress.XtraGrid.Columns;
-using DevExpress.XtraGrid.Views.Grid.ViewInfo;
+using SalesInventorySystem.Classes;
+using DevExpress.XtraEditors.Repository;
 
 namespace SalesInventorySystem.HOFormsDevEx
 {
     public partial class ClientPaymentsDevEx : DevExpress.XtraEditors.XtraForm
     {
-        //double balance = 0.0, amountpaid = 0.0, discount = 0.0, totalmoney = 0.0, ewt = 0.0, vatex = 0.0, vatable = 0.0, totsales = 0.0, ewtamount = 0.0, totalbalance = 0.0, totalbalance2 = 0.0;
         bool isglobalSales = false, isglobalCharge = false;
-        double advncepymentval = 0.0,totalbalance=0.0,totalamountpaid=0.0;
-        string   paymenttype = "",custkey="",refno;
+        string paymenttype = "", custkey = "", refno;
         int lasttransseqno;
+        RepositoryItemCheckEdit chkPay;
+
         public ClientPaymentsDevEx()
         {
             InitializeComponent();
+
+            chkPay = new RepositoryItemCheckEdit();
+            chkPay.ValueChecked = true;
+            chkPay.ValueUnchecked = false;
+            chkPay.AllowGrayed = false;
+
+            gridControl2.RepositoryItems.Add(chkPay);
         }
 
-        private void simpleButton2_Click(object sender, EventArgs e)
-        {
-            //Database.display("SELECT TransactionDate,CustomerID,Reference,Amount,AmountPaid,Balance,PaymentStatus FROM TransactionChargeSales WHERE CAST(TransactionDate as date) between '" + dateEdit1.Text + "' and '" + dateEdit2.Text + "' and CustomerID='" + groupControl1.Text + "' and Balance=0", gridControl1, gridView9);
-        }
-
+        // ── LOAD ────────────────────────────────────────────────────────
         private void ClientPaymentsDevEx_Load(object sender, EventArgs e)
         {
-            
             custkey = txtcustid.Text;
-            txtcustid.Text = custkey;
-            txtcustname.Text = txtcustname.Text;
             groupControl1.Text = custkey;
+
             populateRepositorySearchLookUp();
             populateCOA();
             display();
-            //Classes.DevXGridViewSettings.ShowFooterCountTotal(gridView2, "SequenceNo");
+
             Classes.DevXGridViewSettings.ShowFooterTotal(gridView2, "InvoiceAmount");
             Classes.DevXGridViewSettings.ShowFooterTotal(gridView2, "Balance");
             Classes.DevXGridViewSettings.ShowFooterTotal(gridView2, "AmountPaid");
@@ -51,458 +48,298 @@ namespace SalesInventorySystem.HOFormsDevEx
             Classes.DevXGridViewSettings.ShowFooterTotal(gridView2, "EWTAmount");
             Classes.DevXGridViewSettings.ShowFooterTotal(gridView2, "DiscountAmount");
             Classes.DevXGridViewSettings.ShowFooterTotal(gridView2, "OffsetAmount");
+
+            gridView2.OptionsBehavior.EditorShowMode = DevExpress.Utils.EditorShowMode.MouseDown;
+            gridView2.OptionsBehavior.ImmediateUpdateRowPosition = true;
+            gridView2.Columns["Pay"].ColumnEdit = chkPay;
+            gridView2.Columns["Pay"].OptionsColumn.AllowEdit = true;
+            gridView2.Columns["Pay"].OptionsColumn.ReadOnly = false;
+            gridView2.CloseEditor();
+            gridView2.UpdateCurrentRow();
         }
 
+        // ── DISPLAY ─────────────────────────────────────────────────────
         void display()
         {
-            SqlConnection con = Database.getConnection();
-            con.Open();
-            gridControl2.BeginUpdate();
-            try
+            using (SqlConnection con = Database.getConnection())
+            using (SqlCommand com = new SqlCommand("splist_ARAccounts", con))
             {
-                string sp = "splist_ARAccounts";
-                SqlCommand com = new SqlCommand(sp, con);
-                com.Parameters.AddWithValue("@parmcustkey", txtcustid.Text);
                 com.CommandType = CommandType.StoredProcedure;
-                com.CommandTimeout = 3600;
-                com.CommandText = sp;
-                SqlDataAdapter adapter = new SqlDataAdapter(com);
+                com.Parameters.Add("@parmcustkey", SqlDbType.VarChar).Value = txtcustid.Text;
+
                 DataTable table = new DataTable();
-                gridView2.Columns.Clear();
+                con.Open();
+                using (SqlDataReader dr = com.ExecuteReader())
+                    table.Load(dr);
+
+                // Unlock editable columns (SP returns them as read-only by default)
+                string[] editableColumns = { "Pay", "AmountPaid", "EWTAmount", "DiscountAmount", "OffsetAmount", "AdvancePayment" };
+                foreach (string col in editableColumns)
+                    if (table.Columns.Contains(col))
+                        table.Columns[col].ReadOnly = false;
+
                 gridControl2.DataSource = null;
-                adapter.Fill(table);
                 gridControl2.DataSource = table;
-                gridView2.BestFitColumns();
             }
-            catch (Exception ex)
+
+            gridView2.OptionsBehavior.Editable = true;
+            gridView2.OptionsBehavior.ReadOnly = false;
+            gridView2.OptionsBehavior.EditorShowMode = DevExpress.Utils.EditorShowMode.Click;
+
+            foreach (GridColumn col in gridView2.Columns)
             {
-                XtraMessageBox.Show(ex.Message.ToString());
+                col.OptionsColumn.AllowEdit = true;
+                col.OptionsColumn.ReadOnly = false;
             }
-            finally
-            {
-                gridControl2.EndUpdate();
-                con.Close();
-            }
+
+            gridView2.Columns["Pay"].ColumnEdit = chkPay;
+            gridView2.BestFitColumns();
         }
 
-        void radEvent()
+        // ── PAYMENT TYPE PANEL VISIBILITY ────────────────────────────────
+        // [CLEAN] Single method drives all radio states — no duplication.
+        void ApplyPaymentTypeVisibility()
         {
-            if (radioButton1.Checked==true) //PAYMENT
-            {
-                radioButton1.Checked = true;
-                groupCheque.Visible = false;
-                panelOnline.Visible = false;
-                groupBoxadvancepayment.Visible = false;
-                groupCreditCardDetails.Visible = false;
-            }
-            else if (radioButton2.Checked == true) //PAYMENT
-            {
-                radioButton2.Checked = true;
-                panelOnline.Visible = false;
-                groupCheque.Visible = true;
-                groupBoxadvancepayment.Visible = false;
-                groupCreditCardDetails.Visible = false;
-            }
-            else if (radioButton3.Checked == true) //PAYMENT
-            {
-                radioButton3.Checked = true;
-                groupCheque.Visible = false;
-                panelOnline.Visible = true;
-                groupBoxadvancepayment.Visible = false;
-                groupCreditCardDetails.Visible = false;
-            }
-            else if (radioButton4.Checked == true) //PAYMENT
-            {
-                
-                radioButton4.Checked = true;
-                groupCheque.Visible = false;
-                groupBoxadvancepayment.Visible = true;
+            groupCheque.Visible = radioButton2.Checked;
+            panelOnline.Visible = radioButton3.Checked;
+            groupBoxadvancepayment.Visible = radioButton4.Checked;
+            groupCreditCardDetails.Visible = radCreditCard.Checked;
 
-                groupCreditCardDetails.Visible = false;
-                panelOnline.Visible = false;
-                txtacctbalance.Text = Math.Round(Convert.ToDouble(Database.getSingleQuery("ClientSavingsAccounts", "AccountKey='" + txtcustid.Text + "'", "AccountBalance")), 2).ToString();
-            }
-            else if (radCreditCard.Checked == true) //PAYMENT
-            {
-                radCreditCard.Checked = true;
-                groupCheque.Visible = false;
-                groupBoxadvancepayment.Visible = false;
-                groupCreditCardDetails.Visible = true;
-                panelOnline.Visible = false;
-            }
+            if (radioButton4.Checked)
+                txtacctbalance.Text = Math.Round(
+                    Convert.ToDouble(Database.getSingleQuery(
+                        "ClientSavingsAccounts", "AccountKey='" + txtcustid.Text + "'", "AccountBalance")), 2
+                ).ToString();
         }
+
+        private void radioButton1_CheckedChanged(object sender, EventArgs e) => ApplyPaymentTypeVisibility();
+        private void radioButton2_CheckedChanged(object sender, EventArgs e) => ApplyPaymentTypeVisibility();
+        private void radioButton3_CheckedChanged(object sender, EventArgs e) => ApplyPaymentTypeVisibility();
+        private void radioButton4_CheckedChanged(object sender, EventArgs e) => ApplyPaymentTypeVisibility();
+        private void radCreditCard_CheckedChanged(object sender, EventArgs e) => ApplyPaymentTypeVisibility();
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            bool functionReturnValue = false;
-            if (keyData == Keys.F1) //PAYMENT
+            switch (keyData)
             {
-                radioButton1.Checked = true;
-                groupCheque.Visible = false;
-                panelOnline.Visible = false;
-                groupBoxadvancepayment.Visible = false;
+                case Keys.F1: radioButton1.Checked = true; break;
+                case Keys.F2: radioButton2.Checked = true; break;
+                case Keys.F3: radioButton3.Checked = true; break;
+                case Keys.F4: radioButton4.Checked = true; break;
+                case Keys.F5: radCreditCard.Checked = true; break;
+                default: return base.ProcessCmdKey(ref msg, keyData);
             }
-            else if (keyData == Keys.F2) //PAYMENT
-            {
-                radioButton2.Checked = true;
-                panelOnline.Visible = false;
-                groupCheque.Visible = true;
-                groupBoxadvancepayment.Visible = false;
-            }
-            else if (keyData == Keys.F3) //PAYMENT
-            {
-                radioButton3.Checked = true;
-                groupCheque.Visible = false;
-                panelOnline.Visible = true;
-                groupBoxadvancepayment.Visible = false;
-            }
-           else if (keyData == Keys.F4) //PAYMENT
-            {
-               
-               radioButton4.Checked = true;
-               groupCheque.Visible = false;
-               groupBoxadvancepayment.Visible = true;
-               panelOnline.Visible = false;
-               txtacctbalance.Text = Math.Round(Convert.ToDouble(Database.getSingleQuery("ClientSavingsAccounts", "AccountKey='" + txtcustid.Text + "'", "AccountBalance")),2).ToString();
-           }else if (keyData == Keys.F5) //PAYMENT
-            {
-               
-               radCreditCard.Checked = true;
-               groupCheque.Visible = false;
-               groupBoxadvancepayment.Visible = false;
-               groupCreditCardDetails.Visible = true;
-               panelOnline.Visible = false;
-           }
-            return functionReturnValue;
+            return true;
         }
+
+        // ── COA LOOKUPS ─────────────────────────────────────────────────
         void populateCOA()
         {
-            Database.displaySearchlookupEdit("SELECT AccountCode,Description FROM ChartOfAccounts WHERE AccountType='D'", txtdebitglcode, "AccountCode", "AccountCode");
-            Database.displaySearchlookupEdit("SELECT AccountCode,Description FROM ChartOfAccounts WHERE AccountType='D'", txtcreditglcode, "AccountCode", "AccountCode");
-        }
-
-      
-        private void gridView2_CellValueChanged(object sender, DevExpress.XtraGrid.Views.Base.CellValueChangedEventArgs e)
-        {
-            //double balance = 0.0;
-            //balance = Convert.ToDouble(gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "Balance").ToString());
-            ////discount = Convert.ToDouble(gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "Discount").ToString());
-            //////amountpaid = Convert.ToDouble(gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "AmountPaid").ToString());
-            ////vatex = Convert.ToDouble(gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "VatExemptAmount").ToString());
-            ////vatable = Convert.ToDouble(gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "VatableAmount").ToString());
-            ////ewt = Convert.ToDouble(gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "EWT").ToString());
-
-            ////totsales = vatable + vatex;
-            ////totalmoney = discount + amountpaid;
-            ////ewtamount = ewt * totsales;
-            ////totalbalance += balance;
-
-            //double invocie = Convert.ToDouble(gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "InvoiceAmount"));
-            //if (edit.Checked.ToString() == "True")
-            //if(repositoryItemCheckEditStatus.ValueChecked.ToString())
-            //{
-            //    gridView2.SetRowCellValue(gridView2.FocusedRowHandle, "AmountPaid", gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "InvoiceAmount").ToString());
-            //    edit.Checked = true;
-            //}
-            //else if (edit.Checked.ToString() == "False")
-            //{
-            //    gridView2.SetRowCellValue(gridView2.FocusedRowHandle, "AmountPaid", "0");
-            //    edit.Checked = false;
-            //}
-            if (e.Value == "True")
-            {
-                //gridViewMaster.SetRowCellValue(gridViewMaster.FocusedRowHandle, "AmountPaid", gridViewMaster.GetRowCellValue(gridViewMaster.FocusedRowHandle, "Balance").ToString());
-                HOFormsDevEx.ClientAddPaymentDevEx asdds = new ClientAddPaymentDevEx();
-                asdds.txtinvoiceno.Text = gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "InvoiceNo").ToString();
-                asdds.txtinvoicedate.Text = gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "TransactionDate").ToString();
-                asdds.txtactualcost.Text = gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "InvoiceAmount").ToString();
-                asdds.txtbalance.Text = gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "Balance").ToString();
-                asdds.groupControl1.Text = txtcustid.Text + "-" + txtcustname.Text;
-                asdds.ShowDialog(this);
-                if (HOFormsDevEx.ClientAddPaymentDevEx.isdone == true)
-                {
-                    gridView2.SetRowCellValue(gridView2.FocusedRowHandle, "AmountPaid", HOFormsDevEx.ClientAddPaymentDevEx.amountpaid);
-                    gridView2.SetRowCellValue(gridView2.FocusedRowHandle, "DiscountAmount", HOFormsDevEx.ClientAddPaymentDevEx.discount);
-                    gridView2.SetRowCellValue(gridView2.FocusedRowHandle, "EWTAmount", HOFormsDevEx.ClientAddPaymentDevEx.ewt);
-                    gridView2.SetRowCellValue(gridView2.FocusedRowHandle, "OffsetAmount", HOFormsDevEx.ClientAddPaymentDevEx.offset);
-                    HOFormsDevEx.ClientAddPaymentDevEx.isdone = false;
-                    asdds.Dispose();
-                }
-            }
-            else if (e.Value == "False")
-            {
-                gridView2.SetRowCellValue(gridView2.FocusedRowHandle, "AmountPaid", "0");
-            }
-           
-            //if (e.Column.FieldName == "EWT")
-            //{
-            //    ewtamount= Convert.ToDouble(gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "EWT").ToString())* Convert.ToDouble(gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "VatExemptAmount").ToString())+ Convert.ToDouble(gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "VatableAmount").ToString());
-            //    gridView2.SetRowCellValue(gridView2.FocusedRowHandle, "EWTAmount", ewtamount.ToString());
-            //}
-            //if (e.Column.FieldName == "EWTAmount")
-            //{
-            //    totalbalance = Convert.ToDouble(gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "Balance").ToString()) - Convert.ToDouble(gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "EWT").ToString()); 
-            //    gridView2.SetRowCellValue(gridView2.FocusedRowHandle, "Balance", totalbalance.ToString());
-            //}
-
-           
-            //if (Convert.ToDouble(gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "ChargeAmountPaid").ToString()) > Convert.ToDouble(gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "ChargeBalance").ToString()))
-            //{
-            //    gridView2.SetRowCellValue(gridView2.FocusedRowHandle, "ChargeAmountPaid", "0");
-            //    XtraMessageBox.Show("ChargeAmountPaid must not greater than Balance amount");
-            //    return;
-            //}
-
-            ////if (totalmoney > balance)
-            ////{
-            ////    XtraMessageBox.Show("AmountPaid + Discount must not greater than Balance amount");
-            ////    return;
-            ////}
-
-            double totalamount = 0.0;
-            for (int i = 0; i <= gridView2.RowCount - 1; i++)
-            {
-                if (gridView2.GetRowCellValue(i, "Pay").ToString() == "True")
-                {
-                    totalamount += Convert.ToDouble(gridView2.GetRowCellValue(i, "AmountPaid").ToString());
-                    //totalchargeamount += Convert.ToDouble(gridView2.GetRowCellValue(i, "ChargeAmountPaid").ToString());
-                }
-            }
-            //overalltotal = totalamount + totalchargeamount;
-            txtamounttopay.Text = totalamount.ToString();//overalltotal.ToString();//totalamount.ToString();
-            ////if (Convert.ToDouble(gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "AmountPaid").ToString()) > Convert.ToDouble(gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "Balance").ToString()))
-            ////{
-            ////    XtraMessageBox.Show("AmountPaid must not greater than Balance amount");
-            ////    return;
-            ////}
+            const string sql = "SELECT AccountCode, Description FROM ChartOfAccounts WHERE AccountType='D'";
+            Database.displaySearchlookupEdit(sql, txtdebitglcode, "AccountCode", "AccountCode");
+            Database.displaySearchlookupEdit(sql, txtcreditglcode, "AccountCode", "AccountCode");
         }
 
         void populateRepositorySearchLookUp()
         {
-            Database.displayRepositorySearchlookupEdit("Select AccountCode,Description FROM ChartOfAccounts WHERE AccountType='D'", repositoryItemSearchLookUpEditglcode, "AccountCode", "AccountCode");
-            Database.displayRepositorySearchlookupEdit("Select AccountCode,Description FROM ChartOfAccounts WHERE AccountType='D'", repositoryItemSearchLookUpEditOffsetGLCode, "AccountCode", "AccountCode");
-            Database.displayRepositorySearchlookupEdit("Select AccountCode,Description FROM ChartOfAccounts WHERE AccountType='D'", repositoryItemSearchLookUpEditOffsetCreditGLCode, "AccountCode", "AccountCode");
-            Database.displayRepositorySearchlookupEdit("Select AccountCode,Description FROM ChartOfAccounts WHERE AccountType='D'", repositoryItemSearchLookUpEditEWTDebitGLCode, "AccountCode", "AccountCode");
-            Database.displayRepositorySearchlookupEdit("Select AccountCode,Description FROM ChartOfAccounts WHERE AccountType='D'", repositoryItemSearchLookUpEditEWTCreditGLCode, "AccountCode", "AccountCode");
+            const string sql = "Select AccountCode, Description FROM ChartOfAccounts WHERE AccountType='D'";
+            Database.displayRepositorySearchlookupEdit(sql, repositoryItemSearchLookUpEditglcode, "AccountCode", "AccountCode");
+            Database.displayRepositorySearchlookupEdit(sql, repositoryItemSearchLookUpEditOffsetGLCode, "AccountCode", "AccountCode");
+            Database.displayRepositorySearchlookupEdit(sql, repositoryItemSearchLookUpEditOffsetCreditGLCode, "AccountCode", "AccountCode");
+            Database.displayRepositorySearchlookupEdit(sql, repositoryItemSearchLookUpEditEWTDebitGLCode, "AccountCode", "AccountCode");
+            Database.displayRepositorySearchlookupEdit(sql, repositoryItemSearchLookUpEditEWTCreditGLCode, "AccountCode", "AccountCode");
         }
-        private void simpleButton1_Click(object sender, EventArgs e)
+
+        // ── GRID EVENTS ─────────────────────────────────────────────────
+        private void gridView2_CellValueChanging(object sender, DevExpress.XtraGrid.Views.Base.CellValueChangedEventArgs e)
         {
-            if (String.IsNullOrEmpty(txtdebitglcode.Text) || String.IsNullOrEmpty(txtcontrolno.Text) || String.IsNullOrEmpty(txtcrno.Text) || String.IsNullOrEmpty(txtdate.Text))
+            if (e.Column.FieldName == "Pay")
+                gridView2.PostEditor();
+        }
+
+        private void gridView2_CellValueChanged(object sender, DevExpress.XtraGrid.Views.Base.CellValueChangedEventArgs e)
+        {
+            int row = e.RowHandle;
+            if (row < 0) return;
+
+            if (e.Column.FieldName == "Pay")
             {
-                XtraMessageBox.Show("Please Filled up Mandatory Fields");
+                bool isPay = Convert.ToBoolean(e.Value);
+                if (isPay)
+                {
+                    double balance = Convert.ToDouble(gridView2.GetRowCellValue(row, "Balance") ?? 0);
+                    // Default: full balance, no deductions
+                    gridView2.SetRowCellValue(row, "EWTAmount", 0);
+                    gridView2.SetRowCellValue(row, "DiscountAmount", 0);
+                    gridView2.SetRowCellValue(row, "OffsetAmount", 0);
+                    gridView2.SetRowCellValue(row, "AmountPaid", balance);
+                }
+                else
+                {
+                    gridView2.SetRowCellValue(row, "EWTAmount", 0);
+                    gridView2.SetRowCellValue(row, "DiscountAmount", 0);
+                    gridView2.SetRowCellValue(row, "OffsetAmount", 0);
+                    gridView2.SetRowCellValue(row, "AmountPaid", 0);
+                }
+                ComputeTotal();
                 return;
             }
-            if (radioButton1.Checked == false && radioButton2.Checked == false && radioButton3.Checked == false && radioButton4.Checked == false)
+
+            if (e.Column.FieldName == "EWTAmount" ||
+                e.Column.FieldName == "DiscountAmount" ||
+                e.Column.FieldName == "OffsetAmount")
             {
-                XtraMessageBox.Show("Please select Payment Type");
+                RecalculateRow(row);
+            }
+
+            if (e.Column.FieldName == "EWTAmount" ||
+                e.Column.FieldName == "DiscountAmount" ||
+                e.Column.FieldName == "OffsetAmount" ||
+                e.Column.FieldName == "AmountPaid")
+            {
+                ComputeTotal();
+                gridView2.UpdateCurrentRow();
+            }
+        }
+
+        // RecalculateRow: AmountPaid (net cash) = balance - all deductions
+        // This is display-only. Gross is reconstructed at save time. [BUG-1]
+        private void RecalculateRow(int row)
+        {
+            bool isPay = Convert.ToBoolean(gridView2.GetRowCellValue(row, "Pay"));
+            if (!isPay) return;
+
+            double balance = Convert.ToDouble(gridView2.GetRowCellValue(row, "Balance") ?? 0);
+            double ewt = Convert.ToDouble(gridView2.GetRowCellValue(row, "EWTAmount") ?? 0);
+            double discount = Convert.ToDouble(gridView2.GetRowCellValue(row, "DiscountAmount") ?? 0);
+            double offset = Convert.ToDouble(gridView2.GetRowCellValue(row, "OffsetAmount") ?? 0);
+
+            double netPayment = balance - ewt - discount - offset;
+            if (netPayment < 0) netPayment = 0;
+
+            double current = Convert.ToDouble(gridView2.GetRowCellValue(row, "AmountPaid") ?? 0);
+            if (current != netPayment)
+                gridView2.SetRowCellValue(row, "AmountPaid", netPayment);
+        }
+
+        // ComputeTotal: txtamounttopay shows total NET cash across selected rows
+        private void ComputeTotal()
+        {
+            double total = 0;
+            for (int i = 0; i < gridView2.RowCount; i++)
+            {
+                if (Convert.ToBoolean(gridView2.GetRowCellValue(i, "Pay")))
+                    total += Convert.ToDouble(gridView2.GetRowCellValue(i, "AmountPaid") ?? 0);
+            }
+            txtamounttopay.Text = total.ToString("N2");
+        }
+
+        // ── GRID VALIDATION ─────────────────────────────────────────────
+        private void gridView2_ValidatingEditor(object sender, DevExpress.XtraEditors.Controls.BaseContainerValidateEditorEventArgs e)
+        {
+            var view = sender as GridView;
+            int row = view.FocusedRowHandle;
+            string field = view.FocusedColumn.FieldName;
+
+            if (field != "AmountPaid" && field != "EWTAmount" &&
+                field != "DiscountAmount" && field != "OffsetAmount")
+                return;
+
+            if (!double.TryParse(e.Value?.ToString(), out double value))
+            {
+                e.Valid = false;
+                e.ErrorText = "Invalid number format.";
+                return;
+            }
+            if (value < 0)
+            {
+                e.Valid = false;
+                e.ErrorText = "Negative values are not allowed.";
                 return;
             }
 
-            int ctr = 0;
-            for (int i = 0; i <= gridView2.RowCount - 1; i++)
+            bool isPay = Convert.ToBoolean(view.GetRowCellValue(row, "Pay"));
+            if (!isPay)
             {
-                if (gridView2.GetRowCellValue(i, "Pay").ToString() == "True")
-                {
-                    ctr += 1;
-                }
-            }
-
-            if (ctr == 0)
-            {
-                XtraMessageBox.Show("No Payments Executed!.. Please select PAY mode Status in Pay Columns");
+                e.Valid = false;
+                e.ErrorText = "Please check the 'Pay' box first.";
                 return;
             }
-            else
+
+            double balance = Convert.ToDouble(view.GetRowCellValue(row, "Balance") ?? 0);
+            double ewt = Convert.ToDouble(view.GetRowCellValue(row, "EWTAmount") ?? 0);
+            double discount = Convert.ToDouble(view.GetRowCellValue(row, "DiscountAmount") ?? 0);
+            double offset = Convert.ToDouble(view.GetRowCellValue(row, "OffsetAmount") ?? 0);
+            double amtPaid = Convert.ToDouble(view.GetRowCellValue(row, "AmountPaid") ?? 0);
+
+            // Apply the pending value to test
+            if (field == "EWTAmount") ewt = value;
+            if (field == "DiscountAmount") discount = value;
+            if (field == "OffsetAmount") offset = value;
+            if (field == "AmountPaid") amtPaid = value;
+
+            if ((ewt + discount + offset) > balance)
             {
-                addPayment();
+                e.Valid = false;
+                e.ErrorText = "Total deductions (EWT + Discount + Offset) cannot exceed the Balance.";
+                return;
             }
-        }
-        void addPayment()
-        {
-            //id = IDGenerator.getReferenceNumber();
-            double totalamount = 0.0;
-            refno = IDGenerator.getIDNumberSP("sp_GetReferenceNumber", "ReferenceNumber");
-            lasttransseqno = Database.getLastID("TransactionPayment", "CustomerKey='" + custkey + "'", "SEQ_NO") + 1;
-            string ponumber = gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "InvoiceNo").ToString();
-            try
+            if (amtPaid > balance)
             {
-                if (radioButton1.Checked == true)
-                {
-                    paymenttype = "CASH";
-                }
-                else if (radioButton2.Checked == true)
-                {
-                    paymenttype = "CHECK";
-                }
-                else if (radioButton3.Checked == true)
-                {
-                    paymenttype = "ONLINE";
-                }
-                else if (radioButton3.Checked == true)
-                {
-                    paymenttype = "ADVANCEPAYMENT";
-                } else if (radioButton3.Checked == true)
-                {
-                    paymenttype = "CREDITCARD";
-                }
-                double amountpaid = 0.0;
-                amountpaid = Convert.ToDouble(gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "AmountPaid").ToString());
-                for (int k = 0; k <= gridView2.RowCount - 1; k++)
-                {
-                    if (gridView2.GetRowCellValue(k, "Pay").ToString() == "True" && Convert.ToDouble(gridView2.GetRowCellValue(k, "OffsetAmount").ToString()) > 0 && String.IsNullOrEmpty(gridView2.GetRowCellValue(k, "OffsetDebitGLCode").ToString()) && String.IsNullOrEmpty(gridView2.GetRowCellValue(k, "OffsetCreditGLCode").ToString()))
-                    {
-                        XtraMessageBox.Show("Please Provide Offset GLCode for Offset Amount!");
-                        return;
-                    }
-                }
-                for (int i = 0; i <= gridView2.RowCount - 1; i++)
-                {
-                    if (gridView2.GetRowCellValue(i, "Pay").ToString() == "True") //total amount of PAY Mode only
-                    {
-                        totalamount += Convert.ToDouble(gridView2.GetRowCellValue(i, "AmountPaid").ToString());
-                        if (Convert.ToDouble(gridView2.GetRowCellValue(i, "AmountPaid").ToString()) > 0)
-                        {
-                            Database.ExecuteQuery("INSERT INTO ARPaymentDetails VALUES('"+ lasttransseqno + "'," +
-                                "'" + custkey + "'," +
-                                "'" + refno + "'," +
-                                "'" + gridView2.GetRowCellValue(i, "OrderNo").ToString() + "'," +
-                                "'" + gridView2.GetRowCellValue(i, "InvoiceNo").ToString() + "'," +
-                                "'" + gridView2.GetRowCellValue(i, "TransactionDate").ToString() + "'," +
-                                "'" + gridView2.GetRowCellValue(i, "AmountPaid").ToString() + "'," +
-                                "'INVOICE PAYMENT'," +
-                                "'PAYMENT'," +
-                                "'"+txtdebitglcode.Text+" '," +
-                                "'"+txtcreditglcode.Text+" '," +
-                                "' ')");
-                        }
-                        if (Convert.ToDouble(gridView2.GetRowCellValue(i, "EWTAmount").ToString()) > 0)
-                        {
-                            Database.ExecuteQuery("INSERT INTO ARPaymentDetails VALUES('" + lasttransseqno + "'," +
-                                "'" + custkey + "'," +
-                                "'" + refno + "'," +
-                                "'" + gridView2.GetRowCellValue(i, "OrderNo").ToString() + "'," +
-                                "'" + gridView2.GetRowCellValue(i, "InvoiceNo").ToString() + "'," +
-                                "'" + gridView2.GetRowCellValue(i, "TransactionDate").ToString() + "'," +
-                                "'" + gridView2.GetRowCellValue(i, "EWTAmount").ToString() + "'," +
-                                "'EWT'," +
-                                "'PAYMENT'," +
-                                "' '," +
-                                "' '," +
-                                "' ')");
-                        }
-                        if (Convert.ToDouble(gridView2.GetRowCellValue(i, "DiscountAmount").ToString()) > 0)
-                        {
-                            Database.ExecuteQuery("INSERT INTO ARPaymentDetails VALUES('" + lasttransseqno + "'," +
-                                "'" + custkey + "'," +
-                                "'" + refno + "'," +
-                                "'" + gridView2.GetRowCellValue(i, "OrderNo").ToString() + "'," +
-                                "'" + gridView2.GetRowCellValue(i, "InvoiceNo").ToString() + "'," +
-                                "'" + gridView2.GetRowCellValue(i, "TransactionDate").ToString() + "'," +
-                                "'" + gridView2.GetRowCellValue(i, "Discount").ToString() + "'," +
-                                "'DISCOUNT'," +
-                                "'PAYMENT'," +
-                                "' '," +
-                                "' '," +
-                                "' ')");
-                        }
-                        if (Convert.ToDouble(gridView2.GetRowCellValue(i, "OffsetAmount").ToString()) > 0)
-                        {
-                            Database.ExecuteQuery("INSERT INTO ARPaymentDetails VALUES('" + lasttransseqno + "'," +
-                                "'" + custkey + "'," +
-                                "'" + refno + "'," +
-                                "'" + gridView2.GetRowCellValue(i, "OrderNo").ToString() + "'," +
-                                "'" + gridView2.GetRowCellValue(i, "InvoiceNo").ToString() + "'," +
-                                "'" + gridView2.GetRowCellValue(i, "TransactionDate").ToString() + "'," +
-                                "'" + gridView2.GetRowCellValue(i, "OffsetAmount").ToString() + "'," +
-                                "'OFFSET'," +
-                                "'PAYMENT'," +
-                                "' '," +
-                                "' '," +
-                                "' ')");
-                        }
-                    }
-
-                }
-                int id = 0;
-                if (paymenttype == "CASH")
-                {
-                    id = Database.getLastID("TransactionCashCollection", "CustomerKey='" + custkey + "'", "SEQ_NO") + 1;
-                    Database.ExecuteQuery("INSERT INTO TransactionCashCollection VALUES('" + id + "','"+custkey+"','" + txtamounttopay.Text + "','" + txtremakrs.Text + "','" + txtdate.Text + "','"+Login.Fullname+"',0)");
-                }
-                else if (paymenttype == "CHECK")
-                {
-                    id = Database.getLastID("TransactionCheque", "CustomerID='" + custkey + "'", "TransactionNo") + 1;
-                    Database.ExecuteQuery("INSERT INTO TransactionCheque VALUES ('" + id + "','" + Customers.getCustBranch(txtcustid.Text) + "','" + txtcontrolno.Text + "','" + txtcrno.Text + "','" + txtcustid.Text + "','" + txtcustname.Text + "','" + txtchecknum.Text + "','" + txtcheckname.Text + "','" + txtcheckbankname.Text + "','" + txtcheckamount.Text + "','" + txtcheckdate.Text + "','" + txtamounttopay.Text + "','" + txtremakrs.Text + "','" + txtdate.Text + "','" + DateTime.Now.ToString() + "','" + Login.Fullname + "','" + txtdebitglcode.Text + "')");
-                }
-                else if (paymenttype == "ONLINE")
-                {
-                    id = Database.getLastID("TransactionOnline", "CustomerID='" + custkey + "'", "TransactionNo") + 1;
-                    Database.ExecuteQuery("INSERT INTO TransactionOnline VALUES ('" + id + "','" + Customers.getCustBranch(txtcustid.Text) + "','" + txtcontrolno.Text + "','" + txtcrno.Text + "','" + txtcustid.Text + "','" + txtcustname.Text + "','" + txtrefnoonline.Text + "','" + txtdepbankonline.Text + "','" + txtdatedeponline.Text + "','" + txtamounttopay.Text + "','" + txtremakrs.Text + "','" + txtdate.Text + "','" + Login.Fullname + "','" + txtdebitglcode.Text + "')");
-                }
-                else if (paymenttype == "ADVANCEPAYMENT")
-                {
-                    id = Database.getLastID("TransactionOnline", "CustomerID='" + custkey + "'", "TransactionNo") + 1;
-                    Database.ExecuteQuery("INSERT INTO TransactionSavings VALUES ('" + id + "','" + Customers.getCustBranch(txtcustid.Text) + "','" + txtcontrolno.Text + "','" + txtcrno.Text + "','" + txtcustid.Text + "','" + txtcustname.Text + "','" + txtrefnoonline.Text + "','" + txtdepbankonline.Text + "','" + txtdatedeponline.Text + "','" + txtamounttopay.Text + "','" + txtremakrs.Text + "','" + txtdate.Text + "','" + Login.Fullname + "','" + txtdebitglcode.Text + "')");
-                }
-                else if (paymenttype == "CREDITCARD")
-                {
-                    id = Database.getLastID("TransactionCreditCard", "CustomerID='" + custkey + "'", "TransactionNo") + 1;
-                    Database.ExecuteQuery("INSERT INTO TransactionCreditCard VALUES ('" + id + "',' ','"+txtccrefno.Text+"','888',' ',' ','"+txtccbank.Text+"',' ',' ',' ',' ','"+txtamounttopay.Text+"','"+DateTime.Now.ToShortDateString()+"','" + Login.Fullname + "')");
-                }
-                postPayment();
-                XtraMessageBox.Show("Payment Successfully Posted");
-                this.Dispose();
+                e.Valid = false;
+                e.ErrorText = "Amount Paid cannot exceed the Balance.";
+                return;
             }
-            catch (SqlException ex)
+
+            e.Valid = true;
+        }
+
+        // ── ROW COLOR CODING ────────────────────────────────────────────
+        private void gridView2_RowCellStyle(object sender, RowCellStyleEventArgs e)
+        {
+            GridView view = sender as GridView;
+            if (e.RowHandle < 0) return;
+
+            object val = view.GetRowCellValue(e.RowHandle, "Pay");
+            bool isPay = val != null && val != DBNull.Value && bool.TryParse(val.ToString(), out bool b) && b;
+
+            if (!isPay)
             {
-                XtraMessageBox.Show(ex.Message.ToString());
+                e.Appearance.BackColor = Color.LightGray;
+                return;
             }
+
+            double balance = Convert.ToDouble(view.GetRowCellValue(e.RowHandle, "Balance") ?? 0);
+            double ewt = Convert.ToDouble(view.GetRowCellValue(e.RowHandle, "EWTAmount") ?? 0);
+            double discount = Convert.ToDouble(view.GetRowCellValue(e.RowHandle, "DiscountAmount") ?? 0);
+            double offset = Convert.ToDouble(view.GetRowCellValue(e.RowHandle, "OffsetAmount") ?? 0); // [BUG-2] was missing
+            double amtPaid = Convert.ToDouble(view.GetRowCellValue(e.RowHandle, "AmountPaid") ?? 0);
+
+            // [BUG-2] FIX: include offset in the computed expected net
+            double expectedNet = balance - ewt - discount - offset;
+
+            if ((ewt + discount + offset) > balance || amtPaid < 0)
+            {
+                e.Appearance.BackColor = Color.LightCoral;
+                e.Appearance.ForeColor = Color.White;
+                return;
+            }
+            if (Math.Abs(amtPaid - expectedNet) > 0.01)
+            {
+                e.Appearance.BackColor = Color.Khaki;
+                e.Appearance.ForeColor = Color.Black;
+                return;
+            }
+
+            e.Appearance.BackColor = Color.LightGreen;
+            e.Appearance.ForeColor = Color.Black;
         }
 
-        private void radioButton2_CheckedChanged(object sender, EventArgs e)
-        {
-            radEvent(); 
-        }
-
-        private void radioButton3_CheckedChanged(object sender, EventArgs e)
-        {
-            radEvent();
-        }
-
-        private void gridView2_ShowingEditor(object sender, CancelEventArgs e)
-        {
-            //GridView view = sender as GridView;
-            //if (view.FocusedColumn.FieldName == "Pay" || view.FocusedColumn.FieldName == "AmountPaid" || view.FocusedColumn.FieldName == "DiscountGLCode" || view.FocusedColumn.FieldName == "Discount" || view.FocusedColumn.FieldName == "OffsetAmount" || view.FocusedColumn.FieldName == "OffsetGLCode" || view.FocusedColumn.FieldName == "OffsetCreditGLCode")
-            //    e.Cancel = false;
-        }
-
-        private void txtcreditglcode_EditValueChanged(object sender, EventArgs e)
-        {
-            GridView view = txtdebitglcode.Properties.View;
-            int rowHandle = view.FocusedRowHandle;
-            //string fieldName = "Name"; // or other field name
-            object value = view.GetRowCellValue(rowHandle, "Description");
-            txtdebitdesc.Text = value.ToString();
-        }
-
-        private void searchLookUpEditcreditglcode_EditValueChanged(object sender, EventArgs e)
-        {
-            GridView view = txtcreditglcode.Properties.View;
-            int rowHandle = view.FocusedRowHandle;
-            //string fieldName = "Name"; // or other field name
-            object value = view.GetRowCellValue(rowHandle, "Description");
-            txtcreditdesc.Text = value.ToString();
-        }
-
+        // ── GRID CUSTOM EDITORS ─────────────────────────────────────────
         private void gridView2_CustomRowCellEdit(object sender, CustomRowCellEditEventArgs e)
         {
-            
             if (e.Column.FieldName == "DiscountGLCode")
                 e.RepositoryItem = repositoryItemSearchLookUpEditglcode;
-            if (e.Column.FieldName == "Pay")
-                e.RepositoryItem = repositoryItemCheckEditStatus;
-            //if (e.Column.FieldName == "PayCharge")
-            //    e.RepositoryItem = repositoryItemCheckEditPayCharge;
             if (e.Column.FieldName == "OffsetGLCode")
                 e.RepositoryItem = repositoryItemSearchLookUpEditOffsetGLCode;
             if (e.Column.FieldName == "OffsetCreditGLCode")
@@ -513,23 +350,22 @@ namespace SalesInventorySystem.HOFormsDevEx
                 e.RepositoryItem = repositoryItemSearchLookUpEditEWTCreditGLCode;
         }
 
-        private void gridView2_RowCellStyle(object sender, RowCellStyleEventArgs e)
+        // ── GL CODE DESCRIPTION DISPLAY ──────────────────────────────────
+        private void txtcreditglcode_EditValueChanged(object sender, EventArgs e)
         {
-            if (e.Column.FieldName == "Balance")
-            {
-                e.Appearance.ForeColor = Color.Red;
-            }
-            if (e.Column.FieldName == "Pay" || e.Column.FieldName == "AmountPaid" || e.Column.FieldName == "ChargeAmountPaid" || e.Column.FieldName == "Discount" || e.Column.FieldName == "DiscountGLCode" || e.Column.FieldName == "OffsetAmount" || e.Column.FieldName == "OffsetGLCode" || e.Column.FieldName == "OffsetCreditGLCode" || e.Column.FieldName == "EWT" || e.Column.FieldName == "EWTAmount" || e.Column.FieldName == "EWTDebitGLCode" || e.Column.FieldName == "EWTCreditGLCode")
-            {
-                e.Appearance.BackColor = Color.LightYellow;
-            }
+            GridView view = txtdebitglcode.Properties.View;
+            object value = view.GetRowCellValue(view.FocusedRowHandle, "Description");
+            txtdebitdesc.Text = value?.ToString() ?? "";
         }
 
-        private void radioButton1_CheckedChanged(object sender, EventArgs e)
+        private void searchLookUpEditcreditglcode_EditValueChanged(object sender, EventArgs e)
         {
-            radEvent();
+            GridView view = txtcreditglcode.Properties.View;
+            object value = view.GetRowCellValue(view.FocusedRowHandle, "Description");
+            txtcreditdesc.Text = value?.ToString() ?? "";
         }
 
+        // ── CONTEXT MENU ─────────────────────────────────────────────────
         private void gridControl2_MouseUp(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
@@ -539,41 +375,34 @@ namespace SalesInventorySystem.HOFormsDevEx
         private void editPaymentToolStripMenuItem_Click(object sender, EventArgs e)
         {
             HOFormsDevEx.ClientEditPayment clientedit = new ClientEditPayment();
-            clientedit.txtdelivdate.Text = gridView2.GetRowCellValue(gridView2.FocusedRowHandle,"TransactionDate").ToString();
-            clientedit.txtinvoiceno.Text = gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "InvoiceNo").ToString();
-            clientedit.txtinvoiceamount.Text = gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "InvoiceAmount").ToString();
-            clientedit.txtfreightamount.Text = gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "ChargeAmount").ToString();
-            clientedit.txtewtamount.Text = gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "EWTAmount").ToString();
-            clientedit.txtduedate.Text = gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "DueDate").ToString();
+            int focused = gridView2.FocusedRowHandle;
+
+            clientedit.txtdelivdate.Text = gridView2.GetRowCellValue(focused, "TransactionDate").ToString();
+            clientedit.txtinvoiceno.Text = gridView2.GetRowCellValue(focused, "InvoiceNo").ToString();
+            clientedit.txtinvoiceamount.Text = gridView2.GetRowCellValue(focused, "InvoiceAmount").ToString();
+            clientedit.txtewtamount.Text = gridView2.GetRowCellValue(focused, "EWTAmount").ToString();
+            clientedit.txtduedate.Text = gridView2.GetRowCellValue(focused, "DueDate").ToString();
             clientedit.txtterms.Text = Database.getSingleQuery("Customers", "CustomerID='" + txtcustid.Text + "'", "Term");
-            clientedit.txtdaysdelayed.Text = gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "DaysDelayed").ToString();
-            clientedit.txtpenaltyrate.Text = gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "PenaltyRate").ToString();
-            clientedit.txtsurcharge.Text = gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "Surcharge").ToString();
             clientedit.ShowDialog(this);
-            if(ClientEditPayment.isdone == true)
+
+            if (ClientEditPayment.isdone)
             {
-                if(ClientEditPayment.isdiscount==true)
+                if (ClientEditPayment.isdiscount)
                 {
-                    gridView2.SetRowCellValue(gridView2.FocusedRowHandle, "Discount", ClientEditPayment.discamount);
-                    gridView2.SetRowCellValue(gridView2.FocusedRowHandle, "DiscountGLCode", ClientEditPayment.discdebit);
+                    gridView2.SetRowCellValue(focused, "DiscountAmount", ClientEditPayment.discamount);
+                    gridView2.SetRowCellValue(focused, "DiscountGLCode", ClientEditPayment.discdebit);
                 }
-                if(ClientEditPayment.isoffset == true)
+                if (ClientEditPayment.isoffset)
                 {
-                    gridView2.SetRowCellValue(gridView2.FocusedRowHandle, "OffsetAmount", ClientEditPayment.offsetamount);
-                    gridView2.SetRowCellValue(gridView2.FocusedRowHandle, "OffsetGLCode", ClientEditPayment.offsetdebit);
-                    gridView2.SetRowCellValue(gridView2.FocusedRowHandle, "OffsetCreditGLCode", ClientEditPayment.offsetcredit);
+                    gridView2.SetRowCellValue(focused, "OffsetAmount", ClientEditPayment.offsetamount);
+                    gridView2.SetRowCellValue(focused, "OffsetGLCode", ClientEditPayment.offsetdebit);
+                    gridView2.SetRowCellValue(focused, "OffsetCreditGLCode", ClientEditPayment.offsetcredit);
                 }
-                if (ClientEditPayment.isewt == true)
+                if (ClientEditPayment.isewt)
                 {
-                    gridView2.SetRowCellValue(gridView2.FocusedRowHandle, "EWTAmount", ClientEditPayment.ewtamount);
-                    gridView2.SetRowCellValue(gridView2.FocusedRowHandle, "EWTDebitGLCode", ClientEditPayment.ewtdebit);
-                    gridView2.SetRowCellValue(gridView2.FocusedRowHandle, "EWTCreditGLCode", ClientEditPayment.ewtcredit);
-                }
-                if (ClientEditPayment.isfreight == true)
-                {
-                    gridView2.SetRowCellValue(gridView2.FocusedRowHandle, "FreightAmount", ClientEditPayment.freightamount);
-                    gridView2.SetRowCellValue(gridView2.FocusedRowHandle, "ChargeDebitGLCode", ClientEditPayment.freightdebit);
-                    gridView2.SetRowCellValue(gridView2.FocusedRowHandle, "ChargeCreditGLCode", ClientEditPayment.freightcredit);
+                    gridView2.SetRowCellValue(focused, "EWTAmount", ClientEditPayment.ewtamount);
+                    gridView2.SetRowCellValue(focused, "EWTDebitGLCode", ClientEditPayment.ewtdebit);
+                    gridView2.SetRowCellValue(focused, "EWTCreditGLCode", ClientEditPayment.ewtcredit);
                 }
                 ClientEditPayment.isdone = false;
                 clientedit.Dispose();
@@ -582,192 +411,378 @@ namespace SalesInventorySystem.HOFormsDevEx
 
         private void clearFieldsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            gridView2.SetRowCellValue(gridView2.FocusedRowHandle, "Discount", "0");
-            gridView2.SetRowCellValue(gridView2.FocusedRowHandle, "DiscountGLCode", "");
-            gridView2.SetRowCellValue(gridView2.FocusedRowHandle, "OffsetAmount", "0");
-            gridView2.SetRowCellValue(gridView2.FocusedRowHandle, "OffsetGLCode", "");
-            gridView2.SetRowCellValue(gridView2.FocusedRowHandle, "OffsetCreditGLCode", "");
-            gridView2.SetRowCellValue(gridView2.FocusedRowHandle, "EWTAmount", "0");
-            gridView2.SetRowCellValue(gridView2.FocusedRowHandle, "EWTDebitGLCode", "");
-            gridView2.SetRowCellValue(gridView2.FocusedRowHandle, "EWTCreditGLCode", "");
+            int row = gridView2.FocusedRowHandle;
+            gridView2.SetRowCellValue(row, "DiscountAmount", "0");
+            gridView2.SetRowCellValue(row, "DiscountGLCode", "");
+            gridView2.SetRowCellValue(row, "OffsetAmount", "0");
+            gridView2.SetRowCellValue(row, "OffsetGLCode", "");
+            gridView2.SetRowCellValue(row, "OffsetCreditGLCode", "");
+            gridView2.SetRowCellValue(row, "EWTAmount", "0");
+            gridView2.SetRowCellValue(row, "EWTDebitGLCode", "");
+            gridView2.SetRowCellValue(row, "EWTCreditGLCode", "");
+            RecalculateRow(row);
         }
 
-        private void refreshDisplayToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            display();
-        }
-
-        private void showSalesItemsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            HOFormsDevEx.ClientSalesItems salesitems = new ClientSalesItems();
-            //Database.GridMasterDetail("SELECT CustomerNo,ReferenceNo,Invoice,TotalItem,TotalVatableItems,TotalKilos,SubTotal,TotalAmount,TotalVatableSale,TotalVATSale,TotalVATExemptSale FROM BatchSalesSummary WHERE BranchCode='888' AND ReferenceNo='" + gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "OrderNo").ToString() + "' AND Invoice='" + gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "InvoiceNo").ToString() + "'", "SELECT ReferenceNo,ProductCode,Description,QtySold,SellingPrice,TaxRate,TaxTotal,SubTotal,TotalAmount FROM BatchSalesDetails WHERE BranchCode='888' AND ReferenceNo='" + gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "OrderNo").ToString() + "'","BatchSalesSummary","BatchSalesDetails", "ReferenceNo", "ReferenceNo", "SalesDetails",salesitems.gridControl2,"");
-            Database.display("SELECT CustomerNo,ReferenceNo,Invoice,TotalItem,TotalVatableItems,TotalKilos,SubTotal,TotalAmount,TotalVatableSale,TotalVATSale,TotalVATExemptSale FROM BatchSalesSummary WHERE BranchCode='888' AND ReferenceNo='" + gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "OrderNo").ToString() + "' AND Invoice='" + gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "InvoiceNo").ToString() + "'", salesitems.gridControl2, salesitems.gridView2);
-            Database.display("SELECT ReferenceNo,ProductCode,Description,QtySold,SellingPrice,TaxRate,TaxTotal,SubTotal,TotalAmount,isVat FROM BatchSalesDetails WHERE BranchCode='888' AND ReferenceNo='" + gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "OrderNo").ToString() + "' ", salesitems.gridControl1, salesitems.gridView8);
-            Database.GridMasterDetail("ClientChargeSalesSummary", "ClientChargeSalesDetails", "PONumber='" + gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "OrderNo").ToString() + "'", "PONumber='" + gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "OrderNo").ToString() + "' ", "ChargeNo", "ChargeNo", "DeliveryChargeDetails", salesitems.gridControlChargesSummary);
-            Classes.DevXGridViewSettings.getTotalSummation(salesitems.gridView8, "QtySold", "TaxTotal", "SubTotal", "TotalAmount");
-            salesitems.ShowDialog(this);
-        }
-
-        private void gridView2_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        void postPayment()
-        {
-            //string refnum = IDGenerator.getReferenceNumber();
-           //string refnum = IDGenerator.getIDNumberSP("sp_GetReferenceNumber", "ReferenceNumber");
-            SqlConnection con = Database.getConnection();
-            con.Open();
-            try
-            {
-                string query = "sp_AddPaymentClient";
-                SqlCommand com = new SqlCommand(query, con);
-                com.Parameters.AddWithValue("@parmrefno", refno);
-                com.Parameters.AddWithValue("@parmtransseqno", lasttransseqno);
-                com.Parameters.AddWithValue("@parmcustkey", custkey);
-                com.Parameters.AddWithValue("@parmcontrolno", txtcontrolno.Text);
-                com.Parameters.AddWithValue("@parmcrno", txtcrno.Text);
-
-                com.Parameters.AddWithValue("@parmamounttopay", txtamounttopay.Text);
-                com.Parameters.AddWithValue("@parmdate", txtdate.Text); 
-                com.Parameters.AddWithValue("@parmremarks", txtremakrs.Text);
-                com.Parameters.AddWithValue("@parmpreparedby", Login.Fullname);
-                com.Parameters.AddWithValue("@parmdebitglcode", txtdebitglcode.Text);
-                com.Parameters.AddWithValue("@parmcreditglcode", txtcreditglcode.Text);
-                com.Parameters.AddWithValue("@parmpaymenttype", paymenttype);
-                com.Parameters.AddWithValue("@parmcheckremarks", txtremakrs.Text);
-                com.CommandType = CommandType.StoredProcedure;
-                com.CommandText = query;
-                com.ExecuteNonQuery();
-
-            }
-            catch (SqlException ex)
-            {
-                XtraMessageBox.Show(ex.Message.ToString());
-            }
-            finally
-            {
-                con.Close();
-            }
-        }
-
-        private void txtremakrs_EditValueChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void simpleButton5_Click(object sender, EventArgs e)
-        {
-
-        }
-
+        // ── CONFIRM PAYMENT ──────────────────────────────────────────────
         void confirmPayment()
         {
-            bool confirm = HelperFunction.ConfirmDialog("Are you sure?", "Confirm Payment");
-            if (confirm == true)
+            if (!HelperFunction.ConfirmDialog("Are you sure?", "Confirm Payment"))
+                return;
+
+            if (string.IsNullOrEmpty(txtdebitglcode.Text) ||
+                string.IsNullOrEmpty(txtcontrolno.Text) ||
+                string.IsNullOrEmpty(txtcrno.Text))
             {
-                bool isSales = false, isCharge = false;
-                if (String.IsNullOrEmpty(txtdebitglcode.Text) || String.IsNullOrEmpty(txtcontrolno.Text) || String.IsNullOrEmpty(txtcrno.Text))
-                {
-                    XtraMessageBox.Show("Please Filled up Mandatory Fields");
-                    return;
-                }
-                if (radioButton1.Checked == false && radioButton2.Checked == false && radioButton3.Checked == false && radioButton4.Checked == false && radCreditCard.Checked==false)
-                {
-                    XtraMessageBox.Show("Please select Payment Type");
-                    return;
-                }
-
-
-                int ctr = 0, advpymntctr = 0;
-
-                for (int i = 0; i <= gridView2.RowCount - 1; i++)
-                {
-                    if (gridView2.GetRowCellValue(i, "Pay").ToString() == "True")
-                    {
-                        ctr += 1;
-                        totalbalance += Convert.ToDouble(gridView2.GetRowCellValue(i, "Balance").ToString());
-                        totalamountpaid += Convert.ToDouble(gridView2.GetRowCellValue(i, "AmountPaid").ToString());
-                    }
-                    if (gridView2.GetRowCellValue(i, "Pay").ToString() == "True" && gridView2.GetRowCellValue(i, "InvoiceType").ToString() == "SALES")
-                    {
-                        isSales = true;
-
-                    }
-                    if (gridView2.GetRowCellValue(i, "Pay").ToString() == "True" && gridView2.GetRowCellValue(i, "InvoiceType").ToString() == "CHARGE")
-                    {
-                        isCharge = true;
-                    }
-                    //advance payment
-                    if (Convert.ToDouble(gridView2.GetRowCellValue(i, "AdvancePayment").ToString()) > 0)
-                    {
-                        advpymntctr += 1;
-                    }
-                    if (Convert.ToDouble(gridView2.GetRowCellValue(i, "AmountPaid").ToString()) > 0)
-                    {
-                        advncepymentval += Convert.ToDouble(gridView2.GetRowCellValue(i, "AmountPaid").ToString());
-
-                    }
-
-                }
-
-
-                if (ctr == 0)
-                {
-                    XtraMessageBox.Show("No Payments Executed!.. Please select PAY mode Status in Pay Columns");
-                    return;
-                }
-                else if (advpymntctr > 1)
-                {
-                    XtraMessageBox.Show("Advance Payment must assigned only in one invoice!...");
-                    return;
-                }
-
-                else if (isCharge == true && isSales == true)
-                {
-                    XtraMessageBox.Show("Cannot Proceed Payment.. Unable to use Mixmode Transactions.. You can Execute one at a time, either CHARGE payment or SALES Invoice first.");
-                    return;
-                }
-                else if (radioButton4.Checked == true && advncepymentval > Convert.ToDouble(txtacctbalance.Text))
-                {
-                    XtraMessageBox.Show("Cannot Proceed Payment.. Your Total Amount Paid is greater than your Savings Amount.!");
-                    return;
-                }
-                else if (totalamountpaid > totalbalance)
-                {
-                    XtraMessageBox.Show("Total Amount Paid must not greater than Total Balance");
-                    return;
-                }
-                else
-                {
-                    isglobalCharge = isCharge;
-                    isglobalSales = isSales;
-                    addPayment();
-                }
+                XtraMessageBox.Show("Please fill up mandatory fields.");
+                return;
             }
-            else
+            if (!radioButton1.Checked && !radioButton2.Checked &&
+                !radioButton3.Checked && !radioButton4.Checked && !radCreditCard.Checked)
             {
+                XtraMessageBox.Show("Please select a Payment Type.");
                 return;
             }
 
+            // [BUG-3] FIX: use local variables, not instance accumulators
+            int ctr = 0;
+            int advpymntctr = 0;
+            double totalBalance = 0;
+            double totalAmtPaid = 0;
+            double advncepymentval = 0;
+            bool isSales = false;
+            bool isCharge = false;
+
+            for (int i = 0; i < gridView2.RowCount; i++)
+            {
+                bool isPay = gridView2.GetRowCellValue(i, "Pay").ToString() == "True";
+                if (!isPay) continue;
+
+                ctr++;
+                totalBalance += Convert.ToDouble(gridView2.GetRowCellValue(i, "Balance") ?? 0);
+                totalAmtPaid += Convert.ToDouble(gridView2.GetRowCellValue(i, "AmountPaid") ?? 0);
+                advncepymentval += Convert.ToDouble(gridView2.GetRowCellValue(i, "AmountPaid") ?? 0);
+
+                string invType = gridView2.GetRowCellValue(i, "InvoiceType")?.ToString();
+                if (invType == "SALES") isSales = true;
+                if (invType == "CHARGE") isCharge = true;
+
+                if (Convert.ToDouble(gridView2.GetRowCellValue(i, "AdvancePayment") ?? 0) > 0)
+                    advpymntctr++;
+            }
+
+            if (ctr == 0)
+            {
+                XtraMessageBox.Show("No invoices selected. Please check the 'Pay' checkbox.");
+                return;
+            }
+            if (advpymntctr > 1)
+            {
+                XtraMessageBox.Show("Advance Payment must be assigned to only one invoice.");
+                return;
+            }
+            if (isSales && isCharge)
+            {
+                XtraMessageBox.Show("Cannot mix CHARGE and SALES invoice payments. Process one type at a time.");
+                return;
+            }
+            if (radioButton4.Checked && advncepymentval > Convert.ToDouble(txtacctbalance.Text))
+            {
+                XtraMessageBox.Show("Total Amount Paid exceeds available savings balance.");
+                return;
+            }
+            if (totalAmtPaid > totalBalance)
+            {
+                XtraMessageBox.Show("Total Amount Paid cannot exceed Total Balance.");
+                return;
+            }
+
+            isglobalCharge = isCharge;
+            isglobalSales = isSales;
+            ProcessPayment();
         }
 
-        private void simpleButton4_Click(object sender, EventArgs e)
+        private void simpleButton4_Click(object sender, EventArgs e) => confirmPayment();
+
+        // ── PAYMENT PROCESSING ───────────────────────────────────────────
+        void ProcessPayment()
         {
-            confirmPayment();
+            using (SqlConnection con = Database.getConnection())
+            {
+                con.Open();
+                using (SqlTransaction tran = con.BeginTransaction())
+                {
+                    try
+                    {
+                        int paymentHeaderId = InsertPaymentHeader(con, tran);
+                        InsertPaymentMethod(con, tran, paymentHeaderId);
+                        InsertARPaymentDetails(con, tran, paymentHeaderId);
+                        ExecutePostingSP(con, tran, paymentHeaderId);
+
+                        tran.Commit();
+                        BigAlert.Show("SUCCESS", "Payment Successfully Posted!", MessageBoxIcon.Information);
+                        this.Dispose();
+                    }
+                    catch (Exception ex)
+                    {
+                        tran.Rollback();
+                        BigAlert.Show("Error", ex.Message, MessageBoxIcon.Error);
+                    }
+                }
+            }
         }
 
+        int InsertPaymentHeader(SqlConnection con, SqlTransaction tran)
+        {
+            refno = IDGenerator.getIDNumberSP("sp_GetReferenceNumber", "ReferenceNumber");
+
+            using (SqlCommand cmd = new SqlCommand(@"
+                INSERT INTO PaymentHeader
+                    (CustomerKey, ReferenceNo, ControlNo, CRNo, PaymentType,
+                     TotalAmount, PaymentDate, Remarks, CreatedBy)
+                OUTPUT INSERTED.PaymentHeaderID
+                VALUES
+                    (@custkey, @refno, @control, @crno, @type,
+                     @amount, @date, @remarks, @user)", con, tran))
+            {
+                cmd.Parameters.Add("@custkey", SqlDbType.Char, 8).Value = custkey;
+                cmd.Parameters.Add("@refno", SqlDbType.VarChar, 20).Value = refno;
+                cmd.Parameters.Add("@control", SqlDbType.VarChar, 30).Value = txtcontrolno.Text;
+                cmd.Parameters.Add("@crno", SqlDbType.VarChar, 20).Value = txtcrno.Text;
+                cmd.Parameters.Add("@type", SqlDbType.VarChar, 30).Value = GetPaymentType();
+                cmd.Parameters.Add("@amount", SqlDbType.Decimal).Value = Convert.ToDecimal(txtamounttopay.Text);
+                cmd.Parameters.Add("@date", SqlDbType.Date).Value = Convert.ToDateTime(txtdate.Text);
+                cmd.Parameters.Add("@remarks", SqlDbType.VarChar, 500).Value = txtremakrs.Text;
+                cmd.Parameters.Add("@user", SqlDbType.VarChar, 50).Value = Login.Fullname;
+
+                return Convert.ToInt32(cmd.ExecuteScalar());
+            }
+        }
+
+        void InsertPaymentMethod(SqlConnection con, SqlTransaction tran, int paymentHeaderId)
+        {
+            string type = GetPaymentType();
+            decimal netAmount = Convert.ToDecimal(txtamounttopay.Text);
+
+            if (type == "CASH")
+            {
+                using (SqlCommand cmd = new SqlCommand(@"
+                    INSERT INTO TransactionCashCollection
+                        (PaymentHeaderID, CustomerKey, AmountPaid, Remarks, DatePaid, TransactedBy, isErrorCorrect)
+                    VALUES
+                        (@phid, @custkey, @amount, @remarks, @date, @user, 0)", con, tran))
+                {
+                    cmd.Parameters.Add("@phid", SqlDbType.Int).Value = paymentHeaderId;
+                    cmd.Parameters.Add("@custkey", SqlDbType.VarChar, 118).Value = custkey;
+                    cmd.Parameters.Add("@amount", SqlDbType.Decimal).Value = netAmount;
+                    cmd.Parameters.Add("@remarks", SqlDbType.VarChar, 500).Value = txtremakrs.Text;
+                    cmd.Parameters.Add("@date", SqlDbType.Date).Value = Convert.ToDateTime(txtdate.Text);
+                    cmd.Parameters.Add("@user", SqlDbType.VarChar, 50).Value = Login.Fullname;
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            else if (type == "CHECK")
+            {
+                using (SqlCommand cmd = new SqlCommand(@"
+                    INSERT INTO TransactionCheque
+                        (PaymentHeaderID, BranchCode, ControlNo, CRNo, CustomerID, CustomerName,
+                         CheckNo, CheckName, CheckBankName, CheckAmount, CheckDate,
+                         Amount, Remarks, DatePaid, TransactedBy, CreditGLCode)
+                    VALUES
+                        (@phid, @branch, @control, @crno, @custid, @custname,
+                         @checkno, @checkname, @bank, @checkamount, @checkdate,
+                         @amount, @remarks, @date, @user, @glcode)", con, tran))
+                {
+                    cmd.Parameters.Add("@phid", SqlDbType.Int).Value = paymentHeaderId;
+                    cmd.Parameters.Add("@branch", SqlDbType.Char, 3).Value = Customers.getCustBranch(txtcustid.Text);
+                    cmd.Parameters.Add("@control", SqlDbType.VarChar, 30).Value = txtcontrolno.Text;
+                    cmd.Parameters.Add("@crno", SqlDbType.VarChar, 20).Value = txtcrno.Text;
+                    cmd.Parameters.Add("@custid", SqlDbType.VarChar, 20).Value = txtcustid.Text;
+                    cmd.Parameters.Add("@custname", SqlDbType.VarChar, 120).Value = txtcustname.Text;
+                    cmd.Parameters.Add("@checkno", SqlDbType.VarChar, 50).Value = txtchecknum.Text;
+                    cmd.Parameters.Add("@checkname", SqlDbType.VarChar, 50).Value = txtcheckname.Text;
+                    cmd.Parameters.Add("@bank", SqlDbType.VarChar, 50).Value = txtcheckbankname.Text;
+                    cmd.Parameters.Add("@checkamount", SqlDbType.Money).Value = Convert.ToDecimal(txtcheckamount.Text);
+                    cmd.Parameters.Add("@checkdate", SqlDbType.Date).Value = Convert.ToDateTime(txtcheckdate.Text);
+                    cmd.Parameters.Add("@amount", SqlDbType.Money).Value = netAmount;
+                    cmd.Parameters.Add("@remarks", SqlDbType.VarChar, 500).Value = txtremakrs.Text;
+                    cmd.Parameters.Add("@date", SqlDbType.Date).Value = Convert.ToDateTime(txtdate.Text);
+                    cmd.Parameters.Add("@user", SqlDbType.VarChar, 50).Value = Login.Fullname;
+                    // CreditGLCode stored here so SP can resolve the bank account
+                    cmd.Parameters.Add("@glcode", SqlDbType.VarChar, 20).Value = txtdebitglcode.Text;
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            else if (type == "ONLINE")
+            {
+                using (SqlCommand cmd = new SqlCommand(@"
+                    INSERT INTO TransactionOnline
+                        (PaymentHeaderID, BranchCode, ControlNo, CRNo,CustomerID, CustomerName, BankRefNumber, BankName, DateDeposit,
+                         Amount, Remarks, DatePaid, TransactedBy)
+                    VALUES
+                        (@phid,@branch, @control, @crno, @custid, @custname, @refno, @bank, @depdate,
+                         @amount, @remarks, @date, @user)", con, tran))
+                {
+                    cmd.Parameters.Add("@phid", SqlDbType.Int).Value = paymentHeaderId;
+                    cmd.Parameters.Add("@branch", SqlDbType.Char, 3).Value = Customers.getCustBranch(txtcustid.Text);
+                    cmd.Parameters.Add("@control", SqlDbType.VarChar, 30).Value = txtcontrolno.Text;
+                    cmd.Parameters.Add("@crno", SqlDbType.VarChar, 20).Value = txtcrno.Text;
+                    cmd.Parameters.Add("@custid", SqlDbType.VarChar, 20).Value = txtcustid.Text;
+                    cmd.Parameters.Add("@custname", SqlDbType.VarChar, 120).Value = txtcustname.Text;
+                    cmd.Parameters.Add("@refno", SqlDbType.VarChar, 50).Value = txtrefnoonline.Text;
+                    cmd.Parameters.Add("@bank", SqlDbType.VarChar, 50).Value = txtdepbankonline.Text;
+                    cmd.Parameters.Add("@depdate", SqlDbType.Date).Value = Convert.ToDateTime(txtdatedeponline.Text);
+                    cmd.Parameters.Add("@amount", SqlDbType.Decimal).Value = netAmount;
+                    cmd.Parameters.Add("@remarks", SqlDbType.VarChar, 500).Value = txtremakrs.Text;
+                    cmd.Parameters.Add("@date", SqlDbType.Date).Value = Convert.ToDateTime(txtdate.Text);
+                    cmd.Parameters.Add("@user", SqlDbType.VarChar, 50).Value = Login.Fullname;
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        // ── AR PAYMENT DETAILS INSERT ────────────────────────────────────
+        // [BUG-1] FIX: INVOICE PAYMENT row now stores GROSS (balance being settled),
+        //         not net cash. The SP derives net cash as Gross - EWT - Discount - Offset.
+        //
+        //  Grid columns meaning:
+        //    AmountPaid    = net cash physically received  (balance - deductions)
+        //    EWTAmount     = EWT withheld
+        //    DiscountAmount= discount granted
+        //    OffsetAmount  = advance/deposit offset
+        //    Balance       = original invoice balance (= gross being settled)
+        //
+        //  ARPaymentDetails rows:
+        //    INVOICE PAYMENT → Amount = Balance (gross)   ← THE FIX
+        //    EWT             → Amount = EWTAmount
+        //    DISCOUNT        → Amount = DiscountAmount
+        //    OFFSET          → Amount = OffsetAmount
+        // ─────────────────────────────────────────────────────────────────
+        void InsertARPaymentDetails(SqlConnection con, SqlTransaction tran, int paymentHeaderId)
+        {
+            for (int i = 0; i < gridView2.RowCount; i++)
+            {
+                bool pay = Convert.ToBoolean(gridView2.GetRowCellValue(i, "Pay"));
+                if (!pay) continue;
+
+                string invoiceNo = gridView2.GetRowCellValue(i, "InvoiceNo").ToString();
+                string orderNo = gridView2.GetRowCellValue(i, "OrderNo").ToString();
+                DateTime transDate = Convert.ToDateTime(gridView2.GetRowCellValue(i, "TransactionDate"));
+
+                decimal netCash = Convert.ToDecimal(gridView2.GetRowCellValue(i, "AmountPaid") ?? 0);
+                decimal ewt = Convert.ToDecimal(gridView2.GetRowCellValue(i, "EWTAmount") ?? 0);
+                decimal discount = Convert.ToDecimal(gridView2.GetRowCellValue(i, "DiscountAmount") ?? 0);
+                decimal offset = Convert.ToDecimal(gridView2.GetRowCellValue(i, "OffsetAmount") ?? 0);
+
+                // [BUG-1] GROSS = net cash the user entered PLUS all deductions
+                // Example: invoice 4600, EWT 460 → netCash=4140, gross=4600
+                decimal gross = netCash + ewt + discount + offset;
+
+                // INVOICE PAYMENT: always insert using the gross amount
+                if (gross > 0)
+                    InsertDetail(con, tran, paymentHeaderId, orderNo, invoiceNo, transDate, gross, "INVOICE PAYMENT");
+
+                if (ewt > 0)
+                    InsertDetail(con, tran, paymentHeaderId, orderNo, invoiceNo, transDate, ewt, "EWT");
+
+                if (discount > 0)
+                    InsertDetail(con, tran, paymentHeaderId, orderNo, invoiceNo, transDate, discount, "DISCOUNT");
+
+                if (offset > 0)
+                    InsertDetail(con, tran, paymentHeaderId, orderNo, invoiceNo, transDate, offset, "OFFSET");
+            }
+        }
+
+        void InsertDetail(SqlConnection con, SqlTransaction tran, int phid,
+                          string po, string invoice, DateTime date, decimal amount, string type)
+        {
+            using (SqlCommand cmd = new SqlCommand(@"
+                INSERT INTO ARPaymentDetails
+                    (PaymentHeaderID, CustomerKey, ReferenceNo, PONumber, InvoiceNo,
+                     InvoiceDate, Amount, PaymentType, PaymentMethod,
+                     DebitGLCode, CreditGLCode, TicketNumber)
+                VALUES
+                    (@phid, @custkey, @refno, @po, @invoice,
+                     @date, @amount, @type, 'PAYMENT',
+                     @debit, @credit, '')", con, tran))
+            {
+                cmd.Parameters.Add("@phid", SqlDbType.Int).Value = phid;
+                cmd.Parameters.Add("@custkey", SqlDbType.Char, 8).Value = custkey;
+                cmd.Parameters.Add("@refno", SqlDbType.VarChar, 20).Value = refno;
+                cmd.Parameters.Add("@po", SqlDbType.VarChar, 10).Value = po;
+                cmd.Parameters.Add("@invoice", SqlDbType.VarChar, 50).Value = invoice;
+                cmd.Parameters.Add("@date", SqlDbType.Date).Value = date;
+                cmd.Parameters.Add("@amount", SqlDbType.Decimal).Value = amount;
+                cmd.Parameters.Add("@type", SqlDbType.VarChar, 20).Value = type;
+                cmd.Parameters.Add("@debit", SqlDbType.VarChar, 20).Value = txtdebitglcode.Text;
+                cmd.Parameters.Add("@credit", SqlDbType.VarChar, 20).Value = txtcreditglcode.Text;
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        void ExecutePostingSP(SqlConnection con, SqlTransaction tran, int paymentHeaderId)
+        {
+            using (SqlCommand cmd = new SqlCommand("sp_AddPaymentClient", con, tran))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add("@PaymentHeaderID", SqlDbType.Int).Value = paymentHeaderId;
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        string GetPaymentType()
+        {
+            if (radioButton1.Checked) return "CASH";
+            if (radioButton2.Checked) return "CHECK";
+            if (radioButton3.Checked) return "ONLINE";
+            if (radioButton4.Checked) return "ADVANCEPAYMENT";
+            if (radCreditCard.Checked) return "CREDITCARD";
+            throw new Exception("No payment type selected.");
+        }
+
+        // ── HISTORY SEARCH ──────────────────────────────────────────────
+        // [BUG-4] FIX: was raw string concatenation (SQL injection risk).
+        // Now uses parameterized query.
         private void simpleButton1_Click_1(object sender, EventArgs e)
         {
-            Database.display("SELECT TransactionDate,CustomerID,Reference,Amount,AmountPaid,Balance,PaymentStatus FROM TransactionChargeSales WHERE CAST(TransactionDate as date) between '" + dateEdit1.Text + "' and '" + dateEdit2.Text + "' and CustomerID='" + groupControl1.Text + "' and Balance=0", gridControl1, gridView9);
-       
+            using (SqlConnection con = Database.getConnection())
+            using (SqlCommand cmd = new SqlCommand(@"
+                SELECT TransactionDate, CustomerKey, ReferenceNo,
+                       TotalAmount, AmountPaid, Balance, PayStatus
+                FROM TransactionChargeSales
+                WHERE CAST(TransactionDate AS DATE) BETWEEN @from AND @to
+                  AND CustomerKey = @custkey
+                  AND Balance = 0", con))
+            {
+                cmd.Parameters.Add("@from", SqlDbType.Date).Value = Convert.ToDateTime(dateEdit1.Text);
+                cmd.Parameters.Add("@to", SqlDbType.Date).Value = Convert.ToDateTime(dateEdit2.Text);
+                cmd.Parameters.Add("@custkey", SqlDbType.Char, 8).Value = custkey;
+
+                DataTable table = new DataTable();
+                con.Open();
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                    table.Load(dr);
+
+                gridControl1.DataSource = table;
+                gridView9.BestFitColumns();
+            }
         }
 
-        private void radioButton4_CheckedChanged(object sender, EventArgs e)
-        {
-            radEvent();
-        }
+        private void simpleButton2_Click(object sender, EventArgs e) { /* reserved */ }
+        private void simpleButton5_Click(object sender, EventArgs e) { /* reserved */ }
+        private void txtremakrs_EditValueChanged(object sender, EventArgs e) { }
+        private void gridView2_ShowingEditor(object sender, System.ComponentModel.CancelEventArgs e) { }
+    }
 
+    // ── DATA MODEL ───────────────────────────────────────────────────────
+    class PaymentRow
+    {
+        public bool Pay { get; set; }
+        public string InvoiceNo { get; set; }
+        public string OrderNo { get; set; }
+        public DateTime TransactionDate { get; set; }
+        public decimal AmountPaid { get; set; }   // net cash
+        public decimal EWTAmount { get; set; }
+        public decimal DiscountAmount { get; set; }
+        public decimal OffsetAmount { get; set; }
     }
 }

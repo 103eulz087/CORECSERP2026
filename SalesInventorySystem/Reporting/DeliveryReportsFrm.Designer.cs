@@ -40,12 +40,12 @@
             this.labelControl2 = new DevExpress.XtraEditors.LabelControl();
             this.labelControl3 = new DevExpress.XtraEditors.LabelControl();
             this.groupControl1 = new DevExpress.XtraEditors.GroupControl();
+            this.btnforapprovalsalesorderexcel = new DevExpress.XtraEditors.SimpleButton();
             this.raddeliv = new System.Windows.Forms.RadioButton();
             this.radfordeliv = new System.Windows.Forms.RadioButton();
             this.btnadd = new DevExpress.XtraEditors.SimpleButton();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.showSTSDetailsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.btnforapprovalsalesorderexcel = new DevExpress.XtraEditors.SimpleButton();
             ((System.ComponentModel.ISupportInitialize)(this.dateTo.Properties.CalendarTimeProperties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dateTo.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dateFrom.Properties.CalendarTimeProperties)).BeginInit();
@@ -63,8 +63,8 @@
             // dateTo
             // 
             this.dateTo.EditValue = null;
-            this.dateTo.Location = new System.Drawing.Point(256, 37);
-            this.dateTo.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            this.dateTo.Location = new System.Drawing.Point(224, 37);
+            this.dateTo.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.dateTo.Name = "dateTo";
             this.dateTo.Properties.Appearance.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.dateTo.Properties.Appearance.Options.UseFont = true;
@@ -72,43 +72,43 @@
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.dateTo.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.dateTo.Size = new System.Drawing.Size(133, 26);
+            this.dateTo.Size = new System.Drawing.Size(116, 26);
             this.dateTo.TabIndex = 4;
             // 
             // dateFrom
             // 
             this.dateFrom.EditValue = null;
-            this.dateFrom.Location = new System.Drawing.Point(79, 37);
-            this.dateFrom.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            this.dateFrom.Location = new System.Drawing.Point(69, 37);
+            this.dateFrom.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.dateFrom.Name = "dateFrom";
             this.dateFrom.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.dateFrom.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.dateFrom.Size = new System.Drawing.Size(133, 22);
+            this.dateFrom.Size = new System.Drawing.Size(116, 22);
             this.dateFrom.TabIndex = 3;
             // 
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.gridControl1);
             this.groupBox2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox2.Location = new System.Drawing.Point(0, 133);
-            this.groupBox2.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            this.groupBox2.Location = new System.Drawing.Point(0, 125);
+            this.groupBox2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Padding = new System.Windows.Forms.Padding(5, 4, 5, 4);
-            this.groupBox2.Size = new System.Drawing.Size(1283, 542);
+            this.groupBox2.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox2.Size = new System.Drawing.Size(1123, 550);
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
             // 
             // gridControl1
             // 
             this.gridControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControl1.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
-            this.gridControl1.Location = new System.Drawing.Point(5, 19);
+            this.gridControl1.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gridControl1.Location = new System.Drawing.Point(4, 20);
             this.gridControl1.MainView = this.gridView1;
-            this.gridControl1.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            this.gridControl1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.gridControl1.Name = "gridControl1";
-            this.gridControl1.Size = new System.Drawing.Size(1273, 519);
+            this.gridControl1.Size = new System.Drawing.Size(1115, 526);
             this.gridControl1.TabIndex = 1;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1});
@@ -142,14 +142,14 @@
             // 
             // searchLookUpEdit1
             // 
-            this.searchLookUpEdit1.Location = new System.Drawing.Point(79, 74);
-            this.searchLookUpEdit1.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            this.searchLookUpEdit1.Location = new System.Drawing.Point(69, 68);
+            this.searchLookUpEdit1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.searchLookUpEdit1.Name = "searchLookUpEdit1";
             this.searchLookUpEdit1.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.searchLookUpEdit1.Properties.NullText = "";
             this.searchLookUpEdit1.Properties.PopupView = this.searchLookUpEdit1View;
-            this.searchLookUpEdit1.Size = new System.Drawing.Size(312, 22);
+            this.searchLookUpEdit1.Size = new System.Drawing.Size(273, 22);
             this.searchLookUpEdit1.TabIndex = 8;
             this.searchLookUpEdit1.EditValueChanged += new System.EventHandler(this.searchLookUpEdit1_EditValueChanged);
             // 
@@ -164,8 +164,8 @@
             // 
             this.labelControl1.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F);
             this.labelControl1.Appearance.Options.UseFont = true;
-            this.labelControl1.Location = new System.Drawing.Point(27, 42);
-            this.labelControl1.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            this.labelControl1.Location = new System.Drawing.Point(24, 42);
+            this.labelControl1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.labelControl1.Name = "labelControl1";
             this.labelControl1.Size = new System.Drawing.Size(39, 18);
             this.labelControl1.TabIndex = 9;
@@ -175,8 +175,8 @@
             // 
             this.labelControl2.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F);
             this.labelControl2.Appearance.Options.UseFont = true;
-            this.labelControl2.Location = new System.Drawing.Point(223, 42);
-            this.labelControl2.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            this.labelControl2.Location = new System.Drawing.Point(195, 42);
+            this.labelControl2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.labelControl2.Name = "labelControl2";
             this.labelControl2.Size = new System.Drawing.Size(23, 18);
             this.labelControl2.TabIndex = 10;
@@ -186,8 +186,8 @@
             // 
             this.labelControl3.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F);
             this.labelControl3.Appearance.Options.UseFont = true;
-            this.labelControl3.Location = new System.Drawing.Point(16, 76);
-            this.labelControl3.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            this.labelControl3.Location = new System.Drawing.Point(14, 70);
+            this.labelControl3.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.labelControl3.Name = "labelControl3";
             this.labelControl3.Size = new System.Drawing.Size(50, 18);
             this.labelControl3.TabIndex = 11;
@@ -207,16 +207,28 @@
             this.groupControl1.Controls.Add(this.searchLookUpEdit1);
             this.groupControl1.Dock = System.Windows.Forms.DockStyle.Top;
             this.groupControl1.Location = new System.Drawing.Point(0, 0);
-            this.groupControl1.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            this.groupControl1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.groupControl1.Name = "groupControl1";
-            this.groupControl1.Size = new System.Drawing.Size(1283, 133);
+            this.groupControl1.Size = new System.Drawing.Size(1123, 125);
             this.groupControl1.TabIndex = 12;
+            // 
+            // btnforapprovalsalesorderexcel
+            // 
+            this.btnforapprovalsalesorderexcel.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.ExportToExcel_16x16;
+            this.btnforapprovalsalesorderexcel.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
+            this.btnforapprovalsalesorderexcel.Location = new System.Drawing.Point(503, 36);
+            this.btnforapprovalsalesorderexcel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnforapprovalsalesorderexcel.Name = "btnforapprovalsalesorderexcel";
+            this.btnforapprovalsalesorderexcel.Size = new System.Drawing.Size(121, 54);
+            this.btnforapprovalsalesorderexcel.TabIndex = 82;
+            this.btnforapprovalsalesorderexcel.Text = "Export to Excel";
+            this.btnforapprovalsalesorderexcel.Click += new System.EventHandler(this.btnforapprovalsalesorderexcel_Click);
             // 
             // raddeliv
             // 
             this.raddeliv.AutoSize = true;
-            this.raddeliv.Location = new System.Drawing.Point(197, 106);
-            this.raddeliv.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            this.raddeliv.Location = new System.Drawing.Point(171, 98);
+            this.raddeliv.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.raddeliv.Name = "raddeliv";
             this.raddeliv.Size = new System.Drawing.Size(85, 21);
             this.raddeliv.TabIndex = 81;
@@ -227,8 +239,8 @@
             // 
             this.radfordeliv.AutoSize = true;
             this.radfordeliv.Checked = true;
-            this.radfordeliv.Location = new System.Drawing.Point(79, 106);
-            this.radfordeliv.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            this.radfordeliv.Location = new System.Drawing.Point(67, 98);
+            this.radfordeliv.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.radfordeliv.Name = "radfordeliv";
             this.radfordeliv.Size = new System.Drawing.Size(102, 21);
             this.radfordeliv.TabIndex = 80;
@@ -240,10 +252,10 @@
             // 
             this.btnadd.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.GenerateData_32x32;
             this.btnadd.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btnadd.Location = new System.Drawing.Point(399, 36);
-            this.btnadd.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            this.btnadd.Location = new System.Drawing.Point(349, 36);
+            this.btnadd.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnadd.Name = "btnadd";
-            this.btnadd.Size = new System.Drawing.Size(168, 62);
+            this.btnadd.Size = new System.Drawing.Size(147, 54);
             this.btnadd.TabIndex = 79;
             this.btnadd.Text = "Add (Enter)";
             this.btnadd.Click += new System.EventHandler(this.btnadd_Click);
@@ -263,29 +275,18 @@
             this.showSTSDetailsToolStripMenuItem.Text = "Show STS Details";
             this.showSTSDetailsToolStripMenuItem.Click += new System.EventHandler(this.showSTSDetailsToolStripMenuItem_Click);
             // 
-            // btnforapprovalsalesorderexcel
-            // 
-            this.btnforapprovalsalesorderexcel.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.ExportToExcel_16x16;
-            this.btnforapprovalsalesorderexcel.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btnforapprovalsalesorderexcel.Location = new System.Drawing.Point(575, 36);
-            this.btnforapprovalsalesorderexcel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.btnforapprovalsalesorderexcel.Name = "btnforapprovalsalesorderexcel";
-            this.btnforapprovalsalesorderexcel.Size = new System.Drawing.Size(138, 62);
-            this.btnforapprovalsalesorderexcel.TabIndex = 82;
-            this.btnforapprovalsalesorderexcel.Text = "Export to Excel";
-            this.btnforapprovalsalesorderexcel.Click += new System.EventHandler(this.btnforapprovalsalesorderexcel_Click);
-            // 
             // DeliveryReportsFrm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1283, 675);
+            this.ClientSize = new System.Drawing.Size(1123, 675);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupControl1);
-            this.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "DeliveryReportsFrm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "DeliveryReportsFrm";
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Load += new System.EventHandler(this.DeliveryReportsFrm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dateTo.Properties.CalendarTimeProperties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dateTo.Properties)).EndInit();

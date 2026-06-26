@@ -88,6 +88,7 @@
             this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip4 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
+            this.txtcheckcoding = new DevExpress.XtraEditors.TextEdit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).BeginInit();
             this.panelControl1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.panelCheckVoucher)).BeginInit();
@@ -125,6 +126,7 @@
             this.contextMenuStrip2.SuspendLayout();
             this.contextMenuStrip3.SuspendLayout();
             this.contextMenuStrip4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.txtcheckcoding.Properties)).BeginInit();
             this.SuspendLayout();
             // 
             // panelControl1
@@ -156,34 +158,35 @@
             // 
             // panelCheckVoucher
             // 
+            this.panelCheckVoucher.Controls.Add(this.txtcheckcoding);
             this.panelCheckVoucher.Controls.Add(this.txtlastchecknum);
             this.panelCheckVoucher.Controls.Add(this.labelControl5);
             this.panelCheckVoucher.Controls.Add(this.labelControl6);
             this.panelCheckVoucher.Controls.Add(this.labelControl7);
             this.panelCheckVoucher.Controls.Add(this.txtcheckdate);
             this.panelCheckVoucher.Controls.Add(this.txtcheckno);
-            this.panelCheckVoucher.Location = new System.Drawing.Point(425, 5);
+            this.panelCheckVoucher.Location = new System.Drawing.Point(419, 11);
             this.panelCheckVoucher.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panelCheckVoucher.Name = "panelCheckVoucher";
-            this.panelCheckVoucher.Size = new System.Drawing.Size(392, 98);
+            this.panelCheckVoucher.Size = new System.Drawing.Size(534, 98);
             this.panelCheckVoucher.TabIndex = 472;
             // 
             // txtlastchecknum
             // 
-            this.txtlastchecknum.Location = new System.Drawing.Point(170, 2);
+            this.txtlastchecknum.Location = new System.Drawing.Point(281, 6);
             this.txtlastchecknum.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.txtlastchecknum.Name = "txtlastchecknum";
             this.txtlastchecknum.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F);
             this.txtlastchecknum.Properties.Appearance.Options.UseFont = true;
             this.txtlastchecknum.Properties.ReadOnly = true;
-            this.txtlastchecknum.Size = new System.Drawing.Size(212, 24);
+            this.txtlastchecknum.Size = new System.Drawing.Size(242, 24);
             this.txtlastchecknum.TabIndex = 473;
             // 
             // labelControl5
             // 
             this.labelControl5.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F);
             this.labelControl5.Appearance.Options.UseFont = true;
-            this.labelControl5.Location = new System.Drawing.Point(13, 14);
+            this.labelControl5.Location = new System.Drawing.Point(123, 9);
             this.labelControl5.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.labelControl5.Name = "labelControl5";
             this.labelControl5.Size = new System.Drawing.Size(152, 18);
@@ -194,18 +197,19 @@
             // 
             this.labelControl6.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F);
             this.labelControl6.Appearance.Options.UseFont = true;
-            this.labelControl6.Location = new System.Drawing.Point(69, 71);
+            this.labelControl6.Location = new System.Drawing.Point(184, 73);
             this.labelControl6.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.labelControl6.Name = "labelControl6";
             this.labelControl6.Size = new System.Drawing.Size(90, 18);
             this.labelControl6.TabIndex = 5;
             this.labelControl6.Text = "Cheque Date:";
+            this.labelControl6.Click += new System.EventHandler(this.labelControl6_Click);
             // 
             // labelControl7
             // 
             this.labelControl7.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F);
             this.labelControl7.Appearance.Options.UseFont = true;
-            this.labelControl7.Location = new System.Drawing.Point(77, 39);
+            this.labelControl7.Location = new System.Drawing.Point(192, 41);
             this.labelControl7.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.labelControl7.Name = "labelControl7";
             this.labelControl7.Size = new System.Drawing.Size(82, 18);
@@ -215,7 +219,7 @@
             // txtcheckdate
             // 
             this.txtcheckdate.EditValue = null;
-            this.txtcheckdate.Location = new System.Drawing.Point(170, 66);
+            this.txtcheckdate.Location = new System.Drawing.Point(281, 70);
             this.txtcheckdate.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.txtcheckdate.Name = "txtcheckdate";
             this.txtcheckdate.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F);
@@ -224,17 +228,17 @@
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.txtcheckdate.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.txtcheckdate.Size = new System.Drawing.Size(212, 24);
+            this.txtcheckdate.Size = new System.Drawing.Size(242, 24);
             this.txtcheckdate.TabIndex = 457;
             // 
             // txtcheckno
             // 
-            this.txtcheckno.Location = new System.Drawing.Point(170, 34);
+            this.txtcheckno.Location = new System.Drawing.Point(428, 38);
             this.txtcheckno.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.txtcheckno.Name = "txtcheckno";
             this.txtcheckno.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F);
             this.txtcheckno.Properties.Appearance.Options.UseFont = true;
-            this.txtcheckno.Size = new System.Drawing.Size(212, 24);
+            this.txtcheckno.Size = new System.Drawing.Size(95, 24);
             this.txtcheckno.TabIndex = 467;
             // 
             // radCheckVoucher
@@ -281,14 +285,14 @@
             this.txtremakrs.Name = "txtremakrs";
             this.txtremakrs.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F);
             this.txtremakrs.Properties.Appearance.Options.UseFont = true;
-            this.txtremakrs.Size = new System.Drawing.Size(656, 85);
+            this.txtremakrs.Size = new System.Drawing.Size(792, 85);
             this.txtremakrs.TabIndex = 466;
             // 
             // btnfilter
             // 
             this.btnfilter.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnfilter.ImageOptions.Image")));
             this.btnfilter.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btnfilter.Location = new System.Drawing.Point(637, 234);
+            this.btnfilter.Location = new System.Drawing.Point(773, 234);
             this.btnfilter.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.btnfilter.Name = "btnfilter";
             this.btnfilter.Size = new System.Drawing.Size(173, 32);
@@ -300,7 +304,7 @@
             // 
             this.btnprint.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnprint.ImageOptions.Image")));
             this.btnprint.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btnprint.Location = new System.Drawing.Point(552, 234);
+            this.btnprint.Location = new System.Drawing.Point(688, 234);
             this.btnprint.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.btnprint.Name = "btnprint";
             this.btnprint.Size = new System.Drawing.Size(78, 32);
@@ -312,7 +316,7 @@
             // 
             this.btnadd.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnadd.ImageOptions.Image")));
             this.btnadd.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btnadd.Location = new System.Drawing.Point(425, 234);
+            this.btnadd.Location = new System.Drawing.Point(561, 234);
             this.btnadd.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.btnadd.Name = "btnadd";
             this.btnadd.Size = new System.Drawing.Size(120, 32);
@@ -334,7 +338,7 @@
             // 
             // searchLookUpEdit1
             // 
-            this.searchLookUpEdit1.Location = new System.Drawing.Point(596, 107);
+            this.searchLookUpEdit1.Location = new System.Drawing.Point(700, 113);
             this.searchLookUpEdit1.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.searchLookUpEdit1.Name = "searchLookUpEdit1";
             this.searchLookUpEdit1.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F);
@@ -345,7 +349,7 @@
             this.searchLookUpEdit1.Properties.NullText = "";
             this.searchLookUpEdit1.Properties.PopupView = this.gridview;
             this.searchLookUpEdit1.Properties.ValueMember = "SupplierName";
-            this.searchLookUpEdit1.Size = new System.Drawing.Size(213, 24);
+            this.searchLookUpEdit1.Size = new System.Drawing.Size(245, 24);
             this.searchLookUpEdit1.TabIndex = 461;
             // 
             // gridview
@@ -394,7 +398,7 @@
             // 
             this.labelControl8.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F);
             this.labelControl8.Appearance.Options.UseFont = true;
-            this.labelControl8.Location = new System.Drawing.Point(492, 111);
+            this.labelControl8.Location = new System.Drawing.Point(597, 115);
             this.labelControl8.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.labelControl8.Name = "labelControl8";
             this.labelControl8.Size = new System.Drawing.Size(97, 18);
@@ -602,7 +606,7 @@
             this.gridViewMaster.CustomRowCellEdit += new DevExpress.XtraGrid.Views.Grid.CustomRowCellEditEventHandler(this.gridViewMaster_CustomRowCellEdit);
             this.gridViewMaster.ShowingEditor += new System.ComponentModel.CancelEventHandler(this.gridViewMaster_ShowingEditor);
             this.gridViewMaster.CellValueChanged += new DevExpress.XtraGrid.Views.Base.CellValueChangedEventHandler(this.gridViewMaster_CellValueChanged);
-            this.gridViewMaster.KeyDown += new System.Windows.Forms.KeyEventHandler(this.gridViewMaster_KeyDown); 
+            this.gridViewMaster.KeyDown += new System.Windows.Forms.KeyEventHandler(this.gridViewMaster_KeyDown);
             // 
             // repositoryItemComboBox5
             // 
@@ -759,13 +763,23 @@
             this.contextMenuStrip4.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripMenuItem3});
             this.contextMenuStrip4.Name = "contextMenuStrip1";
-            this.contextMenuStrip4.Size = new System.Drawing.Size(208, 28); 
+            this.contextMenuStrip4.Size = new System.Drawing.Size(208, 28);
             // 
             // toolStripMenuItem3
             // 
             this.toolStripMenuItem3.Name = "toolStripMenuItem3";
             this.toolStripMenuItem3.Size = new System.Drawing.Size(207, 24);
             this.toolStripMenuItem3.Text = "Exclude this Invoice";
+            // 
+            // txtcheckcoding
+            // 
+            this.txtcheckcoding.Location = new System.Drawing.Point(281, 38);
+            this.txtcheckcoding.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
+            this.txtcheckcoding.Name = "txtcheckcoding";
+            this.txtcheckcoding.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F);
+            this.txtcheckcoding.Properties.Appearance.Options.UseFont = true;
+            this.txtcheckcoding.Size = new System.Drawing.Size(141, 24);
+            this.txtcheckcoding.TabIndex = 474;
             // 
             // SupplierPaymentDevEx
             // 
@@ -821,6 +835,7 @@
             this.contextMenuStrip2.ResumeLayout(false);
             this.contextMenuStrip3.ResumeLayout(false);
             this.contextMenuStrip4.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.txtcheckcoding.Properties)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -885,5 +900,6 @@
         private DevExpress.XtraEditors.LabelControl labelControl11;
         private DevExpress.XtraEditors.PanelControl panelCheckVoucher;
         public DevExpress.XtraEditors.TextEdit txtlastchecknum;
+        private DevExpress.XtraEditors.TextEdit txtcheckcoding;
     }
 }

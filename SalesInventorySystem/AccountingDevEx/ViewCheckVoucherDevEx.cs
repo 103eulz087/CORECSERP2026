@@ -117,25 +117,22 @@ namespace SalesInventorySystem.AccountingDevEx
 
                 cmd.Parameters.Add("@parmsupplierid", SqlDbType.VarChar, 30)
                     .Value = gridView1.GetFocusedRowCellValue("SupplierID");
-
                 cmd.Parameters.Add("@parmcheckno", SqlDbType.VarChar, 50)
                     .Value = gridView1.GetFocusedRowCellValue("CheckNo");
-
                 cmd.Parameters.Add("@parmreferenceno", SqlDbType.VarChar, 20)
                     .Value = gridView1.GetFocusedRowCellValue("ReferenceNumber");
-
                 cmd.Parameters.Add("@parmvoucherid", SqlDbType.VarChar, 10)
                     .Value = gridView1.GetFocusedRowCellValue("VoucherID");
-
                 cmd.Parameters.Add("@parmvouchertype", SqlDbType.VarChar, 20)
                     .Value = gridView1.GetFocusedRowCellValue("VoucherType");
-
                 cmd.Parameters.Add("@parmreason", SqlDbType.VarChar, 300)
                     .Value = reason.Trim();
-
-
                 cmd.Parameters.Add("@parmuser", SqlDbType.VarChar, 50)
                     .Value = Login.Fullname;
+                cmd.Parameters.Add("@parmglcode", SqlDbType.VarChar, 30)
+                    .Value = gridView1.GetFocusedRowCellValue("OfficialReceiptNo");
+                cmd.Parameters.Add("@parmbranch", SqlDbType.VarChar, 30)
+                   .Value = Login.assignedBranch;
 
                 try
                 {
