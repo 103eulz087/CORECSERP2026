@@ -12397,7 +12397,7 @@ D:\MYGDRIVE\CORECS2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.cspro
 D:\MYGDRIVE\CORECS2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.AccountingDevEx.BalanceSheetAccountDetails.resources
 D:\MYGDRIVE\CORECS2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.AccountingDevEx.BalanceSheetDevEx.resources
 D:\MYGDRIVE\CORECS2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.AccountingDevEx.BankReconFormV1.resources
-D:\MYGDRIVE\CORECS2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.AccountingDevEx.BankReconForm.resources
+D:\MYGDRIVE\CORECS2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.AccountingDevEx.BankReconFormV2.resources
 D:\MYGDRIVE\CORECS2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.AccountingDevEx.ManualTicketFormV1.resources
 D:\MYGDRIVE\CORECS2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.AccountingDevEx.ViewCheckVoucherDetailsDevEx.resources
 D:\MYGDRIVE\CORECS2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.AccountingDevEx.CancelledCheckVoucher.resources

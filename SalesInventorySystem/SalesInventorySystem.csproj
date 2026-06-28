@@ -337,11 +337,11 @@
     <Compile Include="AccountingDevEx\BankReconFormV1.Designer.cs">
       <DependentUpon>BankReconFormV1.cs</DependentUpon>
     </Compile>
-    <Compile Include="AccountingDevEx\BankReconForm.cs">
+    <Compile Include="AccountingDevEx\BankReconFormV2.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="AccountingDevEx\BankReconForm.Designer.cs">
-      <DependentUpon>BankReconForm.cs</DependentUpon>
+    <Compile Include="AccountingDevEx\BankReconFormV2.Designer.cs">
+      <DependentUpon>BankReconFormV2.cs</DependentUpon>
     </Compile>
     <Compile Include="AccountingDevEx\BankReconItemForm.cs">
       <SubType>Form</SubType>
@@ -3372,8 +3372,8 @@
     <EmbeddedResource Include="AccountingDevEx\BankReconFormV1.resx">
       <DependentUpon>BankReconFormV1.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="AccountingDevEx\BankReconForm.resx">
-      <DependentUpon>BankReconForm.cs</DependentUpon>
+    <EmbeddedResource Include="AccountingDevEx\BankReconFormV2.resx">
+      <DependentUpon>BankReconFormV2.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="AccountingDevEx\ManualTicketFormV1.resx">
       <DependentUpon>ManualTicketFormV1.cs</DependentUpon>
@@ -4916,6 +4916,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AccountingDevEx\OldReferenceFile\BankReconForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Content Include="CORECSICON.ico" />
     <Content Include="Gemini_Generated_Image_knbj2tknbj2tknbjNew.ico" />
     <Content Include="icon175x175.ico" />

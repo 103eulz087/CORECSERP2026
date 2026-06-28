@@ -1759,7 +1759,7 @@ namespace SalesInventorySystem
 
         private void barButtonItem72_ItemClick(object sender, ItemClickEventArgs e)
         {
-            AccountingDevEx.BankReconForm bnkform = new AccountingDevEx.BankReconForm();
+            AccountingDevEx.BankReconFormV2 bnkform = new AccountingDevEx.BankReconFormV2();
             bnkform.Show();
             //foreach (Form form in Application.OpenForms)
             //{

@@ -182,7 +182,11 @@ namespace SalesInventorySystem
                 com.Parameters.AddWithValue("@parmprodcatcode", productcategorycode);
                 com.Parameters.AddWithValue("@parmprodcode", primalproductcode);
 
-                if (GlobalCache.CompanyName == "JFC") { com.Parameters.AddWithValue("@parmshipmentno", objshipmentno.ToString()); }
+                if (GlobalCache.CompanyName == "JFC")
+                {
+                    com.Parameters.AddWithValue("@parmshipmentno", objshipmentno.ToString());
+                    //com.Parameters.AddWithValue("@parmreferencecode", objshipmentno.ToString());
+                }
                 
                 com.Parameters.AddWithValue("@parmqty", txtweight.Text);
                 com.Parameters.AddWithValue("@parmbarcode", txtsku.Text);
@@ -989,6 +993,10 @@ namespace SalesInventorySystem
                     {
                         XtraMessageBox.Show("No Product Inventory");
                         txtsku.Text = "";
+                    }
+                    else if (GlobalCache.CompanyName == "JFC" && Convert.ToDouble(txtweight.Text) > Database.getTotalSummation2("Inventory", "ShipmentNo='" + objshipmentno.ToString() + "' AND Branch='" + Login.assignedBranch + "' AND Product = '" + primalproductcode + "' and Available > 0 ", "Available")) //Database.getTotalSummation("Inventory", "Product", txtsku.Text.Substring(1, 6), "Quantity"))
+                    {
+                        BigAlert.Show("INSUFFICENT STOCKS","Insuficient Stocks for this Product.. Your Available Quantity is ",MessageBoxIcon.Warning);
                     }
                     //kung imong gi encode na quantity is greater than sa total quantity sa imong Inventory sa commisary
                     else if (Convert.ToDouble(txtweight.Text) > Database.getTotalSummation2("Inventory", "Product = '" + primalproductcode + "' AND Branch='" + Login.assignedBranch + "' AND isWarehouse='1' and Available > 0 ", "Available")) //Database.getTotalSummation("Inventory", "Product", txtsku.Text.Substring(1, 6), "Quantity"))

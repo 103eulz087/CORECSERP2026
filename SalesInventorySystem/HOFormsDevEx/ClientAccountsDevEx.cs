@@ -35,7 +35,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             datepymntfrom.Text = HelperFunction.GetPreviousMonthSameDay(today).ToShortDateString();
             datepymntto.Text = today.ToShortDateString();
 
-            loadCustomers();
+            //loadCustomers();
 
         }
         void loadCustomers()
