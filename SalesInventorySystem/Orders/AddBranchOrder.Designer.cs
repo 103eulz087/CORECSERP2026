@@ -37,7 +37,7 @@
             this.advBandedGridView1 = new DevExpress.XtraGrid.Views.BandedGrid.AdvBandedGridView();
             this.gridBand1 = new DevExpress.XtraGrid.Views.BandedGrid.GridBand();
             this.groupControl2 = new DevExpress.XtraEditors.GroupControl();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.groupBox2 = new DevExpress.XtraEditors.PanelControl();
             this.panel4 = new System.Windows.Forms.Panel();
             this.labelControl15 = new DevExpress.XtraEditors.LabelControl();
             this.txtsearchlookupproduct = new DevExpress.XtraEditors.SearchLookUpEdit();
@@ -54,13 +54,13 @@
             this.panel2 = new System.Windows.Forms.Panel();
             this.txtbarcodescanning = new DevExpress.XtraEditors.TextEdit();
             this.labelControl14 = new DevExpress.XtraEditors.LabelControl();
-            this.barcodescanning = new System.Windows.Forms.CheckBox();
+            this.barcodescanning = new DevExpress.XtraEditors.CheckEdit();
             this.txteffectivedate = new DevExpress.XtraEditors.TextEdit();
             this.labelControl10 = new DevExpress.XtraEditors.LabelControl();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
-            this.txtweight = new System.Windows.Forms.TextBox();
+            this.checkBox1 = new DevExpress.XtraEditors.CheckEdit();
+            this.txtweight = new DevExpress.XtraEditors.TextEdit();
             this.labelControl9 = new DevExpress.XtraEditors.LabelControl();
-            this.txtcomport = new System.Windows.Forms.ComboBox();
+            this.txtcomport = new DevExpress.XtraEditors.ComboBoxEdit();
             this.labelControl6 = new DevExpress.XtraEditors.LabelControl();
             this.txtrefno = new DevExpress.XtraEditors.TextEdit();
             this.labelControl5 = new DevExpress.XtraEditors.LabelControl();
@@ -100,13 +100,18 @@
             ((System.ComponentModel.ISupportInitialize)(this.advBandedGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.groupControl2)).BeginInit();
             this.groupControl2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.groupBox2)).BeginInit();
             this.groupBox2.SuspendLayout();
             this.panel4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtsearchlookupproduct.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.searchLookUpEdit2View)).BeginInit();
             this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtbarcodescanning.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.barcodescanning.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txteffectivedate.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.checkBox1.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtweight.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtcomport.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtrefno.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtponum.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtbrcode.Properties)).BeginInit();
@@ -136,10 +141,10 @@
             this.tablePanel1.SetColumn(this.groupControl1, 1);
             this.groupControl1.Controls.Add(this.gridControl1);
             this.groupControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupControl1.Location = new System.Drawing.Point(727, 3);
+            this.groupControl1.Location = new System.Drawing.Point(967, 3);
             this.groupControl1.Name = "groupControl1";
             this.tablePanel1.SetRow(this.groupControl1, 0);
-            this.groupControl1.Size = new System.Drawing.Size(652, 494);
+            this.groupControl1.Size = new System.Drawing.Size(871, 494);
             this.groupControl1.TabIndex = 3;
             this.groupControl1.Text = "Order Details";
             // 
@@ -149,7 +154,7 @@
             this.gridControl1.Location = new System.Drawing.Point(2, 28);
             this.gridControl1.MainView = this.gridView1;
             this.gridControl1.Name = "gridControl1";
-            this.gridControl1.Size = new System.Drawing.Size(648, 464);
+            this.gridControl1.Size = new System.Drawing.Size(867, 464);
             this.gridControl1.TabIndex = 2;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1,
@@ -230,7 +235,7 @@
             this.groupControl2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupControl2.Location = new System.Drawing.Point(2, 2);
             this.groupControl2.Name = "groupControl2";
-            this.groupControl2.Size = new System.Drawing.Size(1382, 172);
+            this.groupControl2.Size = new System.Drawing.Size(1841, 172);
             this.groupControl2.TabIndex = 4;
             this.groupControl2.Text = "Add Order";
             // 
@@ -269,9 +274,8 @@
             this.groupBox2.Dock = System.Windows.Forms.DockStyle.Top;
             this.groupBox2.Location = new System.Drawing.Point(2, 28);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(1378, 145);
+            this.groupBox2.Size = new System.Drawing.Size(1837, 145);
             this.groupBox2.TabIndex = 0;
-            this.groupBox2.TabStop = false;
             this.groupBox2.Enter += new System.EventHandler(this.groupBox2_Enter);
             // 
             // panel4
@@ -285,17 +289,17 @@
             // 
             // labelControl15
             // 
-            this.labelControl15.Appearance.Font = new System.Drawing.Font("Tahoma", 8.75F, System.Drawing.FontStyle.Bold);
+            this.labelControl15.Appearance.Font = new System.Drawing.Font("Tahoma", 7.75F, System.Drawing.FontStyle.Bold);
             this.labelControl15.Appearance.Options.UseFont = true;
             this.labelControl15.Location = new System.Drawing.Point(15, 29);
             this.labelControl15.Name = "labelControl15";
-            this.labelControl15.Size = new System.Drawing.Size(139, 18);
+            this.labelControl15.Size = new System.Drawing.Size(111, 16);
             this.labelControl15.TabIndex = 89;
             this.labelControl15.Text = "SELECT PRODUCT:";
             // 
             // txtsearchlookupproduct
             // 
-            this.txtsearchlookupproduct.Location = new System.Drawing.Point(168, 27);
+            this.txtsearchlookupproduct.Location = new System.Drawing.Point(132, 26);
             this.txtsearchlookupproduct.Name = "txtsearchlookupproduct";
             this.txtsearchlookupproduct.Properties.Appearance.Options.UseFont = true;
             this.txtsearchlookupproduct.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
@@ -321,7 +325,7 @@
             this.searchLookUpEdit2View.PreviewIndent = 0;
             this.searchLookUpEdit2View.RowHeight = 0;
             this.searchLookUpEdit2View.ViewCaptionHeight = 0;
-            //
+            // 
             // simpleButton2
             // 
             this.simpleButton2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("simpleButton2.ImageOptions.Image")));
@@ -446,13 +450,11 @@
             // 
             // barcodescanning
             // 
-            this.barcodescanning.AutoSize = true;
             this.barcodescanning.Location = new System.Drawing.Point(5, 99);
             this.barcodescanning.Name = "barcodescanning";
-            this.barcodescanning.Size = new System.Drawing.Size(162, 20);
+            this.barcodescanning.Properties.Caption = "Use Barcode Scanning?";
+            this.barcodescanning.Size = new System.Drawing.Size(162, 24);
             this.barcodescanning.TabIndex = 66;
-            this.barcodescanning.Text = "Use Barcode Scanning?";
-            this.barcodescanning.UseVisualStyleBackColor = true;
             this.barcodescanning.CheckedChanged += new System.EventHandler(this.barcodescanning_CheckedChanged);
             // 
             // txteffectivedate
@@ -460,10 +462,10 @@
             this.txteffectivedate.EditValue = "";
             this.txteffectivedate.Location = new System.Drawing.Point(1531, 17);
             this.txteffectivedate.Name = "txteffectivedate";
-            this.txteffectivedate.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 10.25F);
+            this.txteffectivedate.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 7.25F);
             this.txteffectivedate.Properties.Appearance.Options.UseFont = true;
             this.txteffectivedate.Properties.ReadOnly = true;
-            this.txteffectivedate.Size = new System.Drawing.Size(91, 28);
+            this.txteffectivedate.Size = new System.Drawing.Size(91, 22);
             this.txteffectivedate.TabIndex = 62;
             this.txteffectivedate.Visible = false;
             // 
@@ -480,160 +482,160 @@
             // 
             // checkBox1
             // 
-            this.checkBox1.AutoSize = true;
             this.checkBox1.Location = new System.Drawing.Point(939, 31);
             this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(118, 20);
+            this.checkBox1.Properties.Caption = "Auto GetWeight";
+            this.checkBox1.Size = new System.Drawing.Size(118, 24);
             this.checkBox1.TabIndex = 60;
-            this.checkBox1.Text = "Auto GetWeight";
-            this.checkBox1.UseVisualStyleBackColor = true;
             // 
             // txtweight
             // 
-            this.txtweight.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
-            this.txtweight.Location = new System.Drawing.Point(583, 24);
-            this.txtweight.MaxLength = 10;
+            this.txtweight.EditValue = "";
+            this.txtweight.Location = new System.Drawing.Point(530, 24);
             this.txtweight.Name = "txtweight";
-            this.txtweight.Size = new System.Drawing.Size(185, 27);
+            this.txtweight.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 7.75F, System.Drawing.FontStyle.Bold);
+            this.txtweight.Properties.Appearance.Options.UseFont = true;
+            this.txtweight.Properties.MaxLength = 10;
+            this.txtweight.Size = new System.Drawing.Size(239, 22);
             this.txtweight.TabIndex = 46;
             this.txtweight.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtweight_KeyDown_1);
             // 
             // labelControl9
             // 
-            this.labelControl9.Appearance.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
+            this.labelControl9.Appearance.Font = new System.Drawing.Font("Tahoma", 7.75F, System.Drawing.FontStyle.Bold);
             this.labelControl9.Appearance.Options.UseFont = true;
-            this.labelControl9.Location = new System.Drawing.Point(505, 29);
+            this.labelControl9.Location = new System.Drawing.Point(463, 27);
             this.labelControl9.Name = "labelControl9";
-            this.labelControl9.Size = new System.Drawing.Size(76, 19);
+            this.labelControl9.Size = new System.Drawing.Size(61, 16);
             this.labelControl9.TabIndex = 45;
             this.labelControl9.Text = "Quantity:";
             // 
             // txtcomport
             // 
-            this.txtcomport.Font = new System.Drawing.Font("Tahoma", 10.25F);
-            this.txtcomport.FormattingEnabled = true;
-            this.txtcomport.Location = new System.Drawing.Point(1174, 88);
+            this.txtcomport.EditValue = "COM1";
+            this.txtcomport.Location = new System.Drawing.Point(1159, 87);
             this.txtcomport.Name = "txtcomport";
-            this.txtcomport.Size = new System.Drawing.Size(91, 29);
+            this.txtcomport.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 7.25F);
+            this.txtcomport.Properties.Appearance.Options.UseFont = true;
+            this.txtcomport.Size = new System.Drawing.Size(91, 22);
             this.txtcomport.TabIndex = 21;
-            this.txtcomport.Text = "COM1";
             this.txtcomport.SelectedIndexChanged += new System.EventHandler(this.txtcomport_SelectedIndexChanged);
             // 
             // labelControl6
             // 
-            this.labelControl6.Appearance.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
+            this.labelControl6.Appearance.Font = new System.Drawing.Font("Tahoma", 7.75F, System.Drawing.FontStyle.Bold);
             this.labelControl6.Appearance.Options.UseFont = true;
-            this.labelControl6.Location = new System.Drawing.Point(1085, 93);
+            this.labelControl6.Location = new System.Drawing.Point(1078, 90);
             this.labelControl6.Name = "labelControl6";
-            this.labelControl6.Size = new System.Drawing.Size(94, 19);
+            this.labelControl6.Size = new System.Drawing.Size(70, 16);
             this.labelControl6.TabIndex = 18;
             this.labelControl6.Text = "COM PORT:";
             // 
             // txtrefno
             // 
             this.txtrefno.EditValue = "";
-            this.txtrefno.Location = new System.Drawing.Point(1422, 53);
+            this.txtrefno.Location = new System.Drawing.Point(1401, 52);
             this.txtrefno.Name = "txtrefno";
-            this.txtrefno.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 10.25F);
+            this.txtrefno.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 7.25F);
             this.txtrefno.Properties.Appearance.Options.UseFont = true;
             this.txtrefno.Properties.ReadOnly = true;
-            this.txtrefno.Size = new System.Drawing.Size(91, 28);
+            this.txtrefno.Size = new System.Drawing.Size(91, 22);
             this.txtrefno.TabIndex = 17;
             // 
             // labelControl5
             // 
-            this.labelControl5.Appearance.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
+            this.labelControl5.Appearance.Font = new System.Drawing.Font("Tahoma", 7.75F, System.Drawing.FontStyle.Bold);
             this.labelControl5.Appearance.Options.UseFont = true;
             this.labelControl5.Location = new System.Drawing.Point(1274, 58);
             this.labelControl5.Name = "labelControl5";
-            this.labelControl5.Size = new System.Drawing.Size(153, 19);
+            this.labelControl5.Size = new System.Drawing.Size(121, 16);
             this.labelControl5.TabIndex = 16;
             this.labelControl5.Text = "ReferenceNumber:";
             // 
             // txtponum
             // 
             this.txtponum.EditValue = "";
-            this.txtponum.Location = new System.Drawing.Point(1422, 16);
+            this.txtponum.Location = new System.Drawing.Point(1401, 15);
             this.txtponum.Name = "txtponum";
-            this.txtponum.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 10.25F);
+            this.txtponum.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 7.25F);
             this.txtponum.Properties.Appearance.Options.UseFont = true;
             this.txtponum.Properties.ReadOnly = true;
-            this.txtponum.Size = new System.Drawing.Size(91, 28);
+            this.txtponum.Size = new System.Drawing.Size(91, 22);
             this.txtponum.TabIndex = 14;
             // 
             // txtbrcode
             // 
             this.txtbrcode.EditValue = "";
-            this.txtbrcode.Location = new System.Drawing.Point(1174, 17);
+            this.txtbrcode.Location = new System.Drawing.Point(1159, 17);
             this.txtbrcode.Name = "txtbrcode";
-            this.txtbrcode.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 10.25F);
+            this.txtbrcode.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 7.25F);
             this.txtbrcode.Properties.Appearance.Options.UseFont = true;
             this.txtbrcode.Properties.ReadOnly = true;
-            this.txtbrcode.Size = new System.Drawing.Size(91, 28);
+            this.txtbrcode.Size = new System.Drawing.Size(91, 22);
             this.txtbrcode.TabIndex = 13;
             // 
             // labelControl4
             // 
-            this.labelControl4.Appearance.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
+            this.labelControl4.Appearance.Font = new System.Drawing.Font("Tahoma", 7.75F, System.Drawing.FontStyle.Bold);
             this.labelControl4.Appearance.Options.UseFont = true;
             this.labelControl4.Location = new System.Drawing.Point(1272, 22);
             this.labelControl4.Name = "labelControl4";
-            this.labelControl4.Size = new System.Drawing.Size(154, 19);
+            this.labelControl4.Size = new System.Drawing.Size(123, 16);
             this.labelControl4.TabIndex = 12;
             this.labelControl4.Text = "Purchase Order  #:";
             // 
             // labelControl1
             // 
-            this.labelControl1.Appearance.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
+            this.labelControl1.Appearance.Font = new System.Drawing.Font("Tahoma", 7.75F, System.Drawing.FontStyle.Bold);
             this.labelControl1.Appearance.Options.UseFont = true;
             this.labelControl1.Location = new System.Drawing.Point(1071, 22);
             this.labelControl1.Name = "labelControl1";
-            this.labelControl1.Size = new System.Drawing.Size(103, 19);
+            this.labelControl1.Size = new System.Drawing.Size(82, 16);
             this.labelControl1.TabIndex = 11;
             this.labelControl1.Text = "BranchCode:";
             // 
             // txtdevno
             // 
             this.txtdevno.EditValue = "";
-            this.txtdevno.Location = new System.Drawing.Point(1174, 54);
+            this.txtdevno.Location = new System.Drawing.Point(1159, 54);
             this.txtdevno.Name = "txtdevno";
-            this.txtdevno.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 10.25F);
+            this.txtdevno.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 7.25F);
             this.txtdevno.Properties.Appearance.Options.UseFont = true;
             this.txtdevno.Properties.ReadOnly = true;
-            this.txtdevno.Size = new System.Drawing.Size(91, 28);
+            this.txtdevno.Size = new System.Drawing.Size(91, 22);
             this.txtdevno.TabIndex = 8;
             // 
             // labelControl3
             // 
-            this.labelControl3.Appearance.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
+            this.labelControl3.Appearance.Font = new System.Drawing.Font("Tahoma", 7.75F, System.Drawing.FontStyle.Bold);
             this.labelControl3.Appearance.Options.UseFont = true;
-            this.labelControl3.Location = new System.Drawing.Point(1084, 59);
+            this.labelControl3.Location = new System.Drawing.Point(1075, 59);
             this.labelControl3.Name = "labelControl3";
-            this.labelControl3.Size = new System.Drawing.Size(91, 19);
+            this.labelControl3.Size = new System.Drawing.Size(71, 16);
             this.labelControl3.TabIndex = 7;
             this.labelControl3.Text = "Delivery #:";
             // 
             // txtsku
             // 
             this.txtsku.EditValue = "";
-            this.txtsku.Location = new System.Drawing.Point(583, 59);
+            this.txtsku.Location = new System.Drawing.Point(530, 56);
             this.txtsku.Name = "txtsku";
-            this.txtsku.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 10.25F);
+            this.txtsku.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 7.25F);
             this.txtsku.Properties.Appearance.Options.UseFont = true;
             this.txtsku.Properties.MaxLength = 50;
             this.txtsku.Properties.ReadOnly = true;
-            this.txtsku.Size = new System.Drawing.Size(187, 28);
+            this.txtsku.Size = new System.Drawing.Size(239, 22);
             this.txtsku.TabIndex = 6;
             this.txtsku.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtsku_KeyDown);
             this.txtsku.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtsku_KeyPress);
             // 
             // labelControl2
             // 
-            this.labelControl2.Appearance.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
+            this.labelControl2.Appearance.Font = new System.Drawing.Font("Tahoma", 7.75F, System.Drawing.FontStyle.Bold);
             this.labelControl2.Appearance.Options.UseFont = true;
-            this.labelControl2.Location = new System.Drawing.Point(542, 63);
+            this.labelControl2.Location = new System.Drawing.Point(495, 60);
             this.labelControl2.Name = "labelControl2";
-            this.labelControl2.Size = new System.Drawing.Size(39, 19);
+            this.labelControl2.Size = new System.Drawing.Size(29, 16);
             this.labelControl2.TabIndex = 1;
             this.labelControl2.Text = "SKU:";
             // 
@@ -757,7 +759,7 @@
             this.gridControl2.MainView = this.gridView2;
             this.gridControl2.Name = "gridControl2";
             this.tablePanel1.SetRow(this.gridControl2, 0);
-            this.gridControl2.Size = new System.Drawing.Size(718, 494);
+            this.gridControl2.Size = new System.Drawing.Size(958, 494);
             this.gridControl2.TabIndex = 3;
             this.gridControl2.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView2,
@@ -863,7 +865,7 @@
             this.tablePanel1.Name = "tablePanel1";
             this.tablePanel1.Rows.AddRange(new DevExpress.Utils.Layout.TablePanelRow[] {
             new DevExpress.Utils.Layout.TablePanelRow(DevExpress.Utils.Layout.TablePanelEntityStyle.Absolute, 26F)});
-            this.tablePanel1.Size = new System.Drawing.Size(1382, 500);
+            this.tablePanel1.Size = new System.Drawing.Size(1841, 500);
             this.tablePanel1.TabIndex = 5;
             // 
             // panelControl1
@@ -872,7 +874,7 @@
             this.panelControl1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelControl1.Location = new System.Drawing.Point(0, 0);
             this.panelControl1.Name = "panelControl1";
-            this.panelControl1.Size = new System.Drawing.Size(1386, 176);
+            this.panelControl1.Size = new System.Drawing.Size(1845, 176);
             this.panelControl1.TabIndex = 6;
             // 
             // panelControl2
@@ -881,14 +883,14 @@
             this.panelControl2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelControl2.Location = new System.Drawing.Point(0, 176);
             this.panelControl2.Name = "panelControl2";
-            this.panelControl2.Size = new System.Drawing.Size(1386, 504);
+            this.panelControl2.Size = new System.Drawing.Size(1845, 504);
             this.panelControl2.TabIndex = 7;
             // 
             // AddBranchOrder
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1386, 680);
+            this.ClientSize = new System.Drawing.Size(1845, 680);
             this.Controls.Add(this.panelControl2);
             this.Controls.Add(this.panelControl1);
             this.IconOptions.Icon = ((System.Drawing.Icon)(resources.GetObject("AddBranchOrder.IconOptions.Icon")));
@@ -905,6 +907,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.advBandedGridView1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.groupControl2)).EndInit();
             this.groupControl2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.groupBox2)).EndInit();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.panel4.ResumeLayout(false);
@@ -914,7 +917,11 @@
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtbarcodescanning.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.barcodescanning.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txteffectivedate.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.checkBox1.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtweight.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtcomport.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtrefno.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtponum.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtbrcode.Properties)).EndInit();
@@ -949,7 +956,7 @@
         private DevExpress.XtraGrid.Views.BandedGrid.AdvBandedGridView advBandedGridView1;
         private DevExpress.XtraGrid.Views.BandedGrid.GridBand gridBand1;
         private DevExpress.XtraEditors.GroupControl groupControl2;
-        private System.Windows.Forms.GroupBox groupBox2;
+        private DevExpress.XtraEditors.PanelControl groupBox2;
         private DevExpress.XtraEditors.TextEdit txtsku;
         private DevExpress.XtraEditors.LabelControl labelControl2;
         private DevExpress.XtraGrid.Views.BandedGrid.BandedGridView bandedGridView2;
@@ -964,11 +971,11 @@
         public DevExpress.XtraEditors.TextEdit txtponum;
         public DevExpress.XtraEditors.TextEdit txtrefno;
         private DevExpress.XtraEditors.LabelControl labelControl6;
-        private System.Windows.Forms.ComboBox txtcomport;
+        private DevExpress.XtraEditors.ComboBoxEdit txtcomport;
         private System.IO.Ports.SerialPort serialPort1;
         private DevExpress.XtraEditors.LabelControl labelControl9;
-        private System.Windows.Forms.TextBox txtweight;
-        private System.Windows.Forms.CheckBox checkBox1;
+        private DevExpress.XtraEditors.TextEdit txtweight;
+        private DevExpress.XtraEditors.CheckEdit checkBox1;
         public DevExpress.XtraEditors.TextEdit txteffectivedate;
         private DevExpress.XtraEditors.LabelControl labelControl10;
         private System.Windows.Forms.Panel panel1;
@@ -985,7 +992,7 @@
         private System.Windows.Forms.Panel panel2;
         private DevExpress.XtraEditors.TextEdit txtbarcodescanning;
         private DevExpress.XtraEditors.LabelControl labelControl14;
-        private System.Windows.Forms.CheckBox barcodescanning;
+        private DevExpress.XtraEditors.CheckEdit barcodescanning;
         public DevExpress.XtraGrid.GridControl gridControl2;
         public DevExpress.XtraGrid.Views.Grid.GridView gridView2;
         public DevExpress.XtraGrid.GridControl gridControl1;

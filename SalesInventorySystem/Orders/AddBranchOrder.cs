@@ -35,14 +35,14 @@ namespace SalesInventorySystem
         public AddBranchOrder()
         {
             InitializeComponent();
-            HelperFunction.AllowNumbersAndPeriod(txtweight);
+            HelperFunction.AllowNumbersAndPeriodDevEx(txtweight);
             serialPort1.WriteTimeout = 500;
             serialPort1.ReadTimeout = 500;
             this.myDelegate = new AddDataDelegate(AddDataMethod);
         }
         public void AddDataMethod(String myString)
         {
-            txtweight.AppendText(myString);
+            txtweight.Text += myString;
         }
         
         private void AddBranchOrder_Load(object sender, EventArgs e)
@@ -109,7 +109,7 @@ namespace SalesInventorySystem
         private void getAvailablePort()
         {
             string[] ports = SerialPort.GetPortNames();
-            txtcomport.Items.AddRange(ports);
+            txtcomport.Properties.Items.AddRange(ports);
         }
 
         /*****************************************NEW*****************************/
@@ -695,6 +695,13 @@ namespace SalesInventorySystem
                         //{
                         //    searchLookUpEdit1.Text = "";
                         //}
+                        txtweight.Text = "";
+                        txtsearchlookupproduct.EditValue = null;
+                        txtsku.Text = "";
+                        pcode = null;
+                        catcode = null;
+                        referencecode = null;
+                        shipmentno = null;
                         if (barcodescanning.Checked == true)
                         {
                             txtbarcodescanning.Focus();
@@ -703,9 +710,6 @@ namespace SalesInventorySystem
                         {
                             txtsearchlookupproduct.Focus();
                         }
-                        txtweight.Text = "";
-                        txtsearchlookupproduct.Text = "";
-                        txtsku.Text = "";
                     }
                 }
             }
