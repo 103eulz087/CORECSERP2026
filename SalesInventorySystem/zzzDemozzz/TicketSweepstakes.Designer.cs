@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            DevExpress.XtraPrinting.BarCode.QRCodeGenerator qrCodeGenerator1 = new DevExpress.XtraPrinting.BarCode.QRCodeGenerator();
+            //DevExpress.XtraPrinting.BarCode.QRCodeGenerator qrCodeGenerator1 = new DevExpress.XtraPrinting.BarCode.QRCodeGenerator();
             this.Detail = new DevExpress.XtraReports.UI.DetailBand();
             this.TopMargin = new DevExpress.XtraReports.UI.TopMarginBand();
             this.BottomMargin = new DevExpress.XtraReports.UI.BottomMarginBand();
@@ -67,7 +67,7 @@
             // 
             // xrLabelDate
             // 
-            this.xrLabelDate.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
+            this.xrLabelDate.Font = new DevExpress.Drawing.DXFont("Microsoft Sans Serif", 8.25F, DevExpress.Drawing.DXFontStyle.Bold);
             this.xrLabelDate.LocationFloat = new DevExpress.Utils.PointFloat(0F, 0F);
             this.xrLabelDate.Multiline = true;
             this.xrLabelDate.Name = "xrLabelDate";
@@ -85,11 +85,11 @@
             this.xrserial.Name = "xrserial";
             this.xrserial.Padding = new DevExpress.XtraPrinting.PaddingInfo(10, 10, 0, 0, 100F);
             this.xrserial.SizeF = new System.Drawing.SizeF(62.5F, 47.16668F);
-            this.xrserial.Symbology = qrCodeGenerator1;
+            //this.xrserial.Symbology = qrCodeGenerator1;
             // 
             // xrNum
             // 
-            this.xrNum.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
+            this.xrNum.Font = new DevExpress.Drawing.DXFont("Microsoft Sans Serif", 8.25F, DevExpress.Drawing.DXFontStyle.Bold);
             this.xrNum.LocationFloat = new DevExpress.Utils.PointFloat(0F, 23.00001F);
             this.xrNum.Multiline = true;
             this.xrNum.Name = "xrNum";
@@ -110,9 +110,9 @@
             this.Detail,
             this.TopMargin,
             this.BottomMargin});
-            this.Margins = new System.Drawing.Printing.Margins(0, 1, 0, 0);
+            this.Margins = new DevExpress.Drawing.DXMargins(0, 1, 0, 0);
             this.PageWidth = 307;
-            this.PaperKind = System.Drawing.Printing.PaperKind.Custom;
+            this.PaperKind = DevExpress.Drawing.Printing.DXPaperKind.Custom;
             this.Version = "18.1";
             ((System.ComponentModel.ISupportInitialize)(this)).EndInit();
 

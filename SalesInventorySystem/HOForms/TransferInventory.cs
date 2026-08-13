@@ -290,7 +290,7 @@ namespace SalesInventorySystem.HOForms
             DevExReportTemplate.TransferInventory xct = new DevExReportTemplate.TransferInventory();
             xct.Landscape = false;
             xct.Landscape = false;
-            xct.PaperKind = System.Drawing.Printing.PaperKind.A4;
+            xct.PaperKind = (DevExpress.Drawing.Printing.DXPaperKind)System.Drawing.Printing.PaperKind.A4;
             xct.Margins = new System.Drawing.Printing.Margins(100, 100, 100, 100);
 
 
@@ -318,7 +318,7 @@ namespace SalesInventorySystem.HOForms
             DevExReportTemplate.CustomerRequest xct = new DevExReportTemplate.CustomerRequest();
  
             xct.Landscape = false;
-            xct.PaperKind = System.Drawing.Printing.PaperKind.Letter;
+            xct.PaperKind = (DevExpress.Drawing.Printing.DXPaperKind)System.Drawing.Printing.PaperKind.Letter;
             xct.Margins = new System.Drawing.Printing.Margins(100, 100, 100, 100);
             xct.xrdateneeded.Text = DateTime.Now.ToShortDateString();
             xct.xrrequestedby.Text = Login.Fullname;
@@ -351,7 +351,7 @@ namespace SalesInventorySystem.HOForms
             xct.xrcaption2.Text = caption2;
 
             xct.Landscape = false;
-            xct.PaperKind = System.Drawing.Printing.PaperKind.Letter;
+            xct.PaperKind = (DevExpress.Drawing.Printing.DXPaperKind)System.Drawing.Printing.PaperKind.Letter;
             xct.Margins = new System.Drawing.Printing.Margins(100, 100, 100, 100);
             xct.xrdate.Text = DateTime.Now.ToShortDateString();
             xct.xrpreparedby.Text = Login.Fullname;

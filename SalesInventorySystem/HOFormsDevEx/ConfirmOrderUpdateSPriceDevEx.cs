@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using DevExpress.XtraEditors;
+using System.Data.SqlClient;
 
 namespace SalesInventorySystem.HOFormsDevEx
 {
@@ -27,16 +28,37 @@ namespace SalesInventorySystem.HOFormsDevEx
 
         private void simpleButton1_Click(object sender, EventArgs e)
         {
-            if(checkapplytoall.Checked==true)
+            bool success = false;
+            SqlConnection con = Database.getConnection();
+            con.Open();
+            try
             {
-                Database.ExecuteQuery("UPDATE DeliveryDetails set SellingPrice='" + txtsprice.Text + "' WHERE PONumber='" + txtpono.Text + "' And ProductName='"+txtdesc.Text+"'", "Successfully Updated!");
+                SqlCommand com = new SqlCommand("sp_UpdateDeliverySellingPrice", con);
+                com.CommandType = CommandType.StoredProcedure;
+                com.Parameters.AddWithValue("@parmpono", txtpono.Text);
+                com.Parameters.AddWithValue("@parmseqno", Convert.ToDecimal(txtseqno.Text));
+                com.Parameters.AddWithValue("@parmprodname", txtdesc.Text);
+                com.Parameters.AddWithValue("@parmsellingprice", txtsprice.Value);
+                com.Parameters.AddWithValue("@parmapplytoall", checkapplytoall.Checked);
+                com.Parameters.AddWithValue("@parmuser", Login.Fullname);
+                com.ExecuteNonQuery();
+                success = true;
             }
-            else
+            catch (SqlException ex)
             {
-                Database.ExecuteQuery("UPDATE DeliveryDetails set SellingPrice='" + txtsprice.Text + "' WHERE SeqNo='" + txtseqno.Text + "' and PONumber='" + txtpono.Text + "'", "Successfully Updated!");
+                XtraMessageBox.Show(ex.Message.ToString());
             }
-            isdone = true;
-            this.Close();
+            finally
+            {
+                con.Close();
+            }
+
+            if (success)
+            {
+                XtraMessageBox.Show("Successfully Updated!");
+                isdone = true;
+                this.Close();
+            }
         }
 
         private void txtsprice_KeyDown(object sender, KeyEventArgs e)

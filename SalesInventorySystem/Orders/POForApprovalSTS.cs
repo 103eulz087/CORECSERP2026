@@ -30,6 +30,11 @@ namespace SalesInventorySystem.Orders
 
         private void POForApprovalSTS_Load(object sender, EventArgs e)
         {
+            HelperFunction.SetDefaultDateRange(datefromsts, datetosts,7,7);
+            HelperFunction.SetDefaultDateRange(datefromapprvdsts, datetoapprvdsts, 7, 7);
+            HelperFunction.SetDefaultDateRange(datefrmrjctdsts, datetorjctdsts, 7, 7);
+            HelperFunction.SetDefaultDateRange(datefromfordelivsts, datetofordelivsts, 7, 7);
+            HelperFunction.SetDefaultDateRange(datefromapprvdsts, datetoapprvdsts, 7, 7);
             //filtertab();
         }
         //private void filtertab()
@@ -212,14 +217,6 @@ namespace SalesInventorySystem.Orders
 
         private void btnForDeliverySTS_Click(object sender, EventArgs e)
         {
-            //Database.display("SELECT * FROM view_ForDeliverySTS WHERE Status='FOR DELIVERY'  and EffectivityDate >= '" + datefromfordelivsts.Text + "' and EffectivityDate <= '" + datetofordelivsts.Text + "' and BranchCode='" + Login.assignedBranch + "' ", gridControlForDelivSts, gridViewForDelivSts);
-            //string query = "SELECT * FROM view_ForDeliverySTS WHERE Status='FOR DELIVERY'  and EffectivityDate >= '" + datefromfordelivsts.Text + "' and EffectivityDate <= '" + datetofordelivsts.Text + "' and BranchCode='" + Login.assignedBranch + "'  ";
-            //HelperFunction.ShowWaitAndDisplay(query, gridControlForDelivSts, gridViewForDelivSts, "Please wait", "Populating data into the database...");
-            //gridViewForDelivSts.Focus();
-            //Classes.DevXGridViewSettings.ShowFooterCountTotal(gridViewForDelivSts, "DeliveryNo");
-            //Classes.DevXGridViewSettings.ShowFooterTotal(gridViewForDelivSts, "TotalItem");
-            //Classes.DevXGridViewSettings.ShowFooterTotal(gridViewForDelivSts, "TotalQtyDelivered");
-
             DateTime from = datefromfordelivsts.Value.Date;
             DateTime toExclusive = datetofordelivsts.Value.Date.AddDays(1);
 
@@ -315,9 +312,9 @@ namespace SalesInventorySystem.Orders
                 podetails.txtpono.Text = refno;
             }
             GridGroupSummaryItem ite = new GridGroupSummaryItem();
-            ite.FieldName = "Qty";
+            ite.FieldName = "QtyRequested";
             ite.SummaryType = DevExpress.Data.SummaryItemType.Sum;
-            ite.ShowInGroupColumnFooter = podetails.gridView1.Columns["Qty"];
+            ite.ShowInGroupColumnFooter = podetails.gridView1.Columns["QtyRequested"];
             podetails.gridView1.GroupSummary.Add(ite);
             podetails.gridView1.Focus();
         }
@@ -454,6 +451,33 @@ namespace SalesInventorySystem.Orders
             showSTSForApproval();
         }
 
+        private void gridControlapprvdsts_MouseUp(object sender, MouseEventArgs e)
+        {
+            if(e.Button == MouseButtons.Right)
+                contextMenuStripApproved.Show(gridControlapprvdsts, e.Location);
+        }
+
+        private void toolStripMenuItemCancelSTSRequest_Click(object sender, EventArgs e)
+        {
+            string pono = gridViewapprvdsts.GetRowCellValue(gridViewapprvdsts.FocusedRowHandle, "PONumber").ToString();
+            if (XtraMessageBox.Show("Are you sure you want to cancel this STS Request?", "Cancel STS Request", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                bool checkifexistsindelivery = Database.checkifExist("SELECT TOP(1) 1 FROM DeliverySummary WHERE PONumber='" + pono + "'");
+                if (checkifexistsindelivery)
+                {
+                    XtraMessageBox.Show("This STS Request is already in delivery. " +
+                        "You cannot cancel it, unless you will cancel all the items that has been processed already",
+                        "Cancel STS Request", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                else
+                {
+                    Database.ExecuteQuery("UPDATE TransferOrderSummary SET Status='CANCELLED' WHERE PONumber='" + pono + "'");
+                    XtraMessageBox.Show("STS Request cancelled successfully.", "Cancel STS Request", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    btnApprovedSTS.PerformClick();
+                }
+            }
+        }
+
         private void gridViewSTS_MouseUp(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
@@ -505,6 +529,10 @@ namespace SalesInventorySystem.Orders
                         new GridColumnSortInfo(view.Columns["Category"],DevExpress.Data.ColumnSortOrder.Ascending)
                         }, 1);
                 //podetails.gridView1.Columns["SequenceNumber"].Visible = false;
+                // Needed by STSForApprovalDetails to map an edited ApprovedQty back to the right
+                // TransferOrderDetails row on submit -- not meant to be shown.
+                if (podetails.gridView1.Columns["ProductCode"] != null)
+                    podetails.gridView1.Columns["ProductCode"].Visible = false;
                 podetails.gridView1.ExpandAllGroups();
                 podetails.ShowDialog(this);
                 if (Orders.STSForApprovalDetails.isdone == true)
@@ -513,35 +541,11 @@ namespace SalesInventorySystem.Orders
                     podetails.Dispose();
                     btnForApprovalSTS.PerformClick();
                 }
-                //if (Convert.ToBoolean(Login.isglobalWarehouseOfficer) == true)
-                //{
-
-                    
-                //}
-                //if (Convert.ToBoolean(Login.isglobalApprover) == true)
-                //{
-
-                //    Database.display("SELECT * FROM view_TransferOrderDetails WHERE PONumber = '" + refno + "' ORDER BY SeqNo", podetails.gridControl1, podetails.gridView1);
-                //    podetails.txtpono.Text = refno;
-                //    GridView view = podetails.gridControl1.FocusedView as GridView;
-                //    view.SortInfo.ClearAndAddRange(new GridColumnSortInfo[] {
-                //        new GridColumnSortInfo(view.Columns["Category"],DevExpress.Data.ColumnSortOrder.Ascending)
-                //        }, 1);
-                //    //podetails.gridView1.Columns["SequenceNumber"].Visible = false;
-                //    podetails.gridView1.ExpandAllGroups();
-                //}
-                //else
-                //{
-                //    Database.display("SELECT SeqNo,PONumber,ProductName,Qty,Units FROM view_TransferOrderDetails WHERE PONumber = '" + refno + "' ORDER BY SeqNo ", podetails.gridControl1, podetails.gridView1);
-                //    podetails.txtpono.Text = refno;
-                //    //podetails.gridView1.Columns["SequenceNumber"].Visible = false;
-                //}
-
-                
+              
                 GridGroupSummaryItem ite = new GridGroupSummaryItem();
-                ite.FieldName = "Qty";
+                ite.FieldName = "QtyRequested";
                 ite.SummaryType = DevExpress.Data.SummaryItemType.Sum;
-                ite.ShowInGroupColumnFooter = podetails.gridView1.Columns["Qty"];
+                ite.ShowInGroupColumnFooter = podetails.gridView1.Columns["QtyRequested"];
                 podetails.gridView1.GroupSummary.Add(ite);
             }
             else

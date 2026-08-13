@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using DevExpress.XtraEditors;
+using DevExpress.XtraGrid;
 
 namespace SalesInventorySystem.POS
 {
@@ -18,48 +19,213 @@ namespace SalesInventorySystem.POS
         public POSSalesReportDevEx()
         {
             InitializeComponent();
+            // Belt-and-suspenders with the explicit ExpandAllGroups() call in
+            // LoadCustomerCashReceipts() -- matches Accounting/AgingReports.cs, which sets this
+            // once at construction so newly created groups always start expanded regardless of
+            // exactly when grouping is applied relative to the grid's own layout pass.
+            gridView1.OptionsBehavior.AutoExpandAllGroups = true;
+
+            // Highlight the group footer (the ControlNo totals row) so the per-group summary
+            // stands out from the data rows -- same GroupFooter styling approach as
+            // HOForms/POSTransactions.cs, just with a warmer accent to read as a "totals" band.
+            gridView1.Appearance.GroupFooter.Font = new Font("Tahoma", 9.75F, FontStyle.Bold);
+            gridView1.Appearance.GroupFooter.ForeColor = Color.FromArgb(102, 60, 0);
+            gridView1.Appearance.GroupFooter.BackColor = Color.FromArgb(255, 244, 214);
+            gridView1.Appearance.GroupFooter.Options.UseFont = true;
+            gridView1.Appearance.GroupFooter.Options.UseForeColor = true;
+            gridView1.Appearance.GroupFooter.Options.UseBackColor = true;
+        }
+        private void LoadCustomerSalesHistory(string branchCode)
+        {
+            string sql = $@"
+                SELECT *
+                FROM dbo.funcview_CustomerSalesHistory(
+                    '{branchCode}',
+                    '{datefromsalessum.Value.Date:yyyy-MM-dd}',
+                    '{datetosalessum.Value.Date:yyyy-MM-dd}'
+                )
+                ORDER BY CustomerName";
+
+            Database.display(sql, gridControl2, gridView2);
+        }
+        private void LoadCustomerSalesHistoryDetails(string branchCode)
+        {
+            string sql = $@"
+                SELECT *
+                FROM dbo.funcview_CustomerSalesHistoryDetails(
+                    '{branchCode}',
+                    '{datefromsalessum.Value.Date:yyyy-MM-dd}',
+                    '{datetosalessum.Value.Date:yyyy-MM-dd}'
+                )
+                ORDER BY CustomerName";
+
+            Database.display(sql, gridControl2, gridView2);
+        }
+        private void LoadCustomerCashReceipts()
+        {
+            string sql = $@"
+                SELECT *
+                FROM dbo.funcview_CustomerCashReceipts(
+                    '{datefromcashreceipts.Value.Date:yyyy-MM-dd}',
+                    '{datetocashreceipts.Value.Date:yyyy-MM-dd}'
+                )";
+                //ORDER BY CustomerName";
+
+            Database.display(sql, gridControl1, gridView1);
+
+            // Group by ControlNo, expanded by default, with per-group totals -- amounts come back
+            // as numeric decimal now (see SQL/2026-08-07_CustomerCashReceipts_NumericAmounts.sql;
+            // the prior FORMAT()-string columns couldn't be summed).
+            gridView1.BeginSort();
+            gridView1.ClearGrouping();
+            if (gridView1.Columns["ControlNo"] != null)
+                gridView1.Columns["ControlNo"].GroupIndex = 0;
+            gridView1.EndSort();
+            gridView1.ExpandAllGroups();
+
+            gridView1.GroupSummary.Clear();
+            string[] amountColumns = { "TotalAmount", "InvoicePaymentAmount", "EwtAmount", "DiscountAmount" };
+            foreach (string col in amountColumns)
+            {
+                Classes.DevXGridViewSettings.ShowFooterTotal(gridView1, col);
+
+                // ShowFooterTotal formats the bottom-of-grid footer panel ("{0:n2}") and the data
+                // rows pick up the column DisplayFormat set below, but the GridGroupSummaryItem it
+                // adds to GroupSummary (the per-ControlNo group footer -- the one that actually
+                // matters here) has no DisplayFormat of its own and does NOT fall back to the
+                // column's -- it has to be set directly on that summary item.
+                gridView1.Columns[col].DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+                gridView1.Columns[col].DisplayFormat.FormatString = "n2";
+
+                foreach (GridGroupSummaryItem item in gridView1.GroupSummary)
+                {
+                    if (item.FieldName == col)
+                        item.DisplayFormat = "{0:n2}";
+                }
+            }
+        }
+        private void LoadCustomerSalesJournal()
+        {
+            string sql = $@"
+                SELECT *
+                FROM dbo.funcview_CustomerSalesJournal(
+                    '{datefromcashreceipts.Value.Date:yyyy-MM-dd}',
+                    '{datetocashreceipts.Value.Date:yyyy-MM-dd}'
+                )";
+            //ORDER BY CustomerName";
+
+            Database.display(sql, gridControl1, gridView1);
+        }
+        private void LoadSalesData(string viewName, string dateColumn, string branchCode)
+        {
+            string sql = $@"
+                SELECT *
+                FROM {viewName}
+                WHERE BranchCode = '{branchCode}'
+                AND {dateColumn} >= '{datefromsalessum.Value.Date:yyyy-MM-dd}'
+                AND {dateColumn} < DATEADD(DAY,1,'{datetosalessum.Value.Date:yyyy-MM-dd}')
+                ORDER BY ReferenceNo";
+
+            Database.display(sql, gridControl2, gridView2);
+        }
+        private string GetBranchCode(string selectedBranch)
+        {
+            return Login.assignedBranch == "888"
+                ? selectedBranch
+                : Login.assignedBranch;
         }
 
         private void btnsalestransummary_Click(object sender, EventArgs e)
         {
-            if (Login.assignedBranch != "888")
-            {
-                Database.display("SELECT * FROM view_batchTransactionSummary " +
-                      "WHERE BranchCode='" + Login.assignedBranch + "' " +
-                      "AND CAST(TransDate as Date) >= '" + datefromsalessum.Text + "' AND CAST(TransDate as Date) <= '" + datetosalessum.Text + "' ORDER BY ReferenceNo", gridControl2, gridView2);
-            }
-            else
-            {
-                Database.display("SELECT * FROM view_batchTransactionSummary " +
-                       $"WHERE BranchCode='{brcodesummary.ToString()}' " +
-                       "AND CAST(TransDate as Date) >= '" + datefromsalessum.Text + "' AND CAST(TransDate as Date) <= '" + datetosalessum.Text + "' ORDER BY ReferenceNo", gridControl2, gridView2);
 
+            try
+            {
+                gridView2.BeginDataUpdate();
+
+                //gridView2.GroupSummary.Clear();
+                gridView2.Columns.Clear();
+
+                string branchCode =
+                    chckboxAllBranch.Checked
+                    ? "ALL"
+                    : (Login.assignedBranch == "888"
+                        ? brcodesummary.ToString()
+                        : Login.assignedBranch);
+
+                if (radbuttonsummary.Checked)
+                {
+                    LoadCustomerSalesHistory(branchCode);
+                }
+                else
+                {
+                    LoadCustomerSalesHistoryDetails(branchCode);
+                }
+
+                gridView2.BestFitColumns();
+
+                //gridView2.Columns["SalesPerson"].GroupIndex = 0;
+                //gridView2.Columns["CustomerName"].GroupIndex = 1;
+
+                //gridView2.ExpandAllGroups();
+                //gridView2.OptionsBehavior.AutoExpandAllGroups = true;
+                //gridView2.ExpandAllGroups();
             }
+            catch (Exception ex)
+            {
+                XtraMessageBox.Show(
+                    ex.Message,
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+            finally
+            {
+                gridView2.EndDataUpdate();
+            }
+
         }
+        //private void btnsalestransummary_Click(object sender, EventArgs e)
+        //{
+        //    if(radbuttonsummary.Checked == true)
+        //    {
+        //        if (Login.assignedBranch != "888")
+        //        {
+        //            Database.display("SELECT * FROM view_batchTransactionSummary " +
+        //                  "WHERE BranchCode='" + Login.assignedBranch + "' " +
+        //                  "AND CAST(TransDate as Date) >= '" + datefromsalessum.Text + "' AND CAST(TransDate as Date) <= '" + datetosalessum.Text + "' ORDER BY ReferenceNo", gridControl2, gridView2);
+        //        }
+        //        else
+        //        {
+        //            Database.display("SELECT * FROM view_batchTransactionSummary " +
+        //                   $"WHERE BranchCode='{brcodesummary.ToString()}' " +
+        //                   "AND CAST(TransDate as Date) >= '" + datefromsalessum.Text + "' AND CAST(TransDate as Date) <= '" + datetosalessum.Text + "' ORDER BY ReferenceNo", gridControl2, gridView2);
+        //        }
+        //    }
+        //    else if(radbuttondetails.Checked == true)
+        //    { 
+        //        gridControl2.BeginUpdate();
+        //        gridView2.GroupSummary.Clear();
+        //        gridView2.Columns.Clear();
+        //        if (Login.assignedBranch != "888")
+        //        {
+        //            Database.display("SELECT * FROM view_detailTransactionHistory " +
+        //             "WHERE BranchCode='" + Login.assignedBranch + "' " +
+        //             "AND CAST(DateOrder as date) >= '" + datefromsalessum.Text + "' AND CAST(DateOrder as date) <= '" + datetosalessum.Text + "' ORDER BY ReferenceNo", gridControl2, gridView2);
+        //        }
+        //        else
+        //        {
+        //            Database.display("SELECT * FROM view_detailTransactionHistory " +
+        //         $"WHERE BranchCode='{brcodedetails.ToString()}' " +
+        //         "AND CAST(DateOrder as date) >= '" + datefromsalessum.Text + "' AND CAST(DateOrder as date) <= '" + datetosalessum.Text + "' ORDER BY ReferenceNo", gridControl2, gridView2);
+        //        }
+        //        Classes.DevXGridViewSettings.ShowFooterCountTotal(gridView2, "BranchCode");
+        //        Classes.DevXGridViewSettings.ShowFooterTotal(gridView2, "QtySold");
+        //        Classes.DevXGridViewSettings.ShowFooterTotal(gridView2, "TotalAmount");
+        //        gridControl2.EndUpdate();
+        //    }
 
-        private void btnTransactionDet_Click(object sender, EventArgs e)
-        {
-            gridControl1.BeginUpdate();
-            gridView1.GroupSummary.Clear();
-            gridView1.Columns.Clear();
-            if(Login.assignedBranch != "888")
-            {
-                Database.display("SELECT * FROM view_detailTransactionHistory " +
-                 "WHERE BranchCode='" + Login.assignedBranch + "' " +
-                 "AND CAST(DateOrder as date) >= '" + txtdateFromTransDet.Text + "' AND CAST(DateOrder as date) <= '" + txtdateToTransDet.Text + "' ORDER BY ReferenceNo", gridControl1, gridView1);
-            }
-            else
-            {
-                Database.display("SELECT * FROM view_detailTransactionHistory " +
-             $"WHERE BranchCode='{brcodedetails.ToString()}' " +
-             "AND CAST(DateOrder as date) >= '" + txtdateFromTransDet.Text + "' AND CAST(DateOrder as date) <= '" + txtdateToTransDet.Text + "' ORDER BY ReferenceNo", gridControl1, gridView1);
+        //}
 
-            }
-            Classes.DevXGridViewSettings.ShowFooterCountTotal(gridView1, "BranchCode");
-            Classes.DevXGridViewSettings.ShowFooterTotal(gridView1, "QtySold");
-            Classes.DevXGridViewSettings.ShowFooterTotal(gridView1, "TotalAmount");
-            gridControl1.EndUpdate();
-        }
 
         private void POSSalesReportDevEx_Load(object sender, EventArgs e)
         {
@@ -75,9 +241,6 @@ namespace SalesInventorySystem.POS
             datefromsalessum.Text = date.ToShortDateString();
             datetosalessum.Text = lastDay.ToShortDateString();
 
-            txtdateFromTransDet.Text = date.ToShortDateString();
-            txtdateToTransDet.Text = lastDay.ToShortDateString();
-
             
             populate();
         }
@@ -87,19 +250,18 @@ namespace SalesInventorySystem.POS
             if(Login.assignedBranch != "888")
             {
                 txtbranchsummary.Visible = false;
-                txtbranchdetails.Visible = false;
+               
             }
             else
             {
                 Database.displaySearchlookupEdit("Select distinct BranchCode,BranchName FROM Branches Order By BranchCode", txtbranchsummary, "BranchName", "BranchName");
-                Database.displaySearchlookupEdit("Select distinct BranchCode,BranchName FROM Branches Order By BranchCode", txtbranchdetails, "BranchName", "BranchName");
-            }
-            Database.displaySearchlookupEdit("SELECT CustomerID,CustomerName From dbo.Customers", searchLookUpEdit1,"CustomerName", "CustomerName");
+             }
+            Database.displaySearchlookupEdit("SELECT CustomerKey,CustomerID,CustomerName From dbo.Customers", searchLookUpEdit1,"CustomerName", "CustomerName");
         }
 
         private void searchLookUpEdit1_EditValueChanged(object sender, EventArgs e)
         {
-            custkey = SearchLookUpClass.getSingleValue(searchLookUpEdit1, "CustomerID");
+            custkey = SearchLookUpClass.getSingleValue(searchLookUpEdit1, "CustomerKey");
         }
 
         private void btnTransactionPayment_Click(object sender, EventArgs e)
@@ -149,10 +311,7 @@ namespace SalesInventorySystem.POS
             brcodesummary = SearchLookUpClass.getSingleValue(txtbranchsummary, "BranchCode");
         }
 
-        private void txtbranchdetails_EditValueChanged(object sender, EventArgs e)
-        {
-            brcodedetails = SearchLookUpClass.getSingleValue(txtbranchdetails, "BranchCode");
-        }
+        
 
         private void btnforapprovalstsexcel_Click(object sender, EventArgs e)
         {
@@ -160,10 +319,68 @@ namespace SalesInventorySystem.POS
             HelperFunction.exporttoexcel(gridView2, filename);
         }
 
-        private void simpleButton1_Click(object sender, EventArgs e)
+        private void simpleButton2_Click(object sender, EventArgs e)
         {
-            string filename = "HRI_SalesTransactionDetails" + DateTime.Now.ToString("yyyyMMdd_HHmmss");
-            HelperFunction.exporttoexcel(gridView2, filename);
+            if(radcashreceipts.Checked==true)
+            {
+                populateCashReceiptsBook();
+            }
+            else if(radsalesjournal.Checked==true)
+            {
+                populateSalesJournal();
+            }
+        }
+
+        void populateCashReceiptsBook()
+        {
+            try
+            {
+                gridView1.BeginDataUpdate();
+
+               
+                gridView1.Columns.Clear();
+                LoadCustomerCashReceipts();
+                
+                gridView1.BestFitColumns();
+                gridView1.ExpandAllGroups();
+            }
+            catch (Exception ex)
+            {
+                XtraMessageBox.Show(
+                    ex.Message,
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+            finally
+            {
+                gridView1.EndDataUpdate();
+            }
+        }
+        void populateSalesJournal()
+        {
+            try
+            {
+                gridView1.BeginDataUpdate();
+
+
+                gridView1.Columns.Clear();
+                LoadCustomerSalesJournal();
+
+                gridView1.BestFitColumns();
+            }
+            catch (Exception ex)
+            {
+                XtraMessageBox.Show(
+                    ex.Message,
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+            finally
+            {
+                gridView1.EndDataUpdate();
+            }
         }
 
         private void label15_Click(object sender, EventArgs e)

@@ -212,12 +212,8 @@ namespace SalesInventorySystem.HOFormsDevEx
             if (checkBox4.Checked)
             {
                 const string sql = @"
-            SELECT TRN_SEQ_NO, BranchCode, ExpenseDate, ReferenceNumber,
-                   InvoiceNo, ExpenseName, Amount, Remarks,
-                   Status, Balance, AmountPaid,
-                   EWTAmount, DiscountAmount, OffsetAmount,
-                   isErrorCorrect
-            FROM ExpenseMaster
+            SELECT *
+            FROM view_ExpenseMaster
             WHERE SupplierID = @supplierId";
 
                 LoadGrid(sql, cmd =>
@@ -231,12 +227,8 @@ namespace SalesInventorySystem.HOFormsDevEx
                 DateTime toDateExclusive = expdateto.Value.Date.AddDays(1);
 
                 const string sql = @"
-                SELECT TRN_SEQ_NO, BranchCode, ExpenseDate, ReferenceNumber,
-                       InvoiceNo, ExpenseName, Amount, Remarks,
-                       Status, Balance, AmountPaid,
-                       EWTAmount, DiscountAmount, OffsetAmount,
-                       isErrorCorrect
-                FROM ExpenseMaster
+                  SELECT *
+                FROM view_ExpenseMaster
                 WHERE SupplierID = @supplierId
                   AND ExpenseDate >= @fromDate
                   AND ExpenseDate <  @toDateExclusive";
@@ -319,7 +311,7 @@ namespace SalesInventorySystem.HOFormsDevEx
                 txtmvmtdate.Text = "";
                 txtacctid.Text = Classes.Suppliers.getSupplierID(adhipma.txtsuppliername.Text);
                 txtacctstatus.Text = Classes.Suppliers.getSupplierStatus(adhipma.txtsuppliername.Text);
-                txtacctbalance.Text = Classes.Suppliers.getSupplierBalance(adhipma.txtsuppliername.Text);
+                txtacctbalance.Text = Classes.Suppliers.GetSupplierBalance(adhipma.txtsuppliername.Text).ToString();
                 txtmvmtdate.Text = Classes.Suppliers.getSupplierLastMovementDate(adhipma.txtsuppliername.Text);
 
                 HOForms.TransactionPayment.isdone = false;
@@ -371,7 +363,7 @@ namespace SalesInventorySystem.HOFormsDevEx
                 txtmvmtdate.Text = "";
                 txtacctid.Text = Classes.Suppliers.getSupplierID(adhipma.txtsuppliername.Text);
                 txtacctstatus.Text = Classes.Suppliers.getSupplierStatus(adhipma.txtsuppliername.Text);
-                txtacctbalance.Text = Classes.Suppliers.getSupplierBalance(adhipma.txtsuppliername.Text);
+                txtacctbalance.Text = Classes.Suppliers.GetSupplierBalance(adhipma.txtsuppliername.Text).ToString();
                 txtmvmtdate.Text = Classes.Suppliers.getSupplierLastMovementDate(adhipma.txtsuppliername.Text);
 
                 //HOForms.TransactionPayment.isdone = false;

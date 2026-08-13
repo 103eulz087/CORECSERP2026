@@ -33,6 +33,7 @@
             this.gridControl1 = new DevExpress.XtraGrid.GridControl();
             this.gridView1 = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.groupControl1 = new DevExpress.XtraEditors.GroupControl();
+            this.chckall = new System.Windows.Forms.CheckBox();
             this.btnadd = new DevExpress.XtraEditors.SimpleButton();
             this.txtsuppliers = new DevExpress.XtraEditors.SearchLookUpEdit();
             this.gridview = new DevExpress.XtraGrid.Views.Grid.GridView();
@@ -40,7 +41,6 @@
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.editItemToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteItemToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.chckall = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.groupControl2)).BeginInit();
             this.groupControl2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).BeginInit();
@@ -66,11 +66,11 @@
             // 
             this.gridControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gridControl1.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4);
-            this.gridControl1.Location = new System.Drawing.Point(2, 25);
+            this.gridControl1.Location = new System.Drawing.Point(2, 28);
             this.gridControl1.MainView = this.gridView1;
             this.gridControl1.Margin = new System.Windows.Forms.Padding(4);
             this.gridControl1.Name = "gridControl1";
-            this.gridControl1.Size = new System.Drawing.Size(1290, 644);
+            this.gridControl1.Size = new System.Drawing.Size(1290, 641);
             this.gridControl1.TabIndex = 2;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1});
@@ -105,6 +105,17 @@
             this.groupControl1.Size = new System.Drawing.Size(1294, 100);
             this.groupControl1.TabIndex = 2;
             this.groupControl1.Text = "Set Product Costing";
+            // 
+            // chckall
+            // 
+            this.chckall.AutoSize = true;
+            this.chckall.Location = new System.Drawing.Point(120, 69);
+            this.chckall.Name = "chckall";
+            this.chckall.Size = new System.Drawing.Size(99, 21);
+            this.chckall.TabIndex = 442;
+            this.chckall.Text = "Display ALL";
+            this.chckall.UseVisualStyleBackColor = true;
+            this.chckall.CheckedChanged += new System.EventHandler(this.chckall_CheckedChanged);
             // 
             // btnadd
             // 
@@ -175,17 +186,6 @@
             this.deleteItemToolStripMenuItem.Size = new System.Drawing.Size(156, 24);
             this.deleteItemToolStripMenuItem.Text = "Delete Item";
             this.deleteItemToolStripMenuItem.Click += new System.EventHandler(this.deleteItemToolStripMenuItem_Click);
-            // 
-            // chckall
-            // 
-            this.chckall.AutoSize = true;
-            this.chckall.Location = new System.Drawing.Point(120, 69);
-            this.chckall.Name = "chckall";
-            this.chckall.Size = new System.Drawing.Size(99, 21);
-            this.chckall.TabIndex = 442;
-            this.chckall.Text = "Display ALL";
-            this.chckall.UseVisualStyleBackColor = true;
-            this.chckall.CheckedChanged += new System.EventHandler(this.chckall_CheckedChanged);
             // 
             // InventoryCost
             // 

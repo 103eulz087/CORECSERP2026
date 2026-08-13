@@ -29,11 +29,15 @@
         private void InitializeComponent()
         {
             this.groupControl1 = new DevExpress.XtraEditors.GroupControl();
+            this.chckewt = new DevExpress.XtraEditors.CheckEdit();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.rad10perc = new System.Windows.Forms.RadioButton();
+            this.rad5perc = new System.Windows.Forms.RadioButton();
+            this.rad2perc = new System.Windows.Forms.RadioButton();
+            this.rad1perc = new System.Windows.Forms.RadioButton();
             this.chckpayfull = new DevExpress.XtraEditors.CheckEdit();
             this.txtshipno = new DevExpress.XtraEditors.TextEdit();
             this.labelControl9 = new DevExpress.XtraEditors.LabelControl();
-            this.btnupdate = new DevExpress.XtraEditors.SimpleButton();
-            this.btnSave = new DevExpress.XtraEditors.SimpleButton();
             this.txtoffsetamount = new DevExpress.XtraEditors.SpinEdit();
             this.txtdiscountamount = new DevExpress.XtraEditors.SpinEdit();
             this.txtewtamount = new DevExpress.XtraEditors.SpinEdit();
@@ -50,14 +54,12 @@
             this.labelControl3 = new DevExpress.XtraEditors.LabelControl();
             this.labelControl2 = new DevExpress.XtraEditors.LabelControl();
             this.labelControl1 = new DevExpress.XtraEditors.LabelControl();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.chckewt = new DevExpress.XtraEditors.CheckEdit();
-            this.rad1perc = new System.Windows.Forms.RadioButton();
-            this.rad2perc = new System.Windows.Forms.RadioButton();
-            this.rad5perc = new System.Windows.Forms.RadioButton();
-            this.rad10perc = new System.Windows.Forms.RadioButton();
+            this.btnupdate = new DevExpress.XtraEditors.SimpleButton();
+            this.btnSave = new DevExpress.XtraEditors.SimpleButton();
             ((System.ComponentModel.ISupportInitialize)(this.groupControl1)).BeginInit();
             this.groupControl1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.chckewt.Properties)).BeginInit();
+            this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.chckpayfull.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtshipno.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtoffsetamount.Properties)).BeginInit();
@@ -68,8 +70,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.txtactualcost.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtinvoicedate.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtinvoiceno.Properties)).BeginInit();
-            this.groupBox1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.chckewt.Properties)).BeginInit();
             this.SuspendLayout();
             // 
             // groupControl1
@@ -105,6 +105,79 @@
             this.groupControl1.Size = new System.Drawing.Size(299, 482);
             this.groupControl1.TabIndex = 0;
             // 
+            // chckewt
+            // 
+            this.chckewt.Location = new System.Drawing.Point(17, 193);
+            this.chckewt.Margin = new System.Windows.Forms.Padding(2);
+            this.chckewt.Name = "chckewt";
+            this.chckewt.Properties.Caption = "with EWT?";
+            this.chckewt.Size = new System.Drawing.Size(87, 24);
+            this.chckewt.TabIndex = 449;
+            this.chckewt.CheckedChanged += new System.EventHandler(this.chckewt_CheckedChanged);
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.rad10perc);
+            this.groupBox1.Controls.Add(this.rad5perc);
+            this.groupBox1.Controls.Add(this.rad2perc);
+            this.groupBox1.Controls.Add(this.rad1perc);
+            this.groupBox1.Enabled = false;
+            this.groupBox1.Font = new System.Drawing.Font("Tahoma", 6.8F);
+            this.groupBox1.Location = new System.Drawing.Point(17, 222);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(266, 66);
+            this.groupBox1.TabIndex = 448;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "EWT Percentage";
+            // 
+            // rad10perc
+            // 
+            this.rad10perc.AutoSize = true;
+            this.rad10perc.Location = new System.Drawing.Point(181, 30);
+            this.rad10perc.Name = "rad10perc";
+            this.rad10perc.Size = new System.Drawing.Size(58, 18);
+            this.rad10perc.TabIndex = 3;
+            this.rad10perc.TabStop = true;
+            this.rad10perc.Text = "10 %";
+            this.rad10perc.UseVisualStyleBackColor = true;
+            this.rad10perc.CheckedChanged += new System.EventHandler(this.rad10perc_CheckedChanged);
+            // 
+            // rad5perc
+            // 
+            this.rad5perc.AutoSize = true;
+            this.rad5perc.Location = new System.Drawing.Point(124, 30);
+            this.rad5perc.Name = "rad5perc";
+            this.rad5perc.Size = new System.Drawing.Size(51, 18);
+            this.rad5perc.TabIndex = 2;
+            this.rad5perc.TabStop = true;
+            this.rad5perc.Text = "5 %";
+            this.rad5perc.UseVisualStyleBackColor = true;
+            this.rad5perc.CheckedChanged += new System.EventHandler(this.rad5perc_CheckedChanged);
+            // 
+            // rad2perc
+            // 
+            this.rad2perc.AutoSize = true;
+            this.rad2perc.Location = new System.Drawing.Point(69, 30);
+            this.rad2perc.Name = "rad2perc";
+            this.rad2perc.Size = new System.Drawing.Size(51, 18);
+            this.rad2perc.TabIndex = 1;
+            this.rad2perc.TabStop = true;
+            this.rad2perc.Text = "2 %";
+            this.rad2perc.UseVisualStyleBackColor = true;
+            this.rad2perc.CheckedChanged += new System.EventHandler(this.rad2perc_CheckedChanged);
+            // 
+            // rad1perc
+            // 
+            this.rad1perc.AutoSize = true;
+            this.rad1perc.Location = new System.Drawing.Point(12, 30);
+            this.rad1perc.Name = "rad1perc";
+            this.rad1perc.Size = new System.Drawing.Size(51, 18);
+            this.rad1perc.TabIndex = 0;
+            this.rad1perc.TabStop = true;
+            this.rad1perc.Text = "1 %";
+            this.rad1perc.UseVisualStyleBackColor = true;
+            this.rad1perc.CheckedChanged += new System.EventHandler(this.rad1perc_CheckedChanged);
+            // 
             // chckpayfull
             // 
             this.chckpayfull.EditValue = true;
@@ -135,29 +208,6 @@
             this.labelControl9.Size = new System.Drawing.Size(93, 18);
             this.labelControl9.TabIndex = 445;
             this.labelControl9.Text = "Shipment No.:";
-            // 
-            // btnupdate
-            // 
-            this.btnupdate.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.Save_16x16__5_;
-            this.btnupdate.Location = new System.Drawing.Point(17, 424);
-            this.btnupdate.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.btnupdate.Name = "btnupdate";
-            this.btnupdate.Size = new System.Drawing.Size(122, 42);
-            this.btnupdate.TabIndex = 444;
-            this.btnupdate.Text = "UPDATE";
-            this.btnupdate.Visible = false;
-            this.btnupdate.Click += new System.EventHandler(this.btnupdate_Click);
-            // 
-            // btnSave
-            // 
-            this.btnSave.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.Save_16x16__5_;
-            this.btnSave.Location = new System.Drawing.Point(146, 424);
-            this.btnSave.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(137, 42);
-            this.btnSave.TabIndex = 443;
-            this.btnSave.Text = "Save";
-            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
             // txtoffsetamount
             // 
@@ -344,78 +394,28 @@
             this.labelControl1.TabIndex = 0;
             this.labelControl1.Text = "Invoice No.:";
             // 
-            // groupBox1
+            // btnupdate
             // 
-            this.groupBox1.Controls.Add(this.rad10perc);
-            this.groupBox1.Controls.Add(this.rad5perc);
-            this.groupBox1.Controls.Add(this.rad2perc);
-            this.groupBox1.Controls.Add(this.rad1perc);
-            this.groupBox1.Enabled = false;
-            this.groupBox1.Font = new System.Drawing.Font("Tahoma", 6.8F);
-            this.groupBox1.Location = new System.Drawing.Point(17, 222);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(266, 66);
-            this.groupBox1.TabIndex = 448;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "EWT Percentage";
+            this.btnupdate.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.Save_16x16__5_;
+            this.btnupdate.Location = new System.Drawing.Point(17, 424);
+            this.btnupdate.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnupdate.Name = "btnupdate";
+            this.btnupdate.Size = new System.Drawing.Size(122, 42);
+            this.btnupdate.TabIndex = 444;
+            this.btnupdate.Text = "UPDATE";
+            this.btnupdate.Visible = false;
+            this.btnupdate.Click += new System.EventHandler(this.btnupdate_Click);
             // 
-            // chckewt
+            // btnSave
             // 
-            this.chckewt.Location = new System.Drawing.Point(17, 193);
-            this.chckewt.Margin = new System.Windows.Forms.Padding(2);
-            this.chckewt.Name = "chckewt";
-            this.chckewt.Properties.Caption = "with EWT?";
-            this.chckewt.Size = new System.Drawing.Size(87, 24);
-            this.chckewt.TabIndex = 449;
-            this.chckewt.CheckedChanged += new System.EventHandler(this.chckewt_CheckedChanged);
-            // 
-            // rad1perc
-            // 
-            this.rad1perc.AutoSize = true;
-            this.rad1perc.Location = new System.Drawing.Point(12, 30);
-            this.rad1perc.Name = "rad1perc";
-            this.rad1perc.Size = new System.Drawing.Size(51, 18);
-            this.rad1perc.TabIndex = 0;
-            this.rad1perc.TabStop = true;
-            this.rad1perc.Text = "1 %";
-            this.rad1perc.UseVisualStyleBackColor = true;
-            this.rad1perc.CheckedChanged += new System.EventHandler(this.rad1perc_CheckedChanged);
-            // 
-            // rad2perc
-            // 
-            this.rad2perc.AutoSize = true;
-            this.rad2perc.Location = new System.Drawing.Point(69, 30);
-            this.rad2perc.Name = "rad2perc";
-            this.rad2perc.Size = new System.Drawing.Size(51, 18);
-            this.rad2perc.TabIndex = 1;
-            this.rad2perc.TabStop = true;
-            this.rad2perc.Text = "2 %";
-            this.rad2perc.UseVisualStyleBackColor = true;
-            this.rad2perc.CheckedChanged += new System.EventHandler(this.rad2perc_CheckedChanged);
-            // 
-            // rad5perc
-            // 
-            this.rad5perc.AutoSize = true;
-            this.rad5perc.Location = new System.Drawing.Point(124, 30);
-            this.rad5perc.Name = "rad5perc";
-            this.rad5perc.Size = new System.Drawing.Size(51, 18);
-            this.rad5perc.TabIndex = 2;
-            this.rad5perc.TabStop = true;
-            this.rad5perc.Text = "5 %";
-            this.rad5perc.UseVisualStyleBackColor = true;
-            this.rad5perc.CheckedChanged += new System.EventHandler(this.rad5perc_CheckedChanged);
-            // 
-            // rad10perc
-            // 
-            this.rad10perc.AutoSize = true;
-            this.rad10perc.Location = new System.Drawing.Point(181, 30);
-            this.rad10perc.Name = "rad10perc";
-            this.rad10perc.Size = new System.Drawing.Size(58, 18);
-            this.rad10perc.TabIndex = 3;
-            this.rad10perc.TabStop = true;
-            this.rad10perc.Text = "10 %";
-            this.rad10perc.UseVisualStyleBackColor = true;
-            this.rad10perc.CheckedChanged += new System.EventHandler(this.rad10perc_CheckedChanged);
+            this.btnSave.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.Save_16x16__5_;
+            this.btnSave.Location = new System.Drawing.Point(146, 424);
+            this.btnSave.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnSave.Name = "btnSave";
+            this.btnSave.Size = new System.Drawing.Size(137, 42);
+            this.btnSave.TabIndex = 443;
+            this.btnSave.Text = "Save";
+            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
             // SupplierAddPaymentDevEx
             // 
@@ -430,6 +430,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.groupControl1)).EndInit();
             this.groupControl1.ResumeLayout(false);
             this.groupControl1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.chckewt.Properties)).EndInit();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.chckpayfull.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtshipno.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtoffsetamount.Properties)).EndInit();
@@ -440,9 +443,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.txtactualcost.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtinvoicedate.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtinvoiceno.Properties)).EndInit();
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.chckewt.Properties)).EndInit();
             this.ResumeLayout(false);
 
         }

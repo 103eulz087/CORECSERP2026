@@ -32,6 +32,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AddPrimalCutInventory));
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
             this.groupControl1 = new DevExpress.XtraEditors.GroupControl();
+            this.btnprintReport = new DevExpress.XtraEditors.SimpleButton();
             this.txtdispatchno = new DevExpress.XtraEditors.TextEdit();
             this.label11 = new System.Windows.Forms.Label();
             this.txtpalletno = new DevExpress.XtraEditors.TextEdit();
@@ -70,7 +71,6 @@
             this.groupControl2 = new DevExpress.XtraEditors.GroupControl();
             this.gridControl1 = new DevExpress.XtraGrid.GridControl();
             this.gridView1 = new DevExpress.XtraGrid.Views.Grid.GridView();
-            this.btnprintReport = new DevExpress.XtraEditors.SimpleButton();
             ((System.ComponentModel.ISupportInitialize)(this.groupControl1)).BeginInit();
             this.groupControl1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtdispatchno.Properties)).BeginInit();
@@ -129,6 +129,19 @@
             this.groupControl1.TabIndex = 39;
             this.groupControl1.Text = "Process To Primal Cuts";
             this.groupControl1.Paint += new System.Windows.Forms.PaintEventHandler(this.groupControl1_Paint);
+            // 
+            // btnprintReport
+            // 
+            this.btnprintReport.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F);
+            this.btnprintReport.Appearance.Options.UseFont = true;
+            this.btnprintReport.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnprintReport.ImageOptions.Image")));
+            this.btnprintReport.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
+            this.btnprintReport.Location = new System.Drawing.Point(936, 253);
+            this.btnprintReport.Name = "btnprintReport";
+            this.btnprintReport.Size = new System.Drawing.Size(122, 37);
+            this.btnprintReport.TabIndex = 62;
+            this.btnprintReport.Text = "Print Report";
+            this.btnprintReport.Click += new System.EventHandler(this.btnprintReport_Click);
             // 
             // txtdispatchno
             // 
@@ -583,19 +596,6 @@
             this.gridView1.OptionsView.RowAutoHeight = true;
             this.gridView1.OptionsView.ShowFooter = true;
             this.gridView1.OptionsView.ShowIndicator = false;
-            // 
-            // btnprintReport
-            // 
-            this.btnprintReport.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F);
-            this.btnprintReport.Appearance.Options.UseFont = true;
-            this.btnprintReport.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnprintReport.ImageOptions.Image")));
-            this.btnprintReport.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btnprintReport.Location = new System.Drawing.Point(936, 253);
-            this.btnprintReport.Name = "btnprintReport";
-            this.btnprintReport.Size = new System.Drawing.Size(122, 37);
-            this.btnprintReport.TabIndex = 62;
-            this.btnprintReport.Text = "Print Report";
-            this.btnprintReport.Click += new System.EventHandler(this.btnprintReport_Click);
             // 
             // AddPrimalCutInventory
             // 

@@ -55,6 +55,7 @@ namespace SalesInventorySystem
         }
      
         private static string _cachedServerName = null;
+        private static string _cachedDbName = null;
 
         public static string getConnectionServerName()
         {
@@ -78,6 +79,29 @@ namespace SalesInventorySystem
             // 3. Return the cached string (or a blank string if the registry key is completely missing)
             return _cachedServerName ?? "";
         }
+        public static string getConnectionServerName(string value)
+        {
+            // 1. Check if we already loaded it into memory
+            if (string.IsNullOrEmpty(_cachedDbName))
+            {
+                // 2. Open safely in READ-ONLY mode, wrapped in a 'using' block to prevent OS memory leaks
+                using (RegistryKey key = Registry.CurrentUser.OpenSubKey(@"AAITCRE\ConnSettingsMain", false))
+                {
+                    if (key != null)
+                    {
+                        object regValue = key.GetValue(value);
+                        if (regValue != null)
+                        {
+                            _cachedDbName = regValue.ToString();
+                        }
+                    }
+                }
+            }
+
+            // 3. Return the cached string (or a blank string if the registry key is completely missing)
+            return _cachedDbName ?? "";
+        }
+
 
         public static string getConnectionString(string regkeypath)
         {
@@ -715,7 +739,53 @@ namespace SalesInventorySystem
             }
             return str;
         }
-   
+
+        public static string getSingleQuery(string query, string returnval, params SqlParameter[] parameters)
+        {
+            string str = "";
+            try
+            {
+                using (SqlConnection con = getConnection())
+                {
+                    con.Open();
+                    using (SqlCommand com = new SqlCommand(query, con))
+                    {
+                        if (parameters != null)
+                            com.Parameters.AddRange(parameters);
+
+                        using (SqlDataReader reader = com.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                str = reader[returnval]?.ToString() ?? "";
+                            }
+                        }
+                    }
+                }
+            }
+            catch (SqlException)
+            {
+                // Silent fail: Let the UI handle the empty string rather than throwing a popup
+            }
+            return str;
+        }
+        public static string getSingleQuery(string table, string where, string column, params SqlParameter[] parameters)
+        {
+            using (SqlConnection conn = getConnection())
+            {
+                conn.Open();
+                string sql = $"SELECT {column} FROM {table} WHERE {where}";
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                {
+                    if (parameters != null)
+                        cmd.Parameters.AddRange(parameters);
+
+                    object result = cmd.ExecuteScalar();
+                    return result?.ToString() ?? string.Empty;
+                }
+            }
+        }
+
         public static string getSingleQuery(string tablename, string condition, string returnval)
         {
             string str = "";
@@ -1654,6 +1724,7 @@ namespace SalesInventorySystem
             view.OptionsView.RowAutoHeight = true;
             view.OptionsView.ShowFooter = true;
             view.BestFitColumns();
+            view.BestFitMaxRowCount = -1;
 
             view.Appearance.HeaderPanel.Font =
                 new System.Drawing.Font("Tahoma", 8, System.Drawing.FontStyle.Bold);
@@ -1730,6 +1801,63 @@ namespace SalesInventorySystem
                             XtraMessageBox.Show(ex.Message, "Master-Detail Error");
                         }
                     }
+
+        public static GridView GridMasterDetailWithUpdate(
+                 string masterQuery,
+                 string detailQuery,
+                 string masterTable,
+                 string detailTable,
+                 string masterKey,
+                 string detailKey,
+                 string relationName,
+                 GridControl grid,
+                 SqlParameter[] masterParams,
+                 SqlParameter[] detailParams)
+        {
+            GridView detailView = null;
+            try
+            {
+                using (SqlConnection con = Database.getConnection())
+                using (SqlDataAdapter masterAdapter = new SqlDataAdapter(masterQuery, con))
+                using (SqlDataAdapter detailAdapter = new SqlDataAdapter(detailQuery, con))
+                {
+                    if (masterParams != null) masterAdapter.SelectCommand.Parameters.AddRange(masterParams);
+                    if (detailParams != null) detailAdapter.SelectCommand.Parameters.AddRange(detailParams);
+
+                    var ds = new DataSet();
+                    masterAdapter.Fill(ds, masterTable);
+                    detailAdapter.Fill(ds, detailTable);
+
+                    grid.DataSource = null;
+                    grid.LevelTree.Nodes.Clear();
+                    ds.Relations.Clear();
+
+                    // Create relation (constraints are OK now because detail is filtered)
+                    ds.Relations.Add(relationName,
+                        ds.Tables[masterTable].Columns[masterKey],
+                        ds.Tables[detailTable].Columns[detailKey]);
+
+                    grid.DataSource = ds;
+                    grid.DataMember = masterTable;
+                    grid.ForceInitialize();
+
+                    GridView masterView = grid.MainView as GridView;
+                    ConfigureView(masterView);
+
+                    detailView = new GridView(grid);
+                    ConfigureView(detailView);
+
+                    grid.LevelTree.Nodes.Add(relationName, detailView);
+
+                    return detailView;
+                }
+            }
+            catch (Exception ex)
+            {
+                XtraMessageBox.Show(ex.Message, "Master-Detail Error");
+                return null;
+            }
+        }
 
         public static SqlParameter[] CloneParams(params SqlParameter[] parms)
         {
@@ -1930,51 +2058,6 @@ namespace SalesInventorySystem
         //    }
         //}
 
-        public static void GridMasterDetailMysql(string query1, string query2,string table1,string table2, string col1, string col2, string fkeyname, GridControl grid,string eulz)
-        {
-            try
-            {
-                string constringLocal = "SERVER=abacos.com.ph;DATABASE=abacos_lucky7;UID=abacos_livetrends;PASSWORD=6969rd//;";
-                MySql.Data.MySqlClient.MySqlConnection con = new MySql.Data.MySqlClient.MySqlConnection(constringLocal);
-                con.Open();
-
-                MySql.Data.MySqlClient.MySqlDataAdapter adapter = new MySql.Data.MySqlClient.MySqlDataAdapter(query1, con);
-                MySql.Data.MySqlClient.MySqlDataAdapter adapter2 = new MySql.Data.MySqlClient.MySqlDataAdapter(query2, con);
-
-                DataSet ds = new DataSet();
-                adapter.Fill(ds, table1);
-                adapter2.Fill(ds, table2);
-
-                //Set up a master-detail relationship between the DataTables
-                DataColumn keycolumn = ds.Tables[table1].Columns[col1];
-                DataColumn foreigncolumn = ds.Tables[table2].Columns[col2];
-                ds.Relations.Add(fkeyname, keycolumn, foreigncolumn);
-                
-                //Bind the grid control to the data source
-                grid.DataSource = ds.Tables[table1];
-                grid.ForceInitialize();
-
-                GridView view = new GridView(grid);
-                view.BestFitColumns();
-                view.ExpandAllGroups();
-                view.OptionsView.ShowGroupPanel = false;
-                view.OptionsView.ColumnAutoWidth = true;
-                view.OptionsView.RowAutoHeight = true;
-                view.OptionsBehavior.ReadOnly = true;
-                view.OptionsBehavior.Editable = false;
-                view.Appearance.HeaderPanel.Font = new System.Drawing.Font("Tahoma", 10, System.Drawing.FontStyle.Bold);
-                view.OptionsView.ShowFooter = true;
-                grid.LevelTree.Nodes.Add(fkeyname, view);
-            }
-            catch(SqlException e)
-            {
-                XtraMessageBox.Show(e.Message.ToString());
-            }
-            finally
-            {
-                con.Close();
-            }
-        }
         public static void GridMasterDetail(string query1, string query2, string table1, string table2, string col1, string col2,string col3,string col4, string fkeyname, GridControl grid,GridView viewDetails, string eulz)
         {
             try
@@ -2064,50 +2147,6 @@ namespace SalesInventorySystem
             }
         }
 
-        public static void GridMasterDetailMysql(string table1, string table2, string col1, string col2, string fkeyname, GridControl grid)
-        {
-            try
-            {
-                string constringLocal = "SERVER=abacos.com.ph;DATABASE=abacos_lucky7;UID=abacos_livetrends;PASSWORD=6969rd//;";
-                MySql.Data.MySqlClient.MySqlConnection con = new MySql.Data.MySqlClient.MySqlConnection(constringLocal);
-                con.Open();
-
-                MySql.Data.MySqlClient.MySqlDataAdapter adapter = new MySql.Data.MySqlClient.MySqlDataAdapter("SELECT * FROM " + table1 + "", con);
-                MySql.Data.MySqlClient.MySqlDataAdapter adapter2 = new MySql.Data.MySqlClient.MySqlDataAdapter("SELECT * FROM " + table2 + "", con);
-
-                DataSet ds = new DataSet();
-                adapter.Fill(ds, table1);
-                adapter2.Fill(ds, table2);
-
-                //Set up a master-detail relationship between the DataTables
-                DataColumn keycolumn = ds.Tables[table1].Columns[col1];
-                DataColumn foreigncolumn = ds.Tables[table2].Columns[col2];
-                ds.Relations.Add(fkeyname, keycolumn, foreigncolumn);
-                //Bind the grid control to the data source
-                grid.DataSource = ds.Tables[table1];
-                grid.ForceInitialize();
-
-                GridView view = new GridView(grid);
-                view.BestFitColumns();
-                view.ExpandAllGroups();
-                view.OptionsView.ShowGroupPanel = false;
-                //view.OptionsView.ColumnAutoWidth = false;
-                view.OptionsView.RowAutoHeight = true;
-                view.OptionsBehavior.ReadOnly = true;
-                view.OptionsBehavior.Editable = false;
-                view.Appearance.HeaderPanel.Font = new System.Drawing.Font("Tahoma", 10, System.Drawing.FontStyle.Bold);
-                view.OptionsView.ShowFooter = true;
-                grid.LevelTree.Nodes.Add(fkeyname, view);
-            }
-            catch (SqlException e)
-            {
-                XtraMessageBox.Show(e.Message.ToString());
-            }
-            finally
-            {
-                con.Close();
-            }
-        }
 
         public static void GridMasterDetail(string table1, string table2,string condition1,string condition2, string col1, string col2, string fkeyname, GridControl grid)
         {
@@ -2117,49 +2156,6 @@ namespace SalesInventorySystem
             {
                 SqlDataAdapter adapter = new SqlDataAdapter("SELECT * FROM " + table1 + " WHERE " + condition1 + "", con);
                 SqlDataAdapter adapter2 = new SqlDataAdapter("SELECT * FROM " + table2 + " WHERE " + condition2 + "", con);
-                DataSet ds = new DataSet();
-                adapter.Fill(ds, table1);
-                adapter2.Fill(ds, table2);
-
-                //Set up a master-detail relationship between the DataTables
-                DataColumn keycolumn = ds.Tables[table1].Columns[col1];
-                DataColumn foreigncolumn = ds.Tables[table2].Columns[col2];
-                ds.Relations.Add(fkeyname, keycolumn, foreigncolumn);
-                //Bind the grid control to the data source
-                grid.DataSource = ds.Tables[table1];
-                grid.ForceInitialize();
-
-                GridView view = new GridView(grid);
-                view.BestFitColumns();
-                view.ExpandAllGroups();
-                view.OptionsView.ShowGroupPanel = false;
-                //view.OptionsView.ColumnAutoWidth = false;
-                view.OptionsView.RowAutoHeight = true;
-                view.OptionsBehavior.ReadOnly = true;
-                view.OptionsBehavior.Editable = false;
-                view.Appearance.HeaderPanel.Font = new System.Drawing.Font("Tahoma", 8, System.Drawing.FontStyle.Bold);
-                view.OptionsView.ShowFooter = true;
-                grid.LevelTree.Nodes.Add(fkeyname, view);
-            }
-            catch(SqlException ex)
-            {
-                XtraMessageBox.Show(ex.Message.ToString());
-            }
-            finally
-            {
-                con.Close();
-            }
-        }
-
-        public static void GridMasterDetailMysql(string table1, string table2,string condition1,string condition2, string col1, string col2, string fkeyname, GridControl grid)
-        {
-            string constringLocal = "SERVER=abacos.com.ph;DATABASE=abacos_lucky7;UID=abacos_livetrends;PASSWORD=6969rd//;";
-            MySql.Data.MySqlClient.MySqlConnection con = new MySql.Data.MySqlClient.MySqlConnection(constringLocal);
-            con.Open();
-            try
-            {
-                MySql.Data.MySqlClient.MySqlDataAdapter adapter = new MySql.Data.MySqlClient.MySqlDataAdapter("SELECT * FROM " + table1 + " WHERE " + condition1 + "", con);
-                MySql.Data.MySqlClient.MySqlDataAdapter adapter2 = new MySql.Data.MySqlClient.MySqlDataAdapter("SELECT * FROM " + table2 + " WHERE " + condition2 + "", con);
                 DataSet ds = new DataSet();
                 adapter.Fill(ds, table1);
                 adapter2.Fill(ds, table2);
@@ -2267,7 +2263,48 @@ namespace SalesInventorySystem
                 con.Close();
             }
         }
-       
+        public static void DisplayDevLookupEditItems(string query, string displayCol, string valueCol, LookUpEdit lookup)
+        {
+            using (SqlConnection con = getConnection())
+            {
+                con.Open();
+                using (SqlCommand com = new SqlCommand(query, con))
+                using (SqlDataAdapter da = new SqlDataAdapter(com))
+                {
+                    DataTable dt = new DataTable();
+                    da.Fill(dt);
+
+                    lookup.Properties.DataSource = dt;
+                    lookup.Properties.DisplayMember = displayCol;
+                    lookup.Properties.ValueMember = valueCol;
+
+                    // Optional: auto-generate columns
+                    lookup.Properties.PopulateColumns();
+
+                    // If you want to hide the value column when display=value
+                    if (displayCol == valueCol && lookup.Properties.Columns[valueCol] != null)
+                        lookup.Properties.Columns[valueCol].Visible = true;
+                }
+            }
+        }
+        public static void DisplayDevLookupEditItems(string query, string displayCol, string valueCol, RepositoryItemLookUpEdit repLookup)
+        {
+            using (SqlConnection con = getConnection())
+            {
+                con.Open();
+                using (SqlCommand com = new SqlCommand(query, con))
+                using (SqlDataAdapter da = new SqlDataAdapter(com))
+                {
+                    DataTable dt = new DataTable();
+                    da.Fill(dt);
+                    repLookup.DataSource = dt;
+                    repLookup.DisplayMember = displayCol;
+                    repLookup.ValueMember = valueCol;
+                }
+            }
+        }
+
+
         public static void displayDevComboBoxItems(string query, string col, ComboBoxEdit box)
         {
             box.Properties.Items.Clear();
@@ -2795,6 +2832,25 @@ namespace SalesInventorySystem
                 Classes.Utilities.displayMessage(ex.Message, MessageBoxIcon.Error);
             }
             return reader;
+        }
+        public static DataTable GetDataTable(string query)
+        {
+            DataTable dt = new DataTable();
+
+            using (SqlConnection con = getConnection())
+            {
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    cmd.CommandTimeout = 0; // optional
+
+                    using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                    {
+                        da.Fill(dt);
+                    }
+                }
+            }
+
+            return dt;
         }
     }
 }

@@ -45,6 +45,9 @@
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.editItemsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.labelControl3 = new DevExpress.XtraEditors.LabelControl();
+            this.txtglcode = new DevExpress.XtraEditors.SearchLookUpEdit();
+            this.searchLookUpEdit1View = new DevExpress.XtraGrid.Views.Grid.GridView();
             ((System.ComponentModel.ISupportInitialize)(this.groupControl2)).BeginInit();
             this.groupControl2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).BeginInit();
@@ -54,27 +57,29 @@
             ((System.ComponentModel.ISupportInitialize)(this.txtdeptname.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtdeptid.Properties)).BeginInit();
             this.contextMenuStrip1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.txtglcode.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.searchLookUpEdit1View)).BeginInit();
             this.SuspendLayout();
             // 
             // groupControl2
             // 
             this.groupControl2.Controls.Add(this.gridControl1);
             this.groupControl2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupControl2.Location = new System.Drawing.Point(0, 226);
-            this.groupControl2.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.groupControl2.Location = new System.Drawing.Point(0, 214);
+            this.groupControl2.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.groupControl2.Name = "groupControl2";
-            this.groupControl2.Size = new System.Drawing.Size(621, 532);
+            this.groupControl2.Size = new System.Drawing.Size(435, 313);
             this.groupControl2.TabIndex = 3;
             // 
             // gridControl1
             // 
             this.gridControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControl1.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
-            this.gridControl1.Location = new System.Drawing.Point(3, 39);
+            this.gridControl1.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.gridControl1.Location = new System.Drawing.Point(2, 28);
             this.gridControl1.MainView = this.gridView1;
-            this.gridControl1.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.gridControl1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.gridControl1.Name = "gridControl1";
-            this.gridControl1.Size = new System.Drawing.Size(615, 490);
+            this.gridControl1.Size = new System.Drawing.Size(431, 283);
             this.gridControl1.TabIndex = 1;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1});
@@ -86,12 +91,13 @@
             this.gridView1.Appearance.HeaderPanel.Options.UseFont = true;
             this.gridView1.Appearance.Row.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.gridView1.Appearance.Row.Options.UseFont = true;
-            this.gridView1.DetailHeight = 502;
+            this.gridView1.DetailHeight = 349;
             this.gridView1.FixedLineWidth = 4;
             this.gridView1.GridControl = this.gridControl1;
             this.gridView1.Name = "gridView1";
             this.gridView1.OptionsBehavior.Editable = false;
             this.gridView1.OptionsBehavior.ReadOnly = true;
+            this.gridView1.OptionsEditForm.PopupEditFormWidth = 560;
             this.gridView1.OptionsSelection.ShowCheckBoxSelectorInColumnHeader = DevExpress.Utils.DefaultBoolean.True;
             this.gridView1.OptionsView.ColumnAutoWidth = false;
             this.gridView1.OptionsView.RowAutoHeight = true;
@@ -99,6 +105,8 @@
             // 
             // groupControl1
             // 
+            this.groupControl1.Controls.Add(this.txtglcode);
+            this.groupControl1.Controls.Add(this.labelControl3);
             this.groupControl1.Controls.Add(this.btncancel);
             this.groupControl1.Controls.Add(this.btnupdate);
             this.groupControl1.Controls.Add(this.btnadd);
@@ -109,18 +117,18 @@
             this.groupControl1.Controls.Add(this.labelControl1);
             this.groupControl1.Dock = System.Windows.Forms.DockStyle.Top;
             this.groupControl1.Location = new System.Drawing.Point(0, 0);
-            this.groupControl1.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.groupControl1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.groupControl1.Name = "groupControl1";
-            this.groupControl1.Size = new System.Drawing.Size(621, 226);
+            this.groupControl1.Size = new System.Drawing.Size(435, 214);
             this.groupControl1.TabIndex = 2;
             // 
             // btncancel
             // 
             this.btncancel.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.Cancel_16x16__2_;
-            this.btncancel.Location = new System.Drawing.Point(377, 159);
-            this.btncancel.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.btncancel.Location = new System.Drawing.Point(265, 152);
+            this.btncancel.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.btncancel.Name = "btncancel";
-            this.btncancel.Size = new System.Drawing.Size(100, 46);
+            this.btncancel.Size = new System.Drawing.Size(70, 32);
             this.btncancel.TabIndex = 61;
             this.btncancel.Text = "Cancel";
             this.btncancel.Click += new System.EventHandler(this.btncancel_Click);
@@ -128,10 +136,10 @@
             // btnupdate
             // 
             this.btnupdate.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.Refresh_16x16;
-            this.btnupdate.Location = new System.Drawing.Point(242, 159);
-            this.btnupdate.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.btnupdate.Location = new System.Drawing.Point(170, 152);
+            this.btnupdate.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.btnupdate.Name = "btnupdate";
-            this.btnupdate.Size = new System.Drawing.Size(125, 46);
+            this.btnupdate.Size = new System.Drawing.Size(88, 32);
             this.btnupdate.TabIndex = 60;
             this.btnupdate.Text = "Update";
             this.btnupdate.Click += new System.EventHandler(this.btnupdate_Click);
@@ -139,10 +147,10 @@
             // btnadd
             // 
             this.btnadd.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.Add_16x16__2_;
-            this.btnadd.Location = new System.Drawing.Point(132, 159);
-            this.btnadd.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.btnadd.Location = new System.Drawing.Point(93, 152);
+            this.btnadd.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.btnadd.Name = "btnadd";
-            this.btnadd.Size = new System.Drawing.Size(100, 46);
+            this.btnadd.Size = new System.Drawing.Size(70, 32);
             this.btnadd.TabIndex = 59;
             this.btnadd.Text = "Add";
             this.btnadd.Click += new System.EventHandler(this.btnadd_Click);
@@ -150,42 +158,42 @@
             // btnnew
             // 
             this.btnnew.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.New_16x16__5_;
-            this.btnnew.Location = new System.Drawing.Point(22, 159);
-            this.btnnew.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.btnnew.Location = new System.Drawing.Point(16, 152);
+            this.btnnew.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.btnnew.Name = "btnnew";
-            this.btnnew.Size = new System.Drawing.Size(100, 46);
+            this.btnnew.Size = new System.Drawing.Size(70, 32);
             this.btnnew.TabIndex = 58;
             this.btnnew.Text = "New";
             this.btnnew.Click += new System.EventHandler(this.btnnew_Click);
             // 
             // txtdeptname
             // 
-            this.txtdeptname.Location = new System.Drawing.Point(205, 103);
-            this.txtdeptname.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.txtdeptname.Location = new System.Drawing.Point(144, 72);
+            this.txtdeptname.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.txtdeptname.Name = "txtdeptname";
             this.txtdeptname.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F);
             this.txtdeptname.Properties.Appearance.Options.UseFont = true;
-            this.txtdeptname.Size = new System.Drawing.Size(368, 40);
+            this.txtdeptname.Size = new System.Drawing.Size(258, 24);
             this.txtdeptname.TabIndex = 3;
             // 
             // txtdeptid
             // 
-            this.txtdeptid.Location = new System.Drawing.Point(207, 51);
-            this.txtdeptid.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.txtdeptid.Location = new System.Drawing.Point(145, 35);
+            this.txtdeptid.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.txtdeptid.Name = "txtdeptid";
             this.txtdeptid.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F);
             this.txtdeptid.Properties.Appearance.Options.UseFont = true;
-            this.txtdeptid.Size = new System.Drawing.Size(368, 40);
+            this.txtdeptid.Size = new System.Drawing.Size(258, 24);
             this.txtdeptid.TabIndex = 2;
             // 
             // labelControl2
             // 
             this.labelControl2.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F);
             this.labelControl2.Appearance.Options.UseFont = true;
-            this.labelControl2.Location = new System.Drawing.Point(20, 106);
-            this.labelControl2.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.labelControl2.Location = new System.Drawing.Point(14, 74);
+            this.labelControl2.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.labelControl2.Name = "labelControl2";
-            this.labelControl2.Size = new System.Drawing.Size(116, 27);
+            this.labelControl2.Size = new System.Drawing.Size(75, 18);
             this.labelControl2.TabIndex = 1;
             this.labelControl2.Text = "Description:";
             // 
@@ -193,10 +201,10 @@
             // 
             this.labelControl1.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F);
             this.labelControl1.Appearance.Options.UseFont = true;
-            this.labelControl1.Location = new System.Drawing.Point(20, 57);
-            this.labelControl1.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.labelControl1.Location = new System.Drawing.Point(14, 40);
+            this.labelControl1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.labelControl1.Name = "labelControl1";
-            this.labelControl1.Size = new System.Drawing.Size(108, 27);
+            this.labelControl1.Size = new System.Drawing.Size(72, 18);
             this.labelControl1.TabIndex = 0;
             this.labelControl1.Text = "Service ID:";
             // 
@@ -207,13 +215,13 @@
             this.editItemsToolStripMenuItem,
             this.deleteToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(183, 72);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(149, 56);
             // 
             // editItemsToolStripMenuItem
             // 
             this.editItemsToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("editItemsToolStripMenuItem.Image")));
             this.editItemsToolStripMenuItem.Name = "editItemsToolStripMenuItem";
-            this.editItemsToolStripMenuItem.Size = new System.Drawing.Size(182, 34);
+            this.editItemsToolStripMenuItem.Size = new System.Drawing.Size(148, 26);
             this.editItemsToolStripMenuItem.Text = "Edit Items";
             this.editItemsToolStripMenuItem.Click += new System.EventHandler(this.editItemsToolStripMenuItem_Click);
             // 
@@ -221,18 +229,46 @@
             // 
             this.deleteToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("deleteToolStripMenuItem.Image")));
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(182, 34);
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(148, 26);
             this.deleteToolStripMenuItem.Text = "Delete";
             this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
             // 
+            // labelControl3
+            // 
+            this.labelControl3.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F);
+            this.labelControl3.Appearance.Options.UseFont = true;
+            this.labelControl3.Location = new System.Drawing.Point(11, 111);
+            this.labelControl3.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.labelControl3.Name = "labelControl3";
+            this.labelControl3.Size = new System.Drawing.Size(55, 18);
+            this.labelControl3.TabIndex = 62;
+            this.labelControl3.Text = "GLCode:";
+            // 
+            // txtglcode
+            // 
+            this.txtglcode.Location = new System.Drawing.Point(145, 110);
+            this.txtglcode.Name = "txtglcode";
+            this.txtglcode.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.txtglcode.Properties.PopupView = this.searchLookUpEdit1View;
+            this.txtglcode.Size = new System.Drawing.Size(258, 22);
+            this.txtglcode.TabIndex = 63;
+            // 
+            // searchLookUpEdit1View
+            // 
+            this.searchLookUpEdit1View.FocusRectStyle = DevExpress.XtraGrid.Views.Grid.DrawFocusRectStyle.RowFocus;
+            this.searchLookUpEdit1View.Name = "searchLookUpEdit1View";
+            this.searchLookUpEdit1View.OptionsSelection.EnableAppearanceFocusedCell = false;
+            this.searchLookUpEdit1View.OptionsView.ShowGroupPanel = false;
+            // 
             // ServicesDevEx
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 23F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(621, 758);
+            this.ClientSize = new System.Drawing.Size(435, 527);
             this.Controls.Add(this.groupControl2);
             this.Controls.Add(this.groupControl1);
-            this.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            this.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.Name = "ServicesDevEx";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "ServicesDevEx";
@@ -247,6 +283,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.txtdeptname.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtdeptid.Properties)).EndInit();
             this.contextMenuStrip1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.txtglcode.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.searchLookUpEdit1View)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -268,5 +306,8 @@
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
         private System.Windows.Forms.ToolStripMenuItem editItemsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
+        private DevExpress.XtraEditors.LabelControl labelControl3;
+        private DevExpress.XtraEditors.SearchLookUpEdit txtglcode;
+        private DevExpress.XtraGrid.Views.Grid.GridView searchLookUpEdit1View;
     }
 }

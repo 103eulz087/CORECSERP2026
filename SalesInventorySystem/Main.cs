@@ -45,6 +45,13 @@ namespace SalesInventorySystem
         {
             InitializeComponent();
             InitializeEODTimer();
+
+            // Auto-hide: ribbon collapses to just tab captions; clicking a tab
+            // pops its content up temporarily and it collapses again once you
+            // click elsewhere (same as Office's minimized-ribbon behavior).
+            // ShowMinimizeButton keeps the little arrow so it can be re-pinned open.
+            ribbonControl.ShowExpandCollapseButton = DevExpress.Utils.DefaultBoolean.True;
+            ribbonControl.Minimized = true;
             //DevExpress.UserSkins.BonusSkins.Register();
             //DevExpress.Skins.SkinManager.EnableFormSkins();
             //DevExpress.XtraBars.Helpers.SkinHelper.InitSkinGallery(skinRibbonGalleryBarItem1, true, true);
@@ -104,21 +111,22 @@ namespace SalesInventorySystem
             barHeaderItem1.Caption = Login.isglobalUserID;
             barHeaderItem3.Caption = Database.getConnectionServerName();
             barHeaderItem4.Caption = GlobalConfig.VersionCheckerUrl;//DateTime.Now.ToShortDateString();
+            barStaticCashierTransNo.Caption = Database.getConnectionServerName("dbname");
 
             if (Convert.ToBoolean(Login.isCashier) == true)
             {
                 string transdate = Database.getSingleResultSet("SELECT  dbo.func_ConvertDateTimeToChar('DATE','" + DateTime.Now.ToString() + "')");
                 string getCashierTransNo = Database.getSingleQuery("SalesTransactionSummary", "BranchCode='" + Login.assignedBranch + "' AND UserID='" + barHeaderItem1.Caption + "' and TransactionDate='" + transdate.Trim() + "'", "CashierTransNo");
 
-                bool isUserExistToday = Database.checkifExist("SELECT BranchCode FROM SalesTransactionSummary WHERE BranchCode='" + Login.assignedBranch + "' and TransactionDate='" + transdate.Trim() + "' AND isOpen='1' and CashierTransNo='" + getCashierTransNo + "'"); //UserID='" + Login.isglobalUserID + "'
-                if (isUserExistToday == true)
-                {
-                    barStaticCashierTransNo.Caption = getCashierTransNo;
-                }
-                else
-                {
-                    barStaticCashierTransNo.Caption = "NON";
-                }
+                //bool isUserExistToday = Database.checkifExist("SELECT BranchCode FROM SalesTransactionSummary WHERE BranchCode='" + Login.assignedBranch + "' and TransactionDate='" + transdate.Trim() + "' AND isOpen='1' and CashierTransNo='" + getCashierTransNo + "'"); //UserID='" + Login.isglobalUserID + "'
+                //if (isUserExistToday == true)
+                //{
+                //    barStaticCashierTransNo.Caption = getCashierTransNo;
+                //}
+                //else
+                //{
+                //    barStaticCashierTransNo.Caption = "NON";
+                //}
 
             }
             else
@@ -1102,8 +1110,13 @@ namespace SalesInventorySystem
             //}
             //Accounting.AddNewTicket addnewtcet = new Accounting.AddNewTicket();
             //addnewtcet.Show();
-            AccountingDevEx.ManualTicketForm addnewtcet = new AccountingDevEx.ManualTicketForm();
-            addnewtcet.Show();
+
+            //AccountingDevEx.ManualTicketForm addnewtcet = new AccountingDevEx.ManualTicketForm();
+            //addnewtcet.Show();
+            //HOFormsDevEx.SupplierAdjustmentMemoFrm addnewtcet = new HOFormsDevEx.SupplierAdjustmentMemoFrm();
+            //addnewtcet.Show();
+            //HOFormsDevEx.ManualJournalVoucherFrm addnewtcet = new HOFormsDevEx.ManualJournalVoucherFrm();
+            //addnewtcet.Show();
         }
 
         private void barButtonItem42_ItemClick(object sender, ItemClickEventArgs e)
@@ -1132,7 +1145,7 @@ namespace SalesInventorySystem
 
         private void barButtonItem43_ItemClick(object sender, ItemClickEventArgs e)
         {
-            Accounting.GLSummary acctglsum = new Accounting.GLSummary();
+            AccountingDevEx.GLSummary acctglsum = new AccountingDevEx.GLSummary();
             acctglsum.Show();
         }
 
@@ -1238,26 +1251,26 @@ namespace SalesInventorySystem
 
         private void barButtonItem48_ItemClick(object sender, ItemClickEventArgs e)
         {
-            foreach (Form form in Application.OpenForms)
-            {
-                if (form.GetType() == typeof(Reporting.AcctTicketReports))
-                {
-                    form.Activate();
-                    return;
-                }
-            }
-            Reporting.AcctTicketReports pcusatfsmr = new Reporting.AcctTicketReports();
-            pcusatfsmr.Show();
             //foreach (Form form in Application.OpenForms)
             //{
-            //    if (form.GetType() == typeof(Reporting.ViewTicketDevExRep))
+            //    if (form.GetType() == typeof(Reporting.AcctTicketReports))
             //    {
             //        form.Activate();
             //        return;
             //    }
             //}
-            //Reporting.ViewTicketDevExRep pcusatfsmr = new Reporting.ViewTicketDevExRep();
+            //Reporting.AcctTicketReports pcusatfsmr = new Reporting.AcctTicketReports();
             //pcusatfsmr.Show();
+            foreach (Form form in Application.OpenForms)
+            {
+                if (form.GetType() == typeof(Reporting.ViewTicketDevExRep))
+                {
+                    form.Activate();
+                    return;
+                }
+            }
+            Reporting.ViewTicketDevExRep pcusatfsmr = new Reporting.ViewTicketDevExRep();
+            pcusatfsmr.Show();
         }
 
         private void barButtonItem52_ItemClick(object sender, ItemClickEventArgs e)
@@ -1613,13 +1626,13 @@ namespace SalesInventorySystem
         {
             foreach (Form form in Application.OpenForms)
             {
-                if (form.GetType() == typeof(Accounting.GLSummary))
+                if (form.GetType() == typeof(AccountingDevEx.GLSummary))
                 {
                     form.Activate();
                     return;
                 }
             }
-            Accounting.GLSummary pcusatfsmr = new Accounting.GLSummary();
+            AccountingDevEx.GLSummary pcusatfsmr = new AccountingDevEx.GLSummary();
             pcusatfsmr.Show();
         }
 
@@ -1636,8 +1649,10 @@ namespace SalesInventorySystem
             //AccountingDevEx.BalanceSheetDevEx pcusatfsmr = new AccountingDevEx.BalanceSheetDevEx();
             //pcusatfsmr.MdiParent = this;
             //pcusatfsmr.Show();
-            Reporting.AccountingReportsForm pcusatfsmr = new Reporting.AccountingReportsForm();
-            pcusatfsmr.Show();
+            //Reporting.AccountingReportsForm pcusatfsmr = new Reporting.AccountingReportsForm();
+            //pcusatfsmr.Show();
+            //HOFormsDevEx.AccountingReportsForm pcusatfsmr = new HOFormsDevEx.AccountingReportsForm();
+            //pcusatfsmr.Show();
         }
 
         private void barButtonItem51_ItemClick(object sender, ItemClickEventArgs e)
@@ -1653,15 +1668,17 @@ namespace SalesInventorySystem
             //Accounting.IncomeStatement pcusatfsmr = new Accounting.IncomeStatement();
             //pcusatfsmr.MdiParent = this;
             //pcusatfsmr.Show();
-            foreach (Form form in Application.OpenForms)
-            {
-                if (form.GetType() == typeof(PivotPractice))
-                {
-                    form.Activate();
-                    return;
-                }
-            }
-            PivotPractice pcusatfsmr = new PivotPractice();
+            //foreach (Form form in Application.OpenForms)
+            //{
+            //    if (form.GetType() == typeof(PivotPractice))
+            //    {
+            //        form.Activate();
+            //        return;
+            //    }
+            //}
+            //PivotPractice pcusatfsmr = new PivotPractice();
+            //pcusatfsmr.Show();
+            Reporting.AccountingReportsForm pcusatfsmr = new Reporting.AccountingReportsForm();
             pcusatfsmr.Show();
         }
 
@@ -1695,7 +1712,7 @@ namespace SalesInventorySystem
 
         private void barButtonItem67_ItemClick(object sender, ItemClickEventArgs e)
         {
-            OpenMdiForm<AccountingDevEx.ViewCheckVoucherDevEx>();
+            //OpenMdiForm<AccountingDevEx.ViewCheckVoucherDevEx>();
             //foreach (Form form in Application.OpenForms)
             //{
             //    if (form.GetType() == typeof(AccountingDevEx.ViewCheckVoucherDevEx))
@@ -1708,6 +1725,8 @@ namespace SalesInventorySystem
             //AccountingDevEx.ViewCheckVoucherDevEx pcusatfsmr = new AccountingDevEx.ViewCheckVoucherDevEx();
             //pcusatfsmr.MdiParent = this;
             //pcusatfsmr.Show();
+            AccountingDevEx.VoucheringManualFrm pcusatfsmr = new AccountingDevEx.VoucheringManualFrm();
+            pcusatfsmr.Show();
         }
 
         private void barButtonItem68_ItemClick(object sender, ItemClickEventArgs e)
@@ -1798,7 +1817,7 @@ namespace SalesInventorySystem
 
         private void barButtonItem75_ItemClick(object sender, ItemClickEventArgs e)
         {
-            OpenMdiForm<HOFormsDevEx.AccountMasterListDevEx>();
+            //OpenMdiForm<HOFormsDevEx.AccountMasterListDevEx>();
             //foreach (Form form in Application.OpenForms)
             //{
             //    if (form.GetType() == typeof(HOFormsDevEx.AccountMasterListDevEx))
@@ -1880,30 +1899,38 @@ namespace SalesInventorySystem
 
         private void barButtonItem79_ItemClick(object sender, ItemClickEventArgs e)
         {
-            foreach (Form form in Application.OpenForms)
-            {
-                if (form.GetType() == typeof(Accounting.DepositInTransitDevEx))
-                {
-                    form.Activate();
-                    return;
-                }
-            }
-            Accounting.DepositInTransitDevEx pcusatfsmr = new Accounting.DepositInTransitDevEx();
-            pcusatfsmr.Show();
+            HOFormsDevEx.CombinedSupplierVoucherFrm asdas = new HOFormsDevEx.CombinedSupplierVoucherFrm();
+            asdas.Show();
+            //foreach (Form form in Application.OpenForms)
+            //{
+            //    if (form.GetType() == typeof(Accounting.DepositInTransitDevEx))
+            //    {
+            //        form.Activate();
+            //        return;
+            //    }
+            //}
+            //Accounting.DepositInTransitDevEx pcusatfsmr = new Accounting.DepositInTransitDevEx();
+            //pcusatfsmr.Show();
         }
 
         private void barButtonItem80_ItemClick(object sender, ItemClickEventArgs e)
         {
-            foreach (Form form in Application.OpenForms)
-            {
-                if (form.GetType() == typeof(Accounting.AddBankTicketDevEx))
-                {
-                    form.Activate();
-                    return;
-                }
-            }
-            Accounting.AddBankTicketDevEx pcusatfsmr = new Accounting.AddBankTicketDevEx();
-            pcusatfsmr.Show();
+            //HOFormsDevEx.PostExpenseDevExFrm sdas = new HOFormsDevEx.PostExpenseDevExFrm();
+            //sdas.Show();
+
+
+            AccountingDevEx.SupplierPaymentDevEx asdasd = new AccountingDevEx.SupplierPaymentDevEx();
+            asdasd.Show();
+            //foreach (Form form in Application.OpenForms)
+            //{
+            //    if (form.GetType() == typeof(Accounting.AddBankTicketDevEx))
+            //    {
+            //        form.Activate();
+            //        return;
+            //    }
+            //}
+            //Accounting.AddBankTicketDevEx pcusatfsmr = new Accounting.AddBankTicketDevEx();
+            //pcusatfsmr.Show();
         }
 
         private void barButtonItem83_ItemClick(object sender, ItemClickEventArgs e)
@@ -2257,7 +2284,9 @@ namespace SalesInventorySystem
 
         private void barButtonItem5_ItemClick_1(object sender, ItemClickEventArgs e)
         {
-            OpenMdiForm<HOFormsDevEx.PostExpenseDevExFrm>();
+            AccountingDevEx.ExpenseManualMultiBranchFrm pcusatfsmr = new AccountingDevEx.ExpenseManualMultiBranchFrm();
+            pcusatfsmr.Show();
+            //OpenMdiForm<HOFormsDevEx.PostExpenseDevExFrm>();
             //foreach (Form form in Application.OpenForms)
             //{
             //    if (form.GetType() == typeof(HOFormsDevEx.PostExpenseDevExFrm))
@@ -2273,7 +2302,10 @@ namespace SalesInventorySystem
 
         private void barButtonItem7_ItemClick_1(object sender, ItemClickEventArgs e)
         {
-            OpenMdiForm<HOFormsDevEx.AddExpenseDevExFrm>();
+            //OpenMdiForm<AccountingDevEx.AddExpenseDevExFrm>();
+            AccountingDevEx.AddExpenseDevExFrm pcusatfsmr = new AccountingDevEx.AddExpenseDevExFrm();
+            pcusatfsmr.Show();
+            //OpenMdiForm<HOFormsDevEx.AddExpenseDevExFrm>();
             //foreach (Form form in Application.OpenForms)
             //{
             //    if (form.GetType() == typeof(HOFormsDevEx.AddExpenseDevExFrm))
@@ -2479,7 +2511,9 @@ namespace SalesInventorySystem
 
         private void barButtonItem7_ItemClick_2(object sender, ItemClickEventArgs e)
         {
-            OpenMdiForm<Forwarding.ForwardingAddPrimeOver>();
+            HOFormsDevEx.ManualJournalVoucherFrm single = new HOFormsDevEx.ManualJournalVoucherFrm();
+            single.ShowDialog(this);
+            //OpenMdiForm<Forwarding.ForwardingAddPrimeOver>();
             //foreach (Form form in Application.OpenForms)
             //{
             //    if (form.GetType() == typeof(Forwarding.ForwardingAddPrimeOver))
@@ -3533,6 +3567,34 @@ namespace SalesInventorySystem
         {
             InventoryMonthlyActivityPivot pcusatfsmr = new InventoryMonthlyActivityPivot();
             pcusatfsmr.Show(this);
+        }
+
+        private void btnSupplierDebitCreditMemo_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            HOFormsDevEx.SupplierAdjustmentMemoFrm pcusatfsmr = new HOFormsDevEx.SupplierAdjustmentMemoFrm();
+            pcusatfsmr.Show(this);
+        }
+
+        private void btnVouchering_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            var frm = new AccountingDevEx.AccountingBoard();
+            frm.Show();
+            //AccountingDevEx.SupplierPaymentDevEx pcusatfsmr = new AccountingDevEx.SupplierPaymentDevEx();
+            //pcusatfsmr.Show(this);
+            //HOFormsDevEx.CashAdvanceVoucherFrm pcusatfsmr = new HOFormsDevEx.CashAdvanceVoucherFrm();
+            //pcusatfsmr.Show(this);
+        }
+
+        private void btnSingleTicket_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            HOFormsDevEx.ManualJournalVoucherFrm pcusatfsmr = new HOFormsDevEx.ManualJournalVoucherFrm();
+            pcusatfsmr.ShowDialog(this);
+        }
+
+        private void btnBatchTicket_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            //HOFormsDevEx.ManualJournalVoucherMultiBranchFrm pcusatfsmr = new HOFormsDevEx.ManualJournalVoucherMultiBranchFrm();
+            //pcusatfsmr.ShowDialog(this);
         }
 
         private void Main_FormClosing(object sender, FormClosingEventArgs e)

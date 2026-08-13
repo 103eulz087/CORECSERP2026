@@ -68,7 +68,7 @@
             // 
             // xrheading
             // 
-            this.xrheading.Font = new System.Drawing.Font("Tahoma", 12.25F, System.Drawing.FontStyle.Bold);
+            this.xrheading.Font = new DevExpress.Drawing.DXFont("Tahoma", 12.25F, DevExpress.Drawing.DXFontStyle.Bold);
             this.xrheading.LocationFloat = new DevExpress.Utils.PointFloat(198.125F, 68.83334F);
             this.xrheading.Name = "xrheading";
             this.xrheading.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);

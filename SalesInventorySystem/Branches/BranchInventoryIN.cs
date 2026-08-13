@@ -32,10 +32,7 @@ namespace SalesInventorySystem.Branches
             display();
             ConfigureNewQtyEditor();
         }
-
-
-
-    // Call this from your form load after grid is created/bound
+        
         private void ConfigureNewQtyEditor()
         {
             var qtyEdit = new RepositoryItemTextEdit();
@@ -137,13 +134,13 @@ namespace SalesInventorySystem.Branches
 
 
             // Loop through data rows (ignore group rows, filter rows, etc.)
-            for (int i = 0; i < gridViewRcvd.DataRowCount; i++)
+            for (int i = 0; i < gridViewRcvd.RowCount; i++)
             {
-                int rowHandle = gridViewRcvd.GetVisibleRowHandle(i);
-                if (!gridViewRcvd.IsDataRow(rowHandle))
+                if (!gridViewRcvd.IsDataRow(i))
                     continue;
 
-                // --- Read NewQty safely ---
+                int rowHandle = i;
+
                 object newQtyObj = gridViewRcvd.GetRowCellValue(rowHandle, "NewQty");
                 if (newQtyObj == null || newQtyObj == DBNull.Value)
                     continue;
@@ -151,17 +148,14 @@ namespace SalesInventorySystem.Branches
                 if (!decimal.TryParse(newQtyObj.ToString(), out decimal newQty))
                     continue;
 
-                // ✅ MAIN BUSINESS RULE
-                if (newQty <= 0m)
-                    continue;
+                //if (newQty <= 0m)
+                //    continue;
 
-                // --- Read Ending safely ---
                 decimal endingQty = 0m;
                 object endingObj = gridViewRcvd.GetRowCellValue(rowHandle, "Ending");
                 if (endingObj != null && endingObj != DBNull.Value)
                     decimal.TryParse(endingObj.ToString(), out endingQty);
 
-                // ✅ Calculate variance (do NOT trust grid)
                 decimal variance = newQty - endingQty;
 
                 string productCode = Convert.ToString(
@@ -182,70 +176,14 @@ namespace SalesInventorySystem.Branches
 
                 dt.Rows.Add(dr);
             }
-
             return dt;
         }
-        //private void insert()
-        //{
-        //    try
-        //    {
-        //        DataTable dtDetails = BuildPODetailsTable_ByQty();
-
-        //        if (dtDetails.Rows.Count == 0)
-        //        {
-        //            XtraMessageBox.Show("No items to insert. Please enter Quantity > 0.");
-        //            return;
-        //        }
-
-        //        using (SqlConnection conn = Database.getConnection())
-        //        using (SqlCommand cmd = new SqlCommand("sp_BulkInsertInventoryIN", conn))
-        //        {
-        //            cmd.CommandType = CommandType.StoredProcedure;
-
-        //            SqlParameter tvpParam = cmd.Parameters.AddWithValue("@Items", dtDetails);
-        //            tvpParam.SqlDbType = SqlDbType.Structured;
-        //            tvpParam.TypeName = "dbo.InventoryINType";
-
-        //            conn.Open();
-        //            cmd.ExecuteNonQuery();
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        XtraMessageBox.Show(ex.Message);
-        //        throw; // VERY IMPORTANT
-        //    }
-        //}
-        //void ExecuteSP()
-        //{
-        //    SqlConnection con = Database.getConnection();
-        //    con.Open();
-        //    try
-        //    {
-        //        string query = "sp_UploadBranchInventoryIN";
-        //        SqlCommand com = new SqlCommand(query, con);
-        //        com.Parameters.AddWithValue("@parmbatchid", txtid.Text);
-        //        com.CommandType = CommandType.StoredProcedure;
-        //        com.CommandText = query;
-        //        com.ExecuteNonQuery();
-        //    }
-        //    catch (SqlException ex)
-        //    {
-        //        XtraMessageBox.Show(ex.Message.ToString());
-        //        throw; // VERY IMPORTANT
-        //    }
-        //    finally
-        //    {
-        //        con.Close();
-        //    }
-
-        //}
-
         private void simpleButton2_Click(object sender, EventArgs e)
         {
 
             try
             {
+                gridViewRcvd.ActiveFilter.Clear();
                 DataTable dtDetails = BuildPODetailsTable_ByQty();
 
                 if (dtDetails.Rows.Count == 0)
@@ -298,30 +236,6 @@ namespace SalesInventorySystem.Branches
                
                 // ✅ no success message, no dispose
             }
-
-            //try
-            //{
-            //    insert();       // must THROW on error
-            //    ExecuteSP();    // must THROW on error
-
-            //    BigAlert.Show(
-            //        "Success",
-            //        "Successfully Uploaded. Please check your Inventory.",
-            //        MessageBoxIcon.Information
-            //    );
-
-            //    this.Dispose();
-            //}
-            //catch (Exception ex)
-            //{
-            //    XtraMessageBox.Show(
-            //        $"Operation failed.\n\n{ex.Message}",
-            //        "Error",
-            //        MessageBoxButtons.OK,
-            //        MessageBoxIcon.Error
-            //    );
-            //}
-
         }
 
         private void gridViewRcvd_CellValueChanged(object sender, DevExpress.XtraGrid.Views.Base.CellValueChangedEventArgs e)
@@ -336,6 +250,7 @@ namespace SalesInventorySystem.Branches
 
         private void btnforapprovalstsexcel_Click(object sender, EventArgs e)
         {
+            gridViewRcvd.ActiveFilter.Clear();
             string filename = "BranchInventoryIN_" + DateTime.Now.ToString("yyyyMMdd_HHmmss");
             HelperFunction.exporttoexcel(gridViewRcvd, filename);
         }

@@ -7,7 +7,7 @@ using System.Text;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Microsoft.Web.WebView2.Core;
+//using Microsoft.Web.WebView2.Core;
 using DevExpress.XtraEditors;
 using Newtonsoft.Json;
 using System.Net.Http;
@@ -32,9 +32,9 @@ namespace SalesInventorySystem.V5
         }
         async public Task InitializeWebView()
         {
-            await webView21.EnsureCoreWebView2Async(null);
-            webView21.WebMessageReceived += WebView_WebMessageReceived;
-            webView21.NavigationCompleted += WebView_NavigationCompleted;
+            //await webView21.EnsureCoreWebView2Async(null);
+            //webView21.WebMessageReceived += WebView_WebMessageReceived;
+            //webView21.NavigationCompleted += WebView_NavigationCompleted;
             //
             /*
                 var referenceId = "TndPY2NoMndtd1c2WWZPU2";
@@ -56,8 +56,8 @@ namespace SalesInventorySystem.V5
                 {
                     if (responseData.Status == "ok")
                     {
-                        await webView21.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(responseData.Script);
-                        webView21.CoreWebView2.Navigate(responseData.RedirectUrl);
+                        //await webView21.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(responseData.Script);
+                        //webView21.CoreWebView2.Navigate(responseData.RedirectUrl);
                         return;
                     }
                     //responseData.Status = "error";
@@ -66,9 +66,9 @@ namespace SalesInventorySystem.V5
             this.FailPayment("failed api response");
             //failed/error process for api not response either no internet-connection or api-no-response
         }
-        private void WebView_WebMessageReceived(object sender, CoreWebView2WebMessageReceivedEventArgs e)
+        private void WebView_WebMessageReceived(object sender)//), CoreWebView2WebMessageReceivedEventArgs e)
         {
-            string data = e.TryGetWebMessageAsString();
+            string data = "";//e.TryGetWebMessageAsString();
             var responseData = JsonConvert.DeserializeObject<V5ResponseData>(data);
             if (responseData != null)
             {
@@ -93,22 +93,22 @@ namespace SalesInventorySystem.V5
             //failed message
             //#MessageBox.Show($"Data from Web: {data}");
         }
-        private void WebView_NavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e)
-        {
-            if (e.IsSuccess)
-            {
-                // The page loaded successfully!
-            }
-            else
-            {
-                var errorStatus = e.WebErrorStatus;
-                if (e.WebErrorStatus == CoreWebView2WebErrorStatus.HostNameNotResolved | e.WebErrorStatus == CoreWebView2WebErrorStatus.Disconnected)
-                {
-                    //failed message
-                    this.FailPayment("failed internet connection");
-                }
-            }
-        }
+        //private void WebView_NavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e)
+        //{
+        //    if (e.IsSuccess)
+        //    {
+        //        // The page loaded successfully!
+        //    }
+        //    else
+        //    {
+        //        var errorStatus = e.WebErrorStatus;
+        //        if (e.WebErrorStatus == CoreWebView2WebErrorStatus.HostNameNotResolved | e.WebErrorStatus == CoreWebView2WebErrorStatus.Disconnected)
+        //        {
+        //            //failed message
+        //            this.FailPayment("failed internet connection");
+        //        }
+        //    }
+        //}
         private void FailPayment(string message)
         {
             this.Hide();

@@ -1,4 +1,4 @@
-﻿using AForge.Video.DirectShow;
+﻿//using AForge.Video.DirectShow;
 using DevExpress.Data;
 using DevExpress.XtraEditors;
 using DevExpress.XtraGrid;
@@ -958,17 +958,17 @@ namespace SalesInventorySystem
         }
 
 
-        public static String getDevices()
-        {
-            FilterInfoCollection videoDevices = new FilterInfoCollection(FilterCategory.VideoInputDevice);
-            string val = "";
-            foreach (FilterInfo device in videoDevices)
-            {
-                val = device.Name;
-            }
-            VideoCaptureDevice videoSource = new VideoCaptureDevice();
-            return val;
-        }
+        //public static String getDevices()
+        //{
+        //    FilterInfoCollection videoDevices = new FilterInfoCollection(FilterCategory.VideoInputDevice);
+        //    string val = "";
+        //    foreach (FilterInfo device in videoDevices)
+        //    {
+        //        val = device.Name;
+        //    }
+        //    VideoCaptureDevice videoSource = new VideoCaptureDevice();
+        //    return val;
+        //}
 
         public static void embedToJournal(string filepath,string filepathJournal,string cashiertranscode)
         {
@@ -1138,6 +1138,123 @@ namespace SalesInventorySystem
             var DaysInMonth = DateTime.DaysInMonth(now2.Year, now2.Month);
             var lastDay = new DateTime(now2.Year, now2.Month, DaysInMonth);
             dateto = lastDay.ToShortDateString();
+        }
+
+
+        public static void SetQuarterDateRange(
+                    DevExpress.XtraEditors.DateEdit dtFrom,
+                    DevExpress.XtraEditors.DateEdit dtTo)
+        {
+            DateTime today = DateTime.Today;
+
+            int quarter = ((today.Month - 1) / 3) + 1;
+
+            DateTime fromDate;
+            DateTime toDate;
+
+            switch (quarter)
+            {
+                case 1:
+                    fromDate = new DateTime(today.Year, 2, 1);
+                    toDate = new DateTime(today.Year, 5, 31);
+                    break;
+
+                case 2:
+                    fromDate = new DateTime(today.Year, 5, 1);
+                    toDate = new DateTime(today.Year, 8, 31);
+                    break;
+
+                case 3:
+                    fromDate = new DateTime(today.Year, 8, 1);
+                    toDate = new DateTime(today.Year, 11, 30);
+                    break;
+
+                default:
+                    fromDate = new DateTime(today.Year, 11, 1);
+                    toDate = new DateTime(today.Year + 1, 2,
+                                 DateTime.DaysInMonth(today.Year + 1, 2));
+                    break;
+            }
+
+            dtFrom.DateTime = fromDate;
+            dtTo.DateTime = toDate;
+        }
+
+        public static void SetQuarterDateRange(
+                            DateTimePicker dtFrom,
+                            DateTimePicker dtTo)
+        {
+            DateTime today = DateTime.Today;
+
+            int quarter = ((today.Month - 1) / 3) + 1;
+
+            DateTime fromDate;
+            DateTime toDate;
+
+            switch (quarter)
+            {
+                case 1: // Jan-Mar
+                    fromDate = new DateTime(today.Year, 2, 1);
+                    toDate = new DateTime(today.Year, 5, 31);
+                    break;
+
+                case 2: // Apr-Jun
+                    fromDate = new DateTime(today.Year, 5, 1);
+                    toDate = new DateTime(today.Year, 8, 31);
+                    break;
+
+                case 3: // Jul-Sep
+                    fromDate = new DateTime(today.Year, 8, 1);
+                    toDate = new DateTime(today.Year, 11, 30);
+                    break;
+
+                default: // Oct-Dec
+                    fromDate = new DateTime(today.Year, 11, 1);
+                    toDate = new DateTime(today.Year + 1, 2,
+                                 DateTime.DaysInMonth(today.Year + 1, 2));
+                    break;
+            }
+
+            dtFrom.Value = fromDate;
+            dtTo.Value = toDate;
+        }
+
+        public static void SetDefaultDateRange(
+    DevExpress.XtraEditors.DateEdit dtFrom,
+    DevExpress.XtraEditors.DateEdit dtTo)
+        {
+            DateTime today = DateTime.Today;
+
+            dtFrom.DateTime = today.AddMonths(-1);
+            dtTo.DateTime = today.AddMonths(1);
+        }
+        public static void SetDefaultDateRange(
+    DateTimePicker dtFrom,
+    DateTimePicker dtTo)
+        {
+            DateTime today = DateTime.Today;
+
+            dtFrom.Value = today.AddMonths(-1);
+            dtTo.Value = today.AddMonths(1);
+        }
+
+        public static void SetDefaultDateRange(
+   DevExpress.XtraEditors.DateEdit dtFrom,
+   DevExpress.XtraEditors.DateEdit dtTo,int FromDays,int ToDays)
+        {
+            DateTime today = DateTime.Today;
+
+            dtFrom.DateTime = today.AddDays(-FromDays);
+            dtTo.DateTime = today.AddDays(ToDays);
+        }
+        public static void SetDefaultDateRange(
+   DateTimePicker dtFrom,
+   DateTimePicker dtTo, int FromDays, int ToDays) 
+        {
+            DateTime today = DateTime.Today;
+
+            dtFrom.Value = today.AddDays(-FromDays);
+            dtTo.Value = today.AddDays(ToDays);
         }
         //Decimal qty = Decimal.Parse(txtqty.Text);
         //string strquantity = String.Format("{0:00.000}", qty);

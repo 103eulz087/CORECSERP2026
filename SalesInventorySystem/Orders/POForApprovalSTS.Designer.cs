@@ -34,7 +34,6 @@
             this.tabForApproval = new DevExpress.XtraTab.XtraTabPage();
             this.tabForApprovalSub = new DevExpress.XtraTab.XtraTabControl();
             this.forApprovalSTS = new DevExpress.XtraTab.XtraTabPage();
-            this.groupBox10 = new System.Windows.Forms.GroupBox();
             this.gridControlSTS = new DevExpress.XtraGrid.GridControl();
             this.gridViewSTS = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.panelControl2 = new DevExpress.XtraEditors.PanelControl();
@@ -47,7 +46,6 @@
             this.tabApproved = new DevExpress.XtraTab.XtraTabPage();
             this.tabApprovedSub = new DevExpress.XtraTab.XtraTabControl();
             this.approvedSTS = new DevExpress.XtraTab.XtraTabPage();
-            this.groupBox26 = new System.Windows.Forms.GroupBox();
             this.gridControlapprvdsts = new DevExpress.XtraGrid.GridControl();
             this.gridViewapprvdsts = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.panelControl4 = new DevExpress.XtraEditors.PanelControl();
@@ -60,7 +58,6 @@
             this.tabRejected = new DevExpress.XtraTab.XtraTabPage();
             this.tabRejectedSub = new DevExpress.XtraTab.XtraTabControl();
             this.rejectedSTS = new DevExpress.XtraTab.XtraTabPage();
-            this.groupBox28 = new System.Windows.Forms.GroupBox();
             this.gridControlrjctdsts = new DevExpress.XtraGrid.GridControl();
             this.gridViewrjctdsts = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.panelControl6 = new DevExpress.XtraEditors.PanelControl();
@@ -73,7 +70,6 @@
             this.tabForDelivery = new DevExpress.XtraTab.XtraTabPage();
             this.tabForDelivSub = new DevExpress.XtraTab.XtraTabControl();
             this.forDelivSTS = new DevExpress.XtraTab.XtraTabPage();
-            this.groupBox20 = new System.Windows.Forms.GroupBox();
             this.gridControlForDelivSts = new DevExpress.XtraGrid.GridControl();
             this.gridViewForDelivSts = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.panelControl8 = new DevExpress.XtraEditors.PanelControl();
@@ -86,7 +82,6 @@
             this.tabDelivered = new DevExpress.XtraTab.XtraTabPage();
             this.tabDelivSub = new DevExpress.XtraTab.XtraTabControl();
             this.delivSTS = new DevExpress.XtraTab.XtraTabPage();
-            this.groupBox30 = new System.Windows.Forms.GroupBox();
             this.gridControlDelivSts = new DevExpress.XtraGrid.GridControl();
             this.gridViewDelivSts = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.panelControl10 = new DevExpress.XtraEditors.PanelControl();
@@ -100,13 +95,14 @@
             this.printDeliveryReceiptToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStripForApproval = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.contextMenuStripApproved = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.toolStripMenuItemCancelSTSRequest = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.tabMain)).BeginInit();
             this.tabMain.SuspendLayout();
             this.tabForApproval.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tabForApprovalSub)).BeginInit();
             this.tabForApprovalSub.SuspendLayout();
             this.forApprovalSTS.SuspendLayout();
-            this.groupBox10.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridControlSTS)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridViewSTS)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl2)).BeginInit();
@@ -115,7 +111,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.tabApprovedSub)).BeginInit();
             this.tabApprovedSub.SuspendLayout();
             this.approvedSTS.SuspendLayout();
-            this.groupBox26.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridControlapprvdsts)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridViewapprvdsts)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl4)).BeginInit();
@@ -124,7 +119,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.tabRejectedSub)).BeginInit();
             this.tabRejectedSub.SuspendLayout();
             this.rejectedSTS.SuspendLayout();
-            this.groupBox28.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridControlrjctdsts)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridViewrjctdsts)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl6)).BeginInit();
@@ -133,7 +127,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.tabForDelivSub)).BeginInit();
             this.tabForDelivSub.SuspendLayout();
             this.forDelivSTS.SuspendLayout();
-            this.groupBox20.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridControlForDelivSts)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridViewForDelivSts)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl8)).BeginInit();
@@ -142,13 +135,13 @@
             ((System.ComponentModel.ISupportInitialize)(this.tabDelivSub)).BeginInit();
             this.tabDelivSub.SuspendLayout();
             this.delivSTS.SuspendLayout();
-            this.groupBox30.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridControlDelivSts)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridViewDelivSts)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl10)).BeginInit();
             this.panelControl10.SuspendLayout();
             this.contextMenuStripForDelivery.SuspendLayout();
             this.contextMenuStripForApproval.SuspendLayout();
+            this.contextMenuStripApproved.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabMain
@@ -199,7 +192,7 @@
             // 
             // forApprovalSTS
             // 
-            this.forApprovalSTS.Controls.Add(this.groupBox10);
+            this.forApprovalSTS.Controls.Add(this.gridControlSTS);
             this.forApprovalSTS.Controls.Add(this.panelControl2);
             this.forApprovalSTS.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.Transit_16x16;
             this.forApprovalSTS.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
@@ -207,27 +200,15 @@
             this.forApprovalSTS.Size = new System.Drawing.Size(1128, 616);
             this.forApprovalSTS.Text = "STS";
             // 
-            // groupBox10
-            // 
-            this.groupBox10.Controls.Add(this.gridControlSTS);
-            this.groupBox10.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox10.Location = new System.Drawing.Point(0, 43);
-            this.groupBox10.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
-            this.groupBox10.Name = "groupBox10";
-            this.groupBox10.Padding = new System.Windows.Forms.Padding(3, 5, 3, 5);
-            this.groupBox10.Size = new System.Drawing.Size(1128, 573);
-            this.groupBox10.TabIndex = 5;
-            this.groupBox10.TabStop = false;
-            // 
             // gridControlSTS
             // 
             this.gridControlSTS.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gridControlSTS.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
-            this.gridControlSTS.Location = new System.Drawing.Point(3, 21);
+            this.gridControlSTS.Location = new System.Drawing.Point(0, 43);
             this.gridControlSTS.MainView = this.gridViewSTS;
             this.gridControlSTS.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.gridControlSTS.Name = "gridControlSTS";
-            this.gridControlSTS.Size = new System.Drawing.Size(1122, 547);
+            this.gridControlSTS.Size = new System.Drawing.Size(1128, 573);
             this.gridControlSTS.TabIndex = 0;
             this.gridControlSTS.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewSTS});
@@ -362,7 +343,7 @@
             // 
             // approvedSTS
             // 
-            this.approvedSTS.Controls.Add(this.groupBox26);
+            this.approvedSTS.Controls.Add(this.gridControlapprvdsts);
             this.approvedSTS.Controls.Add(this.panelControl4);
             this.approvedSTS.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.Transit_16x16;
             this.approvedSTS.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
@@ -370,30 +351,19 @@
             this.approvedSTS.Size = new System.Drawing.Size(1128, 617);
             this.approvedSTS.Text = "STS";
             // 
-            // groupBox26
-            // 
-            this.groupBox26.Controls.Add(this.gridControlapprvdsts);
-            this.groupBox26.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox26.Location = new System.Drawing.Point(0, 43);
-            this.groupBox26.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
-            this.groupBox26.Name = "groupBox26";
-            this.groupBox26.Padding = new System.Windows.Forms.Padding(3, 5, 3, 5);
-            this.groupBox26.Size = new System.Drawing.Size(1128, 574);
-            this.groupBox26.TabIndex = 2;
-            this.groupBox26.TabStop = false;
-            // 
             // gridControlapprvdsts
             // 
             this.gridControlapprvdsts.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gridControlapprvdsts.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
-            this.gridControlapprvdsts.Location = new System.Drawing.Point(3, 21);
+            this.gridControlapprvdsts.Location = new System.Drawing.Point(0, 52);
             this.gridControlapprvdsts.MainView = this.gridViewapprvdsts;
             this.gridControlapprvdsts.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.gridControlapprvdsts.Name = "gridControlapprvdsts";
-            this.gridControlapprvdsts.Size = new System.Drawing.Size(1122, 548);
+            this.gridControlapprvdsts.Size = new System.Drawing.Size(1128, 565);
             this.gridControlapprvdsts.TabIndex = 2;
             this.gridControlapprvdsts.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewapprvdsts});
+            this.gridControlapprvdsts.MouseUp += new System.Windows.Forms.MouseEventHandler(this.gridControlapprvdsts_MouseUp);
             // 
             // gridViewapprvdsts
             // 
@@ -426,14 +396,14 @@
             this.panelControl4.Location = new System.Drawing.Point(0, 0);
             this.panelControl4.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.panelControl4.Name = "panelControl4";
-            this.panelControl4.Size = new System.Drawing.Size(1128, 43);
+            this.panelControl4.Size = new System.Drawing.Size(1128, 52);
             this.panelControl4.TabIndex = 1;
             // 
             // btnapprovedreqstsexcel
             // 
             this.btnapprovedreqstsexcel.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.ExportToExcel_16x16;
             this.btnapprovedreqstsexcel.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btnapprovedreqstsexcel.Location = new System.Drawing.Point(506, 10);
+            this.btnapprovedreqstsexcel.Location = new System.Drawing.Point(514, 10);
             this.btnapprovedreqstsexcel.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.btnapprovedreqstsexcel.Name = "btnapprovedreqstsexcel";
             this.btnapprovedreqstsexcel.Size = new System.Drawing.Size(138, 27);
@@ -445,7 +415,7 @@
             // 
             this.btnApprovedSTS.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnApprovedSTS.ImageOptions.Image")));
             this.btnApprovedSTS.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btnApprovedSTS.Location = new System.Drawing.Point(399, 10);
+            this.btnApprovedSTS.Location = new System.Drawing.Point(407, 10);
             this.btnApprovedSTS.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.btnApprovedSTS.Name = "btnApprovedSTS";
             this.btnApprovedSTS.Size = new System.Drawing.Size(100, 27);
@@ -467,7 +437,7 @@
             // 
             this.datetoapprvdsts.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
             this.datetoapprvdsts.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.datetoapprvdsts.Location = new System.Drawing.Point(254, 10);
+            this.datetoapprvdsts.Location = new System.Drawing.Point(262, 10);
             this.datetoapprvdsts.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.datetoapprvdsts.Name = "datetoapprvdsts";
             this.datetoapprvdsts.Size = new System.Drawing.Size(137, 27);
@@ -477,7 +447,7 @@
             // 
             this.label15.AutoSize = true;
             this.label15.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
-            this.label15.Location = new System.Drawing.Point(215, 16);
+            this.label15.Location = new System.Drawing.Point(221, 14);
             this.label15.Name = "label15";
             this.label15.Size = new System.Drawing.Size(37, 21);
             this.label15.TabIndex = 1;
@@ -487,7 +457,7 @@
             // 
             this.datefromapprvdsts.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
             this.datefromapprvdsts.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.datefromapprvdsts.Location = new System.Drawing.Point(70, 10);
+            this.datefromapprvdsts.Location = new System.Drawing.Point(78, 10);
             this.datefromapprvdsts.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.datefromapprvdsts.Name = "datefromapprvdsts";
             this.datefromapprvdsts.Size = new System.Drawing.Size(137, 27);
@@ -518,7 +488,7 @@
             // 
             // rejectedSTS
             // 
-            this.rejectedSTS.Controls.Add(this.groupBox28);
+            this.rejectedSTS.Controls.Add(this.gridControlrjctdsts);
             this.rejectedSTS.Controls.Add(this.panelControl6);
             this.rejectedSTS.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.Transit_16x16;
             this.rejectedSTS.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
@@ -526,27 +496,15 @@
             this.rejectedSTS.Size = new System.Drawing.Size(1128, 617);
             this.rejectedSTS.Text = "STS";
             // 
-            // groupBox28
-            // 
-            this.groupBox28.Controls.Add(this.gridControlrjctdsts);
-            this.groupBox28.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox28.Location = new System.Drawing.Point(0, 43);
-            this.groupBox28.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
-            this.groupBox28.Name = "groupBox28";
-            this.groupBox28.Padding = new System.Windows.Forms.Padding(3, 5, 3, 5);
-            this.groupBox28.Size = new System.Drawing.Size(1128, 574);
-            this.groupBox28.TabIndex = 2;
-            this.groupBox28.TabStop = false;
-            // 
             // gridControlrjctdsts
             // 
             this.gridControlrjctdsts.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gridControlrjctdsts.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
-            this.gridControlrjctdsts.Location = new System.Drawing.Point(3, 21);
+            this.gridControlrjctdsts.Location = new System.Drawing.Point(0, 47);
             this.gridControlrjctdsts.MainView = this.gridViewrjctdsts;
             this.gridControlrjctdsts.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.gridControlrjctdsts.Name = "gridControlrjctdsts";
-            this.gridControlrjctdsts.Size = new System.Drawing.Size(1122, 548);
+            this.gridControlrjctdsts.Size = new System.Drawing.Size(1128, 570);
             this.gridControlrjctdsts.TabIndex = 3;
             this.gridControlrjctdsts.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewrjctdsts});
@@ -581,14 +539,14 @@
             this.panelControl6.Location = new System.Drawing.Point(0, 0);
             this.panelControl6.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.panelControl6.Name = "panelControl6";
-            this.panelControl6.Size = new System.Drawing.Size(1128, 43);
+            this.panelControl6.Size = new System.Drawing.Size(1128, 47);
             this.panelControl6.TabIndex = 1;
             // 
             // btnrejectedstsexcel
             // 
             this.btnrejectedstsexcel.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.ExportToExcel_16x16;
             this.btnrejectedstsexcel.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btnrejectedstsexcel.Location = new System.Drawing.Point(506, 10);
+            this.btnrejectedstsexcel.Location = new System.Drawing.Point(514, 10);
             this.btnrejectedstsexcel.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.btnrejectedstsexcel.Name = "btnrejectedstsexcel";
             this.btnrejectedstsexcel.Size = new System.Drawing.Size(138, 27);
@@ -600,7 +558,7 @@
             // 
             this.btnRejectedSTS.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnRejectedSTS.ImageOptions.Image")));
             this.btnRejectedSTS.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btnRejectedSTS.Location = new System.Drawing.Point(399, 10);
+            this.btnRejectedSTS.Location = new System.Drawing.Point(407, 10);
             this.btnRejectedSTS.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.btnRejectedSTS.Name = "btnRejectedSTS";
             this.btnRejectedSTS.Size = new System.Drawing.Size(100, 27);
@@ -622,7 +580,7 @@
             // 
             this.datetorjctdsts.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
             this.datetorjctdsts.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.datetorjctdsts.Location = new System.Drawing.Point(254, 10);
+            this.datetorjctdsts.Location = new System.Drawing.Point(262, 10);
             this.datetorjctdsts.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.datetorjctdsts.Name = "datetorjctdsts";
             this.datetorjctdsts.Size = new System.Drawing.Size(137, 27);
@@ -632,7 +590,7 @@
             // 
             this.label17.AutoSize = true;
             this.label17.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
-            this.label17.Location = new System.Drawing.Point(215, 16);
+            this.label17.Location = new System.Drawing.Point(221, 14);
             this.label17.Name = "label17";
             this.label17.Size = new System.Drawing.Size(37, 21);
             this.label17.TabIndex = 1;
@@ -642,7 +600,7 @@
             // 
             this.datefrmrjctdsts.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
             this.datefrmrjctdsts.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.datefrmrjctdsts.Location = new System.Drawing.Point(70, 10);
+            this.datefrmrjctdsts.Location = new System.Drawing.Point(78, 10);
             this.datefrmrjctdsts.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.datefrmrjctdsts.Name = "datefrmrjctdsts";
             this.datefrmrjctdsts.Size = new System.Drawing.Size(137, 27);
@@ -673,7 +631,7 @@
             // 
             // forDelivSTS
             // 
-            this.forDelivSTS.Controls.Add(this.groupBox20);
+            this.forDelivSTS.Controls.Add(this.gridControlForDelivSts);
             this.forDelivSTS.Controls.Add(this.panelControl8);
             this.forDelivSTS.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.Transit_16x16;
             this.forDelivSTS.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
@@ -681,27 +639,15 @@
             this.forDelivSTS.Size = new System.Drawing.Size(1128, 617);
             this.forDelivSTS.Text = "STS";
             // 
-            // groupBox20
-            // 
-            this.groupBox20.Controls.Add(this.gridControlForDelivSts);
-            this.groupBox20.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox20.Location = new System.Drawing.Point(0, 43);
-            this.groupBox20.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
-            this.groupBox20.Name = "groupBox20";
-            this.groupBox20.Padding = new System.Windows.Forms.Padding(3, 5, 3, 5);
-            this.groupBox20.Size = new System.Drawing.Size(1128, 574);
-            this.groupBox20.TabIndex = 6;
-            this.groupBox20.TabStop = false;
-            // 
             // gridControlForDelivSts
             // 
             this.gridControlForDelivSts.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gridControlForDelivSts.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
-            this.gridControlForDelivSts.Location = new System.Drawing.Point(3, 21);
+            this.gridControlForDelivSts.Location = new System.Drawing.Point(0, 54);
             this.gridControlForDelivSts.MainView = this.gridViewForDelivSts;
             this.gridControlForDelivSts.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.gridControlForDelivSts.Name = "gridControlForDelivSts";
-            this.gridControlForDelivSts.Size = new System.Drawing.Size(1122, 548);
+            this.gridControlForDelivSts.Size = new System.Drawing.Size(1128, 563);
             this.gridControlForDelivSts.TabIndex = 3;
             this.gridControlForDelivSts.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewForDelivSts});
@@ -737,14 +683,14 @@
             this.panelControl8.Location = new System.Drawing.Point(0, 0);
             this.panelControl8.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.panelControl8.Name = "panelControl8";
-            this.panelControl8.Size = new System.Drawing.Size(1128, 43);
+            this.panelControl8.Size = new System.Drawing.Size(1128, 54);
             this.panelControl8.TabIndex = 1;
             // 
             // btnfordelivstsexcel
             // 
             this.btnfordelivstsexcel.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.ExportToExcel_16x16;
             this.btnfordelivstsexcel.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btnfordelivstsexcel.Location = new System.Drawing.Point(506, 10);
+            this.btnfordelivstsexcel.Location = new System.Drawing.Point(506, 14);
             this.btnfordelivstsexcel.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.btnfordelivstsexcel.Name = "btnfordelivstsexcel";
             this.btnfordelivstsexcel.Size = new System.Drawing.Size(138, 27);
@@ -756,7 +702,7 @@
             // 
             this.btnForDeliverySTS.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnForDeliverySTS.ImageOptions.Image")));
             this.btnForDeliverySTS.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btnForDeliverySTS.Location = new System.Drawing.Point(399, 10);
+            this.btnForDeliverySTS.Location = new System.Drawing.Point(399, 14);
             this.btnForDeliverySTS.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.btnForDeliverySTS.Name = "btnForDeliverySTS";
             this.btnForDeliverySTS.Size = new System.Drawing.Size(100, 27);
@@ -768,7 +714,7 @@
             // 
             this.label20.AutoSize = true;
             this.label20.Font = new System.Drawing.Font("Tahoma", 9.25F);
-            this.label20.Location = new System.Drawing.Point(12, 16);
+            this.label20.Location = new System.Drawing.Point(12, 20);
             this.label20.Name = "label20";
             this.label20.Size = new System.Drawing.Size(52, 19);
             this.label20.TabIndex = 4;
@@ -778,7 +724,7 @@
             // 
             this.datetofordelivsts.Font = new System.Drawing.Font("Tahoma", 9.25F);
             this.datetofordelivsts.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.datetofordelivsts.Location = new System.Drawing.Point(254, 10);
+            this.datetofordelivsts.Location = new System.Drawing.Point(254, 14);
             this.datetofordelivsts.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.datetofordelivsts.Name = "datetofordelivsts";
             this.datetofordelivsts.Size = new System.Drawing.Size(137, 26);
@@ -788,7 +734,7 @@
             // 
             this.label19.AutoSize = true;
             this.label19.Font = new System.Drawing.Font("Tahoma", 9.25F);
-            this.label19.Location = new System.Drawing.Point(213, 16);
+            this.label19.Location = new System.Drawing.Point(213, 20);
             this.label19.Name = "label19";
             this.label19.Size = new System.Drawing.Size(34, 19);
             this.label19.TabIndex = 5;
@@ -798,7 +744,7 @@
             // 
             this.datefromfordelivsts.Font = new System.Drawing.Font("Tahoma", 9.25F);
             this.datefromfordelivsts.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.datefromfordelivsts.Location = new System.Drawing.Point(70, 10);
+            this.datefromfordelivsts.Location = new System.Drawing.Point(70, 14);
             this.datefromfordelivsts.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.datefromfordelivsts.Name = "datefromfordelivsts";
             this.datefromfordelivsts.Size = new System.Drawing.Size(137, 26);
@@ -831,7 +777,7 @@
             // 
             // delivSTS
             // 
-            this.delivSTS.Controls.Add(this.groupBox30);
+            this.delivSTS.Controls.Add(this.gridControlDelivSts);
             this.delivSTS.Controls.Add(this.panelControl10);
             this.delivSTS.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.Transit_16x16;
             this.delivSTS.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
@@ -839,27 +785,15 @@
             this.delivSTS.Size = new System.Drawing.Size(1128, 616);
             this.delivSTS.Text = "STS";
             // 
-            // groupBox30
-            // 
-            this.groupBox30.Controls.Add(this.gridControlDelivSts);
-            this.groupBox30.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox30.Location = new System.Drawing.Point(0, 43);
-            this.groupBox30.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
-            this.groupBox30.Name = "groupBox30";
-            this.groupBox30.Padding = new System.Windows.Forms.Padding(3, 5, 3, 5);
-            this.groupBox30.Size = new System.Drawing.Size(1128, 573);
-            this.groupBox30.TabIndex = 2;
-            this.groupBox30.TabStop = false;
-            // 
             // gridControlDelivSts
             // 
             this.gridControlDelivSts.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gridControlDelivSts.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
-            this.gridControlDelivSts.Location = new System.Drawing.Point(3, 21);
+            this.gridControlDelivSts.Location = new System.Drawing.Point(0, 56);
             this.gridControlDelivSts.MainView = this.gridViewDelivSts;
             this.gridControlDelivSts.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.gridControlDelivSts.Name = "gridControlDelivSts";
-            this.gridControlDelivSts.Size = new System.Drawing.Size(1122, 547);
+            this.gridControlDelivSts.Size = new System.Drawing.Size(1128, 560);
             this.gridControlDelivSts.TabIndex = 4;
             this.gridControlDelivSts.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewDelivSts});
@@ -894,14 +828,14 @@
             this.panelControl10.Location = new System.Drawing.Point(0, 0);
             this.panelControl10.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.panelControl10.Name = "panelControl10";
-            this.panelControl10.Size = new System.Drawing.Size(1128, 43);
+            this.panelControl10.Size = new System.Drawing.Size(1128, 56);
             this.panelControl10.TabIndex = 1;
             // 
             // btndeliveredstsexcel
             // 
             this.btndeliveredstsexcel.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.ExportToExcel_16x16;
             this.btndeliveredstsexcel.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btndeliveredstsexcel.Location = new System.Drawing.Point(506, 10);
+            this.btndeliveredstsexcel.Location = new System.Drawing.Point(514, 10);
             this.btndeliveredstsexcel.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.btndeliveredstsexcel.Name = "btndeliveredstsexcel";
             this.btndeliveredstsexcel.Size = new System.Drawing.Size(138, 27);
@@ -913,7 +847,7 @@
             // 
             this.btnDeliveredSTS.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnDeliveredSTS.ImageOptions.Image")));
             this.btnDeliveredSTS.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btnDeliveredSTS.Location = new System.Drawing.Point(399, 10);
+            this.btnDeliveredSTS.Location = new System.Drawing.Point(407, 10);
             this.btnDeliveredSTS.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.btnDeliveredSTS.Name = "btnDeliveredSTS";
             this.btnDeliveredSTS.Size = new System.Drawing.Size(100, 27);
@@ -935,7 +869,7 @@
             // 
             this.datetodelivsts.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
             this.datetodelivsts.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.datetodelivsts.Location = new System.Drawing.Point(254, 10);
+            this.datetodelivsts.Location = new System.Drawing.Point(262, 10);
             this.datetodelivsts.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.datetodelivsts.Name = "datetodelivsts";
             this.datetodelivsts.Size = new System.Drawing.Size(137, 27);
@@ -945,7 +879,7 @@
             // 
             this.label21.AutoSize = true;
             this.label21.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
-            this.label21.Location = new System.Drawing.Point(215, 16);
+            this.label21.Location = new System.Drawing.Point(221, 14);
             this.label21.Name = "label21";
             this.label21.Size = new System.Drawing.Size(37, 21);
             this.label21.TabIndex = 1;
@@ -955,7 +889,7 @@
             // 
             this.datefromdelivsts.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
             this.datefromdelivsts.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.datefromdelivsts.Location = new System.Drawing.Point(70, 10);
+            this.datefromdelivsts.Location = new System.Drawing.Point(78, 10);
             this.datefromdelivsts.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.datefromdelivsts.Name = "datefromdelivsts";
             this.datefromdelivsts.Size = new System.Drawing.Size(137, 27);
@@ -993,6 +927,22 @@
             this.toolStripMenuItem1.Text = "Show Details";
             this.toolStripMenuItem1.Click += new System.EventHandler(this.toolStripMenuItem1_Click);
             // 
+            // contextMenuStripApproved
+            // 
+            this.contextMenuStripApproved.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.contextMenuStripApproved.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripMenuItemCancelSTSRequest});
+            this.contextMenuStripApproved.Name = "contextMenuStrip2";
+            this.contextMenuStripApproved.Size = new System.Drawing.Size(155, 30);
+            // 
+            // toolStripMenuItemCancelSTSRequest
+            // 
+            this.toolStripMenuItemCancelSTSRequest.Image = global::SalesInventorySystem.Properties.Resources.Cancel_16x16__2_;
+            this.toolStripMenuItemCancelSTSRequest.Name = "toolStripMenuItemCancelSTSRequest";
+            this.toolStripMenuItemCancelSTSRequest.Size = new System.Drawing.Size(154, 26);
+            this.toolStripMenuItemCancelSTSRequest.Text = "Cancel STS";
+            this.toolStripMenuItemCancelSTSRequest.Click += new System.EventHandler(this.toolStripMenuItemCancelSTSRequest_Click);
+            // 
             // POForApprovalSTS
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
@@ -1010,7 +960,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.tabForApprovalSub)).EndInit();
             this.tabForApprovalSub.ResumeLayout(false);
             this.forApprovalSTS.ResumeLayout(false);
-            this.groupBox10.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.gridControlSTS)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridViewSTS)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl2)).EndInit();
@@ -1020,7 +969,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.tabApprovedSub)).EndInit();
             this.tabApprovedSub.ResumeLayout(false);
             this.approvedSTS.ResumeLayout(false);
-            this.groupBox26.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.gridControlapprvdsts)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridViewapprvdsts)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl4)).EndInit();
@@ -1030,7 +978,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.tabRejectedSub)).EndInit();
             this.tabRejectedSub.ResumeLayout(false);
             this.rejectedSTS.ResumeLayout(false);
-            this.groupBox28.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.gridControlrjctdsts)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridViewrjctdsts)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl6)).EndInit();
@@ -1040,7 +987,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.tabForDelivSub)).EndInit();
             this.tabForDelivSub.ResumeLayout(false);
             this.forDelivSTS.ResumeLayout(false);
-            this.groupBox20.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.gridControlForDelivSts)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridViewForDelivSts)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl8)).EndInit();
@@ -1050,7 +996,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.tabDelivSub)).EndInit();
             this.tabDelivSub.ResumeLayout(false);
             this.delivSTS.ResumeLayout(false);
-            this.groupBox30.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.gridControlDelivSts)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridViewDelivSts)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl10)).EndInit();
@@ -1058,6 +1003,7 @@
             this.panelControl10.PerformLayout();
             this.contextMenuStripForDelivery.ResumeLayout(false);
             this.contextMenuStripForApproval.ResumeLayout(false);
+            this.contextMenuStripApproved.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -1068,7 +1014,6 @@
         private DevExpress.XtraTab.XtraTabPage tabForApproval;
         private DevExpress.XtraTab.XtraTabControl tabForApprovalSub;
         private DevExpress.XtraTab.XtraTabPage forApprovalSTS;
-        private System.Windows.Forms.GroupBox groupBox10;
         private DevExpress.XtraGrid.GridControl gridControlSTS;
         private DevExpress.XtraGrid.Views.Grid.GridView gridViewSTS;
         private DevExpress.XtraEditors.PanelControl panelControl2;
@@ -1081,7 +1026,6 @@
         private DevExpress.XtraTab.XtraTabPage tabApproved;
         private DevExpress.XtraTab.XtraTabControl tabApprovedSub;
         private DevExpress.XtraTab.XtraTabPage approvedSTS;
-        private System.Windows.Forms.GroupBox groupBox26;
         private DevExpress.XtraGrid.GridControl gridControlapprvdsts;
         private DevExpress.XtraGrid.Views.Grid.GridView gridViewapprvdsts;
         private DevExpress.XtraEditors.PanelControl panelControl4;
@@ -1094,7 +1038,6 @@
         private DevExpress.XtraTab.XtraTabPage tabRejected;
         private DevExpress.XtraTab.XtraTabControl tabRejectedSub;
         private DevExpress.XtraTab.XtraTabPage rejectedSTS;
-        private System.Windows.Forms.GroupBox groupBox28;
         private DevExpress.XtraGrid.GridControl gridControlrjctdsts;
         private DevExpress.XtraGrid.Views.Grid.GridView gridViewrjctdsts;
         private DevExpress.XtraEditors.PanelControl panelControl6;
@@ -1107,7 +1050,6 @@
         private DevExpress.XtraTab.XtraTabPage tabForDelivery;
         private DevExpress.XtraTab.XtraTabControl tabForDelivSub;
         private DevExpress.XtraTab.XtraTabPage forDelivSTS;
-        private System.Windows.Forms.GroupBox groupBox20;
         private DevExpress.XtraGrid.GridControl gridControlForDelivSts;
         private DevExpress.XtraGrid.Views.Grid.GridView gridViewForDelivSts;
         private DevExpress.XtraEditors.PanelControl panelControl8;
@@ -1120,7 +1062,6 @@
         private DevExpress.XtraTab.XtraTabPage tabDelivered;
         private DevExpress.XtraTab.XtraTabControl tabDelivSub;
         private DevExpress.XtraTab.XtraTabPage delivSTS;
-        private System.Windows.Forms.GroupBox groupBox30;
         private DevExpress.XtraGrid.GridControl gridControlDelivSts;
         private DevExpress.XtraGrid.Views.Grid.GridView gridViewDelivSts;
         private DevExpress.XtraEditors.PanelControl panelControl10;
@@ -1134,5 +1075,7 @@
         private System.Windows.Forms.ToolStripMenuItem printDeliveryReceiptToolStripMenuItem;
         private System.Windows.Forms.ContextMenuStrip contextMenuStripForApproval;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStripApproved;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemCancelSTSRequest;
     }
 }

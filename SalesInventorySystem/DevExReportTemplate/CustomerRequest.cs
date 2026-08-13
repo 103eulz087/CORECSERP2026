@@ -14,7 +14,7 @@ namespace SalesInventorySystem.DevExReportTemplate
             InitializeComponent();
         }
 
-        private void ReportHeader_BeforePrint(object sender, System.Drawing.Printing.PrintEventArgs e)
+        private void ReportHeader_BeforePrint(object sender, CancelEventArgs e)
         {
             i++;
             if (i != 1) e.Cancel = true;

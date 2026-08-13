@@ -352,11 +352,11 @@
         private DevExpress.XtraGrid.Views.Grid.GridView gridView6;
         private DevExpress.XtraEditors.Repository.RepositoryItemSearchLookUpEdit repositoryItemSearchLookUpEditEWTCreditGLCode;
         private DevExpress.XtraGrid.Views.Grid.GridView gridView7;
-        private DevExpress.XtraEditors.GroupControl groupControl1;
         public DevExpress.XtraEditors.SimpleButton btncancel;
         public DevExpress.XtraEditors.SimpleButton btnApproved;
         public DevExpress.XtraEditors.TextEdit txtinvoiceno;
         public DevExpress.XtraEditors.TextEdit txtrefno;
         public DevExpress.XtraEditors.TextEdit txtsuppid;
+        public DevExpress.XtraEditors.GroupControl groupControl1;
     }
 }

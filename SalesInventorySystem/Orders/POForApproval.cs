@@ -1,17 +1,18 @@
-﻿using System;
+﻿using DevExpress.CodeParser;
+using DevExpress.XtraEditors;
+using DevExpress.XtraGrid;
+using DevExpress.XtraGrid.Columns;
+using DevExpress.XtraGrid.Views.Grid;
+using DevExpress.XtraReports.UI;
+using SalesInventorySystem.Classes;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.SqlClient;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
-using DevExpress.XtraEditors;
-using DevExpress.XtraReports.UI;
-using DevExpress.XtraGrid.Views.Grid;
-using DevExpress.XtraGrid.Columns;
-using DevExpress.XtraGrid;
-using System.Data.SqlClient;
-using SalesInventorySystem.Classes;
 
 // ALL VIEWS
 //view_POSummary - FOR APPROVAL gridview1, APPROVED REQUEST gridview2, REJECTED REQUEST gridview 3
@@ -42,6 +43,16 @@ namespace SalesInventorySystem
 
         private void POForApproval_Load(object sender, EventArgs e)
         {
+            HelperFunction.SetDefaultDateRange(datefromforapproval, datetoforapproval,7, 7);
+            HelperFunction.SetDefaultDateRange(datefromapproved, datetoapproved, 7, 7);
+            HelperFunction.SetDefaultDateRange(datefromrejected, datetorejected, 7, 7);
+            HelperFunction.SetDefaultDateRange(datefromdelivered, datetodelivered, 7, 7);
+            HelperFunction.SetDefaultDateRange(dateFromDeliv, dateToDeliv, 7, 7);
+            HelperFunction.SetDefaultDateRange(dateFromReturned, dateToReturned, 7, 7);
+            HelperFunction.SetDefaultDateRange(dateFromPaid, dateToPaid, 7, 7);
+            HelperFunction.SetDefaultDateRange(dateFromForApprovalServices, dateToForApprovalServices, 7, 7);
+            HelperFunction.SetDefaultDateRange(dateFromApprovedServices, dateToApprovedServices, 7, 7);
+            HelperFunction.SetDefaultDateRange(dateTimePicker2, dateTimePicker1, 7, 7);
             //filtertab();
         }
 
@@ -50,15 +61,36 @@ namespace SalesInventorySystem
         {
             if (tabMain.SelectedTabPage.Equals(tabForApproval))
             {
-                Database.display("SELECT * FROM view_POSummary WHERE Status='FOR APPROVAL' and EffectivityDate >= '" + datefromforapproval.Text + "' and EffectivityDate <= '" + datetoforapproval.Text + "' AND BranchCode='" + Login.assignedBranch + "'", gridControl1, gridView1);
+                if (tabForApprovalSub.SelectedTabPage.Equals(forApprovalServicesSalesOrder))
+                {
+                    loadForApprovalServices();
+                }
+                else
+                {
+                    Database.display("SELECT * FROM view_POSummary WHERE Status='FOR APPROVAL' and EffectivityDate >= '" + datefromforapproval.Text + "' and EffectivityDate <= '" + datetoforapproval.Text + "' AND BranchCode='" + Login.assignedBranch + "'", gridControl1, gridView1);
+                }
             }
             else if (tabMain.SelectedTabPage.Equals(tabApproved))
             {
-                Database.display("SELECT * FROM view_POSummary WHERE Status='APPROVED' and EffectivityDate >= '" + datefromapproved.Text + "' and EffectivityDate <= '" + datetoapproved.Text + "' AND BranchCode='" + Login.assignedBranch + "' ORDER BY DateAdded DESC", gridControl2, gridView2);
+                if (tabApprovedSub.SelectedTabPage.Equals(approvedServicesSalesOrder))
+                {
+                    loadApprovedServices();
+                }
+                else
+                {
+                    Database.display("SELECT * FROM view_POSummary WHERE Status='APPROVED' and EffectivityDate >= '" + datefromapproved.Text + "' and EffectivityDate <= '" + datetoapproved.Text + "' AND BranchCode='" + Login.assignedBranch + "' ORDER BY DateAdded DESC", gridControl2, gridView2);
+                }
             }
             else if (tabMain.SelectedTabPage.Equals(tabRejected))
             {
-                Database.display("SELECT * FROM view_POSummary WHERE Status='REJECTED' and EffectivityDate >= '" + datefromrejected.Text + "' and EffectivityDate <= '" + datefromrejected.Text + "' AND BranchCode='" + Login.assignedBranch + "'", gridControl3, gridView3);
+                if (tabRejectedSub.SelectedTabPage.Equals(rejectedServicesSalesOrder))
+                {
+                    loadRejectedServices();
+                }
+                else
+                {
+                    Database.display("SELECT * FROM view_POSummary WHERE Status='REJECTED' and EffectivityDate >= '" + datefromrejected.Text + "' and EffectivityDate <= '" + datefromrejected.Text + "' AND BranchCode='" + Login.assignedBranch + "'", gridControl3, gridView3);
+                }
             }
             else if (tabMain.SelectedTabPage.Equals(tabForDelivery))
             {
@@ -69,7 +101,177 @@ namespace SalesInventorySystem
             }
             else if (tabMain.SelectedTabPage.Equals(tabDelivered))
             {
-                Database.display("SELECT * FROM view_DeliverySummary WHERE Status='DELIVERED' and DateApproved >= '" + dateFromDeliv.Text + "' and DateApproved <= '" + dateToDeliv.Text + "' AND BranchCode='" + Login.assignedBranch + "'", gridControl5, gridView5);
+                loadDeliveredSalesOrder();
+            }
+            else if (tabMain.SelectedTabPage.Equals(tabPaid))
+            {
+                loadPaidSalesOrder();
+            }
+        }
+
+        // Shared by filtertab() (tab switch) and btnDeliveredSalesOrder_Click (manual refresh) --
+        // both must populate gridView5 identically, since gridView5_RowStyle depends on the
+        // HasCreditMemo/HasReturnOrder columns added here being present either way.
+        void loadDeliveredSalesOrder()
+        {
+            Database.display(
+                "SELECT v.*, " +
+                "CASE WHEN EXISTS (SELECT 1 FROM CreditMemo cm WHERE cm.PONumber = v.PONumber) THEN 1 ELSE 0 END AS HasCreditMemo, " +
+                "CASE WHEN EXISTS (SELECT 1 FROM ReturnedOrderDetails rod WHERE rod.PONumber = v.PONumber) THEN 1 ELSE 0 END AS HasReturnOrder " +
+                "FROM view_DeliverySummary v " +
+                "WHERE v.Status='DELIVERED' and v.DateApproved >= '" + dateFromDeliv.Text + "' and v.DateApproved < DATEADD(DAY,1,'" + dateToDeliv.Text + "')  AND v.BranchCode='" + Login.assignedBranch + "' " +
+                // Already fully paid (Balance=0) POs are excluded from this list. Only excludes
+                // when a TransactionChargeSales row exists AND shows Balance=0 -- a PO with no AR
+                // row at all still shows, rather than being silently hidden.
+                "AND NOT EXISTS (SELECT 1 FROM TransactionChargeSales t WHERE t.ReferenceNo = v.PONumber AND t.Balance = 0) " +
+                "ORDER BY v.PONumber", gridControl5, gridView5);
+            gridView5.Columns["HasCreditMemo"].Visible = false;
+            gridView5.Columns["HasReturnOrder"].Visible = false;
+        }
+
+        // Same shape as loadDeliveredSalesOrder(), inverted: only POs that ARE fully paid
+        // (TransactionChargeSales.Balance = 0) -- the ones loadDeliveredSalesOrder() excludes.
+        void loadPaidSalesOrder()
+        {
+            Database.display(
+                "SELECT v.*, " +
+                "CASE WHEN EXISTS (SELECT 1 FROM CreditMemo cm WHERE cm.PONumber = v.PONumber) THEN 1 ELSE 0 END AS HasCreditMemo, " +
+                "CASE WHEN EXISTS (SELECT 1 FROM ReturnedOrderDetails rod WHERE rod.PONumber = v.PONumber) THEN 1 ELSE 0 END AS HasReturnOrder " +
+                "FROM view_DeliverySummary v " +
+                "WHERE v.Status='DELIVERED' and v.DateApproved >= '" + dateFromPaid.Text + "' and v.DateApproved < DATEADD(DAY,1,'" + dateToPaid.Text + "')  AND v.BranchCode='" + Login.assignedBranch + "' " +
+                "AND EXISTS (SELECT 1 FROM TransactionChargeSales t WHERE t.ReferenceNo = v.PONumber AND t.Balance = 0) " +
+                "ORDER BY v.PONumber", gridControlPaid, gridViewPaid);
+            gridViewPaid.Columns["HasCreditMemo"].Visible = false;
+            gridViewPaid.Columns["HasReturnOrder"].Visible = false;
+        }
+
+        // Services Sales Order sub-tabs (dedicated ServiceOrderSummary/ServiceOrderDetails tables --
+        // see SQL/2026-08-09_ServiceOrder_NewTables_And_SPs.sql. Services never go through the
+        // Delivery/BatchSales/ConfirmOrder pipeline the Products sub-tabs above use.)
+        void loadForApprovalServices()
+        {
+            Database.display("SELECT * FROM view_ServiceOrderSummary WHERE Status='FOR APPROVAL' and DateAdded >= '" + dateFromForApprovalServices.Text + "' and DateAdded < DATEADD(DAY,1,'" + dateToForApprovalServices.Text + "') AND BranchCode='" + Login.assignedBranch + "' ORDER BY DateAdded DESC", gridControlForApprovalServices, gridViewForApprovalServices);
+        }
+
+        void loadApprovedServices()
+        {
+            Database.display("SELECT * FROM view_ServiceOrderSummary WHERE Status='APPROVED' and DateApproved >= '" + dateFromApprovedServices.Text + "' and DateApproved < DATEADD(DAY,1,'" + dateToApprovedServices.Text + "') AND BranchCode='" + Login.assignedBranch + "' ORDER BY DateApproved DESC", gridControlApprovedServices, gridViewApprovedServices);
+        }
+
+        // NOTE: this sub-tab's controls are still under their DevExpress-assigned default
+        // names (never renamed in the designer) -- dateTimePicker2=From, dateTimePicker1=To,
+        // simpleButton7="Generate"/load, gridControl6/gridView6=the list grid. Rename via the
+        // VS Designer's Properties panel (safe, updates all references) whenever convenient.
+        void loadRejectedServices()
+        {
+            Database.display("SELECT * FROM view_ServiceOrderSummary WHERE Status='REJECTED' and DateRejected >= '" + dateTimePicker2.Text + "' and DateRejected < DATEADD(DAY,1,'" + dateTimePicker1.Text + "') AND BranchCode='" + Login.assignedBranch + "' ORDER BY DateRejected DESC", gridControl6, gridView6);
+        }
+
+        private void btnApproveService_Click(object sender, EventArgs e)
+        {
+            loadForApprovalServices();
+        }
+
+        private void btnApprovedServices_Click(object sender, EventArgs e)
+        {
+            loadApprovedServices();
+        }
+
+        private void simpleButton7_Click(object sender, EventArgs e)
+        {
+            loadRejectedServices();
+        }
+
+        private void tabForApprovalSub_SelectedPageChanged(object sender, DevExpress.XtraTab.TabPageChangedEventArgs e)
+        {
+            filtertab();
+        }
+
+        private void tabApprovedSub_SelectedPageChanged(object sender, DevExpress.XtraTab.TabPageChangedEventArgs e)
+        {
+            filtertab();
+        }
+
+        private void tabRejectedSub_SelectedPageChanged(object sender, DevExpress.XtraTab.TabPageChangedEventArgs e)
+        {
+            filtertab();
+        }
+
+        private void gridViewForApprovalServices_DoubleClick(object sender, EventArgs e)
+        {
+            if (gridViewForApprovalServices.FocusedRowHandle < 0)
+                return;
+
+            if (Convert.ToBoolean(Login.isglobalApprover) != true)
+            {
+                XtraMessageBox.Show("You are not authorized to approve/reject Service Orders.");
+                return;
+            }
+
+            string svcNumber = gridViewForApprovalServices.GetRowCellValue(gridViewForApprovalServices.FocusedRowHandle, "SVCNumber").ToString();
+            string custName = gridViewForApprovalServices.GetRowCellValue(gridViewForApprovalServices.FocusedRowHandle, "Customer").ToString();
+            decimal totalAmount = Convert.ToDecimal(gridViewForApprovalServices.GetRowCellValue(gridViewForApprovalServices.FocusedRowHandle, "TotalAmount"));
+
+            StringBuilder detail = new StringBuilder();
+            detail.AppendLine("Service Order: " + svcNumber);
+            detail.AppendLine("Customer: " + custName);
+            detail.AppendLine();
+            DataTable lines = Database.GetDataTable("SELECT ServiceName, Qty, SellingPrice, Amount FROM funcview_ServiceOrderDetails('" + svcNumber + "')");
+            foreach (DataRow r in lines.Rows)
+            {
+                detail.AppendLine("  " + r["ServiceName"] + "  x" + r["Qty"] + "  @ " + Convert.ToDecimal(r["SellingPrice"]).ToString("n2") + " = " + Convert.ToDecimal(r["Amount"]).ToString("n2"));
+            }
+            detail.AppendLine();
+            detail.AppendLine("Total: " + totalAmount.ToString("n2"));
+            detail.AppendLine();
+            detail.AppendLine("Yes = Approve, No = Reject, Cancel = do nothing.");
+
+            DialogResult result = XtraMessageBox.Show(detail.ToString(), "Service Order Approval", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+            if (result == DialogResult.Yes)
+            {
+                try
+                {
+                    using (SqlConnection con = Database.getConnection())
+                    {
+                        con.Open();
+                        SqlCommand com = new SqlCommand("sp_ApproveServiceOrder", con);
+                        com.CommandType = CommandType.StoredProcedure;
+                        com.Parameters.AddWithValue("@SVCNumber", svcNumber);
+                        com.Parameters.AddWithValue("@ApprovedBy", Login.Fullname);
+                        com.ExecuteNonQuery();
+                    }
+                    XtraMessageBox.Show("Service Order Approved.");
+                    loadForApprovalServices();
+                }
+                catch (SqlException ex)
+                {
+                    XtraMessageBox.Show(ex.Message.ToString());
+                }
+            }
+            else if (result == DialogResult.No)
+            {
+                string reason = XtraInputBox.Show("Enter rejection reason:", "Reject Service Order", "");
+                if (string.IsNullOrWhiteSpace(reason))
+                    return;
+                try
+                {
+                    using (SqlConnection con = Database.getConnection())
+                    {
+                        con.Open();
+                        SqlCommand com = new SqlCommand("sp_RejectServiceOrder", con);
+                        com.CommandType = CommandType.StoredProcedure;
+                        com.Parameters.AddWithValue("@SVCNumber", svcNumber);
+                        com.Parameters.AddWithValue("@RejectedBy", Login.Fullname);
+                        com.Parameters.AddWithValue("@Reason", reason);
+                        com.ExecuteNonQuery();
+                    }
+                    XtraMessageBox.Show("Service Order Rejected.");
+                    loadForApprovalServices();
+                }
+                catch (SqlException ex)
+                {
+                    XtraMessageBox.Show(ex.Message.ToString());
+                }
             }
         }
 
@@ -306,18 +508,18 @@ namespace SalesInventorySystem
 
         private void cancelThisOrderToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            bool isexist = Database.checkifExist("SELECT TOP 1 PONumber FROM DeliveryDetails WHERE PONumber='" + gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "PONumber").ToString() + "'");
+            bool isexist = Database.checkifExist("SELECT TOP(1) 1 FROM DeliveryDetails WHERE PONumber='" + gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "PONumber").ToString() + "' AND isReturned=0");
             if(isexist)
             {
                 XtraMessageBox.Show("This PO is Already Processed in your Commissary..To Cancel this Order, Please Delete All Item/s Processed in this PO.");
                 return;
             }
-            bool ok = HelperFunction.ConfirmDialog("Are you sure you want to Delete this Order?..", "Delete Purchase Order");
+            bool ok = HelperFunction.ConfirmDialog("Are you sure you want to Cancel this Order?..", "Cancel Purchase Order");
             if (ok)
             {
-                string actionlogs = "DELETE APPROVED REQUEST with PONumber=" + gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "PONumber").ToString() + " ";
+                string actionlogs = "CANCEL REJECTED REQUEST with PONumber=" + gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "PONumber").ToString() + " ";
                 Database.ExecuteQuery("insert into HistoryLogs values('" + Login.Fullname + "','" + DateTime.Now.ToShortDateString() + "','"+ actionlogs + "','" + Login.assignedBranch + "')");
-                Database.ExecuteQuery("Update PurchaseOrderSummary SET Status='CANCELLED' WHERE PONumber='" + gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "PONumber").ToString() + "'", "Successfully Executed");
+                Database.ExecuteQuery("Update PurchaseOrderSummary SET Status='REJECTED' WHERE PONumber='" + gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "PONumber").ToString() + "'", "Successfully Executed");
             }
             else
                 return;
@@ -377,12 +579,22 @@ namespace SalesInventorySystem
             Reporting.SalesInvoiceDexEx viewdet = new Reporting.SalesInvoiceDexEx();
             viewdet.Show();
             
-            analyze("spview_SalesInvoice", refno1, viewdet.gridControl4, viewdet.gridView4);
+            //analyze("spview_SalesInvoice", refno1, viewdet.gridControl4, viewdet.gridView4);
+            if (GlobalCache.CompanyName == "JFC")
+            {
+                analyze("spview_SalesInvoiceJFC", refno1, viewdet.gridControl4, viewdet.gridView4);
+            }
+            else
+            {
+                analyze("spview_SalesInvoice", refno1, viewdet.gridControl4, viewdet.gridView4);
+            }
+
             string compname = Database.getSingleQuery("CompanyProfile", "CompanyName='JFC'", "CompanyName");
             if (compname == "JFC")
             {
                 Classes.DevXGridViewSettings.ShowFooterCountTotal(viewdet.gridView4, "Cnt"); //NEW
             }
+            viewdet.txtinvoiceno.Text = gridView4.GetRowCellValue(gridView4.FocusedRowHandle, "InvoiceNo").ToString(); ;
             viewdet.txtpono.Text = refno1;
             viewdet.txtcusttin.Text = tinno;
             double vatablesales = 0.0, vatexemptsale = 0.0, vatamount = 0.0, totalsales = 0.0, lessvat = 0.0, netofvat = 0.0, amountdue = 0.0, addvat = 0.0, vatsales = 0.0, totalamountdue = 0.0;
@@ -573,6 +785,48 @@ namespace SalesInventorySystem
                 XtraMessageBox.Show(ex.Message.ToString());
             }
         }
+        void showItemsReturned(GridView view)
+        {
+            try
+            {
+                bool isInvoiceUpdated = Database.checkifExist("Select isInvoiceUpdate FROM DeliverySummary WHERE PONumber='" + view.GetRowCellValue(view.FocusedRowHandle, "PONumber").ToString() + "' and isInvoiceUpdate=1");
+                if (isInvoiceUpdated == false)
+                {
+                    XtraMessageBox.Show("Invoice Number must be updated first..please go to Print Delivery Receipt Option!...");
+                    return;
+                }
+
+                HOFormsDevEx.ClientShowItemsDevEx confi = new HOFormsDevEx.ClientShowItemsDevEx();
+              
+                confi.txtpono.Text = view.GetRowCellValue(view.FocusedRowHandle, "PONumber").ToString();
+                confi.txteffectivitydate.Text = view.GetRowCellValue(view.FocusedRowHandle, "EffectivityDate").ToString();
+                string custkey = Database.getSingleQuery("PurchaseOrderSummary", "PONumber='" + confi.txtpono.Text + "'", "Customer");
+                confi.txtcustname.Text = Database.getSingleQuery("Customers", "CustomerKey='" + custkey + "'", "CustomerName");
+                confi.txtpreparedby.Text = view.GetRowCellValue(view.FocusedRowHandle, "PreparedBy").ToString();
+                confi.txtrefkey.Text = Database.getSingleQuery("DeliverySummary", "PONumber='" + confi.txtpono.Text + "'", "InvoiceNo");
+                confi.txtstatus.Text = "RETURNED";
+                confi.txttotalitem.Text = view.GetRowCellValue(view.FocusedRowHandle, "TotalItemReturned").ToString();
+                confi.txttotalqty.Text = view.GetRowCellValue(view.FocusedRowHandle, "TotalQtyReturned").ToString();
+                Database.display("Select * FROM funcview_ForDeliveryDetails('" + confi.txtpono.Text + "')", confi.gridControl2, confi.gridView2);
+
+
+                Classes.DevXGridViewSettings.ShowFooterTotal(confi.gridView2, "QtyDelivered");
+                Classes.DevXGridViewSettings.ShowFooterCountTotal(confi.gridView2, "ProductName");
+
+                confi.gridView2.Columns["SeqNo"].Visible = false;
+                confi.ShowDialog(this);
+                if (HOFormsDevEx.ClientShowItemsDevEx.isdone == true)
+                {
+                    filtertab();
+                    HOFormsDevEx.ClientShowItemsDevEx.isdone = false;
+                    confi.Dispose();
+                }
+            }
+            catch (SqlException ex)
+            {
+                XtraMessageBox.Show(ex.Message.ToString());
+            }
+        }
 
         private void showItemsToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -624,7 +878,7 @@ namespace SalesInventorySystem
             }
             if (Convert.ToBoolean(Login.isglobalApprover) == true)
             {
-
+             
                 Database.display("SELECT * FROM view_PurchaseOrderDetails WHERE PONumber = '" + refno + "'", podetails.gridControl1, podetails.gridView1);
                 podetails.txtpono.Text = refno;
                 GridView view = podetails.gridControl1.FocusedView as GridView;
@@ -719,6 +973,18 @@ namespace SalesInventorySystem
         private void gridView5_RowStyle(object sender, RowStyleEventArgs e)
         {
             rowstyle(sender, e);
+            if (e.HighPriority || e.RowHandle < 0)
+                return;
+
+            GridView view = sender as GridView;
+            bool hasCreditMemo = Convert.ToBoolean(view.GetRowCellValue(e.RowHandle, "HasCreditMemo"));
+            bool hasReturnOrder = Convert.ToBoolean(view.GetRowCellValue(e.RowHandle, "HasReturnOrder"));
+            if (hasCreditMemo || hasReturnOrder)
+            {
+                e.Appearance.BackColor = Color.Gold;
+                e.Appearance.BackColor2 = Color.LightYellow;
+                e.HighPriority = true;
+            }
         }
 
         private void gridView1_RowStyle(object sender, RowStyleEventArgs e)
@@ -728,25 +994,27 @@ namespace SalesInventorySystem
 
         private void btnForApprovalSalesOrder_Click(object sender, EventArgs e)
         {
-            Database.display("SELECT * FROM view_POSummary WHERE Status='FOR APPROVAL' and EffectivityDate >= '" + datefromforapproval.Text + "' and EffectivityDate <= '" + datetoforapproval.Text + "' AND BranchCode='" + Login.assignedBranch + "'", gridControl1, gridView1);
+            Database.display("SELECT * FROM view_POSummary WHERE Status='FOR APPROVAL' and EffectivityDate >= '" + datefromforapproval.Text + "' and EffectivityDate < DATEADD(DAY,1,'" + datetoforapproval.Text + "')  AND BranchCode='" + Login.assignedBranch + "'", gridControl1, gridView1);
         }
 
       
         private void btnApprovedSalesReq_Click(object sender, EventArgs e)
         {
-            Database.display("SELECT * FROM view_POSummary WHERE Status='APPROVED' and EffectivityDate >= '" + datefromapproved.Text + "' and EffectivityDate <= '" + datetoapproved.Text + "' AND BranchCode='" + Login.assignedBranch + "' ORDER BY DateAdded DESC", gridControl2, gridView2);
+            Database.display("SELECT * FROM view_POSummary WHERE Status='APPROVED' and EffectivityDate >= '" + datefromapproved.Text + "' and EffectivityDate < DATEADD(DAY,1,'" + datetoapproved.Text + "') AND BranchCode='" + Login.assignedBranch + "' ORDER BY DateAdded DESC", gridControl2, gridView2);
         }
 
 
         private void simpleButton1_Click(object sender, EventArgs e)
         {
-            Database.display("SELECT * FROM view_POSummary WHERE Status='REJECTED' and EffectivityDate >= '" + datefromrejected.Text + "' and EffectivityDate <= '" + datefromrejected.Text + "' AND BranchCode='" + Login.assignedBranch + "'", gridControl3, gridView3);
+            Database.display("SELECT * FROM view_POSummary WHERE Status='REJECTED' and EffectivityDate >= '" + datefromrejected.Text + "' and EffectivityDate < DATEADD(DAY,1,'" + datefromrejected.Text + "') AND BranchCode='" + Login.assignedBranch + "'", gridControl3, gridView3);
         }
 
         private void btnForDelivSalesOrder_Click(object sender, EventArgs e)
         {
+            //WHERE DateAdded >= @DateFrom
+            //          AND DateAdded<DATEADD(day,1,@DateTo)
             //view_OrdersForDelivery  is combination of 2 views view_ForDelivery(PurchaseOrderSummary,DeliverySummary,Customers) and view_DeliveryReciept(DeliveryDetails)
-            Database.display("SELECT * FROM view_OrdersForDelivery WHERE Status='FOR DELIVERY' and EffectivityDate >= '" + datefromdelivered.Text + "' and EffectivityDate <= '" + datetodelivered.Text + "' ORDER BY PONumber", gridControl4, gridView4);
+            Database.display("SELECT * FROM view_OrdersForDelivery WHERE Status='FOR DELIVERY' and EffectivityDate >= '" + datefromdelivered.Text + "' and EffectivityDate < DATEADD(day,1,'" + datetodelivered.Text + "')  ORDER BY PONumber", gridControl4, gridView4);
             Classes.DevXGridViewSettings.ShowFooterCountTotal(gridView4, "DeliveryNo");
             Classes.DevXGridViewSettings.ShowFooterTotal(gridView4, "TotalItem");
             Classes.DevXGridViewSettings.ShowFooterTotal(gridView4, "TotalQtyDelivered");
@@ -756,7 +1024,12 @@ namespace SalesInventorySystem
 
         private void btnDeliveredSalesOrder_Click(object sender, EventArgs e)
         {
-            Database.display("SELECT * FROM view_DeliverySummary WHERE Status='DELIVERED' and DateApproved >= '" + dateFromDeliv.Text + "' and DateApproved <= '" + dateToDeliv.Text + "' AND BranchCode='" + Login.assignedBranch + "'", gridControl5, gridView5);
+            loadDeliveredSalesOrder();
+        }
+
+        private void btnPaidSalesOrder_Click(object sender, EventArgs e)
+        {
+            loadPaidSalesOrder();
         }
 
     
@@ -822,8 +1095,8 @@ namespace SalesInventorySystem
             if (e.Button == MouseButtons.Right)
             {
                 contextMenuForDelivery.Show(gridControl4, e.Location);
-                contextMenuForDelivery.Items[1].Visible = false;
-                contextMenuForDelivery.Items[2].Visible = false;
+                //contextMenuForDelivery.Items[1].Visible = false;
+                //contextMenuForDelivery.Items[2].Visible = false;
             }
         }
 
@@ -841,6 +1114,26 @@ namespace SalesInventorySystem
         private void toolStripMenuItem2_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void btnReturnedGenerate_Click(object sender, EventArgs e)
+        {
+            Database.display(
+               "SELECT v.* FROM [view_ReturnedSummary] v " +
+               "WHERE v.DateAdded >= '" + dateFromReturned.Text + "' and v.DateAdded < DATEADD(DAY,1,'" + dateToReturned.Text + "') AND v.BranchCode='" + Login.assignedBranch + "' " +
+               "ORDER BY v.PONumber", gridControlReturned, gridViewReturned);
+        }
+
+        private void gridControlReturned_MouseUp(object sender, MouseEventArgs e)
+        {
+            if(e.Button == MouseButtons.Right)
+                contextMenuStripReturned.Show(gridControlReturned,e.Location);
+        }
+
+        private void toolStripMenuItem21_Click(object sender, EventArgs e)
+        {
+            stat = "RETURNED";
+            showItemsReturned(gridViewReturned);
         }
 
         private void toolStripMenuItem13_Click(object sender, EventArgs e)

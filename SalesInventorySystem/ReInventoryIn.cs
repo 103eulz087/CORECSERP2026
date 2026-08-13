@@ -14,13 +14,14 @@ using SalesInventorySystem.Classes;
 using System.IO;
 using DevExpress.XtraGrid.Views.Grid;
 using DevExpress.XtraGrid.Columns;
+using DevExpress.XtraReports.UI;
 
 namespace SalesInventorySystem
 {
     public partial class ReInventoryIn : DevExpress.XtraEditors.XtraForm
     {
         //DataTable table;
-        object brcode = null;
+        object brcode = null,prodcode=null,brcodetab2=null;
         public static bool ispriceused = false, isusedbarcode = false;
         bool isusedsearchform = false;//, isusedbarcode = false;//, ispriceused=false;
         public static string seqno = "",branchcode="";
@@ -61,13 +62,6 @@ namespace SalesInventorySystem
             Database.display("SELECT * " +
                 $"FROM dbo.funcview_InventoryIN('{txtid.Text}') ORDER BY SequenceNumber ASC", gridControl1, gridView1);
 
-
-            //GridView view = gridControl1.FocusedView as GridView;
-            //view.SortInfo.ClearAndAddRange(new GridColumnSortInfo[] {
-            //    new GridColumnSortInfo(view.Columns["Description"],DevExpress.Data.ColumnSortOrder.Ascending)
-            //    }, 1);
-            //gridView1.ExpandAllGroups();
-
             GridGroupSummaryItem ite = new GridGroupSummaryItem();
             ite.FieldName = "Quantity";
             ite.SummaryType = DevExpress.Data.SummaryItemType.Sum;
@@ -79,15 +73,34 @@ namespace SalesInventorySystem
             Classes.DevXGridViewSettings.ShowFooterTotal(gridView1, "Quantity");
         }
 
-        private void ReInventoryIn_Load(object sender, EventArgs e)
+        void displayTab2()
         {
-            //Database.displayComboBoxItems("SELECT BranchName FROM Branches WHERE BranchCode='"+Login.assignedBranch+"'", "BranchName", comboBox1);
+            Database.display("SELECT * " +
+                //$"FROM dbo.funcview_InventoryINManualEntry('{tab2batchid.Text}') ORDER BY SequenceNumber ASC", gridControltab2, gridViewtab2);
+                $"FROM dbo.funcview_InventoryINManualEntry('{tab2batchid.Text}') ORDER BY SequenceNumber ASC", gridControltab2, gridView4);
+
+            GridGroupSummaryItem ite = new GridGroupSummaryItem();
+            ite.FieldName = "Quantity";
+            ite.SummaryType = DevExpress.Data.SummaryItemType.Sum;
+            ite.ShowInGroupColumnFooter = gridView4.Columns["Quantity"];
+            //ite.ShowInGroupColumnFooter = gridViewtab2.Columns["Quantity"];
+            //gridViewtab2.GroupSummary.Add(ite);
+            //gridViewtab2.Focus();
+            gridView4.GroupSummary.Add(ite);
+            gridView4.Focus();
+            
+            //Classes.DevXGridViewSettings.ShowFooterTotal(gridViewtab2, "Quantity");
+        }
+
+        private void ReInventoryIn_Load(object sender, EventArgs e)
+        { 
             string branchname = Database.getSingleQuery("Branches", "BranchCode='" + Login.assignedBranch + "'", "BranchName");
-           
+            Database.displaySearchlookupEdit("SELECT ProductCode,Description FROM Products WHERE BranchCode='888' order by Description", txtproduct, "Description", "Description");
             loadInvNum();
             populateBranch();
             txtbarcodescanning.Focus();
         }
+            
 
         void loadInvNum()
         {
@@ -99,6 +112,7 @@ namespace SalesInventorySystem
         {
            
             Database.displaySearchlookupEdit("Select BranchCode,BranchName FROM Branches", txtbranch,"BranchName","BranchName");
+            Database.displaySearchlookupEdit("Select BranchCode,BranchName FROM Branches", tab2brcode,"BranchName","BranchName");
         }
 
      
@@ -111,158 +125,11 @@ namespace SalesInventorySystem
                 return;
             }
             else
-            { AddEntryNew(); }
+            {
+                AddEntryNew();
+            }
         }
 
-        //void add()
-        //{
-        //    string pcode = "", desc = "", qty = "", barcode = "", qty1 = "", qty2 = "";
-        //    bool isBarcodeLong = false;
-        //    isBarcodeLong = Database.checkifExist("SELECT * FROM BarcodeSettings WHERE isLong=1");
-        //    bool iswarehouse = false;
-        //    string sku = "";
-         
-        //    //if (sku == "")
-        //    //{
-        //    //    XtraMessageBox.Show("Barcode must be 13 characters");
-        //    //    txtsku.Text = "";
-        //    //    return;
-        //    //}
-        //    if (comboBox1.Text == "")
-        //    {
-        //        XtraMessageBox.Show("Branch Destination must not empty");
-                
-        //        return;
-        //    }
-        //    else
-        //    {
-        //        if (comboBox1.Text == "HEAD OFFICE" && Commissary.Checked == true)
-        //        {
-        //            iswarehouse = true;
-        //        }
-        //        else if (comboBox1.Text == "HEAD OFFICE" && bigblue.Checked == true)
-        //        {
-        //            iswarehouse = false;
-        //        }
-        //        else
-        //        {
-        //            iswarehouse = true;
-        //        }
-        //    }
-        //    string prodname = "";
-
-        //    string productcode = "";
-
-        //    if (isusedsearchform == true) //
-        //    {
-               
-        //        prodname = Database.getSingleQuery("Products", "ProductCode='" + productcode + "' and BranchCode='" + Login.assignedBranch + "'", "Description");
-        //        barcode = Database.getSingleQuery("Products", "ProductCode='" + productcode + "' and BranchCode='" + Login.assignedBranch + "'", "Barcode");
-        //    }
-        //    else
-        //    {
-        //        if (barcodescanning.Checked == true)
-        //        {
-        //            if (isBarcodeLong == false) //short barcode
-        //            {
-        //                if (txtbarcodescanning.Text.Length == 14) //tens 10015 10123 0001
-        //                {
-        //                    pcode = txtbarcodescanning.Text.Substring(0, 5);
-        //                    desc = Database.getSingleQuery("Products", "ProductCode='" + pcode + "' and BranchCode='888'", "Description");
-        //                    qty1 = txtbarcodescanning.Text.Substring(5, 2); //1001512345
-        //                    qty2 = txtbarcodescanning.Text.Substring(7, 3);
-        //                    qty = qty1 + "." + qty2;
-        //                    barcode = txtbarcodescanning.Text;
-        //                }
-        //                else if (txtbarcodescanning.Text.Length == 15) //hundred
-        //                {
-        //                    pcode = txtbarcodescanning.Text.Substring(0, 5);
-        //                    desc = Database.getSingleQuery("Products", "ProductCode='" + pcode + "' and BranchCode='888'", "Description");
-        //                    qty1 = txtbarcodescanning.Text.Substring(5, 3); //10015100345
-        //                    qty2 = txtbarcodescanning.Text.Substring(8, 3);
-        //                    qty = qty1 + "." + qty2;
-        //                    barcode = txtbarcodescanning.Text;
-        //                }
-        //                else if (txtbarcodescanning.Text.Length == 16) //thousand
-        //                {
-        //                    pcode = txtbarcodescanning.Text.Substring(0, 5);
-        //                    desc = Database.getSingleQuery("Products", "ProductCode='" + pcode + "' and BranchCode='888'", "Description");
-        //                    qty1 = txtbarcodescanning.Text.Substring(5, 4); //10015100345
-        //                    qty2 = txtbarcodescanning.Text.Substring(9, 3);
-        //                    qty = qty1 + "." + qty2;
-        //                    barcode = txtbarcodescanning.Text;
-        //                }
-        //                else
-        //                {
-        //                    XtraMessageBox.Show("Invalid Barcode Type!.. Please use manual input!..");
-        //                    return;
-        //                }
-        //            }
-        //            else
-        //            {
-        //                if (txtbarcodescanning.Text.Length == 19) //tens 11111 10015 10123 0001 --10.123 kilos
-        //                {
-        //                    pcode = txtbarcodescanning.Text.Substring(5, 5);
-        //                    desc = Database.getSingleQuery("Products", "ProductCode='" + pcode + "' and BranchCode='888'", "Description");
-        //                    qty1 = txtbarcodescanning.Text.Substring(10, 2); //1001512345
-        //                    qty2 = txtbarcodescanning.Text.Substring(12, 3);
-        //                    qty = qty1 + "." + qty2;
-        //                    barcode = txtbarcodescanning.Text;
-        //                }
-        //                else if (txtbarcodescanning.Text.Length == 20) //hundred 11111 10015 100123 0001 --100.123 kilos
-        //                {
-        //                    pcode = txtbarcodescanning.Text.Substring(5, 5);
-        //                    desc = Database.getSingleQuery("Products", "ProductCode='" + pcode + "' and BranchCode='888'", "Description");
-        //                    qty1 = txtbarcodescanning.Text.Substring(10, 3); //10015100345
-        //                    qty2 = txtbarcodescanning.Text.Substring(13, 3);
-        //                    qty = qty1 + "." + qty2;
-        //                    barcode = txtbarcodescanning.Text;
-        //                }
-        //                else if (txtbarcodescanning.Text.Length == 21) //thousand  11111 10015 1000123 0001 --1000.123 kilos
-        //                {
-        //                    pcode = txtbarcodescanning.Text.Substring(5, 5);
-        //                    desc = Database.getSingleQuery("Products", "ProductCode='" + pcode + "' and BranchCode='888'", "Description");
-        //                    qty1 = txtbarcodescanning.Text.Substring(10, 4); //10015100345
-        //                    qty2 = txtbarcodescanning.Text.Substring(14, 3);
-        //                    qty = qty1 + "." + qty2;
-        //                    barcode = txtbarcodescanning.Text;
-        //                }
-        //                else
-        //                {
-        //                    XtraMessageBox.Show("Invalid Barcode Type!.. Please use manual input!..");
-        //                    return;
-        //                }
-        //            }
-
-        //        }
-        //        //bool checkbarcode = Database.checkifExist("SELECT Barcode FROM Products WHERE Barcode='"+txtsku.Text+"' AND BranchCode='"+Login.assignedBranch+"'");
-        //        //if (!checkbarcode)
-        //        //{
-        //        //    XtraMessageBox.Show("Barcode Not Exist..Please used Search Item");
-        //        //    txtsku.Text = "";
-        //        //    return;
-        //        //}
-        //        //else
-        //        //{
-        //        //    productcode = Database.getSingleQuery("Products", "Barcode='" + txtsku.Text + "' and BranchCode='" + Login.assignedBranch + "'", "ProductCode");
-        //        //    prodname = Database.getSingleQuery("Products", "Barcode='" + txtsku.Text + "' and BranchCode='" + Login.assignedBranch + "'", "Description");
-        //        //    barcode = Database.getSingleQuery("Products", "Barcode='" + txtsku.Text + "' and BranchCode='" + Login.assignedBranch + "'", "Barcode");
-        //        //}
-        //    }
-        //    Database.ExecuteQuery("INSERT INTO TempInventoryIN (ID,Branch,DateReceived,Product,Description,Barcode,Quantity,Cost,isWarehouse,DateEncode,EncodeBy) VALUES('" + txtid.Text + "','" + Login.assignedBranch + "','" + txtdatereceived.Text + "','" + pcode + "','" + desc + "','" + barcode + "','" + qty + "','0','" + iswarehouse + "','" + DateTime.Now.ToShortDateString() + "','" + Login.isglobalUserID + "')");
-        //    isusedsearchform = false;
-        //    display();
-        //    gridView1.MoveLast();
-        //    // txtcosting.Text = "";
-        //    txtbarcodescanning.Text = "";
-        
-        //    //txtsku.Focus();
-        //    txtbarcodescanning.Focus();
-        //}
-
-     
-
-     
 
         private void btnclear_Click(object sender, EventArgs e)
         {
@@ -467,62 +334,9 @@ namespace SalesInventorySystem
                 con.Close();
             }
         }
-        //void searchProductItems()
-        //{
-        //    try
-        //    {
-
-        //        SearchProductItems searchprod = new SearchProductItems();
-        //        searchprod.ShowDialog(this);
-        //        if (SearchProductItems.isUsedSearchForm == true) //isUsedSearchForm indicator ni cya sa searchproduct form kng nigamit ba cya og searchform
-        //        {
-        //            txtbarcodescanning.Text = SearchProductItems.prodcode.Substring(0, 2) + SearchProductItems.prodcode;
-        //            //isusedbarcode = false;
-        //            SearchProductItems.isUsedSearchForm = false;
-
-
-        //            searchprod.Dispose();
-        //            txtbarcodescanning.Focus();
-        //            isusedsearchform = true; //is isusedsearchform is a local variable declare in this class
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        XtraMessageBox.Show(ex.Message.ToString());
-        //    }
-        //}
+        
         void searchProductItems()
         {
-            //try
-            //{
-            //    SearchProduct searchprod = new SearchProduct();
-            //    searchprod.ShowDialog(this);
-            //    if (SearchProduct.isUsedSearchForm == true) //isUsedSearchForm indicator ni cya sa searchproduct form kng nigamit ba cya og searchform
-            //    {
-            //        isusedsearchform = true; //is isusedsearchform is a local variable declare in this class
-            //        if (SearchProduct.havebarcode == true) //kng pag select nya kay naay barcode
-            //        {
-            //            txtbarcodescanning.Text = SearchProduct.barcode; // 
-            //            isusedbarcode = true;
-            //            SearchProduct.isUsedSearchForm = false;
-            //        }
-            //        else //kung pag select nya sa item sa search product kay wlaay barcode
-            //        {
-            //            //txtbarcodescanning.Text = SearchProduct.prodcode.Substring(0, 2) + SearchProduct.prodcode + SearchProduct.qty.Replace(".", "");
-            //            txtbarcodescanning.Text = SearchProduct.prodcode + SearchProduct.qty.Replace(".", "");
-            //            isusedbarcode = false;
-            //            SearchProduct.isUsedSearchForm = false;
-            //        }
-            //        //SearchProduct.isUsedSearchForm = false; public static bool ispriceused=false,isusedbarcode=false;
-            //        //ispriceused = SearchProduct.priceused;
-            //        searchprod.Dispose();
-            //        txtbarcodescanning.Focus();
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    XtraMessageBox.Show(ex.Message.ToString());
-            //}
             try
             {
                 SearchProductItems searchprod = new SearchProductItems();
@@ -677,11 +491,7 @@ namespace SalesInventorySystem
                     con.Open();
                     cmd.ExecuteNonQuery();
                     display();
-                    gridView1.BestFitColumns();
-                    //gridView1.Columns["SequenceNo"].Summary.Clear();
-                    //gridView1.Columns["SequenceNo"].Summary.Add(DevExpress.Data.SummaryItemType.Count, "SequenceNo", "{0}");
-                    //gridView1.Columns["Qty"].Summary.Clear();
-                    //gridView1.Columns["Qty"].Summary.Add(DevExpress.Data.SummaryItemType.Sum, "Qty", "{0}");
+                    gridView1.BestFitColumns(); 
 
                 }
                 catch (SqlException ex)
@@ -700,60 +510,252 @@ namespace SalesInventorySystem
             txtbarcodescanning.Focus();
         }
 
+        private void txtproduct_EditValueChanged(object sender, EventArgs e)
+        {
+            prodcode = SearchLookUpClass.getSingleValue(txtproduct, "ProductCode");
+            txtqty.Text = "";
+            txtqty.Focus();
+        }
+        void displaSKU()
+        {
+            try
+            {
+                decimal quantity;
+                string strquantity;
+                string productcode = "";     
+                quantity = Decimal.Parse(txtqty.Text);
+                strquantity = String.Format("{0:00.000}", quantity);
+                productcode = prodcode.ToString();//getProductCode();
+                                                   //txtsku.Text = Database.getSingleQuery("Products", "BranchCode='" + Login.assignedBranch + "' AND ProductCode='" + pcode + "' ", "Barcode");
+                string barcode = "";
+                    
+                barcode = Database.getSingleResultSet($"SELECT dbo.[func_GenerateBarcodeReInventoryIN]" +
+                                                            $"('{txtid.Text}','{productcode}','{strquantity}' ) ");
+                txtsku.Text = barcode;
+                tab2AddBtn.Focus();
 
-        //void AddEntry()
-        //{
-        //    bool validproductcode = false;
-        //    string desc = "", pcode = "", barcode = "", qty = "";
-        //    double finalqty = 0.0;
-        //    barcode = txtbarcodescanning.Text.Trim();
-        //    if (isusedbarcode == true)
-        //    {
-        //        pcode = Database.getSingleQuery("Products", "Barcode='" + txtbarcodescanning.Text + "' and BranchCode='" + Login.assignedBranch + "'", "ProductCode");
-        //        desc = Database.getSingleQuery("Products", "Barcode='" + txtbarcodescanning.Text + "' and BranchCode='" + Login.assignedBranch + "'", "Description");
-        //        //Database.getSingleQuery("Products", "ProductCode='" + pcode + "' and BranchCode='" + brcode.ToString() + "'", "Description");
-        //    }else
-        //    {
-        //        pcode = Database.getSingleQuery("Products", "ProductCode='" + txtbarcodescanning.Text + "' and BranchCode='" + Login.assignedBranch + "'", "ProductCode");
-        //        desc = Database.getSingleQuery("Products", "ProductCode='" + txtbarcodescanning.Text + "' and BranchCode='" + Login.assignedBranch + "'", "Description");
-        //        //Database.getSingleQuery("Products", "ProductCode='" + pcode + "' and BranchCode='" + brcode.ToString() + "'", "Description");
-        //    }
+            }
+            catch (SqlException ex)
+            {
+                XtraMessageBox.Show(ex.Message.ToString() + "ABC");
+            }
+        }
+        private void txtqty_KeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.KeyCode == Keys.Enter)
+            {
+                displaSKU();
+            }
+        }
 
-        //    qty = "1";
-        //    validproductcode = Database.checkifExist("SELECT TOP(1) ProductCode FROM dbo.Products WHERE ProductCode='" + pcode + "' And BranchCode='"+ brcode.ToString() + "'");
-        //    if (!validproductcode)
-        //    {
-        //        XtraMessageBox.Show("Invalid Product Code!!..");
-        //        return;
-        //    }
-           
-        //    finalqty = Convert.ToDouble(qty);
+        private void tab2btnnew_Click(object sender, EventArgs e)
+        {
+            tab2batchid.Text = IDGenerator.getIDNumberSP("sp_GetInventoryINNumber", "InventoryID");
+            txtproduct.Enabled = true;
+            txtqty.Enabled = true;
+            txtsku.Enabled = true;
+            tab2btnnew.Enabled = false;
+        }
 
-        //    string prodcatcode = Database.getSingleQuery("Products", "BranchCode='" + brcode.ToString() + "' AND ProductCode='" + pcode + "'", "ProductCategoryCode");
-        //    string isvat = Database.getSingleQuery("ProductCategory", "ProductCategoryID='"+prodcatcode+"'", "isVat");
+
+        void addManualInventory()
+        {
+            bool isWarehouse = false;
+            if(tab2radbigblue.Checked==true)
+            {
+                isWarehouse = false;
+            }else
+            {
+                isWarehouse = true;
+            }
          
-        //    Database.ExecuteQuery("INSERT INTO dbo.TempInventoryIN (ID,Branch,DateReceived,ExpiryDate,Product,Description,Barcode,Quantity,Cost,isWarehouse,isVat,isDone,DateEncode,EncodeBy) " +
-        //        "VALUES('" + txtid.Text + "'" +
-        //        $",'{brcode.ToString()}'" +
-        //        $",'{txtdatereceived.Text}'" +
-        //        $",'{txtxpirydate.Text}'" +
-        //        $",'{pcode}'" +
-        //        $",'{desc}'" +
-        //        $",'{barcode}'" +
-        //        $",'{finalqty}'" +
-        //        $",'{txtcost.Text}'" +
-        //        $",'0" +
-        //        $",'{isvat}'" +
-        //        $",'0'" +
-        //        $",'{DateTime.Now.ToShortDateString()}'" +
-        //        $",'{Login.isglobalUserID}')", "Succesfully Added");
+            SqlConnection con = Database.getConnection();
+            con.Open();
+            int ctr = gridView1.RowCount - 1;
+            try
+            {
+                string query = "[sp_StageManualEntryForReInventoryIN]";
+                SqlCommand com = new SqlCommand(query, con);
+                com.Parameters.AddWithValue("@parmid", tab2batchid.Text);
+                com.Parameters.AddWithValue("@parmbranch", brcodetab2.ToString());
+                com.Parameters.AddWithValue("@parmdatereceived", tab2datereceived.Text);
+                com.Parameters.AddWithValue("@parmexpirydate", tab2expirydate.Text);
+                com.Parameters.AddWithValue("@parmproductcode", prodcode.ToString());
+                com.Parameters.AddWithValue("@parmbarcode", txtsku.Text);
+                com.Parameters.AddWithValue("@parmqty", txtqty.Text);
+                com.Parameters.AddWithValue("@parmcost", tab2cost.Text);                                                                      
+                com.Parameters.AddWithValue("@parmiswarehouse", isWarehouse);
+                com.Parameters.AddWithValue("@parmuser", Login.isglobalUserID);
 
-        //    isusedsearchform = false;
-        //    display();
-        //    gridView1.MoveLast();
-        //    txtbarcodescanning.Text = "";
-        //    txtbarcodescanning.Focus();
-        //}
+                com.CommandType = CommandType.StoredProcedure;
+                com.CommandText = query;
+                com.ExecuteNonQuery();
+            }
+            catch (SqlException ex)
+            {
+                XtraMessageBox.Show(ex.Message.ToString());
+            }
+            finally
+            {
+                con.Close();
+            }
+
+            XtraMessageBox.Show("Successfully Added!");
+           
+        }
+        private void PrintQr(string barcodeValue)
+        {
+            var rpt = new Barcode.BarcodePrinting();
+
+            rpt.DataSource = null;
+            rpt.DataMember = "";
+
+            rpt.xrshipno.Text = "INVIN-" + tab2batchid.Text;
+            rpt.xrpalletno.Text = "";
+            rpt.lblmanufdate.Text = Convert.ToDateTime(tab2datereceived.Text).ToShortDateString();
+            rpt.lblprodtype.Text = txtproduct.Text;
+            rpt.xrsku.Text = prodcode.ToString();
+            rpt.lbltotalkilos.Text = txtqty.Text.Trim();
+            rpt.lblxpirydate.Text = Convert.ToDateTime(tab2expirydate.Text).ToShortDateString();
+
+            // KEY: force QR payload
+            rpt.xrBarCode2.AutoModule = false; // override designer
+            rpt.xrBarCode2.Text = barcodeValue.Trim();
+
+            rpt.CreateDocument();
+
+            try
+            {
+                new ReportPrintTool(rpt).Print();
+            }
+            catch (System.Drawing.Printing.InvalidPrinterException ex)
+            {
+                // Handle gracefully
+                XtraMessageBox.Show("Printing failed: " + ex.Message +
+                                    "\nPlease install or configure a printer before printing.",
+                                    "Printer Error",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Error);
+            }
+        }
+
+        void printBarcode()
+        {
+            PrintQr(txtsku.Text);
+        }
+        private void tab2AddBtn_Click(object sender, EventArgs e)
+        {
+            if (String.IsNullOrEmpty(tab2batchid.Text) || String.IsNullOrEmpty(tab2datereceived.Text) || String.IsNullOrEmpty(tab2brcode.Text))
+            {
+                XtraMessageBox.Show("No Empty Fields");
+                return;
+            }
+            else
+            {
+               
+                addManualInventory();
+                printBarcode();
+                displayTab2();
+                
+                txtqty.Text = "";
+                txtsku.Text = "";
+
+                txtproduct.Focus();
+            }
+        }
+
+        private void tab2cancelbtn_Click(object sender, EventArgs e)
+        {
+            string seqno = gridView4.GetRowCellValue(gridView4.FocusedRowHandle, "SequenceNumber").ToString();
+            Database.ExecuteQuery($"DELETE FROM TempInventoryIN WHERE ID='{tab2batchid.Text}' " +
+                $"AND SequenceNumber='{seqno}'", "Successfully Deleted");
+            displayTab2();
+        }
+
+
+        void saveManualInventoryEntry()
+        {
+            SqlConnection con = Database.getConnection();
+            con.Open();
+            //int ctr = gridView1.RowCount - 1;
+            try
+            {
+                string query = "sp_CommitReInventoryINManualEntry";
+                SqlCommand com = new SqlCommand(query, con);
+                com.Parameters.AddWithValue("@parmid", tab2batchid.Text);
+                com.CommandType = CommandType.StoredProcedure;
+                com.CommandText = query;
+                com.ExecuteNonQuery();
+            }
+            catch (SqlException ex)
+            {
+                XtraMessageBox.Show(ex.Message.ToString());
+            }
+            finally
+            {
+                con.Close();
+            }
+
+           
+        }
+        private void tab2savebtn_Click(object sender, EventArgs e)
+        {
+            if(gridView4.RowCount <= 0)
+            {
+                XtraMessageBox.Show("No Records to Save");
+            }
+            else
+            {
+                saveManualInventoryEntry();
+                XtraMessageBox.Show("Successfully Saved!");
+
+                tab2batchid.Text = "";
+                txtproduct.Text = "";
+                txtqty.Text = "";
+                txtsku.Text = "";
+
+                txtproduct.Enabled = false;
+                txtqty.Enabled = false;
+                txtsku.Enabled = false;
+
+                gridControltab2.DataSource = null;
+                gridView4.Columns.Clear();
+
+                tab2btnnew.Enabled = true;
+            }
+        }
+
+        private void simpleButton8_Click(object sender, EventArgs e)
+        {
+            recoverInventoryForManualSelection();
+        }
+
+        void recoverInventoryForManualSelection()
+        {
+            ReInventoryINRecovery revin = new ReInventoryINRecovery();
+            revin.ShowDialog(this);
+            if (ReInventoryINRecovery.isdone == true)
+            {
+                bool checkfirst = Database.checkifExist("SELECT ID FROM [TempInventoryIN] WHERE ID = '" + ReInventoryINRecovery.id + "'");
+                if (checkfirst)
+                {
+                    Database.display("SELECT * FROM [TempInventoryIN] WHERE ID='" + ReInventoryINRecovery.id + "'", gridControltab2, gridView4);
+                    tab2batchid.Text = ReInventoryINRecovery.id;
+                }
+                else
+                {
+                    XtraMessageBox.Show("Inventory ID Not Exist in Temporary Container, This Number is either not exist OR it is already Uploaded in Inventory Table");
+                    return;
+                }
+                ReInventoryINRecovery.isdone = false;
+                revin.Dispose();
+            }
+        }
+
+        private void tab2brcode_EditValueChanged(object sender, EventArgs e)
+        {
+            brcodetab2 = SearchLookUpClass.getSingleValue(tab2brcode, "BranchCode");
+        }
 
         private void txtbranch_EditValueChanged(object sender, EventArgs e)
         {

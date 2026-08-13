@@ -30,8 +30,8 @@
         {
             this.txtcost = new DevExpress.XtraEditors.SpinEdit();
             this.labelControl1 = new DevExpress.XtraEditors.LabelControl();
-            this.simpleButton1 = new DevExpress.XtraEditors.SimpleButton();
             this.txtseqno = new DevExpress.XtraEditors.TextEdit();
+            this.simpleButton1 = new DevExpress.XtraEditors.SimpleButton();
             ((System.ComponentModel.ISupportInitialize)(this.txtcost.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtseqno.Properties)).BeginInit();
             this.SuspendLayout();
@@ -63,6 +63,14 @@
             this.labelControl1.TabIndex = 1;
             this.labelControl1.Text = "Set Cost:";
             // 
+            // txtseqno
+            // 
+            this.txtseqno.Location = new System.Drawing.Point(23, 104);
+            this.txtseqno.Name = "txtseqno";
+            this.txtseqno.Size = new System.Drawing.Size(125, 22);
+            this.txtseqno.TabIndex = 15;
+            this.txtseqno.Visible = false;
+            // 
             // simpleButton1
             // 
             this.simpleButton1.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.Refresh_16x16;
@@ -74,14 +82,6 @@
             this.simpleButton1.TabIndex = 14;
             this.simpleButton1.Text = "Generate";
             this.simpleButton1.Click += new System.EventHandler(this.simpleButton1_Click);
-            // 
-            // txtseqno
-            // 
-            this.txtseqno.Location = new System.Drawing.Point(23, 104);
-            this.txtseqno.Name = "txtseqno";
-            this.txtseqno.Size = new System.Drawing.Size(125, 22);
-            this.txtseqno.TabIndex = 15;
-            this.txtseqno.Visible = false;
             // 
             // BranchGenInventoryUpdateCost
             // 

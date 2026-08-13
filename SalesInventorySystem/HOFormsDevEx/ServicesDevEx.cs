@@ -7,6 +7,7 @@ using System.Text;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Data.SqlClient;
 using DevExpress.XtraEditors;
 
 namespace SalesInventorySystem.HOFormsDevEx
@@ -23,25 +24,35 @@ namespace SalesInventorySystem.HOFormsDevEx
         {
             disablefields();
             display();
+            populateGLCode();
             btnadd.Enabled = false;
             btnupdate.Enabled = false;
             btncancel.Enabled = false;
         }
+
+        void populateGLCode()
+        {
+            Database.displaySearchlookupEdit("SELECT AccountCode, Description FROM ChartOfAccounts WHERE AccountType='D'", txtglcode, "AccountCode", "AccountCode");
+        }
+
         void clear()
         {
             txtdeptid.Text = "";
             txtdeptname.Text = "";
+            txtglcode.EditValue = null;
         }
 
         void disablefields()
         {
             txtdeptid.Enabled = false;
             txtdeptname.Enabled = false;
+            txtglcode.Enabled = false;
         }
         void enablefields()
         {
             txtdeptid.Enabled = true;
             txtdeptname.Enabled = true;
+            txtglcode.Enabled = true;
         }
 
         private void btnnew_Click(object sender, EventArgs e)
@@ -67,7 +78,16 @@ namespace SalesInventorySystem.HOFormsDevEx
             }
             else
             {
-                Database.ExecuteQuery("INSERT INTO Services VALUES('" + txtdeptid.Text + "','" + txtdeptname.Text + "')", "Successfully Added");
+                using (SqlConnection con = Database.getConnection())
+                {
+                    con.Open();
+                    SqlCommand com = new SqlCommand("INSERT INTO Services (SRVC_ID, SRVC_DESC, GLCode) VALUES (@srvcid, @srvcdesc, @glcode)", con);
+                    com.Parameters.AddWithValue("@srvcid", txtdeptid.Text);
+                    com.Parameters.AddWithValue("@srvcdesc", txtdeptname.Text);
+                    com.Parameters.AddWithValue("@glcode", (object)txtglcode.EditValue ?? DBNull.Value);
+                    com.ExecuteNonQuery();
+                }
+                XtraMessageBox.Show("Successfully Added");
                 clear();
 
                 btnnew.Enabled = true;
@@ -82,7 +102,18 @@ namespace SalesInventorySystem.HOFormsDevEx
 
         private void btnupdate_Click(object sender, EventArgs e)
         {
-            Database.ExecuteQuery("UPDATE Services SET SRVC_ID='" + txtdeptid.Text + "',SRVC_DESC='" + txtdeptname.Text + "' WHERE SRVC_ID='" + deptid + "' AND SRVC_DESC='" + deptname + "' ", "Successfully Updated!");
+            using (SqlConnection con = Database.getConnection())
+            {
+                con.Open();
+                SqlCommand com = new SqlCommand("UPDATE Services SET SRVC_ID=@srvcid, SRVC_DESC=@srvcdesc, GLCode=@glcode WHERE SRVC_ID=@oldid AND SRVC_DESC=@olddesc", con);
+                com.Parameters.AddWithValue("@srvcid", txtdeptid.Text);
+                com.Parameters.AddWithValue("@srvcdesc", txtdeptname.Text);
+                com.Parameters.AddWithValue("@glcode", (object)txtglcode.EditValue ?? DBNull.Value);
+                com.Parameters.AddWithValue("@oldid", deptid);
+                com.Parameters.AddWithValue("@olddesc", deptname);
+                com.ExecuteNonQuery();
+            }
+            XtraMessageBox.Show("Successfully Updated!");
             clear();
             disablefields();
             btnnew.Enabled = true;
@@ -129,6 +160,8 @@ namespace SalesInventorySystem.HOFormsDevEx
             deptname = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "SRVC_DESC").ToString();
             txtdeptid.Text = deptid;
             txtdeptname.Text = deptname;
+            object glcode = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "GLCode");
+            txtglcode.EditValue = (glcode == DBNull.Value) ? null : glcode;
             enablefields();
 
             btnnew.Enabled = false;

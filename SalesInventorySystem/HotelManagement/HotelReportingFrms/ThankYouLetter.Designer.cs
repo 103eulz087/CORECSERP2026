@@ -81,7 +81,7 @@
             this.xrLabel3,
             this.xrLabel2,
             this.xrLabel1});
-            this.PageHeader.Font = new System.Drawing.Font("Times New Roman", 12.75F);
+            this.PageHeader.Font = new DevExpress.Drawing.DXFont("Times New Roman", 12.75F);
             this.PageHeader.HeightF = 220.9167F;
             this.PageHeader.Name = "PageHeader";
             this.PageHeader.StylePriority.UseFont = false;
@@ -135,7 +135,7 @@
             // 
             // xrLabel6
             // 
-            this.xrLabel6.Font = new System.Drawing.Font("Times New Roman", 12.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.xrLabel6.Font = new DevExpress.Drawing.DXFont("Times New Roman", 12.75F, DevExpress.Drawing.DXFontStyle.Bold, DevExpress.Drawing.DXGraphicsUnit.Point, new DevExpress.Drawing.DXFontAdditionalProperty[] {new DevExpress.Drawing.DXFontAdditionalProperty("GdiCharSet", ((byte)(0)))});
             this.xrLabel6.LocationFloat = new DevExpress.Utils.PointFloat(441.6667F, 151.0417F);
             this.xrLabel6.Name = "xrLabel6";
             this.xrLabel6.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -158,7 +158,7 @@
             // 
             // xrLabel8
             // 
-            this.xrLabel8.Font = new System.Drawing.Font("Times New Roman", 12.75F);
+            this.xrLabel8.Font = new DevExpress.Drawing.DXFont("Times New Roman", 12.75F);
             this.xrLabel8.LocationFloat = new DevExpress.Utils.PointFloat(0F, 37.5F);
             this.xrLabel8.Name = "xrLabel8";
             this.xrLabel8.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -177,7 +177,7 @@
             this.PageHeader,
             this.ReportFooter,
             this.PageFooter});
-            this.Margins = new System.Drawing.Printing.Margins(100, 100, 50, 100);
+            this.Margins = new DevExpress.Drawing.DXMargins(100, 100, 50, 100);
             this.Version = "15.1";
             ((System.ComponentModel.ISupportInitialize)(this)).EndInit();
 

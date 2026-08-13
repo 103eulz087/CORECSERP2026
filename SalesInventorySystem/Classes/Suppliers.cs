@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -71,12 +72,26 @@ namespace SalesInventorySystem.Classes
             return custname;
         }
 
-        public static String getSupplierBalance(string custid)
+        //public static String getSupplierBalance(string custid)
+        //{
+        //    string custname = "";
+        //    custname = Database.getSingleQuery("SupplierAccounts", "SupplierID='" + getSupplierID(custid) + "'", "AccountBalance");
+        //    return custname;
+        //}
+        public static decimal GetSupplierBalance(string custid)
         {
-            string custname = "";
-            custname = Database.getSingleQuery("SupplierAccounts", "SupplierID='" + getSupplierID(custid) + "'", "AccountBalance");
-            return custname;
+            var supplierId = getSupplierID(custid);
+
+            var balanceStr = Database.getSingleQuery(
+                "SupplierAccounts",
+                "SupplierID = @SupplierID",
+                "AccountBalance",
+                new SqlParameter("@SupplierID", supplierId)
+            );
+
+            return decimal.TryParse(balanceStr, out var balance) ? balance : 0m;
         }
+
 
         public static String getSupplierLastMovementDate(string custid)
         {

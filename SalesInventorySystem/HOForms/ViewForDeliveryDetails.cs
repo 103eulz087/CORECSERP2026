@@ -18,7 +18,7 @@ using DevExpress.XtraGrid;
 
 namespace SalesInventorySystem.HOForms
 {
-    public partial class ViewForDeliveryDetails : Form
+    public partial class ViewForDeliveryDetails : XtraForm
     {
         //string referenceNumber = "";
         public static bool isupdated = false;
@@ -87,7 +87,7 @@ namespace SalesInventorySystem.HOForms
                         xct.xrcaption2.Text = caption2;
 
                         xct.Landscape = false;
-                        xct.PaperKind = System.Drawing.Printing.PaperKind.Letter;
+                        xct.PaperKind = (DevExpress.Drawing.Printing.DXPaperKind)System.Drawing.Printing.PaperKind.Letter;
                         xct.Margins = new System.Drawing.Printing.Margins(100, 100, 100, 100);
                         xct.xrdate.Text = DateTime.Now.ToShortDateString();
                         xct.xrorderno.Text = txtpono.Text;
@@ -183,8 +183,15 @@ namespace SalesInventorySystem.HOForms
             Reporting.SalesInvoiceDexEx viewdet = new Reporting.SalesInvoiceDexEx();
             viewdet.Show();
 
-            analyze("spview_SalesInvoice", txtpono.Text, viewdet.gridControl4, viewdet.gridView4);
-            
+            if(GlobalCache.CompanyName=="JFC")
+            {
+                analyze("spview_SalesInvoiceJFC", txtpono.Text, viewdet.gridControl4, viewdet.gridView4);
+            }
+            else
+            {
+
+                analyze("spview_SalesInvoice", txtpono.Text, viewdet.gridControl4, viewdet.gridView4);
+            }
 
             viewdet.txtpono.Text = txtpono.Text;
             double vatablesales = 0.0, vatexemptsale = 0.0, vatamount = 0.0, totalsales = 0.0, lessvat = 0.0, netofvat = 0.0, amountdue = 0.0, addvat = 0.0, vatsales = 0.0, totalamountdue = 0.0;

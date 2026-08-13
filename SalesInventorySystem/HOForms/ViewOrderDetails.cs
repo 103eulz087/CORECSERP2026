@@ -84,7 +84,7 @@ namespace SalesInventorySystem
             xct.xraddress1.Text = "";
             xct.xraddress2.Text = "";
             xct.Landscape = false;
-            xct.PaperKind = System.Drawing.Printing.PaperKind.Letter;
+            xct.PaperKind = (DevExpress.Drawing.Printing.DXPaperKind)System.Drawing.Printing.PaperKind.Letter;
             xct.Margins = new System.Drawing.Printing.Margins(100, 100, 100, 100);
             xct.lbldate.Text = DateTime.Now.ToShortDateString();
             xct.lblorderno.Text = ViewOrder.shipmentno;

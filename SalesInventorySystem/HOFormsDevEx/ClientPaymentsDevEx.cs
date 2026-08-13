@@ -44,7 +44,8 @@ namespace SalesInventorySystem.HOFormsDevEx
             Classes.DevXGridViewSettings.ShowFooterTotal(gridView2, "InvoiceAmount");
             Classes.DevXGridViewSettings.ShowFooterTotal(gridView2, "Balance");
             Classes.DevXGridViewSettings.ShowFooterTotal(gridView2, "AmountPaid");
-            Classes.DevXGridViewSettings.ShowFooterTotal(gridView2, "AdvancePayment");
+            //Classes.DevXGridViewSettings.ShowFooterTotal(gridView2, "AdvancePayment");
+            Classes.DevXGridViewSettings.ShowFooterTotal(gridView2, "OverPay");
             Classes.DevXGridViewSettings.ShowFooterTotal(gridView2, "EWTAmount");
             Classes.DevXGridViewSettings.ShowFooterTotal(gridView2, "DiscountAmount");
             Classes.DevXGridViewSettings.ShowFooterTotal(gridView2, "OffsetAmount");
@@ -73,7 +74,8 @@ namespace SalesInventorySystem.HOFormsDevEx
                     table.Load(dr);
 
                 // Unlock editable columns (SP returns them as read-only by default)
-                string[] editableColumns = { "Pay", "AmountPaid", "EWTAmount", "DiscountAmount", "OffsetAmount", "AdvancePayment" };
+                //string[] editableColumns = { "Pay", "AmountPaid", "EWTAmount", "DiscountAmount", "OffsetAmount", "AdvancePayment" };
+                string[] editableColumns = { "Pay", "AmountPaid", "EWTAmount", "DiscountAmount", "OffsetAmount", "OverPay" };
                 foreach (string col in editableColumns)
                     if (table.Columns.Contains(col))
                         table.Columns[col].ReadOnly = false;
@@ -172,6 +174,7 @@ namespace SalesInventorySystem.HOFormsDevEx
                     gridView2.SetRowCellValue(row, "EWTAmount", 0);
                     gridView2.SetRowCellValue(row, "DiscountAmount", 0);
                     gridView2.SetRowCellValue(row, "OffsetAmount", 0);
+                    gridView2.SetRowCellValue(row, "OverPay", 0);
                     gridView2.SetRowCellValue(row, "AmountPaid", balance);
                 }
                 else
@@ -179,6 +182,7 @@ namespace SalesInventorySystem.HOFormsDevEx
                     gridView2.SetRowCellValue(row, "EWTAmount", 0);
                     gridView2.SetRowCellValue(row, "DiscountAmount", 0);
                     gridView2.SetRowCellValue(row, "OffsetAmount", 0);
+                    gridView2.SetRowCellValue(row, "OverPay", 0);
                     gridView2.SetRowCellValue(row, "AmountPaid", 0);
                 }
                 ComputeTotal();
@@ -187,6 +191,7 @@ namespace SalesInventorySystem.HOFormsDevEx
 
             if (e.Column.FieldName == "EWTAmount" ||
                 e.Column.FieldName == "DiscountAmount" ||
+                e.Column.FieldName == "OverPay" ||
                 e.Column.FieldName == "OffsetAmount")
             {
                 RecalculateRow(row);
@@ -195,6 +200,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             if (e.Column.FieldName == "EWTAmount" ||
                 e.Column.FieldName == "DiscountAmount" ||
                 e.Column.FieldName == "OffsetAmount" ||
+                e.Column.FieldName == "OverPay" ||
                 e.Column.FieldName == "AmountPaid")
             {
                 ComputeTotal();
@@ -203,7 +209,7 @@ namespace SalesInventorySystem.HOFormsDevEx
         }
 
         // RecalculateRow: AmountPaid (net cash) = balance - all deductions
-        // This is display-only. Gross is reconstructed at save time. [BUG-1]
+        // This is display-only. Gross is reconstructed at save time.
         private void RecalculateRow(int row)
         {
             bool isPay = Convert.ToBoolean(gridView2.GetRowCellValue(row, "Pay"));
@@ -213,12 +219,19 @@ namespace SalesInventorySystem.HOFormsDevEx
             double ewt = Convert.ToDouble(gridView2.GetRowCellValue(row, "EWTAmount") ?? 0);
             double discount = Convert.ToDouble(gridView2.GetRowCellValue(row, "DiscountAmount") ?? 0);
             double offset = Convert.ToDouble(gridView2.GetRowCellValue(row, "OffsetAmount") ?? 0);
+            double overpay = Convert.ToDouble(gridView2.GetRowCellValue(row, "OverPay") ?? 0);
 
-            double netPayment = balance - ewt - discount - offset;
+            double netPayment = (balance - ewt - discount - offset) + overpay;
             if (netPayment < 0) netPayment = 0;
 
             double current = Convert.ToDouble(gridView2.GetRowCellValue(row, "AmountPaid") ?? 0);
-            if (current != netPayment)
+            if (current == netPayment) return;
+
+            
+            DataRow dr = gridView2.GetDataRow(row);
+            if (dr != null)
+                dr["AmountPaid"] = netPayment;
+            else
                 gridView2.SetRowCellValue(row, "AmountPaid", netPayment);
         }
 
@@ -270,6 +283,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             double ewt = Convert.ToDouble(view.GetRowCellValue(row, "EWTAmount") ?? 0);
             double discount = Convert.ToDouble(view.GetRowCellValue(row, "DiscountAmount") ?? 0);
             double offset = Convert.ToDouble(view.GetRowCellValue(row, "OffsetAmount") ?? 0);
+            double overpay = Convert.ToDouble(view.GetRowCellValue(row, "OverPay") ?? 0);
             double amtPaid = Convert.ToDouble(view.GetRowCellValue(row, "AmountPaid") ?? 0);
 
             // Apply the pending value to test
@@ -278,18 +292,19 @@ namespace SalesInventorySystem.HOFormsDevEx
             if (field == "OffsetAmount") offset = value;
             if (field == "AmountPaid") amtPaid = value;
 
-            if ((ewt + discount + offset) > balance)
-            {
-                e.Valid = false;
-                e.ErrorText = "Total deductions (EWT + Discount + Offset) cannot exceed the Balance.";
-                return;
-            }
-            if (amtPaid > balance)
-            {
-                e.Valid = false;
-                e.ErrorText = "Amount Paid cannot exceed the Balance.";
-                return;
-            }
+            //if ((ewt + discount + offset) > balance)
+            //{
+            //    e.Valid = false;
+            //    e.ErrorText = "Total deductions (EWT + Discount + Offset) cannot exceed the Balance.";
+            //    return;
+            //}
+            //// OverPay legitimately lets AmountPaid exceed Balance - allow that room.
+            //if (amtPaid > balance + overpay)
+            //{
+            //    e.Valid = false;
+            //    e.ErrorText = "Amount Paid cannot exceed the Balance plus Overpay.";
+            //    return;
+            //}
 
             e.Valid = true;
         }
@@ -312,11 +327,11 @@ namespace SalesInventorySystem.HOFormsDevEx
             double balance = Convert.ToDouble(view.GetRowCellValue(e.RowHandle, "Balance") ?? 0);
             double ewt = Convert.ToDouble(view.GetRowCellValue(e.RowHandle, "EWTAmount") ?? 0);
             double discount = Convert.ToDouble(view.GetRowCellValue(e.RowHandle, "DiscountAmount") ?? 0);
-            double offset = Convert.ToDouble(view.GetRowCellValue(e.RowHandle, "OffsetAmount") ?? 0); // [BUG-2] was missing
+            double offset = Convert.ToDouble(view.GetRowCellValue(e.RowHandle, "OffsetAmount") ?? 0);
+            double overpay = Convert.ToDouble(view.GetRowCellValue(e.RowHandle, "OverPay") ?? 0);
             double amtPaid = Convert.ToDouble(view.GetRowCellValue(e.RowHandle, "AmountPaid") ?? 0);
 
-            // [BUG-2] FIX: include offset in the computed expected net
-            double expectedNet = balance - ewt - discount - offset;
+            double expectedNet = balance - ewt - discount - offset + overpay;
 
             if ((ewt + discount + offset) > balance || amtPaid < 0)
             {
@@ -443,11 +458,11 @@ namespace SalesInventorySystem.HOFormsDevEx
                 return;
             }
 
-            // [BUG-3] FIX: use local variables, not instance accumulators
             int ctr = 0;
             int advpymntctr = 0;
             double totalBalance = 0;
             double totalAmtPaid = 0;
+            double totalOverpay = 0;
             double advncepymentval = 0;
             bool isSales = false;
             bool isCharge = false;
@@ -460,13 +475,15 @@ namespace SalesInventorySystem.HOFormsDevEx
                 ctr++;
                 totalBalance += Convert.ToDouble(gridView2.GetRowCellValue(i, "Balance") ?? 0);
                 totalAmtPaid += Convert.ToDouble(gridView2.GetRowCellValue(i, "AmountPaid") ?? 0);
+                totalOverpay += Convert.ToDouble(gridView2.GetRowCellValue(i, "OverPay") ?? 0);
                 advncepymentval += Convert.ToDouble(gridView2.GetRowCellValue(i, "AmountPaid") ?? 0);
 
                 string invType = gridView2.GetRowCellValue(i, "InvoiceType")?.ToString();
                 if (invType == "SALES") isSales = true;
                 if (invType == "CHARGE") isCharge = true;
 
-                if (Convert.ToDouble(gridView2.GetRowCellValue(i, "AdvancePayment") ?? 0) > 0)
+                //if (Convert.ToDouble(gridView2.GetRowCellValue(i, "AdvancePayment") ?? 0) > 0)
+                if (Convert.ToDouble(gridView2.GetRowCellValue(i, "OverPay") ?? 0) > 0)
                     advpymntctr++;
             }
 
@@ -477,7 +494,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             }
             if (advpymntctr > 1)
             {
-                XtraMessageBox.Show("Advance Payment must be assigned to only one invoice.");
+                XtraMessageBox.Show("OverPay must be assigned to only one invoice.");
                 return;
             }
             if (isSales && isCharge)
@@ -490,9 +507,12 @@ namespace SalesInventorySystem.HOFormsDevEx
                 XtraMessageBox.Show("Total Amount Paid exceeds available savings balance.");
                 return;
             }
-            if (totalAmtPaid > totalBalance)
+            // OverPay is deliberate excess cash - AmountPaid is expected to
+            // exceed Balance by exactly that much, so it must be added to
+            // the allowed ceiling here instead of being treated as an error.
+            if (totalAmtPaid > totalBalance + totalOverpay)
             {
-                XtraMessageBox.Show("Total Amount Paid cannot exceed Total Balance.");
+                XtraMessageBox.Show("Total Amount Paid cannot exceed Total Balance plus Overpay.");
                 return;
             }
 
@@ -668,14 +688,22 @@ namespace SalesInventorySystem.HOFormsDevEx
                 string orderNo = gridView2.GetRowCellValue(i, "OrderNo").ToString();
                 DateTime transDate = Convert.ToDateTime(gridView2.GetRowCellValue(i, "TransactionDate"));
 
-                decimal netCash = Convert.ToDecimal(gridView2.GetRowCellValue(i, "AmountPaid") ?? 0);
                 decimal ewt = Convert.ToDecimal(gridView2.GetRowCellValue(i, "EWTAmount") ?? 0);
                 decimal discount = Convert.ToDecimal(gridView2.GetRowCellValue(i, "DiscountAmount") ?? 0);
                 decimal offset = Convert.ToDecimal(gridView2.GetRowCellValue(i, "OffsetAmount") ?? 0);
+                decimal overpay = Convert.ToDecimal(gridView2.GetRowCellValue(i, "OverPay") ?? 0);
+                decimal amountPaid = Convert.ToDecimal(gridView2.GetRowCellValue(i, "AmountPaid") ?? 0);
 
-                // [BUG-1] GROSS = net cash the user entered PLUS all deductions
-                // Example: invoice 4600, EWT 460 → netCash=4140, gross=4600
-                decimal gross = netCash + ewt + discount + offset;
+                // GROSS = however much of the invoice is being cleared THIS
+                // transaction, not necessarily the whole Balance - AmountPaid
+                // can legitimately be less than Balance for a genuine partial
+                // payment (no EWT/Discount/Offset, just paying less than owed).
+                // Reconstruct it as net cash + deductions withheld/applied,
+                // minus OverPay since RecalculateRow() already baked +overpay
+                // into AmountPaid (balance - ewt - discount - offset + overpay) -
+                // without subtracting it back out here, overpay would double
+                // count into gross.
+                decimal gross = amountPaid + ewt + discount + offset - overpay;
 
                 // INVOICE PAYMENT: always insert using the gross amount
                 if (gross > 0)
@@ -689,6 +717,9 @@ namespace SalesInventorySystem.HOFormsDevEx
 
                 if (offset > 0)
                     InsertDetail(con, tran, paymentHeaderId, orderNo, invoiceNo, transDate, offset, "OFFSET");
+
+                if (overpay > 0)
+                    InsertDetail(con, tran, paymentHeaderId, orderNo, invoiceNo, transDate, overpay, "OVERPAY");
             }
         }
 
@@ -739,50 +770,200 @@ namespace SalesInventorySystem.HOFormsDevEx
             throw new Exception("No payment type selected.");
         }
 
+        void displayInvoices()
+        {
+            DateTime dateFrom = txtdatefrom.EditValue == null
+                ? DateTime.MinValue
+                : (DateTime)txtdatefrom.EditValue;
+
+            DateTime dateTo = txtdateto.EditValue == null
+                ? DateTime.MaxValue
+                : ((DateTime)txtdateto.EditValue).AddDays(1);
+
+            string masterQuery = @"
+                    SELECT *
+                    FROM vw_PaymentHeaderTransactions
+                    WHERE PaymentDate >= @DateFrom
+                      AND PaymentDate < @DateTo
+                      AND CustomerKey=@custkey
+                    ";
+
+            string detailQuery = @"
+                    SELECT d.*
+                    FROM vw_TransactionChargeSales_WithPaymentHeaderID_OnePerInvoice d
+                    INNER JOIN vw_PaymentHeaderTransactions s
+                        ON s.PaymentHeaderID = d.PaymentHeaderID
+                       AND s.InvoiceNo = d.InvoiceNo
+                       AND s.PONumber = d.ReferenceNo
+                       AND s.CustomerKey = d.CustomerKey
+                    WHERE s.PaymentDate >= @DateFrom
+                      AND s.PaymentDate < @DateTo
+                      AND s.CustomerKey = @custkey
+
+                    ";
+
+
+
+            //detailQuery += ")"; // close EXISTS
+
+            var masterParams = new List<SqlParameter>
+                {
+                    new SqlParameter("@DateFrom", dateFrom),
+                    new SqlParameter("@DateTo", dateTo),
+                    new SqlParameter("@custkey", custkey),
+                };
+
+            var detailParams = new List<SqlParameter>
+                {
+                    new SqlParameter("@DateFrom", dateFrom),
+                    new SqlParameter("@DateTo", dateTo),
+                    new SqlParameter("@custkey", custkey)
+                };
+
+            Database.GridMasterDetail(
+                masterQuery,
+                detailQuery,
+                "Master",
+                "Detail",
+                "PaymentHeaderID",
+                "PaymentHeaderID",
+                "vw_TransactionChargeSales_WithPaymentHeaderID_OnePerInvoice",
+                gridControl1,
+                masterParams.ToArray(),
+                detailParams.ToArray()
+            );
+
+            gridView9.OptionsView.ColumnAutoWidth = false;
+            gridView9.BestFitColumns();
+        }
         // ── HISTORY SEARCH ──────────────────────────────────────────────
         // [BUG-4] FIX: was raw string concatenation (SQL injection risk).
         // Now uses parameterized query.
         private void simpleButton1_Click_1(object sender, EventArgs e)
         {
-            using (SqlConnection con = Database.getConnection())
-            using (SqlCommand cmd = new SqlCommand(@"
-                SELECT TransactionDate, CustomerKey, ReferenceNo,
-                       TotalAmount, AmountPaid, Balance, PayStatus
-                FROM TransactionChargeSales
-                WHERE CAST(TransactionDate AS DATE) BETWEEN @from AND @to
-                  AND CustomerKey = @custkey
-                  AND Balance = 0", con))
-            {
-                cmd.Parameters.Add("@from", SqlDbType.Date).Value = Convert.ToDateTime(dateEdit1.Text);
-                cmd.Parameters.Add("@to", SqlDbType.Date).Value = Convert.ToDateTime(dateEdit2.Text);
-                cmd.Parameters.Add("@custkey", SqlDbType.Char, 8).Value = custkey;
+            //using (SqlConnection con = Database.getConnection())
+            //using (SqlCommand cmd = new SqlCommand(@"
+            //    SELECT TransactionDate, CustomerKey, ReferenceNo,
+            //           TotalAmount, AmountPaid, Balance, PayStatus
+            //    FROM TransactionChargeSales
+            //    WHERE CAST(TransactionDate AS DATE) BETWEEN @from AND @to
+            //      AND CustomerKey = @custkey
+            //      AND Balance = 0", con))
+            //{
+            //    cmd.Parameters.Add("@from", SqlDbType.Date).Value = Convert.ToDateTime(txtdatefrom.Text);
+            //    cmd.Parameters.Add("@to", SqlDbType.Date).Value = Convert.ToDateTime(txtdateto.Text);
+            //    cmd.Parameters.Add("@custkey", SqlDbType.Char, 8).Value = custkey;
 
-                DataTable table = new DataTable();
-                con.Open();
-                using (SqlDataReader dr = cmd.ExecuteReader())
-                    table.Load(dr);
+            //    DataTable table = new DataTable();
+            //    con.Open();
+            //    using (SqlDataReader dr = cmd.ExecuteReader())
+            //        table.Load(dr);
 
-                gridControl1.DataSource = table;
-                gridView9.BestFitColumns();
-            }
+            //    gridControl1.DataSource = table;
+            //    gridView9.BestFitColumns();
+            //}
+            displayInvoices();
         }
 
         private void simpleButton2_Click(object sender, EventArgs e) { /* reserved */ }
+
+        private void gridControl1_ViewRegistered(object sender, DevExpress.XtraGrid.ViewOperationEventArgs e)
+        {
+            GridView view = e.View as GridView;
+            if (view == null) return;
+
+            // ✅ Apply to ALL views (master + detail)
+            view.OptionsView.ColumnAutoWidth = false;
+            view.OptionsView.RowAutoHeight = true;
+            view.OptionsBehavior.ReadOnly = true;
+            view.OptionsBehavior.Editable = false;
+
+            view.PopulateColumns();
+            view.BestFitColumns();
+        }
+
+        private void gridView9_MasterRowExpanded(object sender, CustomMasterRowEventArgs e)
+        {
+            GridView masterView = sender as GridView;
+
+            // ✅ Get actual detail view
+            GridView detailView = masterView.GetDetailView(e.RowHandle, e.RelationIndex) as GridView;
+
+            if (detailView != null)
+            {
+                detailView.OptionsView.ColumnAutoWidth = false;
+                detailView.PopulateColumns();
+
+                // ✅ SHOW FOOTER
+                detailView.OptionsView.ShowFooter = true;
+
+                // ✅ Footer styling
+                detailView.Appearance.FooterPanel.BackColor = Color.LightYellow;
+                detailView.Appearance.FooterPanel.ForeColor = Color.Black;
+                detailView.Appearance.FooterPanel.Font = new Font("Segoe UI", 9, FontStyle.Bold);
+
+                // ✅ ADD SUM FOR DEBIT
+                if (detailView.Columns["TotalAmount"] != null)
+                {
+                    detailView.Columns["TotalAmount"].Summary.Clear();
+                    detailView.Columns["TotalAmount"].Summary.Add(
+                        DevExpress.Data.SummaryItemType.Sum,
+                        "TotalAmount",
+                        "Total: {0:n2}"
+                    );
+                }
+
+                // ✅ ADD SUM FOR CREDIT
+                if (detailView.Columns["EWTAmount"] != null)
+                {
+                    detailView.Columns["EWTAmount"].Summary.Clear();
+                    detailView.Columns["EWTAmount"].Summary.Add(
+                        DevExpress.Data.SummaryItemType.Sum,
+                        "EWTAmount",
+                        "Total: {0:n2}"
+                    );
+                }
+
+                detailView.BestFitColumns();
+
+                //// ✅ HIDE COLUMNS
+                //detailView.Columns["BranchCode"].Visible = false;
+                //detailView.Columns["TicketDate"].Visible = false;
+                //detailView.Columns["TicketNumber"].Visible = false;
+                //detailView.Columns["ReferenceNumber"].Visible = false;
+                //detailView.Columns["ReferenceKey"].Visible = false;
+
+                // ✅ MIN WIDTH FOR DETAIL
+                foreach (DevExpress.XtraGrid.Columns.GridColumn col in detailView.Columns)
+                {
+                    col.MinWidth = 100;
+                }
+
+                // ✅ MIN WIDTH FOR MASTER
+                foreach (DevExpress.XtraGrid.Columns.GridColumn col in gridView9.Columns)
+                {
+                    col.MinWidth = 100;
+                }
+
+                masterView.BestFitColumns();
+            }
+
+        }
+
         private void simpleButton5_Click(object sender, EventArgs e) { /* reserved */ }
         private void txtremakrs_EditValueChanged(object sender, EventArgs e) { }
         private void gridView2_ShowingEditor(object sender, System.ComponentModel.CancelEventArgs e) { }
-    }
-
-    // ── DATA MODEL ───────────────────────────────────────────────────────
-    class PaymentRow
-    {
-        public bool Pay { get; set; }
-        public string InvoiceNo { get; set; }
-        public string OrderNo { get; set; }
-        public DateTime TransactionDate { get; set; }
-        public decimal AmountPaid { get; set; }   // net cash
-        public decimal EWTAmount { get; set; }
-        public decimal DiscountAmount { get; set; }
-        public decimal OffsetAmount { get; set; }
+        // ── DATA MODEL ───────────────────────────────────────────────────────
+        class PaymentRow
+        {
+            public bool Pay { get; set; }
+            public string InvoiceNo { get; set; }
+            public string OrderNo { get; set; }
+            public DateTime TransactionDate { get; set; }
+            public decimal AmountPaid { get; set; }   // net cash
+            public decimal EWTAmount { get; set; }
+            public decimal DiscountAmount { get; set; }
+            public decimal OffsetAmount { get; set; }
+        }
     }
 }

@@ -75,8 +75,9 @@
             this.groupControl1.Controls.Add(this.txtamount);
             this.groupControl1.Dock = System.Windows.Forms.DockStyle.Top;
             this.groupControl1.Location = new System.Drawing.Point(0, 0);
+            this.groupControl1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.groupControl1.Name = "groupControl1";
-            this.groupControl1.Size = new System.Drawing.Size(1834, 199);
+            this.groupControl1.Size = new System.Drawing.Size(1070, 127);
             this.groupControl1.TabIndex = 0;
             this.groupControl1.Text = "Send Bonus";
             this.groupControl1.Paint += new System.Windows.Forms.PaintEventHandler(this.groupControl1_Paint);
@@ -84,10 +85,10 @@
             // btnSave
             // 
             this.btnSave.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.Save_16x16__5_;
-            this.btnSave.Location = new System.Drawing.Point(474, 91);
-            this.btnSave.Margin = new System.Windows.Forms.Padding(5, 7, 5, 7);
+            this.btnSave.Location = new System.Drawing.Point(276, 58);
+            this.btnSave.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(235, 57);
+            this.btnSave.Size = new System.Drawing.Size(137, 36);
             this.btnSave.TabIndex = 444;
             this.btnSave.Text = "Send";
             // 
@@ -95,38 +96,39 @@
             // 
             this.labelControl3.Appearance.Font = new System.Drawing.Font("Tahoma", 12.25F);
             this.labelControl3.Appearance.Options.UseFont = true;
-            this.labelControl3.Location = new System.Drawing.Point(35, 100);
-            this.labelControl3.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            this.labelControl3.Location = new System.Drawing.Point(20, 64);
             this.labelControl3.Name = "labelControl3";
-            this.labelControl3.Size = new System.Drawing.Size(223, 40);
+            this.labelControl3.Size = new System.Drawing.Size(136, 24);
             this.labelControl3.TabIndex = 3;
             this.labelControl3.Text = "Bonus Amount:";
             // 
             // txtamount
             // 
-            this.txtamount.Location = new System.Drawing.Point(266, 92);
+            this.txtamount.Location = new System.Drawing.Point(155, 59);
+            this.txtamount.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.txtamount.Name = "txtamount";
             this.txtamount.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 12.875F);
             this.txtamount.Properties.Appearance.Options.UseFont = true;
-            this.txtamount.Size = new System.Drawing.Size(200, 56);
+            this.txtamount.Size = new System.Drawing.Size(117, 32);
             this.txtamount.TabIndex = 0;
             // 
             // panelControl1
             // 
             this.panelControl1.Controls.Add(this.gridControlMaster);
             this.panelControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelControl1.Location = new System.Drawing.Point(0, 199);
+            this.panelControl1.Location = new System.Drawing.Point(0, 127);
+            this.panelControl1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.panelControl1.Name = "panelControl1";
-            this.panelControl1.Size = new System.Drawing.Size(1834, 985);
+            this.panelControl1.Size = new System.Drawing.Size(1070, 553);
             this.panelControl1.TabIndex = 1;
             // 
             // gridControlMaster
             // 
             this.gridControlMaster.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControlMaster.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(6, 8, 6, 8);
-            this.gridControlMaster.Location = new System.Drawing.Point(3, 3);
+            this.gridControlMaster.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
+            this.gridControlMaster.Location = new System.Drawing.Point(2, 2);
             this.gridControlMaster.MainView = this.gridViewMaster;
-            this.gridControlMaster.Margin = new System.Windows.Forms.Padding(6, 8, 6, 8);
+            this.gridControlMaster.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.gridControlMaster.Name = "gridControlMaster";
             this.gridControlMaster.RepositoryItems.AddRange(new DevExpress.XtraEditors.Repository.RepositoryItem[] {
             this.repositoryItemComboBox5,
@@ -137,7 +139,7 @@
             this.repositoryItemSearchLookUpEditoffsetdebitglcode,
             this.repositoryItemSearchLookUpEditdiscountglcode,
             this.repositoryItemSearchLookUpEditoffsetCreditGLCode});
-            this.gridControlMaster.Size = new System.Drawing.Size(1828, 979);
+            this.gridControlMaster.Size = new System.Drawing.Size(1066, 549);
             this.gridControlMaster.TabIndex = 9;
             this.gridControlMaster.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewMaster});
@@ -148,8 +150,8 @@
             this.gridViewMaster.Appearance.HeaderPanel.Options.UseFont = true;
             this.gridViewMaster.Appearance.Row.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.gridViewMaster.Appearance.Row.Options.UseFont = true;
-            this.gridViewMaster.DetailHeight = 673;
-            this.gridViewMaster.FixedLineWidth = 4;
+            this.gridViewMaster.DetailHeight = 431;
+            this.gridViewMaster.FixedLineWidth = 3;
             this.gridViewMaster.GridControl = this.gridControlMaster;
             this.gridViewMaster.LevelIndent = 0;
             this.gridViewMaster.Name = "gridViewMaster";
@@ -179,8 +181,8 @@
             // 
             // gridView5
             // 
-            this.gridView5.DetailHeight = 546;
-            this.gridView5.FixedLineWidth = 4;
+            this.gridView5.DetailHeight = 349;
+            this.gridView5.FixedLineWidth = 3;
             this.gridView5.FocusRectStyle = DevExpress.XtraGrid.Views.Grid.DrawFocusRectStyle.RowFocus;
             this.gridView5.LevelIndent = 0;
             this.gridView5.Name = "gridView5";
@@ -220,8 +222,8 @@
             // 
             // repositoryItemSearchLookUpEdit1View
             // 
-            this.repositoryItemSearchLookUpEdit1View.DetailHeight = 546;
-            this.repositoryItemSearchLookUpEdit1View.FixedLineWidth = 4;
+            this.repositoryItemSearchLookUpEdit1View.DetailHeight = 349;
+            this.repositoryItemSearchLookUpEdit1View.FixedLineWidth = 3;
             this.repositoryItemSearchLookUpEdit1View.FocusRectStyle = DevExpress.XtraGrid.Views.Grid.DrawFocusRectStyle.RowFocus;
             this.repositoryItemSearchLookUpEdit1View.LevelIndent = 0;
             this.repositoryItemSearchLookUpEdit1View.Name = "repositoryItemSearchLookUpEdit1View";
@@ -239,8 +241,8 @@
             // 
             // gridView1
             // 
-            this.gridView1.DetailHeight = 546;
-            this.gridView1.FixedLineWidth = 4;
+            this.gridView1.DetailHeight = 349;
+            this.gridView1.FixedLineWidth = 3;
             this.gridView1.FocusRectStyle = DevExpress.XtraGrid.Views.Grid.DrawFocusRectStyle.RowFocus;
             this.gridView1.LevelIndent = 0;
             this.gridView1.Name = "gridView1";
@@ -258,8 +260,8 @@
             // 
             // gridView2
             // 
-            this.gridView2.DetailHeight = 546;
-            this.gridView2.FixedLineWidth = 4;
+            this.gridView2.DetailHeight = 349;
+            this.gridView2.FixedLineWidth = 3;
             this.gridView2.FocusRectStyle = DevExpress.XtraGrid.Views.Grid.DrawFocusRectStyle.RowFocus;
             this.gridView2.LevelIndent = 0;
             this.gridView2.Name = "gridView2";
@@ -269,11 +271,12 @@
             // 
             // SampleBonus
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1834, 1184);
+            this.ClientSize = new System.Drawing.Size(1070, 680);
             this.Controls.Add(this.panelControl1);
             this.Controls.Add(this.groupControl1);
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "SampleBonus";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "SampleBonus";

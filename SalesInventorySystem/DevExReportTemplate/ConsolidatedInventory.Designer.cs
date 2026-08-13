@@ -63,7 +63,7 @@
             // 
             // xrcompanyname
             // 
-            this.xrcompanyname.Font = new System.Drawing.Font("Arial Black", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.xrcompanyname.Font = new DevExpress.Drawing.DXFont("Arial Black", 9.75F, DevExpress.Drawing.DXFontStyle.Regular, DevExpress.Drawing.DXGraphicsUnit.Point, new DevExpress.Drawing.DXFontAdditionalProperty[] {new DevExpress.Drawing.DXFontAdditionalProperty("GdiCharSet", ((byte)(0)))});
             this.xrcompanyname.LocationFloat = new DevExpress.Utils.PointFloat(211.4583F, 10.00004F);
             this.xrcompanyname.Name = "xrcompanyname";
             this.xrcompanyname.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -73,7 +73,7 @@
             // 
             // xrcaption1
             // 
-            this.xrcaption1.Font = new System.Drawing.Font("Arial", 9.75F);
+            this.xrcaption1.Font = new DevExpress.Drawing.DXFont("Arial", 9.75F);
             this.xrcaption1.LocationFloat = new DevExpress.Utils.PointFloat(211.4583F, 33.00006F);
             this.xrcaption1.Name = "xrcaption1";
             this.xrcaption1.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -83,7 +83,7 @@
             // 
             // xrcaption2
             // 
-            this.xrcaption2.Font = new System.Drawing.Font("Arial", 9.75F);
+            this.xrcaption2.Font = new DevExpress.Drawing.DXFont("Arial", 9.75F);
             this.xrcaption2.LocationFloat = new DevExpress.Utils.PointFloat(211.4583F, 51.83334F);
             this.xrcaption2.Name = "xrcaption2";
             this.xrcaption2.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -113,7 +113,7 @@
             // 
             // inventoryowner
             // 
-            this.inventoryowner.Font = new System.Drawing.Font("Tahoma", 12.25F, System.Drawing.FontStyle.Bold);
+            this.inventoryowner.Font = new DevExpress.Drawing.DXFont("Tahoma", 12.25F, DevExpress.Drawing.DXFontStyle.Bold);
             this.inventoryowner.LocationFloat = new DevExpress.Utils.PointFloat(0F, 34.29165F);
             this.inventoryowner.Name = "inventoryowner";
             this.inventoryowner.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -125,7 +125,7 @@
             // 
             // xrLabel1
             // 
-            this.xrLabel1.Font = new System.Drawing.Font("Tahoma", 12.25F, System.Drawing.FontStyle.Bold);
+            this.xrLabel1.Font = new DevExpress.Drawing.DXFont("Tahoma", 12.25F, DevExpress.Drawing.DXFontStyle.Bold);
             this.xrLabel1.LocationFloat = new DevExpress.Utils.PointFloat(209.3751F, 0F);
             this.xrLabel1.Name = "xrLabel1";
             this.xrLabel1.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -151,7 +151,7 @@
             this.BottomMargin,
             this.ReportHeader,
             this.PageHeader});
-            this.Margins = new System.Drawing.Printing.Margins(100, 100, 83, 100);
+            this.Margins = new DevExpress.Drawing.DXMargins(100, 100, 83, 100);
             this.Version = "15.1";
             ((System.ComponentModel.ISupportInitialize)(this)).EndInit();
 

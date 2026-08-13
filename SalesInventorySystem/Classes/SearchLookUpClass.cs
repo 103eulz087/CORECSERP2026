@@ -3,6 +3,7 @@ using DevExpress.XtraEditors.Repository;
 using DevExpress.XtraGrid.Views.Grid;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
@@ -32,6 +33,12 @@ namespace SalesInventorySystem
             string fieldName = fieldname; // or other field name
             value = view.GetRowCellValue(rowHandle, fieldName);
             return value;
+        }
+
+        public static object GetSingleValueLookUpEdit(LookUpEdit lookupEdit, string fieldName)
+        {
+            DataRowView row = lookupEdit.GetSelectedDataRow() as DataRowView;
+            return row?[fieldName];
         }
 
 

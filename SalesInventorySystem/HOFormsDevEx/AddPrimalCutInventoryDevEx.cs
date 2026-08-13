@@ -526,7 +526,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             DevExReportTemplate.TransferInventory xct = new DevExReportTemplate.TransferInventory();
             xct.Landscape = false;
             xct.Landscape = false;
-            xct.PaperKind = System.Drawing.Printing.PaperKind.Letter;
+            xct.PaperKind = (DevExpress.Drawing.Printing.DXPaperKind)System.Drawing.Printing.PaperKind.Letter;
             xct.Margins = new System.Drawing.Printing.Margins(100, 100, 100, 100);
 
 

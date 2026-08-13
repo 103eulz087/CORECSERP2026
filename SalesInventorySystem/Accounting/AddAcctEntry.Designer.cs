@@ -47,84 +47,97 @@
             // labelControl6
             // 
             this.labelControl6.Appearance.Font = new System.Drawing.Font("Tahoma", 10.25F);
-            this.labelControl6.Location = new System.Drawing.Point(12, 12);
+            this.labelControl6.Appearance.Options.UseFont = true;
+            this.labelControl6.Location = new System.Drawing.Point(16, 15);
+            this.labelControl6.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.labelControl6.Name = "labelControl6";
-            this.labelControl6.Size = new System.Drawing.Size(88, 17);
+            this.labelControl6.Size = new System.Drawing.Size(103, 21);
             this.labelControl6.TabIndex = 11;
             this.labelControl6.Text = "AccountCode:";
             // 
             // labelControl1
             // 
             this.labelControl1.Appearance.Font = new System.Drawing.Font("Tahoma", 10.25F);
-            this.labelControl1.Location = new System.Drawing.Point(12, 42);
+            this.labelControl1.Appearance.Options.UseFont = true;
+            this.labelControl1.Location = new System.Drawing.Point(16, 52);
+            this.labelControl1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.labelControl1.Name = "labelControl1";
-            this.labelControl1.Size = new System.Drawing.Size(80, 17);
+            this.labelControl1.Size = new System.Drawing.Size(99, 21);
             this.labelControl1.TabIndex = 12;
             this.labelControl1.Text = "AccountTitle:";
             // 
             // labelControl2
             // 
             this.labelControl2.Appearance.Font = new System.Drawing.Font("Tahoma", 10.25F);
-            this.labelControl2.Location = new System.Drawing.Point(12, 72);
+            this.labelControl2.Appearance.Options.UseFont = true;
+            this.labelControl2.Location = new System.Drawing.Point(16, 89);
+            this.labelControl2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.labelControl2.Name = "labelControl2";
-            this.labelControl2.Size = new System.Drawing.Size(90, 17);
+            this.labelControl2.Size = new System.Drawing.Size(109, 21);
             this.labelControl2.TabIndex = 13;
             this.labelControl2.Text = "Debit Amount:";
             // 
             // labelControl3
             // 
             this.labelControl3.Appearance.Font = new System.Drawing.Font("Tahoma", 10.25F);
-            this.labelControl3.Location = new System.Drawing.Point(12, 102);
+            this.labelControl3.Appearance.Options.UseFont = true;
+            this.labelControl3.Location = new System.Drawing.Point(16, 126);
+            this.labelControl3.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.labelControl3.Name = "labelControl3";
-            this.labelControl3.Size = new System.Drawing.Size(94, 17);
+            this.labelControl3.Size = new System.Drawing.Size(113, 21);
             this.labelControl3.TabIndex = 14;
             this.labelControl3.Text = "Credit Amount:";
             // 
             // txtacctcode
             // 
-            this.txtacctcode.Location = new System.Drawing.Point(116, 9);
+            this.txtacctcode.Location = new System.Drawing.Point(155, 11);
+            this.txtacctcode.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.txtacctcode.Name = "txtacctcode";
             this.txtacctcode.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 10.25F);
             this.txtacctcode.Properties.Appearance.Options.UseFont = true;
             this.txtacctcode.Properties.ReadOnly = true;
-            this.txtacctcode.Size = new System.Drawing.Size(118, 24);
+            this.txtacctcode.Size = new System.Drawing.Size(157, 28);
             this.txtacctcode.TabIndex = 15;
             // 
             // txtaccttitle
             // 
-            this.txtaccttitle.Location = new System.Drawing.Point(116, 39);
+            this.txtaccttitle.Location = new System.Drawing.Point(155, 48);
+            this.txtaccttitle.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.txtaccttitle.Name = "txtaccttitle";
             this.txtaccttitle.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 10.25F);
             this.txtaccttitle.Properties.Appearance.Options.UseFont = true;
             this.txtaccttitle.Properties.ReadOnly = true;
-            this.txtaccttitle.Size = new System.Drawing.Size(118, 24);
+            this.txtaccttitle.Size = new System.Drawing.Size(157, 28);
             this.txtaccttitle.TabIndex = 16;
             // 
             // txtdebit
             // 
             this.txtdebit.EditValue = "0";
-            this.txtdebit.Location = new System.Drawing.Point(116, 69);
+            this.txtdebit.Location = new System.Drawing.Point(155, 85);
+            this.txtdebit.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.txtdebit.Name = "txtdebit";
             this.txtdebit.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 10.25F);
             this.txtdebit.Properties.Appearance.Options.UseFont = true;
-            this.txtdebit.Size = new System.Drawing.Size(118, 24);
+            this.txtdebit.Size = new System.Drawing.Size(157, 28);
             this.txtdebit.TabIndex = 17;
             // 
             // txtcredit
             // 
             this.txtcredit.EditValue = "0";
-            this.txtcredit.Location = new System.Drawing.Point(116, 99);
+            this.txtcredit.Location = new System.Drawing.Point(155, 122);
+            this.txtcredit.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.txtcredit.Name = "txtcredit";
             this.txtcredit.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 10.25F);
             this.txtcredit.Properties.Appearance.Options.UseFont = true;
-            this.txtcredit.Size = new System.Drawing.Size(118, 24);
+            this.txtcredit.Size = new System.Drawing.Size(157, 28);
             this.txtcredit.TabIndex = 18;
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(240, 10);
+            this.button1.Location = new System.Drawing.Point(320, 12);
+            this.button1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(30, 23);
+            this.button1.Size = new System.Drawing.Size(40, 28);
             this.button1.TabIndex = 19;
             this.button1.Text = "...";
             this.button1.UseVisualStyleBackColor = true;
@@ -132,9 +145,10 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(116, 138);
+            this.button2.Location = new System.Drawing.Point(155, 170);
+            this.button2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(118, 30);
+            this.button2.Size = new System.Drawing.Size(157, 37);
             this.button2.TabIndex = 20;
             this.button2.Text = "Submit";
             this.button2.UseVisualStyleBackColor = true;
@@ -142,10 +156,10 @@
             // 
             // AddAcctEntry
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(283, 178);
+            this.ClientSize = new System.Drawing.Size(377, 219);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.txtcredit);
@@ -156,6 +170,7 @@
             this.Controls.Add(this.labelControl2);
             this.Controls.Add(this.labelControl1);
             this.Controls.Add(this.labelControl6);
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "AddAcctEntry";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "AddAcctEntry";

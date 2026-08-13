@@ -19,6 +19,25 @@ namespace SalesInventorySystem.HOFormsDevEx
     {
         string strmenuInventory, strmenuAdmin, strmenuSales, strmenuAccounting, strmenuReporting, strmenuPayroll,strmenuHotel,strmenuForwarding,strmenucif;
 
+        // Accounting Board (AccountingDevEx/AccountingBoard.cs) accordion items.
+        // Keys must match the PageXxx constants / element Tags in AccountingBoard.cs.
+        // Unlike the ribbon checklists above (backed by pipe-delimited UserMenuAccess
+        // columns), this is a normalized UserID/MenuKey table -- see
+        // SQL/2026-08-09_UserAccountingBoardAccess_NewTable.sql.
+        static readonly KeyValuePair<string, string>[] AcctBoardMenuItems = new KeyValuePair<string, string>[]
+        {
+            new KeyValuePair<string, string>("navMasterlist", "Masterlist"),
+            new KeyValuePair<string, string>("navVoucherPosting", "Vouchering - Posting Cash/Check"),
+            new KeyValuePair<string, string>("navVoucherPostingManual", "Vouchering - Posting Telegraphic"),
+            new KeyValuePair<string, string>("navVoucherPaymentList", "Vouchering - Payment List"),
+            new KeyValuePair<string, string>("navExpenseSingle", "Post Expense - Single Mode"),
+            new KeyValuePair<string, string>("navExpenseBatch", "Post Expense - Batch Mode"),
+            new KeyValuePair<string, string>("navManualTicket", "Manual Ticket"),
+            new KeyValuePair<string, string>("navBankRecon", "Bank Recon"),
+            new KeyValuePair<string, string>("navReports", "Reports"),
+            new KeyValuePair<string, string>("navGLTicketEntries", "GL Ticket Entries"),
+        };
+
 
         public UserAccessDevEx()
         {
@@ -75,12 +94,36 @@ namespace SalesInventorySystem.HOFormsDevEx
 
                 }
                 reader.Close();
+                loadAcctBoardAccess(con);
             }
             catch(SqlException ex)
             {
                 XtraMessageBox.Show(ex.Message.ToString());
             }
             finally { con.Close(); }
+        }
+
+        // Reset first (unlike readData_Menu_listbox above, which only ever checks boxes and
+        // never unchecks) so switching between users doesn't leak the previous user's state.
+        void loadAcctBoardAccess(SqlConnection con)
+        {
+            for (int i = 0; i <= acctBoard_checklist.Items.Count - 1; i++)
+                acctBoard_checklist.Items[i].CheckState = CheckState.Unchecked;
+
+            var allowedKeys = new HashSet<string>();
+            SqlCommand com = new SqlCommand("SELECT MenuKey FROM UserAccountingBoardAccess WHERE UserID=@UserID", con);
+            com.Parameters.AddWithValue("@UserID", searchLookUpEdit1.Text);
+            using (SqlDataReader reader = com.ExecuteReader())
+            {
+                while (reader.Read())
+                    allowedKeys.Add(reader["MenuKey"].ToString());
+            }
+
+            for (int i = 0; i < AcctBoardMenuItems.Length; i++)
+            {
+                if (allowedKeys.Contains(AcctBoardMenuItems[i].Key))
+                    acctBoard_checklist.Items[i].CheckState = CheckState.Checked;
+            }
         }
 
         private void btnupdate_Click(object sender, EventArgs e)
@@ -122,15 +165,49 @@ namespace SalesInventorySystem.HOFormsDevEx
             {
                 Database.ExecuteQuery("DELETE FROM UserMenuAccess WHERE UserID='" + searchLookUpEdit1.Text + "'");
                 Database.ExecuteQuery("INSERT INTO UserMenuAccess (UserID,isAdmin,isSales,isInventory,isAccounting,isHotel,isPayroll,isReporting,isForwarding,isClientDataSheet) VALUES ('" + searchLookUpEdit1.Text + "','" + strmenuAdmin + "','" + strmenuSales + "','" + strmenuInventory + "','" + strmenuAccounting + "','"+strmenuHotel+"',0,'" + strmenuReporting + "','"+strmenuForwarding+"','"+strmenucif+"') ", "Successfully Inserted!");
+                saveAcctBoardAccess();
                 if(Login.isglobalUserID == searchLookUpEdit1.Text)
                 {
                     Application.Restart();
                 }
                 //else
                 //{ Application.Exit(); }
-               
+
             }
-           
+
+        }
+
+        void saveAcctBoardAccess()
+        {
+            using (SqlConnection con = Database.getConnection())
+            {
+                con.Open();
+                SqlTransaction tran = con.BeginTransaction();
+                try
+                {
+                    SqlCommand delCom = new SqlCommand("DELETE FROM UserAccountingBoardAccess WHERE UserID=@UserID", con, tran);
+                    delCom.Parameters.AddWithValue("@UserID", searchLookUpEdit1.Text);
+                    delCom.ExecuteNonQuery();
+
+                    for (int i = 0; i < AcctBoardMenuItems.Length; i++)
+                    {
+                        if (acctBoard_checklist.Items[i].CheckState != CheckState.Checked)
+                            continue;
+
+                        SqlCommand insCom = new SqlCommand("INSERT INTO UserAccountingBoardAccess (UserID, MenuKey) VALUES (@UserID, @MenuKey)", con, tran);
+                        insCom.Parameters.AddWithValue("@UserID", searchLookUpEdit1.Text);
+                        insCom.Parameters.AddWithValue("@MenuKey", AcctBoardMenuItems[i].Key);
+                        insCom.ExecuteNonQuery();
+                    }
+
+                    tran.Commit();
+                }
+                catch (SqlException ex)
+                {
+                    tran.Rollback();
+                    XtraMessageBox.Show(ex.Message.ToString());
+                }
+            }
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -139,7 +216,11 @@ namespace SalesInventorySystem.HOFormsDevEx
             Main main = new Main();
             BarItem mcurrentitem;
             adminTools_checklist.Items.Clear();
-     
+
+            acctBoard_checklist.Items.Clear();
+            foreach (var item in AcctBoardMenuItems)
+                acctBoard_checklist.Items.Add(item.Value);
+
             foreach (RibbonPage currentPage in main.Ribbon.Pages)
             {
                 foreach (RibbonPageGroup currentgroup in currentPage.Groups)

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 namespace SalesInventorySystem.Classes
 {
     using System;
+    using System.Data;
     using System.Data.SqlClient;
     using System.Threading.Tasks;
 
@@ -193,26 +194,54 @@ namespace SalesInventorySystem.Classes
                         selectCmd.Parameters.AddWithValue("@ShipmentNo", shipmentno);
                         using (SqlDataReader reader = await selectCmd.ExecuteReaderAsync())
                         {
+                            //using (SqlBulkCopy bulkCopy = new SqlBulkCopy(cloudConn, SqlBulkCopyOptions.Default, cloudTx))
+                            //{
+                            //    bulkCopy.DestinationTableName = "[dbo].[TempInventoryBatchUpload]";
+                            //    bulkCopy.BatchSize = 1000;
+
+                            //    // --- NEW: PROGRESS TRACKING ---
+                            //    bulkCopy.NotifyAfter = 50; // Fire event every 50 rows
+                            //    bulkCopy.SqlRowsCopied += (sender, e) =>
+                            //    {
+                            //        // Calculate percentage (0 to 100)
+                            //        int percent = (int)((e.RowsCopied * 100.0) / totalRows);
+
+                            //        // Send the numbers safely back to the UI thread
+                            //        progress?.Report(percent);
+                            //        statusText?.Report($"Uploading {e.RowsCopied} of {totalRows} records...");
+                            //    };
+                            //    // ------------------------------
+
+                            //    await bulkCopy.WriteToServerAsync(reader);
+                            //}
                             using (SqlBulkCopy bulkCopy = new SqlBulkCopy(cloudConn, SqlBulkCopyOptions.Default, cloudTx))
                             {
                                 bulkCopy.DestinationTableName = "[dbo].[TempInventoryBatchUpload]";
                                 bulkCopy.BatchSize = 1000;
 
-                                // --- NEW: PROGRESS TRACKING ---
-                                bulkCopy.NotifyAfter = 50; // Fire event every 50 rows
+                                // Build mappings dynamically
+                                var schemaTable = reader.GetSchemaTable();
+                                foreach (DataRow row in schemaTable.Rows)
+                                {
+                                    string colName = row["ColumnName"].ToString();
+                                    if (!string.Equals(colName, "SequenceNumber", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        bulkCopy.ColumnMappings.Add(colName, colName);
+                                    }
+                                }
+
+                                bulkCopy.NotifyAfter = 50;
                                 bulkCopy.SqlRowsCopied += (sender, e) =>
                                 {
-                                    // Calculate percentage (0 to 100)
                                     int percent = (int)((e.RowsCopied * 100.0) / totalRows);
-
-                                    // Send the numbers safely back to the UI thread
                                     progress?.Report(percent);
                                     statusText?.Report($"Uploading {e.RowsCopied} of {totalRows} records...");
                                 };
-                                // ------------------------------
 
                                 await bulkCopy.WriteToServerAsync(reader);
                             }
+
+
                         }
                     }
                     cloudTx.Commit();

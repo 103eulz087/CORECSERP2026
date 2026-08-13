@@ -46,16 +46,18 @@
             this.groupControl1.Controls.Add(this.btnToggle);
             this.groupControl1.Dock = System.Windows.Forms.DockStyle.Top;
             this.groupControl1.Location = new System.Drawing.Point(0, 0);
+            this.groupControl1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.groupControl1.Name = "groupControl1";
-            this.groupControl1.Size = new System.Drawing.Size(2092, 200);
+            this.groupControl1.Size = new System.Drawing.Size(1132, 128);
             this.groupControl1.TabIndex = 0;
             this.groupControl1.Text = "groupControl1";
             // 
             // btnToggle
             // 
-            this.btnToggle.Location = new System.Drawing.Point(614, 112);
+            this.btnToggle.Location = new System.Drawing.Point(358, 72);
+            this.btnToggle.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnToggle.Name = "btnToggle";
-            this.btnToggle.Size = new System.Drawing.Size(150, 46);
+            this.btnToggle.Size = new System.Drawing.Size(87, 29);
             this.btnToggle.TabIndex = 0;
             this.btnToggle.Text = "simpleButton1";
             this.btnToggle.Click += new System.EventHandler(this.simpleButton1_Click);
@@ -64,20 +66,21 @@
             // 
             this.panelControl1.Controls.Add(this.groupBox2);
             this.panelControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelControl1.Location = new System.Drawing.Point(0, 200);
+            this.panelControl1.Location = new System.Drawing.Point(0, 128);
+            this.panelControl1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.panelControl1.Name = "panelControl1";
-            this.panelControl1.Size = new System.Drawing.Size(2092, 1092);
+            this.panelControl1.Size = new System.Drawing.Size(1132, 552);
             this.panelControl1.TabIndex = 1;
             // 
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.pivotGridControl1);
             this.groupBox2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox2.Location = new System.Drawing.Point(3, 3);
-            this.groupBox2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox2.Location = new System.Drawing.Point(2, 2);
+            this.groupBox2.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.groupBox2.Size = new System.Drawing.Size(2086, 1086);
+            this.groupBox2.Padding = new System.Windows.Forms.Padding(2, 3, 2, 3);
+            this.groupBox2.Size = new System.Drawing.Size(1128, 548);
             this.groupBox2.TabIndex = 8;
             this.groupBox2.TabStop = false;
             // 
@@ -119,25 +122,25 @@
             this.pivotGridControl1.Appearance.TotalCell.Options.UseForeColor = true;
             this.pivotGridControl1.DataMember = "CustomSqlQuery";
             this.pivotGridControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pivotGridControl1.Location = new System.Drawing.Point(4, 30);
-            this.pivotGridControl1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.pivotGridControl1.Location = new System.Drawing.Point(2, 19);
+            this.pivotGridControl1.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.pivotGridControl1.Name = "pivotGridControl1";
             this.pivotGridControl1.OptionsBehavior.BestFitMode = ((DevExpress.XtraPivotGrid.PivotGridBestFitMode)((DevExpress.XtraPivotGrid.PivotGridBestFitMode.FieldValue | DevExpress.XtraPivotGrid.PivotGridBestFitMode.FieldHeader)));
-            this.pivotGridControl1.OptionsView.FilterSeparatorBarPadding = 2;
             this.pivotGridControl1.OptionsView.ShowRowGrandTotals = false;
             this.pivotGridControl1.OptionsView.ShowRowTotals = false;
-            this.pivotGridControl1.Size = new System.Drawing.Size(2078, 1052);
+            this.pivotGridControl1.Size = new System.Drawing.Size(1124, 526);
             this.pivotGridControl1.TabIndex = 0;
             this.pivotGridControl1.CustomAppearance += new DevExpress.XtraPivotGrid.PivotCustomAppearanceEventHandler(this.pivotGridControl1_CustomAppearance);
             this.pivotGridControl1.FieldValueExpanded += new DevExpress.XtraPivotGrid.PivotFieldValueEventHandler(this.pivotGridControl1_FieldValueExpanded);
             // 
             // SampleSalesSummary
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(2092, 1292);
+            this.ClientSize = new System.Drawing.Size(1132, 680);
             this.Controls.Add(this.panelControl1);
             this.Controls.Add(this.groupControl1);
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "SampleSalesSummary";
             this.Text = "SampleSalesSummary";
             this.Load += new System.EventHandler(this.SampleSalesSummary_Load);

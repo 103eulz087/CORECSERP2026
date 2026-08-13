@@ -594,5 +594,10 @@ namespace SalesInventorySystem.AccountingDevEx
         private static decimal SafeDecimal(object v) => v == null || v == DBNull.Value ? 0m : decimal.TryParse(v.ToString().Replace(",", ""), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var r) ? r : 0m;
 
         private static int SafeInt(object v) => v == null || v == DBNull.Value ? 0 : int.TryParse(v.ToString(), out var r) ? r : 0;
+
+        private void btnAddLeg_Click_1(object sender, EventArgs e)
+        {
+
+        }
     }
 }

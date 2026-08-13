@@ -75,6 +75,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.txtDocRef.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtRemarks.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerControl1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainerControl1.Panel1)).BeginInit();
+            this.splitContainerControl1.Panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainerControl1.Panel2)).BeginInit();
+            this.splitContainerControl1.Panel2.SuspendLayout();
             this.splitContainerControl1.SuspendLayout();
             this.tableLayoutPanelLeft.SuspendLayout();
             this.flowLayoutPanelLegBar.SuspendLayout();
@@ -102,14 +106,14 @@
             this.tableLayoutPanelMain.Controls.Add(this.panelToolbar, 0, 3);
             this.tableLayoutPanelMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanelMain.Location = new System.Drawing.Point(0, 0);
-            this.tableLayoutPanelMain.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.tableLayoutPanelMain.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.tableLayoutPanelMain.Name = "tableLayoutPanelMain";
             this.tableLayoutPanelMain.RowCount = 4;
             this.tableLayoutPanelMain.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 64F));
             this.tableLayoutPanelMain.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 241F));
             this.tableLayoutPanelMain.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanelMain.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 54F));
-            this.tableLayoutPanelMain.Size = new System.Drawing.Size(1493, 985);
+            this.tableLayoutPanelMain.Size = new System.Drawing.Size(1492, 985);
             this.tableLayoutPanelMain.TabIndex = 0;
             // 
             // panelBanner
@@ -117,16 +121,16 @@
             this.panelBanner.Controls.Add(this.lblBannerTitle);
             this.panelBanner.Controls.Add(this.lblBannerSub);
             this.panelBanner.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelBanner.Location = new System.Drawing.Point(3, 4);
-            this.panelBanner.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.panelBanner.Location = new System.Drawing.Point(2, 4);
+            this.panelBanner.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.panelBanner.Name = "panelBanner";
-            this.panelBanner.Size = new System.Drawing.Size(1487, 56);
+            this.panelBanner.Size = new System.Drawing.Size(1488, 56);
             this.panelBanner.TabIndex = 0;
             // 
             // lblBannerTitle
             // 
-            this.lblBannerTitle.Location = new System.Drawing.Point(16, 15);
-            this.lblBannerTitle.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.lblBannerTitle.Location = new System.Drawing.Point(15, 15);
+            this.lblBannerTitle.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.lblBannerTitle.Name = "lblBannerTitle";
             this.lblBannerTitle.Size = new System.Drawing.Size(96, 16);
             this.lblBannerTitle.TabIndex = 0;
@@ -134,8 +138,8 @@
             // 
             // lblBannerSub
             // 
-            this.lblBannerSub.Location = new System.Drawing.Point(16, 36);
-            this.lblBannerSub.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.lblBannerSub.Location = new System.Drawing.Point(15, 36);
+            this.lblBannerSub.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.lblBannerSub.Name = "lblBannerSub";
             this.lblBannerSub.Size = new System.Drawing.Size(456, 16);
             this.lblBannerSub.TabIndex = 1;
@@ -145,10 +149,10 @@
             // 
             this.panelHeader.Controls.Add(this.flowLayoutPanelHeader);
             this.panelHeader.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelHeader.Location = new System.Drawing.Point(3, 68);
-            this.panelHeader.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.panelHeader.Location = new System.Drawing.Point(2, 68);
+            this.panelHeader.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.panelHeader.Name = "panelHeader";
-            this.panelHeader.Size = new System.Drawing.Size(1487, 233);
+            this.panelHeader.Size = new System.Drawing.Size(1488, 233);
             this.panelHeader.TabIndex = 1;
             // 
             // flowLayoutPanelHeader
@@ -165,35 +169,35 @@
             this.flowLayoutPanelHeader.Controls.Add(this.txtRemarks);
             this.flowLayoutPanelHeader.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flowLayoutPanelHeader.Location = new System.Drawing.Point(0, 0);
-            this.flowLayoutPanelHeader.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.flowLayoutPanelHeader.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.flowLayoutPanelHeader.Name = "flowLayoutPanelHeader";
             this.flowLayoutPanelHeader.Padding = new System.Windows.Forms.Padding(12);
-            this.flowLayoutPanelHeader.Size = new System.Drawing.Size(1487, 233);
+            this.flowLayoutPanelHeader.Size = new System.Drawing.Size(1488, 233);
             this.flowLayoutPanelHeader.TabIndex = 0;
             // 
             // radSourceType
             // 
-            this.radSourceType.Location = new System.Drawing.Point(15, 16);
-            this.radSourceType.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.radSourceType.Location = new System.Drawing.Point(14, 16);
+            this.radSourceType.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.radSourceType.Name = "radSourceType";
-            this.radSourceType.Size = new System.Drawing.Size(175, 49);
+            this.radSourceType.Size = new System.Drawing.Size(174, 49);
             this.radSourceType.TabIndex = 0;
             // 
             // cmbAdjType
             // 
-            this.cmbAdjType.Location = new System.Drawing.Point(196, 16);
-            this.cmbAdjType.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.cmbAdjType.Location = new System.Drawing.Point(192, 16);
+            this.cmbAdjType.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.cmbAdjType.Name = "cmbAdjType";
-            this.cmbAdjType.Size = new System.Drawing.Size(163, 22);
+            this.cmbAdjType.Size = new System.Drawing.Size(162, 22);
             this.cmbAdjType.TabIndex = 1;
             // 
             // cmbSupplier
             // 
-            this.cmbSupplier.Location = new System.Drawing.Point(365, 16);
-            this.cmbSupplier.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.cmbSupplier.Location = new System.Drawing.Point(358, 16);
+            this.cmbSupplier.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.cmbSupplier.Name = "cmbSupplier";
             this.cmbSupplier.Properties.PopupView = this.cmbSupplierView;
-            this.cmbSupplier.Size = new System.Drawing.Size(233, 22);
+            this.cmbSupplier.Size = new System.Drawing.Size(232, 22);
             this.cmbSupplier.TabIndex = 2;
             // 
             // cmbSupplierView
@@ -206,11 +210,11 @@
             // 
             // cmbInvoice
             // 
-            this.cmbInvoice.Location = new System.Drawing.Point(604, 16);
-            this.cmbInvoice.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.cmbInvoice.Location = new System.Drawing.Point(594, 16);
+            this.cmbInvoice.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.cmbInvoice.Name = "cmbInvoice";
             this.cmbInvoice.Properties.PopupView = this.cmbInvoiceView;
-            this.cmbInvoice.Size = new System.Drawing.Size(233, 22);
+            this.cmbInvoice.Size = new System.Drawing.Size(232, 22);
             this.cmbInvoice.TabIndex = 3;
             // 
             // cmbInvoiceView
@@ -223,63 +227,69 @@
             // 
             // lblInvoiceBalance
             // 
-            this.lblInvoiceBalance.Location = new System.Drawing.Point(843, 16);
-            this.lblInvoiceBalance.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.lblInvoiceBalance.Location = new System.Drawing.Point(830, 16);
+            this.lblInvoiceBalance.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.lblInvoiceBalance.Name = "lblInvoiceBalance";
             this.lblInvoiceBalance.Size = new System.Drawing.Size(0, 16);
             this.lblInvoiceBalance.TabIndex = 4;
             // 
             // txtAdjAmount
             // 
-            this.txtAdjAmount.Location = new System.Drawing.Point(849, 16);
-            this.txtAdjAmount.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.txtAdjAmount.Location = new System.Drawing.Point(834, 16);
+            this.txtAdjAmount.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.txtAdjAmount.Name = "txtAdjAmount";
             this.txtAdjAmount.Size = new System.Drawing.Size(117, 22);
             this.txtAdjAmount.TabIndex = 5;
             // 
             // cmbAPImpact
             // 
-            this.cmbAPImpact.Location = new System.Drawing.Point(972, 16);
-            this.cmbAPImpact.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.cmbAPImpact.Location = new System.Drawing.Point(955, 16);
+            this.cmbAPImpact.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.cmbAPImpact.Name = "cmbAPImpact";
             this.cmbAPImpact.Size = new System.Drawing.Size(117, 22);
             this.cmbAPImpact.TabIndex = 6;
             // 
             // txtOrigTicket
             // 
-            this.txtOrigTicket.Location = new System.Drawing.Point(1095, 16);
-            this.txtOrigTicket.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.txtOrigTicket.Location = new System.Drawing.Point(1076, 16);
+            this.txtOrigTicket.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.txtOrigTicket.Name = "txtOrigTicket";
-            this.txtOrigTicket.Size = new System.Drawing.Size(140, 22);
+            this.txtOrigTicket.Size = new System.Drawing.Size(139, 22);
             this.txtOrigTicket.TabIndex = 7;
             // 
             // txtDocRef
             // 
-            this.txtDocRef.Location = new System.Drawing.Point(1241, 16);
-            this.txtDocRef.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.txtDocRef.Location = new System.Drawing.Point(1219, 16);
+            this.txtDocRef.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.txtDocRef.Name = "txtDocRef";
-            this.txtDocRef.Size = new System.Drawing.Size(140, 22);
+            this.txtDocRef.Size = new System.Drawing.Size(139, 22);
             this.txtDocRef.TabIndex = 8;
             // 
             // txtRemarks
             // 
-            this.txtRemarks.Location = new System.Drawing.Point(15, 73);
-            this.txtRemarks.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.txtRemarks.Location = new System.Drawing.Point(14, 73);
+            this.txtRemarks.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.txtRemarks.Name = "txtRemarks";
-            this.txtRemarks.Size = new System.Drawing.Size(350, 22);
+            this.txtRemarks.Size = new System.Drawing.Size(349, 22);
             this.txtRemarks.TabIndex = 9;
             // 
             // splitContainerControl1
             // 
             this.splitContainerControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainerControl1.Location = new System.Drawing.Point(3, 309);
-            this.splitContainerControl1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.splitContainerControl1.Location = new System.Drawing.Point(2, 309);
+            this.splitContainerControl1.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.splitContainerControl1.Name = "splitContainerControl1";
+            // 
+            // splitContainerControl1.Panel1
+            // 
             this.splitContainerControl1.Panel1.Controls.Add(this.tableLayoutPanelLeft);
             this.splitContainerControl1.Panel1.Text = "Panel1";
+            // 
+            // splitContainerControl1.Panel2
+            // 
             this.splitContainerControl1.Panel2.Controls.Add(this.tableLayoutPanelRight);
             this.splitContainerControl1.Panel2.Text = "Panel2";
-            this.splitContainerControl1.Size = new System.Drawing.Size(1487, 618);
+            this.splitContainerControl1.Size = new System.Drawing.Size(1488, 618);
             this.splitContainerControl1.SplitterPosition = 700;
             this.splitContainerControl1.TabIndex = 2;
             // 
@@ -292,7 +302,7 @@
             this.tableLayoutPanelLeft.Controls.Add(this.gridLegs, 0, 2);
             this.tableLayoutPanelLeft.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanelLeft.Location = new System.Drawing.Point(0, 0);
-            this.tableLayoutPanelLeft.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.tableLayoutPanelLeft.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.tableLayoutPanelLeft.Name = "tableLayoutPanelLeft";
             this.tableLayoutPanelLeft.RowCount = 3;
             this.tableLayoutPanelLeft.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
@@ -304,10 +314,10 @@
             // lblLegs
             // 
             this.lblLegs.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lblLegs.Location = new System.Drawing.Point(3, 4);
-            this.lblLegs.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.lblLegs.Location = new System.Drawing.Point(2, 4);
+            this.lblLegs.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.lblLegs.Name = "lblLegs";
-            this.lblLegs.Size = new System.Drawing.Size(694, 17);
+            this.lblLegs.Size = new System.Drawing.Size(696, 17);
             this.lblLegs.TabIndex = 0;
             this.lblLegs.Text = "GL LEGS";
             // 
@@ -320,19 +330,19 @@
             this.flowLayoutPanelLegBar.Controls.Add(this.btnAddLeg);
             this.flowLayoutPanelLegBar.Controls.Add(this.btnRemoveLeg);
             this.flowLayoutPanelLegBar.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.flowLayoutPanelLegBar.Location = new System.Drawing.Point(3, 29);
-            this.flowLayoutPanelLegBar.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.flowLayoutPanelLegBar.Location = new System.Drawing.Point(2, 29);
+            this.flowLayoutPanelLegBar.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.flowLayoutPanelLegBar.Name = "flowLayoutPanelLegBar";
-            this.flowLayoutPanelLegBar.Size = new System.Drawing.Size(694, 77);
+            this.flowLayoutPanelLegBar.Size = new System.Drawing.Size(696, 77);
             this.flowLayoutPanelLegBar.TabIndex = 1;
             // 
             // cmbLegAccount
             // 
-            this.cmbLegAccount.Location = new System.Drawing.Point(3, 4);
-            this.cmbLegAccount.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.cmbLegAccount.Location = new System.Drawing.Point(2, 4);
+            this.cmbLegAccount.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.cmbLegAccount.Name = "cmbLegAccount";
             this.cmbLegAccount.Properties.PopupView = this.cmbLegAccountView;
-            this.cmbLegAccount.Size = new System.Drawing.Size(175, 22);
+            this.cmbLegAccount.Size = new System.Drawing.Size(174, 22);
             this.cmbLegAccount.TabIndex = 0;
             // 
             // cmbLegAccountView
@@ -345,41 +355,42 @@
             // 
             // cmbLegDC
             // 
-            this.cmbLegDC.Location = new System.Drawing.Point(184, 4);
-            this.cmbLegDC.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.cmbLegDC.Location = new System.Drawing.Point(180, 4);
+            this.cmbLegDC.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.cmbLegDC.Name = "cmbLegDC";
-            this.cmbLegDC.Size = new System.Drawing.Size(93, 22);
+            this.cmbLegDC.Size = new System.Drawing.Size(92, 22);
             this.cmbLegDC.TabIndex = 1;
             // 
             // txtLegAmount
             // 
-            this.txtLegAmount.Location = new System.Drawing.Point(283, 4);
-            this.txtLegAmount.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.txtLegAmount.Location = new System.Drawing.Point(276, 4);
+            this.txtLegAmount.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.txtLegAmount.Name = "txtLegAmount";
             this.txtLegAmount.Size = new System.Drawing.Size(117, 22);
             this.txtLegAmount.TabIndex = 2;
             // 
             // txtLegDesc
             // 
-            this.txtLegDesc.Location = new System.Drawing.Point(406, 4);
-            this.txtLegDesc.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.txtLegDesc.Location = new System.Drawing.Point(397, 4);
+            this.txtLegDesc.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.txtLegDesc.Name = "txtLegDesc";
-            this.txtLegDesc.Size = new System.Drawing.Size(175, 22);
+            this.txtLegDesc.Size = new System.Drawing.Size(174, 22);
             this.txtLegDesc.TabIndex = 3;
             // 
             // btnAddLeg
             // 
-            this.btnAddLeg.Location = new System.Drawing.Point(3, 34);
-            this.btnAddLeg.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnAddLeg.Location = new System.Drawing.Point(575, 4);
+            this.btnAddLeg.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.btnAddLeg.Name = "btnAddLeg";
             this.btnAddLeg.Size = new System.Drawing.Size(110, 36);
             this.btnAddLeg.TabIndex = 4;
             this.btnAddLeg.Text = "Add";
+            this.btnAddLeg.Click += new System.EventHandler(this.btnAddLeg_Click_1);
             // 
             // btnRemoveLeg
             // 
-            this.btnRemoveLeg.Location = new System.Drawing.Point(119, 34);
-            this.btnRemoveLeg.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnRemoveLeg.Location = new System.Drawing.Point(2, 48);
+            this.btnRemoveLeg.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.btnRemoveLeg.Name = "btnRemoveLeg";
             this.btnRemoveLeg.Size = new System.Drawing.Size(110, 36);
             this.btnRemoveLeg.TabIndex = 5;
@@ -388,12 +399,12 @@
             // gridLegs
             // 
             this.gridLegs.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridLegs.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.gridLegs.Location = new System.Drawing.Point(3, 114);
+            this.gridLegs.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.gridLegs.Location = new System.Drawing.Point(2, 114);
             this.gridLegs.MainView = this.viewLegs;
-            this.gridLegs.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.gridLegs.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.gridLegs.Name = "gridLegs";
-            this.gridLegs.Size = new System.Drawing.Size(694, 500);
+            this.gridLegs.Size = new System.Drawing.Size(696, 500);
             this.gridLegs.TabIndex = 2;
             this.gridLegs.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.viewLegs});
@@ -412,33 +423,33 @@
             this.tableLayoutPanelRight.Controls.Add(this.gridPending, 0, 1);
             this.tableLayoutPanelRight.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanelRight.Location = new System.Drawing.Point(0, 0);
-            this.tableLayoutPanelRight.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.tableLayoutPanelRight.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.tableLayoutPanelRight.Name = "tableLayoutPanelRight";
             this.tableLayoutPanelRight.RowCount = 2;
             this.tableLayoutPanelRight.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
             this.tableLayoutPanelRight.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanelRight.Size = new System.Drawing.Size(775, 618);
+            this.tableLayoutPanelRight.Size = new System.Drawing.Size(776, 618);
             this.tableLayoutPanelRight.TabIndex = 0;
             // 
             // lblPend
             // 
             this.lblPend.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lblPend.Location = new System.Drawing.Point(3, 4);
-            this.lblPend.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.lblPend.Location = new System.Drawing.Point(2, 4);
+            this.lblPend.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.lblPend.Name = "lblPend";
-            this.lblPend.Size = new System.Drawing.Size(769, 17);
+            this.lblPend.Size = new System.Drawing.Size(772, 17);
             this.lblPend.TabIndex = 0;
             this.lblPend.Text = "PENDING APPROVAL";
             // 
             // gridPending
             // 
             this.gridPending.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridPending.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.gridPending.Location = new System.Drawing.Point(3, 29);
+            this.gridPending.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.gridPending.Location = new System.Drawing.Point(2, 29);
             this.gridPending.MainView = this.viewPending;
-            this.gridPending.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.gridPending.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.gridPending.Name = "gridPending";
-            this.gridPending.Size = new System.Drawing.Size(769, 585);
+            this.gridPending.Size = new System.Drawing.Size(772, 585);
             this.gridPending.TabIndex = 1;
             this.gridPending.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.viewPending});
@@ -454,17 +465,17 @@
             this.panelToolbar.Controls.Add(this.lblStatus);
             this.panelToolbar.Controls.Add(this.flowLayoutPanelToolbar);
             this.panelToolbar.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelToolbar.Location = new System.Drawing.Point(3, 935);
-            this.panelToolbar.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.panelToolbar.Location = new System.Drawing.Point(2, 935);
+            this.panelToolbar.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.panelToolbar.Name = "panelToolbar";
-            this.panelToolbar.Size = new System.Drawing.Size(1487, 46);
+            this.panelToolbar.Size = new System.Drawing.Size(1488, 46);
             this.panelToolbar.TabIndex = 3;
             // 
             // lblStatus
             // 
             this.lblStatus.Dock = System.Windows.Forms.DockStyle.Right;
-            this.lblStatus.Location = new System.Drawing.Point(1451, 0);
-            this.lblStatus.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.lblStatus.Location = new System.Drawing.Point(1452, 0);
+            this.lblStatus.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.lblStatus.Name = "lblStatus";
             this.lblStatus.Size = new System.Drawing.Size(36, 16);
             this.lblStatus.TabIndex = 0;
@@ -479,15 +490,15 @@
             this.flowLayoutPanelToolbar.Controls.Add(this.btnRefresh);
             this.flowLayoutPanelToolbar.Dock = System.Windows.Forms.DockStyle.Left;
             this.flowLayoutPanelToolbar.Location = new System.Drawing.Point(0, 0);
-            this.flowLayoutPanelToolbar.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.flowLayoutPanelToolbar.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.flowLayoutPanelToolbar.Name = "flowLayoutPanelToolbar";
-            this.flowLayoutPanelToolbar.Size = new System.Drawing.Size(116, 46);
+            this.flowLayoutPanelToolbar.Size = new System.Drawing.Size(114, 46);
             this.flowLayoutPanelToolbar.TabIndex = 1;
             // 
             // btnPost
             // 
-            this.btnPost.Location = new System.Drawing.Point(3, 4);
-            this.btnPost.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnPost.Location = new System.Drawing.Point(2, 4);
+            this.btnPost.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.btnPost.Name = "btnPost";
             this.btnPost.Size = new System.Drawing.Size(110, 36);
             this.btnPost.TabIndex = 0;
@@ -495,8 +506,8 @@
             // 
             // btnApprove
             // 
-            this.btnApprove.Location = new System.Drawing.Point(3, 48);
-            this.btnApprove.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnApprove.Location = new System.Drawing.Point(2, 48);
+            this.btnApprove.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.btnApprove.Name = "btnApprove";
             this.btnApprove.Size = new System.Drawing.Size(110, 36);
             this.btnApprove.TabIndex = 1;
@@ -504,8 +515,8 @@
             // 
             // btnReject
             // 
-            this.btnReject.Location = new System.Drawing.Point(3, 92);
-            this.btnReject.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnReject.Location = new System.Drawing.Point(2, 92);
+            this.btnReject.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.btnReject.Name = "btnReject";
             this.btnReject.Size = new System.Drawing.Size(110, 36);
             this.btnReject.TabIndex = 2;
@@ -513,8 +524,8 @@
             // 
             // btnRefresh
             // 
-            this.btnRefresh.Location = new System.Drawing.Point(3, 136);
-            this.btnRefresh.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnRefresh.Location = new System.Drawing.Point(2, 136);
+            this.btnRefresh.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.btnRefresh.Name = "btnRefresh";
             this.btnRefresh.Size = new System.Drawing.Size(110, 36);
             this.btnRefresh.TabIndex = 3;
@@ -524,11 +535,11 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1493, 985);
+            this.ClientSize = new System.Drawing.Size(1492, 985);
             this.Controls.Add(this.tableLayoutPanelMain);
-            this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.Name = "ManualTicketFormV1";
-            this.Text = "Manual Ticketing";
+            this.Text = "Manual Ticketing v1";
             this.tableLayoutPanelMain.ResumeLayout(false);
             this.panelBanner.ResumeLayout(false);
             this.panelBanner.PerformLayout();
@@ -546,6 +557,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.txtOrigTicket.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtDocRef.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtRemarks.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainerControl1.Panel1)).EndInit();
+            this.splitContainerControl1.Panel1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainerControl1.Panel2)).EndInit();
+            this.splitContainerControl1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerControl1)).EndInit();
             this.splitContainerControl1.ResumeLayout(false);
             this.tableLayoutPanelLeft.ResumeLayout(false);

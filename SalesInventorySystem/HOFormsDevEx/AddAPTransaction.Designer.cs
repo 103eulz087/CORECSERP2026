@@ -34,8 +34,6 @@
             this.txtvatexamount = new DevExpress.XtraEditors.SpinEdit();
             this.txtewtamount = new DevExpress.XtraEditors.SpinEdit();
             this.labelControl8 = new DevExpress.XtraEditors.LabelControl();
-            this.simpleButton1 = new DevExpress.XtraEditors.SimpleButton();
-            this.simpleButton4 = new DevExpress.XtraEditors.SimpleButton();
             this.txttotalamount = new DevExpress.XtraEditors.SpinEdit();
             this.labelControl7 = new DevExpress.XtraEditors.LabelControl();
             this.txtshipmentno = new DevExpress.XtraEditors.TextEdit();
@@ -53,6 +51,8 @@
             this.txtremakrs = new System.Windows.Forms.TextBox();
             this.labelControl16 = new DevExpress.XtraEditors.LabelControl();
             this.txtinvoicedate = new DevExpress.XtraEditors.DateEdit();
+            this.simpleButton1 = new DevExpress.XtraEditors.SimpleButton();
+            this.simpleButton4 = new DevExpress.XtraEditors.SimpleButton();
             ((System.ComponentModel.ISupportInitialize)(this.groupControl1)).BeginInit();
             this.groupControl1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtvatinputamount.Properties)).BeginInit();
@@ -179,30 +179,6 @@
             this.labelControl8.Size = new System.Drawing.Size(93, 18);
             this.labelControl8.TabIndex = 484;
             this.labelControl8.Text = "EWT Amount:";
-            // 
-            // simpleButton1
-            // 
-            this.simpleButton1.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.Show_32x32__2_;
-            this.simpleButton1.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.simpleButton1.Location = new System.Drawing.Point(290, 217);
-            this.simpleButton1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.simpleButton1.Name = "simpleButton1";
-            this.simpleButton1.Size = new System.Drawing.Size(211, 79);
-            this.simpleButton1.TabIndex = 483;
-            this.simpleButton1.Text = "Show Inventory Report";
-            this.simpleButton1.Click += new System.EventHandler(this.simpleButton1_Click);
-            // 
-            // simpleButton4
-            // 
-            this.simpleButton4.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.Completed_16x16;
-            this.simpleButton4.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.simpleButton4.Location = new System.Drawing.Point(166, 368);
-            this.simpleButton4.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.simpleButton4.Name = "simpleButton4";
-            this.simpleButton4.Size = new System.Drawing.Size(117, 43);
-            this.simpleButton4.TabIndex = 482;
-            this.simpleButton4.Text = "Submit";
-            this.simpleButton4.Click += new System.EventHandler(this.simpleButton4_Click);
             // 
             // txttotalamount
             // 
@@ -399,6 +375,30 @@
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.txtinvoicedate.Size = new System.Drawing.Size(117, 24);
             this.txtinvoicedate.TabIndex = 456;
+            // 
+            // simpleButton1
+            // 
+            this.simpleButton1.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.Show_32x32__2_;
+            this.simpleButton1.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
+            this.simpleButton1.Location = new System.Drawing.Point(290, 217);
+            this.simpleButton1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.simpleButton1.Name = "simpleButton1";
+            this.simpleButton1.Size = new System.Drawing.Size(211, 79);
+            this.simpleButton1.TabIndex = 483;
+            this.simpleButton1.Text = "Show Inventory Report";
+            this.simpleButton1.Click += new System.EventHandler(this.simpleButton1_Click);
+            // 
+            // simpleButton4
+            // 
+            this.simpleButton4.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.Completed_16x16;
+            this.simpleButton4.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
+            this.simpleButton4.Location = new System.Drawing.Point(166, 368);
+            this.simpleButton4.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.simpleButton4.Name = "simpleButton4";
+            this.simpleButton4.Size = new System.Drawing.Size(117, 43);
+            this.simpleButton4.TabIndex = 482;
+            this.simpleButton4.Text = "Submit";
+            this.simpleButton4.Click += new System.EventHandler(this.simpleButton4_Click);
             // 
             // AddAPTransaction
             // 

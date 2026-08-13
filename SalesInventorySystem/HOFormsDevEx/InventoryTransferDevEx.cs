@@ -119,7 +119,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             DevExReportTemplate.TransferInventory xct = new DevExReportTemplate.TransferInventory();
             xct.Landscape = false;
             xct.Landscape = false;
-            xct.PaperKind = System.Drawing.Printing.PaperKind.A4;
+            xct.PaperKind = (DevExpress.Drawing.Printing.DXPaperKind)System.Drawing.Printing.PaperKind.A4;
             xct.Margins = new System.Drawing.Printing.Margins(100, 100, 100, 100);
 
             xct.xrdispatchno.Text = dispatchno;

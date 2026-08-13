@@ -182,7 +182,6 @@ namespace SalesInventorySystem.Orders
         {
             try
             {
-                int ctr = 1;
                 string destinationBranch = "";
                 if (radho.Checked == true)
                 {
@@ -192,29 +191,48 @@ namespace SalesInventorySystem.Orders
                 {
                     destinationBranch = txtbranch.Text;
                 }
-                double totalqty = 0.0;
-                string approvalstatus = "", dateapproved = "", approvedby = "";
-                DateTime dt = DateTime.Now;
 
-           
-                approvalstatus = "FOR APPROVAL";
-                dateapproved = "";
-                approvedby = "";
+                DataTable lines = new DataTable();
+                lines.Columns.Add("ProductCode", typeof(string));
+                lines.Columns.Add("ProductName", typeof(string));
+                lines.Columns.Add("Qty", typeof(decimal));
+                lines.Columns.Add("Units", typeof(string));
+                lines.Columns.Add("Remarks", typeof(string));
 
                 for (int i = 0; i <= gridView1.RowCount - 1; i++)
                 {
-                    Database.ExecuteQuery("INSERT INTO TransferOrderDetails VALUES('" + textEdit1.Text + "','"+ctr+"','" + gridView1.GetRowCellValue(i, "ProductCode").ToString() + "','" + gridView1.GetRowCellValue(i, "ProductName").ToString() + "','" + gridView1.GetRowCellValue(i, "Qty").ToString() + "','" + gridView1.GetRowCellValue(i, "Units").ToString() + "', '0','" + gridView1.GetRowCellValue(i, "Remarks").ToString() + "' )");
-                    totalqty += Convert.ToDouble(gridView1.GetRowCellValue(i, "Qty").ToString());
-                    ctr += 1;
+                    lines.Rows.Add(
+                        gridView1.GetRowCellValue(i, "ProductCode").ToString(),
+                        gridView1.GetRowCellValue(i, "ProductName").ToString(),
+                        Convert.ToDecimal(gridView1.GetRowCellValue(i, "Qty")),
+                        gridView1.GetRowCellValue(i, "Units").ToString(),
+                        gridView1.GetRowCellValue(i, "Remarks")?.ToString() ?? "");
                 }
-                Database.ExecuteQuery("UPDATE TransferOrderDetails SET Remarks=Replace(replace(Remarks, char(10), ''), char(13), '') WHERE PONumber='" + textEdit1.Text + "' ");
 
-                Database.ExecuteQuery("INSERT INTO TransferOrderSummary VALUES('" + textEdit1.Text + "','" + Login.assignedBranch + "','" + destinationBranch + "','" + totalqty + "','" + approvalstatus + "','" + DateTime.Now.ToString() + "','" + DateTime.Now.ToString() + "','" + txteffectivedate.Text + "','" + Login.Fullname + "','" + approvedby + "','" + dateapproved + "',' ','" + richTextBox1.Text + "',' ',0,'" + ordertype.Text + "','"+txtgroup.Text+"')", "Request Successfully Updated!");
+                using (SqlConnection con = Database.getConnection())
+                {
+                    con.Open();
+                    SqlCommand com = new SqlCommand("sp_AddTransferOrderRequest", con);
+                    com.CommandType = CommandType.StoredProcedure;
+                    com.Parameters.AddWithValue("@parmpono", textEdit1.Text);
+                    com.Parameters.AddWithValue("@parminitiatingbranch", Login.assignedBranch);
+                    com.Parameters.AddWithValue("@parmdestinationbranch", destinationBranch);
+                    com.Parameters.AddWithValue("@parmeffectivitydate", Convert.ToDateTime(txteffectivedate.Text));
+                    com.Parameters.AddWithValue("@parmrequestedby", Login.Fullname);
+                    com.Parameters.AddWithValue("@parmnotes", richTextBox1.Text);
+                    com.Parameters.AddWithValue("@parmordertype", ordertype.Text);
+                    com.Parameters.AddWithValue("@parmgroupcategory", txtgroup.Text);
+                    var tvpParam = com.Parameters.AddWithValue("@Lines", lines);
+                    tvpParam.SqlDbType = SqlDbType.Structured;
+                    tvpParam.TypeName = "dbo.tt_TransferOrderLines";
+                    com.ExecuteNonQuery();
+                }
+
                 table.Clear();
                 gridControl1.DataSource = null;
                 gridView1.Columns.Clear();
 
-           
+
                 this.Dispose();
             }
             catch (SqlException sqx)

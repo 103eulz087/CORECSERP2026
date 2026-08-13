@@ -143,10 +143,10 @@
             // 
             this.groupControl3.Controls.Add(this.gridControl1);
             this.groupControl3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupControl3.Location = new System.Drawing.Point(0, 96);
+            this.groupControl3.Location = new System.Drawing.Point(0, 127);
             this.groupControl3.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.groupControl3.Name = "groupControl3";
-            this.groupControl3.Size = new System.Drawing.Size(1195, 552);
+            this.groupControl3.Size = new System.Drawing.Size(1195, 521);
             this.groupControl3.TabIndex = 1;
             // 
             // gridControl1
@@ -157,7 +157,7 @@
             this.gridControl1.MainView = this.gridView1;
             this.gridControl1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.gridControl1.Name = "gridControl1";
-            this.gridControl1.Size = new System.Drawing.Size(1191, 522);
+            this.gridControl1.Size = new System.Drawing.Size(1191, 491);
             this.gridControl1.TabIndex = 8;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1,
@@ -215,14 +215,14 @@
             this.groupControl1.Location = new System.Drawing.Point(0, 0);
             this.groupControl1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.groupControl1.Name = "groupControl1";
-            this.groupControl1.Size = new System.Drawing.Size(1195, 96);
+            this.groupControl1.Size = new System.Drawing.Size(1195, 127);
             this.groupControl1.TabIndex = 0;
             // 
             // chckzerobal
             // 
             this.chckzerobal.AutoSize = true;
             this.chckzerobal.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.chckzerobal.Location = new System.Drawing.Point(114, 67);
+            this.chckzerobal.Location = new System.Drawing.Point(114, 87);
             this.chckzerobal.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.chckzerobal.Name = "chckzerobal";
             this.chckzerobal.Size = new System.Drawing.Size(119, 22);
@@ -232,7 +232,7 @@
             // 
             // simpleButton1
             // 
-            this.simpleButton1.Location = new System.Drawing.Point(287, 33);
+            this.simpleButton1.Location = new System.Drawing.Point(287, 48);
             this.simpleButton1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.simpleButton1.Name = "simpleButton1";
             this.simpleButton1.Size = new System.Drawing.Size(99, 48);
@@ -243,7 +243,7 @@
             // txtapaccnt
             // 
             this.txtapaccnt.EditValue = "";
-            this.txtapaccnt.Location = new System.Drawing.Point(114, 33);
+            this.txtapaccnt.Location = new System.Drawing.Point(114, 48);
             this.txtapaccnt.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtapaccnt.Name = "txtapaccnt";
             this.txtapaccnt.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -270,7 +270,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(6, 35);
+            this.label1.Location = new System.Drawing.Point(6, 50);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(108, 18);
             this.label1.TabIndex = 443;
@@ -289,10 +289,10 @@
             // 
             this.groupControl2.Controls.Add(this.gridControl2);
             this.groupControl2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupControl2.Location = new System.Drawing.Point(0, 96);
+            this.groupControl2.Location = new System.Drawing.Point(0, 127);
             this.groupControl2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.groupControl2.Name = "groupControl2";
-            this.groupControl2.Size = new System.Drawing.Size(1195, 552);
+            this.groupControl2.Size = new System.Drawing.Size(1195, 521);
             this.groupControl2.TabIndex = 3;
             // 
             // gridControl2
@@ -303,7 +303,7 @@
             this.gridControl2.MainView = this.gridView2;
             this.gridControl2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.gridControl2.Name = "gridControl2";
-            this.gridControl2.Size = new System.Drawing.Size(1191, 522);
+            this.gridControl2.Size = new System.Drawing.Size(1191, 491);
             this.gridControl2.TabIndex = 8;
             this.gridControl2.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView2,
@@ -362,12 +362,12 @@
             this.groupControl4.Location = new System.Drawing.Point(0, 0);
             this.groupControl4.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.groupControl4.Name = "groupControl4";
-            this.groupControl4.Size = new System.Drawing.Size(1195, 96);
+            this.groupControl4.Size = new System.Drawing.Size(1195, 127);
             this.groupControl4.TabIndex = 2;
             // 
             // simpleButton2
             // 
-            this.simpleButton2.Location = new System.Drawing.Point(299, 37);
+            this.simpleButton2.Location = new System.Drawing.Point(287, 48);
             this.simpleButton2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.simpleButton2.Name = "simpleButton2";
             this.simpleButton2.Size = new System.Drawing.Size(99, 48);
@@ -379,7 +379,7 @@
             // 
             this.chckzerobalar.AutoSize = true;
             this.chckzerobalar.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.chckzerobalar.Location = new System.Drawing.Point(117, 64);
+            this.chckzerobalar.Location = new System.Drawing.Point(114, 87);
             this.chckzerobalar.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.chckzerobalar.Name = "chckzerobalar";
             this.chckzerobalar.Size = new System.Drawing.Size(119, 22);
@@ -390,7 +390,7 @@
             // txtaraccount
             // 
             this.txtaraccount.Enabled = false;
-            this.txtaraccount.Location = new System.Drawing.Point(117, 32);
+            this.txtaraccount.Location = new System.Drawing.Point(114, 48);
             this.txtaraccount.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtaraccount.Name = "txtaraccount";
             this.txtaraccount.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -417,7 +417,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(8, 37);
+            this.label2.Location = new System.Drawing.Point(6, 50);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(108, 18);
             this.label2.TabIndex = 443;
@@ -429,17 +429,17 @@
             this.tabliquidation.Controls.Add(this.groupControl6);
             this.tabliquidation.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.tabliquidation.Name = "tabliquidation";
-            this.tabliquidation.Size = new System.Drawing.Size(1195, 693);
+            this.tabliquidation.Size = new System.Drawing.Size(1195, 648);
             this.tabliquidation.Text = "Liquidation";
             // 
             // groupControl5
             // 
             this.groupControl5.Controls.Add(this.gridControl3);
             this.groupControl5.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupControl5.Location = new System.Drawing.Point(0, 96);
+            this.groupControl5.Location = new System.Drawing.Point(0, 127);
             this.groupControl5.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.groupControl5.Name = "groupControl5";
-            this.groupControl5.Size = new System.Drawing.Size(1195, 597);
+            this.groupControl5.Size = new System.Drawing.Size(1195, 521);
             this.groupControl5.TabIndex = 3;
             // 
             // gridControl3
@@ -453,7 +453,7 @@
             this.gridControl3.MainView = this.gridView4;
             this.gridControl3.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.gridControl3.Name = "gridControl3";
-            this.gridControl3.Size = new System.Drawing.Size(1191, 567);
+            this.gridControl3.Size = new System.Drawing.Size(1191, 491);
             this.gridControl3.TabIndex = 8;
             this.gridControl3.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView4,
@@ -510,7 +510,7 @@
             this.groupControl6.Location = new System.Drawing.Point(0, 0);
             this.groupControl6.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.groupControl6.Name = "groupControl6";
-            this.groupControl6.Size = new System.Drawing.Size(1195, 96);
+            this.groupControl6.Size = new System.Drawing.Size(1195, 127);
             this.groupControl6.TabIndex = 2;
             // 
             // simpleButton3
@@ -607,11 +607,10 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1197, 680);
             this.Controls.Add(this.xtraTabControl1);
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "AccountMasterListDevEx";
-            this.Text = "Account MasterList";
+            this.Size = new System.Drawing.Size(1197, 680);
             this.Load += new System.EventHandler(this.AccountMasterListDevEx_Load);
             ((System.ComponentModel.ISupportInitialize)(this.xtraTabControl1)).EndInit();
             this.xtraTabControl1.ResumeLayout(false);

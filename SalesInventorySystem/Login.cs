@@ -267,6 +267,7 @@ namespace SalesInventorySystem
                     this.Hide();
                     Main m = new Main();
                     m.Show();
+                    Classes.ApprovalRelaySession.Initialize();
                 }
                 else if (loginStatus == "DEFAULT_PASSWORD")
                 {

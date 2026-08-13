@@ -118,14 +118,15 @@
             this.tablePanel1.Controls.Add(this.txtpayoutmeron);
             this.tablePanel1.Controls.Add(this.txtpayoutwala);
             this.tablePanel1.Controls.Add(this.txtwalabet);
-            this.tablePanel1.Location = new System.Drawing.Point(50, 114);
+            this.tablePanel1.Location = new System.Drawing.Point(29, 73);
+            this.tablePanel1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.tablePanel1.Name = "tablePanel1";
             this.tablePanel1.Rows.AddRange(new DevExpress.Utils.Layout.TablePanelRow[] {
             new DevExpress.Utils.Layout.TablePanelRow(DevExpress.Utils.Layout.TablePanelEntityStyle.Absolute, 75F),
             new DevExpress.Utils.Layout.TablePanelRow(DevExpress.Utils.Layout.TablePanelEntityStyle.Absolute, 90.5F),
             new DevExpress.Utils.Layout.TablePanelRow(DevExpress.Utils.Layout.TablePanelEntityStyle.Absolute, 188.5F),
             new DevExpress.Utils.Layout.TablePanelRow(DevExpress.Utils.Layout.TablePanelEntityStyle.Absolute, 26F)});
-            this.tablePanel1.Size = new System.Drawing.Size(2015, 244);
+            this.tablePanel1.Size = new System.Drawing.Size(1175, 156);
             this.tablePanel1.TabIndex = 0;
             // 
             // labelControl5
@@ -139,10 +140,11 @@
             this.labelControl5.Appearance.TextOptions.WordWrap = DevExpress.Utils.WordWrap.Wrap;
             this.tablePanel1.SetColumn(this.labelControl5, 6);
             this.labelControl5.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.labelControl5.Location = new System.Drawing.Point(1559, 3);
+            this.labelControl5.Location = new System.Drawing.Point(909, 2);
+            this.labelControl5.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.labelControl5.Name = "labelControl5";
             this.tablePanel1.SetRow(this.labelControl5, 0);
-            this.labelControl5.Size = new System.Drawing.Size(453, 69);
+            this.labelControl5.Size = new System.Drawing.Size(264, 44);
             this.labelControl5.TabIndex = 9;
             this.labelControl5.Text = "Wala";
             // 
@@ -157,10 +159,11 @@
             this.labelControl4.Appearance.TextOptions.WordWrap = DevExpress.Utils.WordWrap.Wrap;
             this.tablePanel1.SetColumn(this.labelControl4, 5);
             this.labelControl4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.labelControl4.Location = new System.Drawing.Point(1336, 3);
+            this.labelControl4.Location = new System.Drawing.Point(779, 2);
+            this.labelControl4.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.labelControl4.Name = "labelControl4";
             this.tablePanel1.SetRow(this.labelControl4, 0);
-            this.labelControl4.Size = new System.Drawing.Size(217, 69);
+            this.labelControl4.Size = new System.Drawing.Size(126, 44);
             this.labelControl4.TabIndex = 8;
             this.labelControl4.Text = "Payout Wala";
             // 
@@ -175,10 +178,11 @@
             this.labelControl3.Appearance.TextOptions.WordWrap = DevExpress.Utils.WordWrap.Wrap;
             this.tablePanel1.SetColumn(this.labelControl3, 3);
             this.labelControl3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.labelControl3.Location = new System.Drawing.Point(793, 3);
+            this.labelControl3.Location = new System.Drawing.Point(463, 2);
+            this.labelControl3.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.labelControl3.Name = "labelControl3";
             this.tablePanel1.SetRow(this.labelControl3, 0);
-            this.labelControl3.Size = new System.Drawing.Size(362, 69);
+            this.labelControl3.Size = new System.Drawing.Size(210, 44);
             this.labelControl3.TabIndex = 7;
             this.labelControl3.Text = "Draw";
             // 
@@ -193,10 +197,11 @@
             this.labelControl2.Appearance.TextOptions.WordWrap = DevExpress.Utils.WordWrap.Wrap;
             this.tablePanel1.SetColumn(this.labelControl2, 1);
             this.labelControl2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.labelControl2.Location = new System.Drawing.Point(237, 3);
+            this.labelControl2.Location = new System.Drawing.Point(138, 2);
+            this.labelControl2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.labelControl2.Name = "labelControl2";
             this.tablePanel1.SetRow(this.labelControl2, 0);
-            this.labelControl2.Size = new System.Drawing.Size(378, 69);
+            this.labelControl2.Size = new System.Drawing.Size(220, 44);
             this.labelControl2.TabIndex = 6;
             this.labelControl2.Text = "Meron";
             // 
@@ -211,10 +216,11 @@
             this.labelControl1.Appearance.TextOptions.WordWrap = DevExpress.Utils.WordWrap.Wrap;
             this.tablePanel1.SetColumn(this.labelControl1, 0);
             this.labelControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.labelControl1.Location = new System.Drawing.Point(3, 3);
+            this.labelControl1.Location = new System.Drawing.Point(2, 2);
+            this.labelControl1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.labelControl1.Name = "labelControl1";
             this.tablePanel1.SetRow(this.labelControl1, 0);
-            this.labelControl1.Size = new System.Drawing.Size(228, 69);
+            this.labelControl1.Size = new System.Drawing.Size(132, 44);
             this.labelControl1.TabIndex = 5;
             this.labelControl1.Text = "Payout Meron";
             // 
@@ -222,7 +228,8 @@
             // 
             this.tablePanel1.SetColumn(this.txtdrawbet, 3);
             this.txtdrawbet.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txtdrawbet.Location = new System.Drawing.Point(793, 78);
+            this.txtdrawbet.Location = new System.Drawing.Point(463, 50);
+            this.txtdrawbet.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.txtdrawbet.Name = "txtdrawbet";
             this.txtdrawbet.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 20F);
             this.txtdrawbet.Properties.Appearance.Options.UseFont = true;
@@ -232,14 +239,15 @@
             this.txtdrawbet.Properties.Appearance.TextOptions.VAlignment = DevExpress.Utils.VertAlignment.Center;
             this.txtdrawbet.Properties.Appearance.TextOptions.WordWrap = DevExpress.Utils.WordWrap.Wrap;
             this.tablePanel1.SetRow(this.txtdrawbet, 1);
-            this.txtdrawbet.Size = new System.Drawing.Size(362, 85);
+            this.txtdrawbet.Size = new System.Drawing.Size(210, 54);
             this.txtdrawbet.TabIndex = 2;
             // 
             // txtmeronbet
             // 
             this.tablePanel1.SetColumn(this.txtmeronbet, 1);
             this.txtmeronbet.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txtmeronbet.Location = new System.Drawing.Point(237, 78);
+            this.txtmeronbet.Location = new System.Drawing.Point(138, 50);
+            this.txtmeronbet.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.txtmeronbet.Name = "txtmeronbet";
             this.txtmeronbet.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 20F);
             this.txtmeronbet.Properties.Appearance.Options.UseFont = true;
@@ -249,14 +257,15 @@
             this.txtmeronbet.Properties.Appearance.TextOptions.VAlignment = DevExpress.Utils.VertAlignment.Center;
             this.txtmeronbet.Properties.Appearance.TextOptions.WordWrap = DevExpress.Utils.WordWrap.Wrap;
             this.tablePanel1.SetRow(this.txtmeronbet, 1);
-            this.txtmeronbet.Size = new System.Drawing.Size(378, 85);
+            this.txtmeronbet.Size = new System.Drawing.Size(220, 54);
             this.txtmeronbet.TabIndex = 1;
             // 
             // txtpayoutmeron
             // 
             this.tablePanel1.SetColumn(this.txtpayoutmeron, 0);
             this.txtpayoutmeron.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txtpayoutmeron.Location = new System.Drawing.Point(3, 78);
+            this.txtpayoutmeron.Location = new System.Drawing.Point(2, 50);
+            this.txtpayoutmeron.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.txtpayoutmeron.Name = "txtpayoutmeron";
             this.txtpayoutmeron.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 20F);
             this.txtpayoutmeron.Properties.Appearance.Options.UseFont = true;
@@ -266,14 +275,15 @@
             this.txtpayoutmeron.Properties.Appearance.TextOptions.VAlignment = DevExpress.Utils.VertAlignment.Center;
             this.txtpayoutmeron.Properties.Appearance.TextOptions.WordWrap = DevExpress.Utils.WordWrap.Wrap;
             this.tablePanel1.SetRow(this.txtpayoutmeron, 1);
-            this.txtpayoutmeron.Size = new System.Drawing.Size(228, 85);
+            this.txtpayoutmeron.Size = new System.Drawing.Size(132, 54);
             this.txtpayoutmeron.TabIndex = 0;
             // 
             // txtpayoutwala
             // 
             this.tablePanel1.SetColumn(this.txtpayoutwala, 5);
             this.txtpayoutwala.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txtpayoutwala.Location = new System.Drawing.Point(1336, 78);
+            this.txtpayoutwala.Location = new System.Drawing.Point(779, 50);
+            this.txtpayoutwala.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.txtpayoutwala.Name = "txtpayoutwala";
             this.txtpayoutwala.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 20F);
             this.txtpayoutwala.Properties.Appearance.Options.UseFont = true;
@@ -283,14 +293,15 @@
             this.txtpayoutwala.Properties.Appearance.TextOptions.VAlignment = DevExpress.Utils.VertAlignment.Center;
             this.txtpayoutwala.Properties.Appearance.TextOptions.WordWrap = DevExpress.Utils.WordWrap.Wrap;
             this.tablePanel1.SetRow(this.txtpayoutwala, 1);
-            this.txtpayoutwala.Size = new System.Drawing.Size(217, 85);
+            this.txtpayoutwala.Size = new System.Drawing.Size(126, 54);
             this.txtpayoutwala.TabIndex = 3;
             // 
             // txtwalabet
             // 
             this.tablePanel1.SetColumn(this.txtwalabet, 6);
             this.txtwalabet.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txtwalabet.Location = new System.Drawing.Point(1559, 78);
+            this.txtwalabet.Location = new System.Drawing.Point(909, 50);
+            this.txtwalabet.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.txtwalabet.Name = "txtwalabet";
             this.txtwalabet.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 20F);
             this.txtwalabet.Properties.Appearance.Options.UseFont = true;
@@ -300,27 +311,26 @@
             this.txtwalabet.Properties.Appearance.TextOptions.VAlignment = DevExpress.Utils.VertAlignment.Center;
             this.txtwalabet.Properties.Appearance.TextOptions.WordWrap = DevExpress.Utils.WordWrap.Wrap;
             this.tablePanel1.SetRow(this.txtwalabet, 1);
-            this.txtwalabet.Size = new System.Drawing.Size(453, 85);
+            this.txtwalabet.Size = new System.Drawing.Size(264, 54);
             this.txtwalabet.TabIndex = 4;
             // 
             // groupControl2
             // 
             this.groupControl2.Controls.Add(this.gridControl1);
-            this.groupControl2.Location = new System.Drawing.Point(50, 370);
-            this.groupControl2.Margin = new System.Windows.Forms.Padding(6, 4, 6, 4);
+            this.groupControl2.Location = new System.Drawing.Point(29, 237);
             this.groupControl2.Name = "groupControl2";
-            this.groupControl2.Size = new System.Drawing.Size(1166, 771);
+            this.groupControl2.Size = new System.Drawing.Size(680, 493);
             this.groupControl2.TabIndex = 14;
             // 
             // gridControl1
             // 
             this.gridControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControl1.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(6);
-            this.gridControl1.Location = new System.Drawing.Point(3, 45);
+            this.gridControl1.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.gridControl1.Location = new System.Drawing.Point(2, 28);
             this.gridControl1.MainView = this.gridView2;
-            this.gridControl1.Margin = new System.Windows.Forms.Padding(6);
+            this.gridControl1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.gridControl1.Name = "gridControl1";
-            this.gridControl1.Size = new System.Drawing.Size(1160, 723);
+            this.gridControl1.Size = new System.Drawing.Size(676, 463);
             this.gridControl1.TabIndex = 5;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView2,
@@ -338,7 +348,8 @@
             this.gridView2.Appearance.HeaderPanel.Options.UseFont = true;
             this.gridView2.Appearance.Row.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.gridView2.Appearance.Row.Options.UseFont = true;
-            this.gridView2.DetailHeight = 364;
+            this.gridView2.DetailHeight = 233;
+            this.gridView2.FixedLineWidth = 1;
             this.gridView2.GridControl = this.gridControl1;
             this.gridView2.Name = "gridView2";
             this.gridView2.OptionsBehavior.Editable = false;
@@ -350,7 +361,8 @@
             // 
             // bandedGridView1
             // 
-            this.bandedGridView1.DetailHeight = 364;
+            this.bandedGridView1.DetailHeight = 233;
+            this.bandedGridView1.FixedLineWidth = 1;
             this.bandedGridView1.GridControl = this.gridControl1;
             this.bandedGridView1.Name = "bandedGridView1";
             // 
@@ -358,40 +370,43 @@
             // 
             this.advBandedGridView1.Bands.AddRange(new DevExpress.XtraGrid.Views.BandedGrid.GridBand[] {
             this.gridBand1});
-            this.advBandedGridView1.DetailHeight = 364;
+            this.advBandedGridView1.DetailHeight = 233;
+            this.advBandedGridView1.FixedLineWidth = 1;
             this.advBandedGridView1.GridControl = this.gridControl1;
             this.advBandedGridView1.Name = "advBandedGridView1";
             // 
             // gridBand1
             // 
             this.gridBand1.Caption = "gridBand1";
-            this.gridBand1.MinWidth = 18;
             this.gridBand1.Name = "gridBand1";
             this.gridBand1.VisibleIndex = 0;
-            this.gridBand1.Width = 88;
+            this.gridBand1.Width = 51;
             // 
             // gridView3
             // 
-            this.gridView3.DetailHeight = 364;
+            this.gridView3.DetailHeight = 233;
+            this.gridView3.FixedLineWidth = 1;
             this.gridView3.GridControl = this.gridControl1;
             this.gridView3.Name = "gridView3";
             // 
             // txtbet
             // 
-            this.txtbet.Location = new System.Drawing.Point(1277, 379);
+            this.txtbet.Location = new System.Drawing.Point(745, 243);
+            this.txtbet.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.txtbet.Name = "txtbet";
             this.txtbet.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 15F);
             this.txtbet.Properties.Appearance.Options.UseFont = true;
-            this.txtbet.Size = new System.Drawing.Size(287, 62);
+            this.txtbet.Size = new System.Drawing.Size(167, 36);
             this.txtbet.TabIndex = 15;
             // 
             // btnmeron
             // 
             this.btnmeron.Appearance.Font = new System.Drawing.Font("Tahoma", 10.875F);
             this.btnmeron.Appearance.Options.UseFont = true;
-            this.btnmeron.Location = new System.Drawing.Point(1578, 377);
+            this.btnmeron.Location = new System.Drawing.Point(920, 241);
+            this.btnmeron.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnmeron.Name = "btnmeron";
-            this.btnmeron.Size = new System.Drawing.Size(150, 66);
+            this.btnmeron.Size = new System.Drawing.Size(87, 42);
             this.btnmeron.TabIndex = 16;
             this.btnmeron.Text = "Meron";
             this.btnmeron.Click += new System.EventHandler(this.btnmeron_Click);
@@ -400,9 +415,10 @@
             // 
             this.btndraw.Appearance.Font = new System.Drawing.Font("Tahoma", 10.875F);
             this.btndraw.Appearance.Options.UseFont = true;
-            this.btndraw.Location = new System.Drawing.Point(1748, 377);
+            this.btndraw.Location = new System.Drawing.Point(1020, 241);
+            this.btndraw.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btndraw.Name = "btndraw";
-            this.btndraw.Size = new System.Drawing.Size(150, 66);
+            this.btndraw.Size = new System.Drawing.Size(87, 42);
             this.btndraw.TabIndex = 17;
             this.btndraw.Text = "Draw";
             this.btndraw.Click += new System.EventHandler(this.btndraw_Click);
@@ -411,9 +427,10 @@
             // 
             this.btnwala.Appearance.Font = new System.Drawing.Font("Tahoma", 10.875F);
             this.btnwala.Appearance.Options.UseFont = true;
-            this.btnwala.Location = new System.Drawing.Point(1915, 377);
+            this.btnwala.Location = new System.Drawing.Point(1117, 241);
+            this.btnwala.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnwala.Name = "btnwala";
-            this.btnwala.Size = new System.Drawing.Size(150, 66);
+            this.btnwala.Size = new System.Drawing.Size(87, 42);
             this.btnwala.TabIndex = 18;
             this.btnwala.Text = "Wala";
             this.btnwala.Click += new System.EventHandler(this.btnwala_Click);
@@ -424,10 +441,10 @@
             this.labelControl19.Appearance.ForeColor = System.Drawing.Color.Black;
             this.labelControl19.Appearance.Options.UseFont = true;
             this.labelControl19.Appearance.Options.UseForeColor = true;
-            this.labelControl19.Location = new System.Drawing.Point(53, 1245);
-            this.labelControl19.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.labelControl19.Location = new System.Drawing.Point(31, 797);
+            this.labelControl19.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.labelControl19.Name = "labelControl19";
-            this.labelControl19.Size = new System.Drawing.Size(260, 40);
+            this.labelControl19.Size = new System.Drawing.Size(157, 23);
             this.labelControl19.TabIndex = 53;
             this.labelControl19.Text = "Cashier Trans ID:";
             // 
@@ -437,10 +454,10 @@
             this.lblfightid.Appearance.ForeColor = System.Drawing.Color.DarkSlateGray;
             this.lblfightid.Appearance.Options.UseFont = true;
             this.lblfightid.Appearance.Options.UseForeColor = true;
-            this.lblfightid.Location = new System.Drawing.Point(207, 1197);
-            this.lblfightid.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.lblfightid.Location = new System.Drawing.Point(121, 766);
+            this.lblfightid.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.lblfightid.Name = "lblfightid";
-            this.lblfightid.Size = new System.Drawing.Size(114, 37);
+            this.lblfightid.Size = new System.Drawing.Size(72, 25);
             this.lblfightid.TabIndex = 54;
             this.lblfightid.Text = "000000";
             // 
@@ -450,10 +467,10 @@
             this.labelControl12.Appearance.ForeColor = System.Drawing.Color.Black;
             this.labelControl12.Appearance.Options.UseFont = true;
             this.labelControl12.Appearance.Options.UseForeColor = true;
-            this.labelControl12.Location = new System.Drawing.Point(53, 1195);
-            this.labelControl12.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.labelControl12.Location = new System.Drawing.Point(31, 765);
+            this.labelControl12.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.labelControl12.Name = "labelControl12";
-            this.labelControl12.Size = new System.Drawing.Size(126, 40);
+            this.labelControl12.Size = new System.Drawing.Size(76, 23);
             this.labelControl12.TabIndex = 51;
             this.labelControl12.Text = "Fight ID:";
             // 
@@ -463,10 +480,10 @@
             this.lblTransactionIDCashier.Appearance.ForeColor = System.Drawing.Color.DarkSlateGray;
             this.lblTransactionIDCashier.Appearance.Options.UseFont = true;
             this.lblTransactionIDCashier.Appearance.Options.UseForeColor = true;
-            this.lblTransactionIDCashier.Location = new System.Drawing.Point(345, 1247);
-            this.lblTransactionIDCashier.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.lblTransactionIDCashier.Location = new System.Drawing.Point(201, 798);
+            this.lblTransactionIDCashier.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.lblTransactionIDCashier.Name = "lblTransactionIDCashier";
-            this.lblTransactionIDCashier.Size = new System.Drawing.Size(114, 37);
+            this.lblTransactionIDCashier.Size = new System.Drawing.Size(72, 25);
             this.lblTransactionIDCashier.TabIndex = 52;
             this.lblTransactionIDCashier.Text = "000000";
             // 
@@ -476,10 +493,10 @@
             this.lblfightno.Appearance.ForeColor = System.Drawing.Color.DarkSlateGray;
             this.lblfightno.Appearance.Options.UseFont = true;
             this.lblfightno.Appearance.Options.UseForeColor = true;
-            this.lblfightno.Location = new System.Drawing.Point(641, 1197);
-            this.lblfightno.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.lblfightno.Location = new System.Drawing.Point(374, 766);
+            this.lblfightno.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.lblfightno.Name = "lblfightno";
-            this.lblfightno.Size = new System.Drawing.Size(114, 37);
+            this.lblfightno.Size = new System.Drawing.Size(72, 25);
             this.lblfightno.TabIndex = 56;
             this.lblfightno.Text = "000000";
             // 
@@ -489,10 +506,10 @@
             this.labelControl8.Appearance.ForeColor = System.Drawing.Color.Black;
             this.labelControl8.Appearance.Options.UseFont = true;
             this.labelControl8.Appearance.Options.UseForeColor = true;
-            this.labelControl8.Location = new System.Drawing.Point(487, 1195);
-            this.labelControl8.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.labelControl8.Location = new System.Drawing.Point(284, 765);
+            this.labelControl8.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.labelControl8.Name = "labelControl8";
-            this.labelControl8.Size = new System.Drawing.Size(139, 40);
+            this.labelControl8.Size = new System.Drawing.Size(84, 23);
             this.labelControl8.TabIndex = 55;
             this.labelControl8.Text = "Fight No:";
             // 
@@ -502,10 +519,10 @@
             this.labelControl7.Appearance.ForeColor = System.Drawing.Color.Black;
             this.labelControl7.Appearance.Options.UseFont = true;
             this.labelControl7.Appearance.Options.UseForeColor = true;
-            this.labelControl7.Location = new System.Drawing.Point(1277, 479);
-            this.labelControl7.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.labelControl7.Location = new System.Drawing.Point(745, 307);
+            this.labelControl7.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.labelControl7.Name = "labelControl7";
-            this.labelControl7.Size = new System.Drawing.Size(233, 37);
+            this.labelControl7.Size = new System.Drawing.Size(146, 25);
             this.labelControl7.TabIndex = 57;
             this.labelControl7.Text = "BET SUMMARY";
             // 
@@ -515,10 +532,10 @@
             this.labelControl9.Appearance.ForeColor = System.Drawing.Color.Black;
             this.labelControl9.Appearance.Options.UseFont = true;
             this.labelControl9.Appearance.Options.UseForeColor = true;
-            this.labelControl9.Location = new System.Drawing.Point(1277, 526);
-            this.labelControl9.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.labelControl9.Location = new System.Drawing.Point(745, 337);
+            this.labelControl9.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.labelControl9.Name = "labelControl9";
-            this.labelControl9.Size = new System.Drawing.Size(76, 40);
+            this.labelControl9.Size = new System.Drawing.Size(45, 23);
             this.labelControl9.TabIndex = 58;
             this.labelControl9.Text = "Side:";
             // 
@@ -528,10 +545,10 @@
             this.labelControl10.Appearance.ForeColor = System.Drawing.Color.Black;
             this.labelControl10.Appearance.Options.UseFont = true;
             this.labelControl10.Appearance.Options.UseForeColor = true;
-            this.labelControl10.Location = new System.Drawing.Point(1277, 576);
-            this.labelControl10.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.labelControl10.Location = new System.Drawing.Point(745, 369);
+            this.labelControl10.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.labelControl10.Name = "labelControl10";
-            this.labelControl10.Size = new System.Drawing.Size(134, 40);
+            this.labelControl10.Size = new System.Drawing.Size(83, 23);
             this.labelControl10.TabIndex = 59;
             this.labelControl10.Text = "Amount:";
             // 
@@ -539,9 +556,10 @@
             // 
             this.btnpostbet.Appearance.Font = new System.Drawing.Font("Tahoma", 11F);
             this.btnpostbet.Appearance.Options.UseFont = true;
-            this.btnpostbet.Location = new System.Drawing.Point(1277, 646);
+            this.btnpostbet.Location = new System.Drawing.Point(745, 413);
+            this.btnpostbet.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnpostbet.Name = "btnpostbet";
-            this.btnpostbet.Size = new System.Drawing.Size(297, 60);
+            this.btnpostbet.Size = new System.Drawing.Size(173, 38);
             this.btnpostbet.TabIndex = 60;
             this.btnpostbet.Text = "Post Bet";
             this.btnpostbet.Click += new System.EventHandler(this.btnpostbet_Click);
@@ -552,10 +570,10 @@
             this.lblamount.Appearance.ForeColor = System.Drawing.Color.Black;
             this.lblamount.Appearance.Options.UseFont = true;
             this.lblamount.Appearance.Options.UseForeColor = true;
-            this.lblamount.Location = new System.Drawing.Point(1431, 576);
-            this.lblamount.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.lblamount.Location = new System.Drawing.Point(835, 369);
+            this.lblamount.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.lblamount.Name = "lblamount";
-            this.lblamount.Size = new System.Drawing.Size(134, 40);
+            this.lblamount.Size = new System.Drawing.Size(83, 23);
             this.lblamount.TabIndex = 61;
             this.lblamount.Text = "Amount:";
             // 
@@ -565,10 +583,10 @@
             this.lblside.Appearance.ForeColor = System.Drawing.Color.Black;
             this.lblside.Appearance.Options.UseFont = true;
             this.lblside.Appearance.Options.UseForeColor = true;
-            this.lblside.Location = new System.Drawing.Point(1431, 526);
-            this.lblside.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.lblside.Location = new System.Drawing.Point(835, 337);
+            this.lblside.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.lblside.Name = "lblside";
-            this.lblside.Size = new System.Drawing.Size(134, 40);
+            this.lblside.Size = new System.Drawing.Size(83, 23);
             this.lblside.TabIndex = 62;
             this.lblside.Text = "Amount:";
             // 
@@ -578,10 +596,10 @@
             this.labelControl6.Appearance.ForeColor = System.Drawing.Color.Black;
             this.labelControl6.Appearance.Options.UseFont = true;
             this.labelControl6.Appearance.Options.UseForeColor = true;
-            this.labelControl6.Location = new System.Drawing.Point(53, 1145);
-            this.labelControl6.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.labelControl6.Location = new System.Drawing.Point(31, 733);
+            this.labelControl6.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.labelControl6.Name = "labelControl6";
-            this.labelControl6.Size = new System.Drawing.Size(194, 40);
+            this.labelControl6.Size = new System.Drawing.Size(115, 23);
             this.labelControl6.TabIndex = 63;
             this.labelControl6.Text = "Machine ID:";
             // 
@@ -591,10 +609,10 @@
             this.lblmachineid.Appearance.ForeColor = System.Drawing.Color.DarkSlateGray;
             this.lblmachineid.Appearance.Options.UseFont = true;
             this.lblmachineid.Appearance.Options.UseForeColor = true;
-            this.lblmachineid.Location = new System.Drawing.Point(276, 1150);
-            this.lblmachineid.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.lblmachineid.Location = new System.Drawing.Point(161, 736);
+            this.lblmachineid.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.lblmachineid.Name = "lblmachineid";
-            this.lblmachineid.Size = new System.Drawing.Size(114, 37);
+            this.lblmachineid.Size = new System.Drawing.Size(72, 25);
             this.lblmachineid.TabIndex = 64;
             this.lblmachineid.Text = "000000";
             // 
@@ -602,28 +620,29 @@
             // 
             this.groupControl1.Controls.Add(this.simpleButton1);
             this.groupControl1.Controls.Add(this.txtbarcode);
-            this.groupControl1.Location = new System.Drawing.Point(1241, 768);
-            this.groupControl1.Margin = new System.Windows.Forms.Padding(6, 4, 6, 4);
+            this.groupControl1.Location = new System.Drawing.Point(724, 492);
             this.groupControl1.Name = "groupControl1";
-            this.groupControl1.Size = new System.Drawing.Size(899, 179);
+            this.groupControl1.Size = new System.Drawing.Size(524, 115);
             this.groupControl1.TabIndex = 65;
             this.groupControl1.Text = "CLAIM WINNINGS";
             // 
             // simpleButton1
             // 
-            this.simpleButton1.Location = new System.Drawing.Point(600, 73);
+            this.simpleButton1.Location = new System.Drawing.Point(350, 47);
+            this.simpleButton1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.simpleButton1.Name = "simpleButton1";
-            this.simpleButton1.Size = new System.Drawing.Size(268, 66);
+            this.simpleButton1.Size = new System.Drawing.Size(156, 42);
             this.simpleButton1.TabIndex = 60;
             this.simpleButton1.Text = "GET";
             // 
             // txtbarcode
             // 
-            this.txtbarcode.Location = new System.Drawing.Point(22, 75);
+            this.txtbarcode.Location = new System.Drawing.Point(13, 48);
+            this.txtbarcode.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.txtbarcode.Name = "txtbarcode";
             this.txtbarcode.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 15F);
             this.txtbarcode.Properties.Appearance.Options.UseFont = true;
-            this.txtbarcode.Size = new System.Drawing.Size(572, 62);
+            this.txtbarcode.Size = new System.Drawing.Size(334, 36);
             this.txtbarcode.TabIndex = 59;
             // 
             // labelControl13
@@ -632,10 +651,10 @@
             this.labelControl13.Appearance.ForeColor = System.Drawing.Color.SeaGreen;
             this.labelControl13.Appearance.Options.UseFont = true;
             this.labelControl13.Appearance.Options.UseForeColor = true;
-            this.labelControl13.Location = new System.Drawing.Point(50, 30);
-            this.labelControl13.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.labelControl13.Location = new System.Drawing.Point(29, 19);
+            this.labelControl13.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.labelControl13.Name = "labelControl13";
-            this.labelControl13.Size = new System.Drawing.Size(347, 76);
+            this.labelControl13.Size = new System.Drawing.Size(220, 48);
             this.labelControl13.TabIndex = 66;
             this.labelControl13.Text = "OPEN BET";
             // 
@@ -643,37 +662,39 @@
             // 
             this.groupControl3.Controls.Add(this.simpleButton2);
             this.groupControl3.Controls.Add(this.textEdit1);
-            this.groupControl3.Location = new System.Drawing.Point(1241, 974);
-            this.groupControl3.Margin = new System.Windows.Forms.Padding(6, 4, 6, 4);
+            this.groupControl3.Location = new System.Drawing.Point(724, 623);
             this.groupControl3.Name = "groupControl3";
-            this.groupControl3.Size = new System.Drawing.Size(899, 167);
+            this.groupControl3.Size = new System.Drawing.Size(524, 107);
             this.groupControl3.TabIndex = 67;
             this.groupControl3.Text = "VOID TICKET";
             // 
             // simpleButton2
             // 
-            this.simpleButton2.Location = new System.Drawing.Point(600, 66);
+            this.simpleButton2.Location = new System.Drawing.Point(350, 42);
+            this.simpleButton2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.simpleButton2.Name = "simpleButton2";
-            this.simpleButton2.Size = new System.Drawing.Size(268, 66);
+            this.simpleButton2.Size = new System.Drawing.Size(156, 42);
             this.simpleButton2.TabIndex = 60;
             this.simpleButton2.Text = "GET";
             // 
             // textEdit1
             // 
-            this.textEdit1.Location = new System.Drawing.Point(22, 68);
+            this.textEdit1.Location = new System.Drawing.Point(13, 44);
+            this.textEdit1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.textEdit1.Name = "textEdit1";
             this.textEdit1.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 15F);
             this.textEdit1.Properties.Appearance.Options.UseFont = true;
-            this.textEdit1.Size = new System.Drawing.Size(572, 62);
+            this.textEdit1.Size = new System.Drawing.Size(334, 36);
             this.textEdit1.TabIndex = 59;
             // 
             // simpleButton3
             // 
             this.simpleButton3.Appearance.Font = new System.Drawing.Font("Tahoma", 10.875F);
             this.simpleButton3.Appearance.Options.UseFont = true;
-            this.simpleButton3.Location = new System.Drawing.Point(1638, 550);
+            this.simpleButton3.Location = new System.Drawing.Point(955, 352);
+            this.simpleButton3.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.simpleButton3.Name = "simpleButton3";
-            this.simpleButton3.Size = new System.Drawing.Size(150, 66);
+            this.simpleButton3.Size = new System.Drawing.Size(87, 42);
             this.simpleButton3.TabIndex = 68;
             this.simpleButton3.Text = "Connect";
             this.simpleButton3.Click += new System.EventHandler(this.simpleButton3_Click);
@@ -682,9 +703,10 @@
             // 
             this.simpleButton4.Appearance.Font = new System.Drawing.Font("Tahoma", 10.875F);
             this.simpleButton4.Appearance.Options.UseFont = true;
-            this.simpleButton4.Location = new System.Drawing.Point(1794, 550);
+            this.simpleButton4.Location = new System.Drawing.Point(1046, 352);
+            this.simpleButton4.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.simpleButton4.Name = "simpleButton4";
-            this.simpleButton4.Size = new System.Drawing.Size(150, 66);
+            this.simpleButton4.Size = new System.Drawing.Size(87, 42);
             this.simpleButton4.TabIndex = 69;
             this.simpleButton4.Text = "Update";
             this.simpleButton4.Click += new System.EventHandler(this.simpleButton4_Click);
@@ -695,10 +717,10 @@
             this.lbltotal.Appearance.ForeColor = System.Drawing.Color.DarkSlateGray;
             this.lbltotal.Appearance.Options.UseFont = true;
             this.lbltotal.Appearance.Options.UseForeColor = true;
-            this.lbltotal.Location = new System.Drawing.Point(937, 14);
-            this.lbltotal.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.lbltotal.Location = new System.Drawing.Point(547, 9);
+            this.lbltotal.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.lbltotal.Name = "lbltotal";
-            this.lbltotal.Size = new System.Drawing.Size(204, 67);
+            this.lbltotal.Size = new System.Drawing.Size(132, 42);
             this.lbltotal.TabIndex = 70;
             this.lbltotal.Text = "000000";
             // 
@@ -706,17 +728,18 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Tahoma", 17.875F);
-            this.label1.Location = new System.Drawing.Point(1641, 45);
+            this.label1.Location = new System.Drawing.Point(957, 29);
+            this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(150, 58);
+            this.label1.Size = new System.Drawing.Size(94, 36);
             this.label1.TabIndex = 71;
             this.label1.Text = "label1";
             // 
             // SBDashboard
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(2171, 1339);
+            this.ClientSize = new System.Drawing.Size(1132, 680);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.lbltotal);
             this.Controls.Add(this.simpleButton4);
@@ -744,6 +767,7 @@
             this.Controls.Add(this.txtbet);
             this.Controls.Add(this.groupControl2);
             this.Controls.Add(this.tablePanel1);
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "SBDashboard";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "SBDashboard";

@@ -7,14 +7,14 @@ using System.Text;
 using System.Windows.Forms;
 using DevExpress.XtraEditors;
 using System.Data.SqlClient;
-using CrystalDecisions.CrystalReports.Engine;
+//using CrystalDecisions.CrystalReports.Engine;
 
 namespace SalesInventorySystem
 {
    
     public partial class POPreview : DevExpress.XtraEditors.XtraForm
     {
-        ReportDocument cry = new ReportDocument();
+        //ReportDocument cry = new ReportDocument();
         public POPreview()
         {
             InitializeComponent();

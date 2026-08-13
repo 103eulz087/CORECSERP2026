@@ -71,7 +71,7 @@ namespace SalesInventorySystem.Reporting
                 xct.xrcaption1.Text = caption1;
                 xct.xrcaption2.Text = caption2;
 
-                xct.PaperKind = System.Drawing.Printing.PaperKind.A4;
+                xct.PaperKind = (DevExpress.Drawing.Printing.DXPaperKind)System.Drawing.Printing.PaperKind.A4;
                 //   DateTime dt = Convert.ToDateTime(gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "EffectivityDate").ToString());
                 //xct.Margins = new System.Drawing.Printing.Margins(100, 100, 100, 10);
                 string branchname = Branch.getBranchName(txtbrcode.Text);

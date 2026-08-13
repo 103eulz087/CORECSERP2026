@@ -11,12 +11,15 @@ using DevExpress.XtraEditors;
 using DevExpress.XtraSplashScreen;
 using System.Data.SqlClient;
 using System.Threading;
+using SalesInventorySystem.AccountingDevEx;
+using SalesInventorySystem.Classes;
+using DevExpress.XtraGrid.Views.Grid;
 
 namespace SalesInventorySystem.HOFormsDevEx
 {
     public partial class ViewExpenseDevEx : DevExpress.XtraEditors.XtraForm
     {
-        string action = "";
+        string action = "", reason="";
         public ViewExpenseDevEx()
         {
             InitializeComponent();
@@ -31,15 +34,82 @@ namespace SalesInventorySystem.HOFormsDevEx
         private void ViewExpenseDevEx_Load(object sender, EventArgs e)
         {
             DateTime today = DateTime.Now;
-            txtdatefromforapproval.Text = HelperFunction.GetPreviousMonthSameDay(today).ToShortDateString();
-            txtdatetoforapproval.Text = today.ToShortDateString();
+            //txtdatefromforapproval.Text = HelperFunction.GetPreviousMonthSameDay(today).ToShortDateString();
+            //txtdatetoforapproval.Text = today.ToShortDateString();
 
-            datefromapproved.Text = HelperFunction.GetPreviousMonthSameDay(today).ToShortDateString();
-            datetoapproved.Text = today.ToShortDateString();
+            HelperFunction.SetQuarterDateRange(txtdatefromforapproval, txtdatetoforapproval);
+            HelperFunction.SetQuarterDateRange(txtdatefrom, txtdateto);
+            HelperFunction.SetQuarterDateRange(dateFromCancelled, dateToCancelled);
+            HelperFunction.SetQuarterDateRange(dateFromPaid, dateToPaid);
 
-            dateFromPaid.Text = HelperFunction.GetPreviousMonthSameDay(today).ToShortDateString();
-            dateToPaid.Text = today.ToShortDateString();
+            //txtdatefrom.Text = HelperFunction.GetPreviousMonthSameDay(today).ToShortDateString();
+            //txtdateto.Text = today.ToShortDateString();
+
+
+            //dateFromCancelled.Text = HelperFunction.GetPreviousMonthSameDay(today).ToShortDateString();
+            //dateToCancelled.Text = today.ToShortDateString();
+
+            //dateFromPaid.Text = HelperFunction.GetPreviousMonthSameDay(today).ToShortDateString();
+            //dateToPaid.Text = today.ToShortDateString();
+
+            gridControl1.ViewRegistered += GridControl1_ViewRegistered;
             //filtertab();
+        }
+        private void GridControl1_ViewRegistered(object sender,DevExpress.XtraGrid.ViewOperationEventArgs e)
+        {
+            GridView view = e.View as GridView;
+
+            if (view == null)
+                return;
+
+            view.CellValueChanged -= DetailView_CellValueChanged;
+            view.CellValueChanged += DetailView_CellValueChanged;
+        }
+        private void DetailView_CellValueChanged(
+                    object sender,
+                    DevExpress.XtraGrid.Views.Base.CellValueChangedEventArgs e)
+        {
+            GridView view = sender as GridView;
+
+            // Only process editable columns
+            if (e.Column.FieldName != "Debit" &&
+                e.Column.FieldName != "Credit")
+                return;
+
+            string ticketNumber = view.GetRowCellValue(
+                e.RowHandle,
+                "TicketNumber").ToString();
+            string accountCode = view.GetRowCellValue(
+                e.RowHandle,
+                "AccountCode").ToString();
+
+            decimal value = Convert.ToDecimal(e.Value);
+
+            try
+            {
+                using (SqlConnection con = Database.getConnection())
+                {
+                    con.Open();
+
+                    string query = $@"
+                UPDATE TicketDetails
+                SET [{e.Column.FieldName}] = @Value
+                WHERE TicketNumber = @TicketNumber and AccountCode=@AccountCode";
+
+                    using (SqlCommand cmd = new SqlCommand(query, con))
+                    {
+                        cmd.Parameters.AddWithValue("@Value", value);
+                        cmd.Parameters.AddWithValue("@TicketNumber", ticketNumber);
+                        cmd.Parameters.AddWithValue("@AccountCode", accountCode);
+
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                XtraMessageBox.Show(ex.Message);
+            }
         }
 
 
@@ -79,9 +149,9 @@ namespace SalesInventorySystem.HOFormsDevEx
             }
             else if (action == "CANCELLED")
             {
-                invoiceno = gridView3.GetRowCellValue(gridView3.FocusedRowHandle, "InvoiceNo").ToString();
-                refno = gridView3.GetRowCellValue(gridView3.FocusedRowHandle, "ReferenceNumber").ToString();
-                suppid = gridView3.GetRowCellValue(gridView3.FocusedRowHandle, "SupplierID").ToString();
+                invoiceno = gridViewCancelled.GetRowCellValue(gridViewCancelled.FocusedRowHandle, "InvoiceNo").ToString();
+                refno = gridViewCancelled.GetRowCellValue(gridViewCancelled.FocusedRowHandle, "ReferenceNumber").ToString();
+                suppid = gridViewCancelled.GetRowCellValue(gridViewCancelled.FocusedRowHandle, "SupplierID").ToString();
              
                 viewdetdevex.txtinvoiceno.Text = invoiceno;
                 viewdetdevex.txtrefno.Text = refno;
@@ -113,7 +183,7 @@ namespace SalesInventorySystem.HOFormsDevEx
 
             }
 
-            Database.display($"SELECT * FROM dbo.ExpenseMaster with(nolock) " +
+            Database.display($"SELECT * FROM dbo.view_ExpenseMasterDetails with(nolock) " +
                $"WHERE ReferenceNumber='{refno}' " +
                $"AND InvoiceNo='{invoiceno}' ", viewdetdevex.gridControl2, viewdetdevex.gridView2);
             //Database.display($"SELECT * FROM dbo.ExpenseDetails " +
@@ -145,7 +215,7 @@ namespace SalesInventorySystem.HOFormsDevEx
         private void gridControl3_MouseUp(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
-                contextMenuStripCancelled.Show(gridControl3, e.Location);
+                contextMenuStripCancelled.Show(gridControlCancelled, e.Location);
         }
 
         private void toolStripMenuItem1_Click(object sender, EventArgs e)
@@ -200,33 +270,190 @@ namespace SalesInventorySystem.HOFormsDevEx
                 Cursor.Current = Cursors.Default;
             }
         }
+        private void DisplayExpenseSummary(
+                                                string status,
+                                                DateTime dateFrom,
+                                                DateTime dateTo,
+                                                DevExpress.XtraGrid.GridControl grid,
+                                                DevExpress.XtraGrid.Views.Grid.GridView view)
+        {
+            // Add one day to make the end date exclusive
+            DateTime dateToExclusive = dateTo.AddDays(1);
+
+            string masterQuery = @"
+                SELECT *
+                FROM view_ExpenseSummary
+                WHERE Status = @Stat
+                  AND ExpenseDate >= @DateFrom
+                  AND ExpenseDate < @DateTo
+                ORDER BY BatchReferenceID DESC";
+
+                    string detailQuery = @"
+                SELECT d.*
+                FROM view_ExpenseMasterDetails d
+                WHERE EXISTS
+                (
+                    SELECT 1
+                    FROM view_ExpenseSummary s
+                    WHERE s.Status = @Stat
+                      AND s.BatchReferenceID = d.BatchReferenceID
+                      AND s.ExpenseDate >= @DateFrom
+                      AND s.ExpenseDate < @DateTo
+                )";
+
+            var masterParams = new List<SqlParameter>
+                        {
+                            new SqlParameter("@DateFrom", dateFrom),
+                            new SqlParameter("@DateTo", dateTo),
+                            new SqlParameter("@Stat", status)
+                        };
+
+            var detailParams = new List<SqlParameter>
+                            {
+                                new SqlParameter("@DateFrom", dateFrom),
+                                new SqlParameter("@DateTo", dateTo),
+                                new SqlParameter("@Stat", status)
+                            };
+
+            //Database.GridMasterDetail(
+            //            masterQuery,
+            //            detailQuery,
+            //            "Master",
+            //            "Detail",
+            //            "BatchReferenceID",
+            //            "BatchReferenceID",
+            //            "ExpenseMaster",
+            //            grid,
+            //            masterParams.ToArray(),
+            //            detailParams.ToArray() // reuse the same parameter array
+            //        );
+
+            GridView detailView = Database.GridMasterDetailWithUpdate(
+                    masterQuery,
+                    detailQuery,
+                    "Master",
+                    "Detail",
+                    "BatchReferenceID",
+                    "BatchReferenceID",
+                    "ExpenseMaster",
+                    gridControl1,
+                    masterParams.ToArray(),
+                    detailParams.ToArray());
+
+            detailView.CellValueChanged += DetailView_CellValueChanged;
+
+            view.OptionsView.ColumnAutoWidth = false;
+            view.BestFitColumns();
+
+          
+        }
+
+
+        //void display()
+        //{
+        //    DateTime dateFrom = txtdatefrom.EditValue == null
+        //        ? DateTime.MinValue
+        //        : (DateTime)txtdatefrom.EditValue;
+
+        //    DateTime dateTo = txtdateto.EditValue == null
+        //        ? DateTime.MaxValue
+        //        : ((DateTime)txtdateto.EditValue).AddDays(1);
+
+           
+        //    string masterQuery = @"
+        //            SELECT *
+        //            FROM [view_ExpenseSummary]
+        //                WHERE Status=@Stat and ExpenseDate >= @DateFrom
+        //                AND ExpenseDate < @DateTo ORDER BY BatchReferenceID DESC";
+
+        //    string detailQuery = @"
+        //            SELECT d.*
+        //            FROM view_ExpenseMasterDetails d
+        //            WHERE EXISTS
+        //            (
+        //                SELECT 1
+        //                FROM [view_ExpenseSummary] s
+        //                WHERE s.Status=@Stat and s.BatchReferenceID = d.BatchReferenceID
+        //                  AND s.ExpenseDate >= @DateFrom
+        //                  AND s.ExpenseDate < @DateTo
+        //            ) ";
+
+        
+        //    var masterParams = new List<SqlParameter>
+        //                {
+        //                    new SqlParameter("@DateFrom", dateFrom),
+        //                    new SqlParameter("@DateTo", dateTo),
+        //                    new SqlParameter("@Stat", "POSTED")
+        //                };
+
+        //    var detailParams = new List<SqlParameter>
+        //                {
+        //                    new SqlParameter("@DateFrom", dateFrom),
+        //                    new SqlParameter("@DateTo", dateTo),
+        //                    new SqlParameter("@Stat", "POSTED")
+        //                };
+
+           
+        //    Database.GridMasterDetail(
+        //        masterQuery,
+        //        detailQuery,
+        //        "Master",
+        //        "Detail",
+        //        "BatchReferenceID",
+        //        "BatchReferenceID",
+        //        "ExpenseMaster",
+        //        gridControl1,
+        //        masterParams.ToArray(),
+        //        detailParams.ToArray()
+        //    );
+
+        //    gridView1.OptionsView.ColumnAutoWidth = false;
+        //    gridView1.BestFitColumns();
+        //}
 
         private void btnPendingGenerate_Click(object sender, EventArgs e)
         {
+            //DateTime fromDate = txtdatefrom.EditValue == null ? DateTime.MinValue : (DateTime)txtdatefrom.EditValue;
+            //DateTime toDate = txtdateto.EditValue == null ? DateTime.MaxValue : (DateTime)txtdateto.EditValue;
 
-            LoadExpenseSummaryByStatus(
-                    "POSTED",
-                    datefromapproved.Text,
-                    datetoapproved.Text,
-                    gridControl1,
-                    gridView1);
+            DateTime fromDate = txtdatefrom.DateTime == DateTime.MinValue
+                ? DateTime.MinValue
+                : txtdatefrom.DateTime;
 
-            //Database.display($"SELECT * FROM view_ExpenseSummary WHERE Status='APPROVED' AND CAST(ExpenseDate as date) between '{datefromapproved.Text}' AND '{datetoapproved.Text}' ", gridControl1, gridView1);
-            //string query = $"SELECT * FROM view_ExpenseSummary WHERE Status='APPROVED' AND CAST(ExpenseDate as date) between '{datefromapproved.Text}' AND '{datetoapproved.Text}' ";
-            //HelperFunction.ShowWaitAndDisplayNonAsync(query, gridControl1, gridView1, "Please wait", "Populating data into the database...");
-            //gridView1.Focus();
-            //Classes.DevXGridViewSettings.ShowFooterTotal(gridView1, "Amount");
+            DateTime toDate = txtdateto.DateTime == DateTime.MinValue
+                ? DateTime.MaxValue
+                : txtdateto.DateTime.AddDays(1);
+
+
+            DisplayExpenseSummary("POSTED", fromDate, toDate, gridControl1, gridView1);
+            //LoadExpenseSummaryByStatus(
+            //        "POSTED",
+            //        datefromapproved.Text,
+            //        datetoapproved.Text,
+            //        gridControl1,
+            //        gridView1);
+            //display();
+
         }
 
         private void simpleButton1_Click(object sender, EventArgs e)
         {
+          
+            DateTime fromDate = dateFromPaid.DateTime == DateTime.MinValue
+               ? DateTime.MinValue
+               : dateFromPaid.DateTime;
 
-            LoadExpenseSummaryByStatus(
-                    "PAID",
-                    dateFromPaid.Text,
-                    dateToPaid.Text,
-                    gridControl4,
-                    gridView4);
+            DateTime toDate = dateToPaid.DateTime == DateTime.MinValue
+                ? DateTime.MaxValue
+                : dateToPaid.DateTime.AddDays(1);
+
+            DisplayExpenseSummary("PAID", fromDate, toDate, gridControl4, gridView4);
+            //LoadExpenseSummaryByStatus(
+            //        "PAID",
+            //        dateFromPaid.Text,
+            //        dateToPaid.Text,
+            //        gridControl4,
+            //        gridView4);
 
             //Database.display($"SELECT * FROM view_ExpenseSummary WHERE Status='PAID' AND CAST(ExpenseDate as date) between '{dateFromPaid.Text}' AND '{dateToPaid.Text}' ", gridControl4, gridView4);
             //string query = $"SELECT * FROM view_ExpenseSummary WHERE Status='PAID' AND CAST(ExpenseDate as date) between '{dateFromPaid.Text}' AND '{dateToPaid.Text}'  ";
@@ -266,41 +493,73 @@ namespace SalesInventorySystem.HOFormsDevEx
 
         private void errorCorrectToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            bool confirm = HelperFunction.ConfirmDialog("Are you sure you want to Cancel this Cheque? if yes All Ticket Entries in this Transaction Voucher will automatically create reversal entries..", "Cancelled Cheque");
+            if (confirm)
+            {
+                CancelledCheckVoucher canfrm = new CancelledCheckVoucher();
+                canfrm.ShowDialog(this);
+                if (CancelledCheckVoucher.isdone == true)
+                {
+                    reason = CancelledCheckVoucher.reason;
+                    errorCorrect();
+                    canfrm.Dispose();
+                }
 
+            }
+            else
+            {
+                return;
+            }
         }
-
-        void errorCorrect()
+        private void errorCorrect()
         {
-            //try
-            //{
+            if (gridView1.FocusedRowHandle < 0)
+            {
+                XtraMessageBox.Show("Please select an Expense to cancel.");
+                return;
+            }
 
-            //    SqlConnection con = Database.getConnection();
-            //    con.Open();
-            //    string query = "sp_UpdateExpense";
-            //    SqlCommand com = new SqlCommand(query, con);
-            //    //com.Parameters.AddWithValue("@parmrefno", txtrefno.Text);
-            //    //com.Parameters.AddWithValue("@parmsupplierid", suppid.ToString());
-            //    //com.Parameters.AddWithValue("@parminvoiceno", txtinvoiceno.Text);
-            //    //com.Parameters.AddWithValue("@parmexpensedate", txtexpdate.Text);
-            //    //com.Parameters.AddWithValue("@parmremarks", txtremarks.Text);
-            //    //com.Parameters.AddWithValue("@parmuser", Login.Fullname);
+            if (XtraMessageBox.Show(
+                "This will reverse all posted Expense and GL entries.\n\nContinue?",
+                "Confirm Reversal",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning) != DialogResult.Yes)
+            {
+                return;
+            }
 
-            //    com.Parameters.AddWithValue("@parmrefno", txtrefno.Text);
-            //    com.Parameters.AddWithValue("@parmsupplierid", suppid.ToString());
-            //    com.Parameters.AddWithValue("@parminvoiceno", txtinvoiceno.Text);
-            //    com.Parameters.AddWithValue("@parmexpensedate", txtexpdate.Text);
-            //    com.Parameters.AddWithValue("@parmremarks", txtremarks.Text); //DESCRIPTION
-            //    com.Parameters.AddWithValue("@parmuser", Login.Fullname);
-            //    com.CommandType = CommandType.StoredProcedure;
-            //    com.CommandText = query;
-            //    com.ExecuteNonQuery();
-            //    con.Close();
-            //}
-            //catch (SqlException ex)
-            //{
-            //    XtraMessageBox.Show(ex.Message.ToString());
-            //}
+            using (var con = Database.getConnection())
+            using (var cmd = new SqlCommand("dbo.sp_ReverseApprovedExpense", con))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.Add("@parmrefno", SqlDbType.VarChar, 10)
+                    .Value = gridView1.GetFocusedRowCellValue("ReferenceNumber");
+                cmd.Parameters.Add("@parminvoiceno", SqlDbType.VarChar, 150)
+                    .Value = gridView1.GetFocusedRowCellValue("InvoiceNo");
+                cmd.Parameters.Add("@parmsupplierid", SqlDbType.VarChar, 20)
+                     .Value = gridView1.GetFocusedRowCellValue("SupplierID");
+                cmd.Parameters.Add("@parmreason", SqlDbType.VarChar, 300)
+                    .Value = reason.Trim();
+                cmd.Parameters.Add("@parmuser", SqlDbType.VarChar, 50)
+                   .Value = Login.Fullname;
+               
+
+                try
+                {
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                    BigAlert.Show("SUCESS","Expense successfully reversed.",MessageBoxIcon.Information);
+                    //btnsearch_Click(null, null); // refresh grid
+                    btnPendingGenerate_Click(null, null);
+                }
+                catch (SqlException ex)
+                {
+                    XtraMessageBox.Show(ex.Message);
+                }
+            }
         }
+        
 
         private void btnforapproval_Click(object sender, EventArgs e)
         {
@@ -313,5 +572,27 @@ namespace SalesInventorySystem.HOFormsDevEx
 
 
         }
+
+        private void editDetailsToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            AddExpenseDevExFrmTest addtest = new AddExpenseDevExFrmTest();
+            addtest.Show();
+        }
+
+        private void btnGenerateCancelled_Click(object sender, EventArgs e)
+        {
+          
+            DateTime fromDate = dateFromCancelled.DateTime == DateTime.MinValue
+               ? DateTime.MinValue
+               : dateFromCancelled.DateTime;
+
+            DateTime toDate = dateToCancelled.DateTime == DateTime.MinValue
+                ? DateTime.MaxValue
+                : dateToCancelled.DateTime.AddDays(1);
+
+
+            DisplayExpenseSummary("CANCELLED", fromDate, toDate, gridControlCancelled, gridViewCancelled);
+        }
+        
     }
 }

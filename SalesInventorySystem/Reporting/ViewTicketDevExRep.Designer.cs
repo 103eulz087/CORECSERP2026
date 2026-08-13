@@ -45,6 +45,7 @@
             this.repositoryItemSearchLookUpEdit5 = new DevExpress.XtraEditors.Repository.RepositoryItemSearchLookUpEdit();
             this.gridView13 = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.groupControl1 = new DevExpress.XtraEditors.GroupControl();
+            this.chckboxAllBranch = new System.Windows.Forms.CheckBox();
             this.simpleButton1 = new DevExpress.XtraEditors.SimpleButton();
             this.txtdateto = new DevExpress.XtraEditors.DateEdit();
             this.labelControl3 = new DevExpress.XtraEditors.LabelControl();
@@ -95,7 +96,7 @@
             gridLevelNode1.RelationName = "Level1";
             this.gridControlTicketSummary.LevelTree.Nodes.AddRange(new DevExpress.XtraGrid.GridLevelNode[] {
             gridLevelNode1});
-            this.gridControlTicketSummary.Location = new System.Drawing.Point(2, 25);
+            this.gridControlTicketSummary.Location = new System.Drawing.Point(2, 28);
             this.gridControlTicketSummary.MainView = this.gridViewTicketSummary;
             this.gridControlTicketSummary.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.gridControlTicketSummary.Name = "gridControlTicketSummary";
@@ -107,7 +108,7 @@
             this.repositoryItemSearchLookUpEdit3,
             this.repositoryItemSearchLookUpEdit4,
             this.repositoryItemSearchLookUpEdit5});
-            this.gridControlTicketSummary.Size = new System.Drawing.Size(1557, 816);
+            this.gridControlTicketSummary.Size = new System.Drawing.Size(1557, 839);
             this.gridControlTicketSummary.TabIndex = 8;
             this.gridControlTicketSummary.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewTicketSummary,
@@ -223,6 +224,7 @@
             // 
             // groupControl1
             // 
+            this.groupControl1.Controls.Add(this.chckboxAllBranch);
             this.groupControl1.Controls.Add(this.simpleButton1);
             this.groupControl1.Controls.Add(this.txtdateto);
             this.groupControl1.Controls.Add(this.labelControl3);
@@ -234,9 +236,23 @@
             this.groupControl1.Location = new System.Drawing.Point(0, 0);
             this.groupControl1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.groupControl1.Name = "groupControl1";
-            this.groupControl1.Size = new System.Drawing.Size(1561, 129);
+            this.groupControl1.Size = new System.Drawing.Size(1561, 103);
             this.groupControl1.TabIndex = 0;
             this.groupControl1.Text = "Parameters";
+            // 
+            // chckboxAllBranch
+            // 
+            this.chckboxAllBranch.AutoSize = true;
+            this.chckboxAllBranch.Checked = true;
+            this.chckboxAllBranch.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chckboxAllBranch.Location = new System.Drawing.Point(347, 40);
+            this.chckboxAllBranch.Margin = new System.Windows.Forms.Padding(4);
+            this.chckboxAllBranch.Name = "chckboxAllBranch";
+            this.chckboxAllBranch.Size = new System.Drawing.Size(89, 21);
+            this.chckboxAllBranch.TabIndex = 18;
+            this.chckboxAllBranch.Text = "All Branch";
+            this.chckboxAllBranch.UseVisualStyleBackColor = true;
+            this.chckboxAllBranch.CheckedChanged += new System.EventHandler(this.chckboxAllBranch_CheckedChanged);
             // 
             // simpleButton1
             // 
@@ -244,7 +260,7 @@
             this.simpleButton1.Location = new System.Drawing.Point(448, 38);
             this.simpleButton1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.simpleButton1.Name = "simpleButton1";
-            this.simpleButton1.Size = new System.Drawing.Size(142, 64);
+            this.simpleButton1.Size = new System.Drawing.Size(142, 51);
             this.simpleButton1.TabIndex = 6;
             this.simpleButton1.Text = "Generate";
             this.simpleButton1.Click += new System.EventHandler(this.simpleButton1_Click);
@@ -252,7 +268,7 @@
             // txtdateto
             // 
             this.txtdateto.EditValue = null;
-            this.txtdateto.Location = new System.Drawing.Point(295, 78);
+            this.txtdateto.Location = new System.Drawing.Point(295, 67);
             this.txtdateto.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtdateto.Name = "txtdateto";
             this.txtdateto.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
@@ -266,7 +282,7 @@
             // 
             this.labelControl3.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F);
             this.labelControl3.Appearance.Options.UseFont = true;
-            this.labelControl3.Location = new System.Drawing.Point(266, 80);
+            this.labelControl3.Location = new System.Drawing.Point(266, 69);
             this.labelControl3.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.labelControl3.Name = "labelControl3";
             this.labelControl3.Size = new System.Drawing.Size(23, 18);
@@ -276,7 +292,7 @@
             // txtdatefrom
             // 
             this.txtdatefrom.EditValue = null;
-            this.txtdatefrom.Location = new System.Drawing.Point(113, 78);
+            this.txtdatefrom.Location = new System.Drawing.Point(113, 67);
             this.txtdatefrom.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtdatefrom.Name = "txtdatefrom";
             this.txtdatefrom.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
@@ -297,7 +313,7 @@
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.txtbrcode.Properties.NullText = "";
             this.txtbrcode.Properties.PopupView = this.searchLookUpEdit1View;
-            this.txtbrcode.Size = new System.Drawing.Size(328, 24);
+            this.txtbrcode.Size = new System.Drawing.Size(227, 24);
             this.txtbrcode.TabIndex = 2;
             // 
             // searchLookUpEdit1View
@@ -311,7 +327,7 @@
             // 
             this.labelControl2.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F);
             this.labelControl2.Appearance.Options.UseFont = true;
-            this.labelControl2.Location = new System.Drawing.Point(14, 80);
+            this.labelControl2.Location = new System.Drawing.Point(14, 69);
             this.labelControl2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.labelControl2.Name = "labelControl2";
             this.labelControl2.Size = new System.Drawing.Size(75, 18);
@@ -333,10 +349,10 @@
             // 
             this.groupControl2.Controls.Add(this.gridControlTicketSummary);
             this.groupControl2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupControl2.Location = new System.Drawing.Point(0, 129);
+            this.groupControl2.Location = new System.Drawing.Point(0, 103);
             this.groupControl2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.groupControl2.Name = "groupControl2";
-            this.groupControl2.Size = new System.Drawing.Size(1561, 843);
+            this.groupControl2.Size = new System.Drawing.Size(1561, 869);
             this.groupControl2.TabIndex = 1;
             this.groupControl2.Text = "Ticket Summary";
             // 
@@ -349,9 +365,9 @@
             this.Controls.Add(this.groupControl1);
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "ViewTicketDevExRep";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            //this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "ViewTicketDevExRep";
-            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+            //this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Load += new System.EventHandler(this.ViewTicketDevExRep_Load);
             ((System.ComponentModel.ISupportInitialize)(this.gridView3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridControlTicketSummary)).EndInit();
@@ -410,5 +426,6 @@
         private DevExpress.XtraEditors.SimpleButton simpleButton1;
         private DevExpress.XtraEditors.DateEdit txtdateto;
         private DevExpress.XtraEditors.LabelControl labelControl3;
+        private System.Windows.Forms.CheckBox chckboxAllBranch;
     }
 }

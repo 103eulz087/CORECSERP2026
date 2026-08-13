@@ -55,7 +55,7 @@
             // 
             // txtsrchprodcat
             // 
-            this.txtsrchprodcat.Location = new System.Drawing.Point(130, 17);
+            this.txtsrchprodcat.Location = new System.Drawing.Point(130, 27);
             this.txtsrchprodcat.Name = "txtsrchprodcat";
             this.txtsrchprodcat.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9.8F);
             this.txtsrchprodcat.Properties.Appearance.Options.UseFont = true;
@@ -78,7 +78,7 @@
             // 
             this.labelControl2.Appearance.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelControl2.Appearance.Options.UseFont = true;
-            this.labelControl2.Location = new System.Drawing.Point(17, 20);
+            this.labelControl2.Location = new System.Drawing.Point(17, 30);
             this.labelControl2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.labelControl2.Name = "labelControl2";
             this.labelControl2.Size = new System.Drawing.Size(107, 18);
@@ -87,9 +87,9 @@
             // 
             // btnsave
             // 
-            this.btnsave.Location = new System.Drawing.Point(349, 14);
+            this.btnsave.Location = new System.Drawing.Point(349, 29);
             this.btnsave.Name = "btnsave";
-            this.btnsave.Size = new System.Drawing.Size(79, 29);
+            this.btnsave.Size = new System.Drawing.Size(79, 24);
             this.btnsave.TabIndex = 4;
             this.btnsave.Text = "Save";
             this.btnsave.Click += new System.EventHandler(this.btnsave_Click);
@@ -105,7 +105,7 @@
             this.panelControl1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelControl1.Location = new System.Drawing.Point(0, 0);
             this.panelControl1.Name = "panelControl1";
-            this.panelControl1.Size = new System.Drawing.Size(1013, 55);
+            this.panelControl1.Size = new System.Drawing.Size(1013, 77);
             this.panelControl1.TabIndex = 9;
             // 
             // label3
@@ -113,7 +113,7 @@
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label3.ForeColor = System.Drawing.Color.DarkRed;
-            this.label3.Location = new System.Drawing.Point(687, 19);
+            this.label3.Location = new System.Drawing.Point(687, 29);
             this.label3.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(315, 18);
@@ -123,10 +123,10 @@
             // simpleButton1
             // 
             this.simpleButton1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("simpleButton1.ImageOptions.Image")));
-            this.simpleButton1.Location = new System.Drawing.Point(602, 12);
+            this.simpleButton1.Location = new System.Drawing.Point(602, 29);
             this.simpleButton1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.simpleButton1.Name = "simpleButton1";
-            this.simpleButton1.Size = new System.Drawing.Size(80, 33);
+            this.simpleButton1.Size = new System.Drawing.Size(80, 24);
             this.simpleButton1.TabIndex = 110;
             this.simpleButton1.Text = "Preview";
             this.simpleButton1.Click += new System.EventHandler(this.simpleButton1_Click);
@@ -145,9 +145,9 @@
             // 
             this.panelControl2.Controls.Add(this.gridControl1);
             this.panelControl2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelControl2.Location = new System.Drawing.Point(0, 55);
+            this.panelControl2.Location = new System.Drawing.Point(0, 77);
             this.panelControl2.Name = "panelControl2";
-            this.panelControl2.Size = new System.Drawing.Size(1013, 614);
+            this.panelControl2.Size = new System.Drawing.Size(1013, 592);
             this.panelControl2.TabIndex = 10;
             // 
             // gridControl1
@@ -160,7 +160,7 @@
             this.gridControl1.Name = "gridControl1";
             this.gridControl1.RepositoryItems.AddRange(new DevExpress.XtraEditors.Repository.RepositoryItem[] {
             this.repoMetrics});
-            this.gridControl1.Size = new System.Drawing.Size(1009, 610);
+            this.gridControl1.Size = new System.Drawing.Size(1009, 588);
             this.gridControl1.TabIndex = 10;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1});

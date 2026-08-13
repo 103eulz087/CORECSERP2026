@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AddPODevEx));
             this.searchLookUpEdit1 = new DevExpress.XtraEditors.SearchLookUpEdit();
             this.gridview = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.label12 = new System.Windows.Forms.Label();
@@ -437,7 +436,6 @@
             // 
             // btncancel
             // 
-            this.btncancel.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btncancel.ImageOptions.Image")));
             this.btncancel.Location = new System.Drawing.Point(297, 254);
             this.btncancel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btncancel.Name = "btncancel";
@@ -470,7 +468,7 @@
             this.txtinvoiceamount.Name = "txtinvoiceamount";
             this.txtinvoiceamount.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.txtinvoiceamount.Size = new System.Drawing.Size(141, 22);
+            this.txtinvoiceamount.Size = new System.Drawing.Size(141, 24);
             this.txtinvoiceamount.TabIndex = 80;
             // 
             // btnadd
@@ -518,7 +516,7 @@
             this.txtqty.Name = "txtqty";
             this.txtqty.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.txtqty.Size = new System.Drawing.Size(141, 22);
+            this.txtqty.Size = new System.Drawing.Size(141, 24);
             this.txtqty.TabIndex = 78;
             this.txtqty.EditValueChanged += new System.EventHandler(this.txtqty_EditValueChanged);
             // 
@@ -534,7 +532,7 @@
             this.txtcost.Name = "txtcost";
             this.txtcost.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.txtcost.Size = new System.Drawing.Size(141, 22);
+            this.txtcost.Size = new System.Drawing.Size(141, 24);
             this.txtcost.TabIndex = 77;
             this.txtcost.EditValueChanged += new System.EventHandler(this.txtcost_EditValueChanged);
             // 
@@ -660,7 +658,7 @@
             this.deleteToolStripMenuItem.Text = "Delete";
             this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
             // 
-            // ADDPO
+            // AddPODevEx
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -668,7 +666,7 @@
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Margin = new System.Windows.Forms.Padding(2);
-            this.Name = "ADDPO";
+            this.Name = "AddPODevEx";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "ADDPO";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;

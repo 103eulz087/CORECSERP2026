@@ -27,6 +27,44 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.Dispose();
         }
 
+        // Highlights lines where QtyDelivered <> ActualQty -- i.e. the line has been adjusted
+        // by a Credit Memo (or a return) since delivery. Only applies to the Detailed view
+        // (funcview_ForDeliveryDetails); the Summary view (funcview_ForDeliverySummary) exposes
+        // neither column, so it's skipped there.
+        private void gridView2_RowStyle(object sender, DevExpress.XtraGrid.Views.Grid.RowStyleEventArgs e)
+        {
+            GridView view = sender as GridView;
+            if (e.RowHandle < 0)
+                return;
+            if (view.Columns["QtyDelivered"] == null || view.Columns["ActualQty"] == null)
+                return;
+
+            object qtyObj = view.GetRowCellValue(e.RowHandle, "QtyDelivered");
+            object actualObj = view.GetRowCellValue(e.RowHandle, "ActualQty");
+            if (qtyObj == null || qtyObj == DBNull.Value || actualObj == null || actualObj == DBNull.Value)
+                return;
+
+            if (Convert.ToDecimal(qtyObj) != Convert.ToDecimal(actualObj))
+            {
+                e.Appearance.BackColor = Color.Gold;
+                e.Appearance.BackColor2 = Color.LightYellow;
+                e.HighPriority = true;
+            }
+            if (e.HighPriority || e.RowHandle < 0)
+                return;
+
+           
+            //bool hasCreditMemo = Convert.ToBoolean(view.GetRowCellValue(e.RowHandle, "isCreditMemo"));
+            bool hasReturnOrder = Convert.ToBoolean(view.GetRowCellValue(e.RowHandle, "isReturned"));
+            if (hasReturnOrder)
+            {
+                e.Appearance.BackColor = Color.Red;
+                e.Appearance.BackColor2 = Color.IndianRed;
+                e.Appearance.ForeColor = Color.White;
+                e.HighPriority = true;
+            }
+        }
+
         private void gridControl2_MouseUp(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)

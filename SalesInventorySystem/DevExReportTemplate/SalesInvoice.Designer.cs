@@ -93,7 +93,7 @@
             // 
             // xrcontrolno
             // 
-            this.xrcontrolno.Font = new System.Drawing.Font("Century Gothic", 9.2F);
+            this.xrcontrolno.Font = new DevExpress.Drawing.DXFont("Century Gothic", 9.2F);
             this.xrcontrolno.LocationFloat = new DevExpress.Utils.PointFloat(698.0001F, 36.00001F);
             this.xrcontrolno.Name = "xrcontrolno";
             this.xrcontrolno.Padding = new DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100F);
@@ -103,7 +103,7 @@
             // 
             // xrterms
             // 
-            this.xrterms.Font = new System.Drawing.Font("Century Gothic", 9.2F);
+            this.xrterms.Font = new DevExpress.Drawing.DXFont("Century Gothic", 9.2F);
             this.xrterms.LocationFloat = new DevExpress.Utils.PointFloat(698F, 18.00001F);
             this.xrterms.Name = "xrterms";
             this.xrterms.Padding = new DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100F);
@@ -114,7 +114,7 @@
             // 
             // xrbusinessstyle
             // 
-            this.xrbusinessstyle.Font = new System.Drawing.Font("Century Gothic", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.xrbusinessstyle.Font = new DevExpress.Drawing.DXFont("Century Gothic", 10.2F, DevExpress.Drawing.DXFontStyle.Regular, DevExpress.Drawing.DXGraphicsUnit.Point, new DevExpress.Drawing.DXFontAdditionalProperty[] {new DevExpress.Drawing.DXFontAdditionalProperty("GdiCharSet", ((byte)(0)))});
             this.xrbusinessstyle.LocationFloat = new DevExpress.Utils.PointFloat(176.6666F, 54.00002F);
             this.xrbusinessstyle.Name = "xrbusinessstyle";
             this.xrbusinessstyle.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -123,7 +123,7 @@
             // 
             // xrdate
             // 
-            this.xrdate.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.xrdate.Font = new DevExpress.Drawing.DXFont("Tahoma", 9.75F, DevExpress.Drawing.DXFontStyle.Regular, DevExpress.Drawing.DXGraphicsUnit.Point, new DevExpress.Drawing.DXFontAdditionalProperty[] {new DevExpress.Drawing.DXFontAdditionalProperty("GdiCharSet", ((byte)(0)))});
             this.xrdate.LocationFloat = new DevExpress.Utils.PointFloat(698F, 0F);
             this.xrdate.Name = "xrdate";
             this.xrdate.Padding = new DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100F);
@@ -134,7 +134,7 @@
             // 
             // xrcustname
             // 
-            this.xrcustname.Font = new System.Drawing.Font("Calibri", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.xrcustname.Font = new DevExpress.Drawing.DXFont("Calibri", 12F, DevExpress.Drawing.DXFontStyle.Bold, DevExpress.Drawing.DXGraphicsUnit.Point, new DevExpress.Drawing.DXFontAdditionalProperty[] {new DevExpress.Drawing.DXFontAdditionalProperty("GdiCharSet", ((byte)(0)))});
             this.xrcustname.LocationFloat = new DevExpress.Utils.PointFloat(176.6666F, 0F);
             this.xrcustname.Name = "xrcustname";
             this.xrcustname.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -144,7 +144,7 @@
             // 
             // xrtin
             // 
-            this.xrtin.Font = new System.Drawing.Font("Century Gothic", 9.2F);
+            this.xrtin.Font = new DevExpress.Drawing.DXFont("Century Gothic", 9.2F);
             this.xrtin.LocationFloat = new DevExpress.Utils.PointFloat(176.6666F, 18.00001F);
             this.xrtin.Name = "xrtin";
             this.xrtin.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -153,7 +153,7 @@
             // 
             // xraddress
             // 
-            this.xraddress.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.xraddress.Font = new DevExpress.Drawing.DXFont("Calibri", 9F, DevExpress.Drawing.DXFontStyle.Regular, DevExpress.Drawing.DXGraphicsUnit.Point, new DevExpress.Drawing.DXFontAdditionalProperty[] {new DevExpress.Drawing.DXFontAdditionalProperty("GdiCharSet", ((byte)(0)))});
             this.xraddress.LocationFloat = new DevExpress.Utils.PointFloat(176.6666F, 32.66668F);
             this.xraddress.Name = "xraddress";
             this.xraddress.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -185,7 +185,7 @@
             // 
             // xrlbladdvat
             // 
-            this.xrlbladdvat.Font = new System.Drawing.Font("Times New Roman", 7.8F);
+            this.xrlbladdvat.Font = new DevExpress.Drawing.DXFont("Times New Roman", 7.8F);
             this.xrlbladdvat.LocationFloat = new DevExpress.Utils.PointFloat(725.83F, 124.7938F);
             this.xrlbladdvat.Name = "xrlbladdvat";
             this.xrlbladdvat.Padding = new DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100F);
@@ -198,7 +198,7 @@
             // 
             // xrLabel2
             // 
-            this.xrLabel2.Font = new System.Drawing.Font("Times New Roman", 7.8F);
+            this.xrLabel2.Font = new DevExpress.Drawing.DXFont("Times New Roman", 7.8F);
             this.xrLabel2.LocationFloat = new DevExpress.Utils.PointFloat(725.83F, 105.7138F);
             this.xrLabel2.Name = "xrLabel2";
             this.xrLabel2.Padding = new DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100F);
@@ -211,7 +211,7 @@
             // 
             // xrLabel1
             // 
-            this.xrLabel1.Font = new System.Drawing.Font("Times New Roman", 7.8F);
+            this.xrLabel1.Font = new DevExpress.Drawing.DXFont("Times New Roman", 7.8F);
             this.xrLabel1.LocationFloat = new DevExpress.Utils.PointFloat(725.83F, 96.17381F);
             this.xrLabel1.Name = "xrLabel1";
             this.xrLabel1.Padding = new DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100F);
@@ -224,7 +224,7 @@
             // 
             // xrlblvatablesales
             // 
-            this.xrlblvatablesales.Font = new System.Drawing.Font("Times New Roman", 7.8F);
+            this.xrlblvatablesales.Font = new DevExpress.Drawing.DXFont("Times New Roman", 7.8F);
             this.xrlblvatablesales.LocationFloat = new DevExpress.Utils.PointFloat(725.83F, 19.85378F);
             this.xrlblvatablesales.Name = "xrlblvatablesales";
             this.xrlblvatablesales.Padding = new DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100F);
@@ -237,7 +237,7 @@
             // 
             // xrlblamountdue
             // 
-            this.xrlblamountdue.Font = new System.Drawing.Font("Times New Roman", 7.8F);
+            this.xrlblamountdue.Font = new DevExpress.Drawing.DXFont("Times New Roman", 7.8F);
             this.xrlblamountdue.LocationFloat = new DevExpress.Utils.PointFloat(725.8334F, 115.2538F);
             this.xrlblamountdue.Name = "xrlblamountdue";
             this.xrlblamountdue.Padding = new DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100F);
@@ -250,7 +250,7 @@
             // 
             // xrdeliveredby
             // 
-            this.xrdeliveredby.Font = new System.Drawing.Font("Century Gothic", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.xrdeliveredby.Font = new DevExpress.Drawing.DXFont("Century Gothic", 10.2F, DevExpress.Drawing.DXFontStyle.Regular, DevExpress.Drawing.DXGraphicsUnit.Point, new DevExpress.Drawing.DXFontAdditionalProperty[] {new DevExpress.Drawing.DXFontAdditionalProperty("GdiCharSet", ((byte)(0)))});
             this.xrdeliveredby.LocationFloat = new DevExpress.Utils.PointFloat(355.6666F, 74.25049F);
             this.xrdeliveredby.Name = "xrdeliveredby";
             this.xrdeliveredby.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -259,7 +259,7 @@
             // 
             // xrpreparedby
             // 
-            this.xrpreparedby.Font = new System.Drawing.Font("Calibri", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.xrpreparedby.Font = new DevExpress.Drawing.DXFont("Calibri", 11.25F, DevExpress.Drawing.DXFontStyle.Regular, DevExpress.Drawing.DXGraphicsUnit.Point, new DevExpress.Drawing.DXFontAdditionalProperty[] {new DevExpress.Drawing.DXFontAdditionalProperty("GdiCharSet", ((byte)(0)))});
             this.xrpreparedby.LocationFloat = new DevExpress.Utils.PointFloat(125.8333F, 74.25047F);
             this.xrpreparedby.Name = "xrpreparedby";
             this.xrpreparedby.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -269,7 +269,7 @@
             // 
             // xrlbltotalamountdue
             // 
-            this.xrlbltotalamountdue.Font = new System.Drawing.Font("Times New Roman", 12.2F, System.Drawing.FontStyle.Bold);
+            this.xrlbltotalamountdue.Font = new DevExpress.Drawing.DXFont("Times New Roman", 12.2F, DevExpress.Drawing.DXFontStyle.Bold);
             this.xrlbltotalamountdue.LocationFloat = new DevExpress.Utils.PointFloat(725.8334F, 134.3332F);
             this.xrlbltotalamountdue.Name = "xrlbltotalamountdue";
             this.xrlbltotalamountdue.Padding = new DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100F);
@@ -282,7 +282,7 @@
             // 
             // xrlblvatexemptsales
             // 
-            this.xrlblvatexemptsales.Font = new System.Drawing.Font("Times New Roman", 7.8F);
+            this.xrlblvatexemptsales.Font = new DevExpress.Drawing.DXFont("Times New Roman", 7.8F);
             this.xrlblvatexemptsales.LocationFloat = new DevExpress.Utils.PointFloat(725.83F, 29.39378F);
             this.xrlblvatexemptsales.Name = "xrlblvatexemptsales";
             this.xrlblvatexemptsales.Padding = new DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100F);
@@ -295,7 +295,7 @@
             // 
             // xrlblvatamount
             // 
-            this.xrlblvatamount.Font = new System.Drawing.Font("Times New Roman", 7.8F);
+            this.xrlblvatamount.Font = new DevExpress.Drawing.DXFont("Times New Roman", 7.8F);
             this.xrlblvatamount.LocationFloat = new DevExpress.Utils.PointFloat(725.83F, 48.47379F);
             this.xrlblvatamount.Name = "xrlblvatamount";
             this.xrlblvatamount.Padding = new DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100F);
@@ -308,7 +308,7 @@
             // 
             // xrlblzeroratedsales
             // 
-            this.xrlblzeroratedsales.Font = new System.Drawing.Font("Times New Roman", 7.8F);
+            this.xrlblzeroratedsales.Font = new DevExpress.Drawing.DXFont("Times New Roman", 7.8F);
             this.xrlblzeroratedsales.LocationFloat = new DevExpress.Utils.PointFloat(725.8367F, 38.93379F);
             this.xrlblzeroratedsales.Name = "xrlblzeroratedsales";
             this.xrlblzeroratedsales.Padding = new DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100F);
@@ -321,7 +321,7 @@
             // 
             // xrlblnetofvat
             // 
-            this.xrlblnetofvat.Font = new System.Drawing.Font("Times New Roman", 7.8F);
+            this.xrlblnetofvat.Font = new DevExpress.Drawing.DXFont("Times New Roman", 7.8F);
             this.xrlblnetofvat.LocationFloat = new DevExpress.Utils.PointFloat(725.8367F, 77.0938F);
             this.xrlblnetofvat.Name = "xrlblnetofvat";
             this.xrlblnetofvat.Padding = new DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100F);
@@ -334,7 +334,7 @@
             // 
             // xrlbdiscount
             // 
-            this.xrlbdiscount.Font = new System.Drawing.Font("Times New Roman", 7.8F);
+            this.xrlbdiscount.Font = new DevExpress.Drawing.DXFont("Times New Roman", 7.8F);
             this.xrlbdiscount.LocationFloat = new DevExpress.Utils.PointFloat(725.8334F, 86.63381F);
             this.xrlbdiscount.Name = "xrlbdiscount";
             this.xrlbdiscount.Padding = new DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100F);
@@ -347,7 +347,7 @@
             // 
             // xrlbllessvat
             // 
-            this.xrlbllessvat.Font = new System.Drawing.Font("Times New Roman", 7.8F);
+            this.xrlbllessvat.Font = new DevExpress.Drawing.DXFont("Times New Roman", 7.8F);
             this.xrlbllessvat.LocationFloat = new DevExpress.Utils.PointFloat(725.83F, 67.5538F);
             this.xrlbllessvat.Name = "xrlbllessvat";
             this.xrlbllessvat.Padding = new DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100F);
@@ -360,7 +360,7 @@
             // 
             // xrlbltotalsales
             // 
-            this.xrlbltotalsales.Font = new System.Drawing.Font("Times New Roman", 7.8F);
+            this.xrlbltotalsales.Font = new DevExpress.Drawing.DXFont("Times New Roman", 7.8F);
             this.xrlbltotalsales.LocationFloat = new DevExpress.Utils.PointFloat(725.83F, 58.0138F);
             this.xrlbltotalsales.Name = "xrlbltotalsales";
             this.xrlbltotalsales.Padding = new DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100F);
@@ -373,7 +373,7 @@
             // 
             // xrlabeltotalcount
             // 
-            this.xrlabeltotalcount.Font = new System.Drawing.Font("Calibri", 11.25F, System.Drawing.FontStyle.Bold);
+            this.xrlabeltotalcount.Font = new DevExpress.Drawing.DXFont("Calibri", 11.25F, DevExpress.Drawing.DXFontStyle.Bold);
             this.xrlabeltotalcount.LocationFloat = new DevExpress.Utils.PointFloat(33.33333F, 74.25049F);
             this.xrlabeltotalcount.Name = "xrlabeltotalcount";
             this.xrlabeltotalcount.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -389,10 +389,10 @@
             this.BottomMargin,
             this.ReportHeader,
             this.PageFooter});
-            this.Margins = new System.Drawing.Printing.Margins(0, 2, 100, 66);
+            this.Margins = new DevExpress.Drawing.DXMargins(0, 2, 100, 66);
             this.PageHeight = 750;
             this.PageWidth = 950;
-            this.PaperKind = System.Drawing.Printing.PaperKind.Custom;
+            this.PaperKind = DevExpress.Drawing.Printing.DXPaperKind.Custom;
             this.ShowPreviewMarginLines = false;
             this.ShowPrintMarginsWarning = false;
             this.Version = "19.2";

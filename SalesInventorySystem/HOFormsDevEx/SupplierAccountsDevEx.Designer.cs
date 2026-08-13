@@ -762,9 +762,9 @@
             this.btnadd.Location = new System.Drawing.Point(714, 35);
             this.btnadd.Margin = new System.Windows.Forms.Padding(2, 5, 2, 5);
             this.btnadd.Name = "btnadd";
-            this.btnadd.Size = new System.Drawing.Size(125, 56);
+            this.btnadd.Size = new System.Drawing.Size(212, 56);
             this.btnadd.TabIndex = 442;
-            this.btnadd.Text = "Add Payment";
+            this.btnadd.Text = "Add Payment / Show Invoices";
             this.btnadd.Click += new System.EventHandler(this.btnadd_Click);
             // 
             // Label1

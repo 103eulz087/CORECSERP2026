@@ -78,7 +78,7 @@ namespace SalesInventorySystem.HOFormsDevEx
                 xct.xrcaption1.Text = caption1;
                 xct.xrcaption2.Text = caption2;
 
-                xct.PaperKind = System.Drawing.Printing.PaperKind.A4;
+                xct.PaperKind = (DevExpress.Drawing.Printing.DXPaperKind)System.Drawing.Printing.PaperKind.A4;
 
                 string custname = Database.getSingleQuery("PurchaseOrderSummary", " PONumber='" + txtpono.Text + "'", "Customer");
                 string refno = Database.getSingleQuery("DeliverySummary", " PONumber='" + txtpono.Text + "'", "ReferenceNumber");

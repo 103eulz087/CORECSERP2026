@@ -22,7 +22,7 @@ namespace SalesInventorySystem.Orders
     {
         public delegate void AddDataDelegate(String myString);
         public AddDataDelegate myDelegate;
-        object pcode,catcode;
+        object pcode,catcode, referencecode, shipmentno;
         private String weight;
         public string wieght2 = "";
         public static bool isdone = false, ispending = false;
@@ -67,7 +67,8 @@ namespace SalesInventorySystem.Orders
             txtbarcodescanning.Focus();
             Database.displayComboBoxItems("SELECT Description FROM ProductCategory", "Description", txtprodcat);
 
-            bool fExst = Database.checkifExist("SELECT 1 FROM DeliveryDetails WHERE PONumber='" + ViewBranchOrderSTS.ponumber + "'");
+            bool fExst = Database.checkifExist("SELECT 1 FROM DeliverySummary WHERE PONumber='" + ViewBranchOrderSTS.ponumber + "'");
+            //bool fExst = Database.checkifExist("SELECT 1 FROM DeliveryDetails WHERE PONumber='" + ViewBranchOrderSTS.ponumber + "'");
             string getID = Database.getSingleData("DeliveryDetails", "PONumber", ViewBranchOrderSTS.ponumber, "DeliveryNo");
             if (fExst)
             {
@@ -148,7 +149,27 @@ namespace SalesInventorySystem.Orders
         {
             gridControl2.BeginUpdate();
             //     Database.display("SELECT QtyDelivered,BarcodeNo,ProductNo,ProductName,FORMAT(Cost,'N','en-us')AS Cost,SequenceNo FROM DeliveryDetails WHERE DeliveryNo='" + txtdevno.Text + "'", gridControl2, gridView2);
-            Database.display("SELECT SeqNo,ProductNo,ProductName,BarcodeNo,QtyDelivered FROM dbo.DeliveryDetails with(nolock) WHERE PONumber='"+txtponum.Text+"' AND DeliveryNo='" + txtdevno.Text + "' AND Status='PENDING' ORDER BY SeqNo DESC", gridControl2, gridView2);
+
+            if (GlobalCache.CompanyName == "JFC")
+            {
+
+                Database.display($"SELECT * FROM dbo.funcview_ProcessOrderItemsSales('{txtponum.Text}')", gridControl2, gridView2);
+            }
+            else
+            {
+                Database.display("SELECT SeqNo" +
+               ",ProductNo" +
+               ",ProductName" +
+               ",BarcodeNo" +
+               ",QtyDelivered " +
+               "FROM DeliveryDetails " +
+               "WHERE PONumber='" + txtponum.Text + "' AND DeliveryNo='" + txtdevno.Text + "' " +
+               "AND Status='PENDING'", gridControl2, gridView2);
+            }
+
+
+            //Database.display("SELECT SeqNo,ProductNo,ProductName,BarcodeNo,QtyDelivered " +
+            //    "FROM dbo.DeliveryDetails with(nolock) WHERE PONumber='"+txtponum.Text+"' AND DeliveryNo='" + txtdevno.Text + "' AND Status='PENDING' ORDER BY SeqNo DESC", gridControl2, gridView2);
 
             //gridView2.Columns[0].Visible = false;
 
@@ -250,8 +271,12 @@ namespace SalesInventorySystem.Orders
                         XtraMessageBox.Show("No Product Inventory");
                         txtsku.Text = "";
                     }
+                    else if (GlobalCache.CompanyName == "JFC" && Convert.ToDouble(txtweight.Text) > Database.getTotalSummation2("Inventory", "ShipmentNo='" + shipmentno.ToString() + "' AND Branch='" + Login.assignedBranch + "' AND Product = '" + primalproductcode + "' and Available > 0 ", "Available")) //Database.getTotalSummation("Inventory", "Product", txtsku.Text.Substring(1, 6), "Quantity"))
+                    {
+                        BigAlert.Show("INSUFFICENT STOCKS", "Insuficient Stocks for this Product.. Your Available Quantity is ", MessageBoxIcon.Warning);
+                    }
                     //kung imong gi encode na quantity is greater than sa total quantity sa imong Inventory sa commisary
-                    else if (Convert.ToDouble(txtweight.Text) > Database.getTotalSummation2("Inventory", "Product = '" + primalproductcode + "' AND Branch='" + Login.assignedBranch + "' AND IsStock='1' and Available > 0 ", "Available")) //Database.getTotalSummation("Inventory", "Product", txtsku.Text.Substring(1, 6), "Quantity"))
+                    else if (GlobalCache.CompanyName != "JFC" && Convert.ToDouble(txtweight.Text) > Database.getTotalSummation2("Inventory", "Product = '" + primalproductcode + "' AND Branch='" + Login.assignedBranch + "' AND IsStock='1' and Available > 0 ", "Available")) //Database.getTotalSummation("Inventory", "Product", txtsku.Text.Substring(1, 6), "Quantity"))
                     {
                         string mark = Database.getTotalSummation2("Inventory", "Product = '" + primalproductcode + "' AND Branch='" + Login.assignedBranch + "' AND IsStock='1'  and Available > 0 ", "Available").ToString();
                         XtraMessageBox.Show("Insuficient Stocks for this Product.. Your Available Quantity is " + mark);
@@ -303,8 +328,8 @@ namespace SalesInventorySystem.Orders
             {
                 addBranchOrder();
             }
-            gridView2.Columns["SeqNo"].Summary.Clear();
-            gridView2.Columns["SeqNo"].Summary.Add(DevExpress.Data.SummaryItemType.Count, "SeqNo", "{0}");
+            //gridView2.Columns["SeqNo"].Summary.Clear();
+            //gridView2.Columns["SeqNo"].Summary.Add(DevExpress.Data.SummaryItemType.Count, "SeqNo", "{0}");
             gridView2.Columns["QtyDelivered"].Summary.Clear();
             gridView2.Columns["QtyDelivered"].Summary.Add(DevExpress.Data.SummaryItemType.Sum, "QtyDelivered", "{0}");
         }
@@ -315,15 +340,34 @@ namespace SalesInventorySystem.Orders
             sourceseqnum = txtseqno.Text;
             SqlConnection con = Database.getConnection();
             con.Open();
-            string query = "sp_AddBranchOrder";
+            string query = "";
+            if(GlobalCache.CompanyName=="JFC")
+            {
+                query = "sp_AddBranchOrder_JFC";
+            }
+            else
+            {
+                query = "sp_AddBranchOrder";
+            }
             try
             {
                 SqlCommand com = new SqlCommand(query, con);
-                com.Parameters.AddWithValue("@parmdevno", txtdevno.Text);
-                com.Parameters.AddWithValue("@parmrefno", txtrefno.Text);
-                com.Parameters.AddWithValue("@parmpono", txtponum.Text);
-                com.Parameters.AddWithValue("@parmprodcatcode", catcode.ToString());
-                com.Parameters.AddWithValue("@parmprodcode", pcode.ToString());
+
+                com.Parameters.AddWithValue("@parmdevno",
+                    string.IsNullOrWhiteSpace(txtdevno.Text) ? "" : txtdevno.Text);
+
+                com.Parameters.AddWithValue("@parmrefno",
+                    string.IsNullOrWhiteSpace(txtrefno.Text) ? "" : txtrefno.Text);
+
+                com.Parameters.AddWithValue("@parmpono",
+                    string.IsNullOrWhiteSpace(txtponum.Text) ? "" : txtponum.Text);
+
+                com.Parameters.AddWithValue("@parmprodcatcode", catcode?.ToString() ?? "");
+                com.Parameters.AddWithValue("@parmprodcode", pcode?.ToString() ?? "");
+                if (GlobalCache.CompanyName == "JFC")
+                {
+                    com.Parameters.AddWithValue("@parmshipmentno", shipmentno?.ToString() ?? "");
+                }
                 com.Parameters.AddWithValue("@parmqty", txtweight.Text);
                 com.Parameters.AddWithValue("@parmbarcode", txtsku.Text);
 
@@ -407,19 +451,30 @@ namespace SalesInventorySystem.Orders
         {
             SqlConnection con = Database.getConnection();
             con.Open();
-            string query = "sp_CancelDelivery";
+            string query = "";
+            if(GlobalCache.CompanyName=="JFC")
+            {
+                query = "sp_CancelDeliveryFIFOJFC";
+            }
+            else
+            {
+                query = "sp_CancelDelivery";
+            }
             try
             {
+                string seqno = Convert.ToInt32(gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "SeqNo")).ToString();
+                string prodno = Convert.ToInt32(gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "ProductNo")).ToString();
+                string qtydeliv = Convert.ToInt32(gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "QtyDelivered")).ToString();
                 SqlCommand com = new SqlCommand(query, con);
                 com.Parameters.AddWithValue("@parmdevno", txtdevno.Text);
                 com.Parameters.AddWithValue("@parmrefno", txtrefno.Text);
                 com.Parameters.AddWithValue("@parmpono", txtponum.Text);
-                com.Parameters.AddWithValue("@parmprodno", gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "ProductNo").ToString());
-                com.Parameters.AddWithValue("@parmqty", gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "QtyDelivered").ToString());
+                com.Parameters.AddWithValue("@parmprodno", prodno);
+                com.Parameters.AddWithValue("@parmqty", qtydeliv);
                 com.Parameters.AddWithValue("@parmbranchcode", txtbrcode.Text);
                 com.Parameters.AddWithValue("@parmorigin", Login.assignedBranch);
                 com.Parameters.AddWithValue("@preparedby", Login.Fullname);
-                com.Parameters.AddWithValue("@parmdevseqno", Convert.ToInt32(gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "SeqNo").ToString()));
+                com.Parameters.AddWithValue("@parmdevseqno", seqno);
                 com.CommandType = CommandType.StoredProcedure;
                 com.CommandText = query;
                 com.ExecuteNonQuery();
@@ -809,9 +864,27 @@ namespace SalesInventorySystem.Orders
                     else
                     {
                         productcode = pcode.ToString();//getProductCode();
-                        //txtsku.Text = Database.getSingleQuery("Products", "BranchCode='" + Login.assignedBranch + "' AND ProductCode='" + pcode + "' ", "Barcode");
-                        string barcode = Database.getSingleResultSet($"SELECT dbo.func_GenerateBarcode" +
-                $"('{Login.assignedBranch}',0,'{txtponum.Text}','{productcode.ToString()}','{strquantity}','2') ");
+                                                       //txtsku.Text = Database.getSingleQuery("Products", "BranchCode='" + Login.assignedBranch + "' AND ProductCode='" + pcode + "' ", "Barcode");
+                        string barcode = "";
+                //        if (GlobalCache.CompanyName=="JFC")
+                //        {
+                //            if(String.IsNullOrEmpty(referencecode.ToString()))
+                //            {
+                //                XtraMessageBox.Show("No Reference Code");
+                //                return;
+                //            }
+                //            else
+                //            {
+                //                barcode = referencecode.ToString();
+                //            }
+                //        }
+                //        else
+                //        {
+                //            barcode = Database.getSingleResultSet($"SELECT dbo.func_GenerateBarcodeSTS" +
+                //$"('{Login.assignedBranch}',0,'{txtponum.Text}','{productcode.ToString()}','{strquantity}','2') ");
+                //        }
+                        barcode = Database.getSingleResultSet($"SELECT dbo.func_GenerateBarcodeSTS" +
+               $"('{Login.assignedBranch}',0,'{txtponum.Text}','{productcode.ToString()}','{strquantity}','2') ");
 
                         txtsku.Text = barcode;
                        
@@ -849,8 +922,8 @@ namespace SalesInventorySystem.Orders
                     //    add();
                     addBranchOrder();
 
-                    gridView2.Columns["SeqNo"].Summary.Clear();
-                    gridView2.Columns["SeqNo"].Summary.Add(DevExpress.Data.SummaryItemType.Count, "SeqNo", "{0}");
+                    //gridView2.Columns["SeqNo"].Summary.Clear();
+                    //gridView2.Columns["SeqNo"].Summary.Add(DevExpress.Data.SummaryItemType.Count, "SeqNo", "{0}");
                     gridView2.Columns["QtyDelivered"].Summary.Clear();
                     gridView2.Columns["QtyDelivered"].Summary.Add(DevExpress.Data.SummaryItemType.Sum, "QtyDelivered", "{0}");
 
@@ -941,9 +1014,27 @@ namespace SalesInventorySystem.Orders
 
         private void btncancel_Click(object sender, EventArgs e)
         {
+        
             if(barcodescanning.Checked == true)
             {
-                returnOrderByBarcode();
+                
+                if(GlobalCache.CompanyName=="JFC")
+                {
+                    var barcodeObj = gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "BarcodeNo");
+                    string barcode = barcodeObj?.ToString() ?? string.Empty; 
+                    if (barcode.StartsWith("A01") || barcode.StartsWith("B01"))
+                    {
+                        returnOrderByBarcode();
+                    }
+                    else
+                    {
+                        returnOrder();
+                    }
+                }
+                else
+                {
+                    returnOrderByBarcode();
+                }
             }
             else
             {
@@ -1007,8 +1098,12 @@ namespace SalesInventorySystem.Orders
         {
             catcode = null;
             pcode = null;
+            referencecode = null;
+            shipmentno = null;
             catcode = SearchLookUpClass.getSingleValue(txtsearchlookupproduct, "CategoryCode");
             pcode =SearchLookUpClass.getSingleValue(txtsearchlookupproduct, "ProductCode");
+            referencecode =SearchLookUpClass.getSingleValue(txtsearchlookupproduct, "ReferenceCode");
+            shipmentno =SearchLookUpClass.getSingleValue(txtsearchlookupproduct, "ShipmentNo");
             txtweight.Focus();
         }
 

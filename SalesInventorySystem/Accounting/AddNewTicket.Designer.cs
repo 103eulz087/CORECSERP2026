@@ -156,7 +156,6 @@
             this.spindebit.Name = "spindebit";
             this.spindebit.NullText = "0";
             this.spindebit.NullValuePrompt = "0";
-            this.spindebit.NullValuePromptShowForEmptyValue = true;
             // 
             // spincredit
             // 

@@ -716,8 +716,15 @@ namespace SalesInventorySystem.POS
 
             Reporting.SalesInvoiceDexEx viewdet = new Reporting.SalesInvoiceDexEx();
 
-
-            analyze("spview_SalesInvoice", lblorderno.Text, viewdet.gridControl4, viewdet.gridView4);
+            if(GlobalCache.CompanyName=="JFC")
+            {
+                analyze("spview_SalesInvoiceJFC", lblorderno.Text, viewdet.gridControl4, viewdet.gridView4);
+            }
+            else
+            {
+                analyze("spview_SalesInvoice", lblorderno.Text, viewdet.gridControl4, viewdet.gridView4);
+            }
+            
 
             viewdet.txtpono.Text = lblorderno.Text;
             viewdet.txtcustkey.Text = custkey;

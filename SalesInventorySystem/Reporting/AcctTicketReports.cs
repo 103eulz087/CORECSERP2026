@@ -13,7 +13,7 @@ using System.Data.SqlClient;
 
 namespace SalesInventorySystem.Reporting
 {
-    public partial class AcctTicketReports : Form
+    public partial class AcctTicketReports : XtraForm
     {
         //public static string debitvalue="", creditvalue = "";
 

@@ -279,7 +279,7 @@
             // 
             this.btnMyReqExcel.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.ExportToExcel_16x16;
             this.btnMyReqExcel.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btnMyReqExcel.Location = new System.Drawing.Point(450, 10);
+            this.btnMyReqExcel.Location = new System.Drawing.Point(467, 10);
             this.btnMyReqExcel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnMyReqExcel.Name = "btnMyReqExcel";
             this.btnMyReqExcel.Size = new System.Drawing.Size(121, 28);
@@ -290,7 +290,7 @@
             // 
             this.btnMyReq.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnMyReq.ImageOptions.Image")));
             this.btnMyReq.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btnMyReq.Location = new System.Drawing.Point(356, 10);
+            this.btnMyReq.Location = new System.Drawing.Point(373, 10);
             this.btnMyReq.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnMyReq.Name = "btnMyReq";
             this.btnMyReq.Size = new System.Drawing.Size(88, 28);
@@ -312,7 +312,7 @@
             // 
             this.datetorcvd.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
             this.datetorcvd.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.datetorcvd.Location = new System.Drawing.Point(229, 10);
+            this.datetorcvd.Location = new System.Drawing.Point(246, 10);
             this.datetorcvd.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.datetorcvd.Name = "datetorcvd";
             this.datetorcvd.Size = new System.Drawing.Size(120, 27);
@@ -322,7 +322,7 @@
             // 
             this.datefromrcvd.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
             this.datefromrcvd.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.datefromrcvd.Location = new System.Drawing.Point(68, 10);
+            this.datefromrcvd.Location = new System.Drawing.Point(76, 10);
             this.datefromrcvd.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.datefromrcvd.Name = "datefromrcvd";
             this.datefromrcvd.Size = new System.Drawing.Size(120, 27);
@@ -332,7 +332,7 @@
             // 
             this.label7.AutoSize = true;
             this.label7.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
-            this.label7.Location = new System.Drawing.Point(195, 16);
+            this.label7.Location = new System.Drawing.Point(203, 16);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(37, 21);
             this.label7.TabIndex = 5;

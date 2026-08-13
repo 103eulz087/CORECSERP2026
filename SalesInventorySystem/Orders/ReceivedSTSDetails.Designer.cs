@@ -28,35 +28,21 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.gridControlMyReq = new DevExpress.XtraGrid.GridControl();
             this.gridViewMyReq = new DevExpress.XtraGrid.Views.Grid.GridView();
-            this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridControlMyReq)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridViewMyReq)).BeginInit();
             this.SuspendLayout();
-            // 
-            // groupBox2
-            // 
-            this.groupBox2.Controls.Add(this.gridControlMyReq);
-            this.groupBox2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox2.Location = new System.Drawing.Point(0, 0);
-            this.groupBox2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.groupBox2.Size = new System.Drawing.Size(1578, 922);
-            this.groupBox2.TabIndex = 9;
-            this.groupBox2.TabStop = false;
             // 
             // gridControlMyReq
             // 
             this.gridControlMyReq.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gridControlMyReq.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.gridControlMyReq.Location = new System.Drawing.Point(3, 20);
+            this.gridControlMyReq.Location = new System.Drawing.Point(0, 0);
             this.gridControlMyReq.MainView = this.gridViewMyReq;
             this.gridControlMyReq.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.gridControlMyReq.Name = "gridControlMyReq";
-            this.gridControlMyReq.Size = new System.Drawing.Size(1572, 898);
+            this.gridControlMyReq.Size = new System.Drawing.Size(1578, 922);
             this.gridControlMyReq.TabIndex = 3;
             this.gridControlMyReq.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewMyReq});
@@ -81,13 +67,12 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1578, 922);
-            this.Controls.Add(this.groupBox2);
+            this.Controls.Add(this.gridControlMyReq);
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "ReceivedSTSDetails";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "ReceivedSTSDetails";
             this.Load += new System.EventHandler(this.ReceivedSTSDetails_Load);
-            this.groupBox2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.gridControlMyReq)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridViewMyReq)).EndInit();
             this.ResumeLayout(false);
@@ -95,8 +80,6 @@
         }
 
         #endregion
-
-        private System.Windows.Forms.GroupBox groupBox2;
         public DevExpress.XtraGrid.GridControl gridControlMyReq;
         public DevExpress.XtraGrid.Views.Grid.GridView gridViewMyReq;
     }

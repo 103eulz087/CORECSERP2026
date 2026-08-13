@@ -8,7 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using DevExpress.XtraEditors;
-using MySql.Data.MySqlClient;
+//using MySql.Data.MySqlClient;
 
 namespace SalesInventorySystem
 {
@@ -24,16 +24,16 @@ namespace SalesInventorySystem
         private void MasterDetailGrid_Load(object sender, EventArgs e)
         {
             //Database.GridMasterDetailMysql("testview", "tblgamebets", "userid<>''", "userid IN (Select userid FROM testview) ", "userid", "userid", "UserDetails", gridControl1);
-            Database.GridMasterDetailMysql("SELECT * FROM testview"
-                , "SELECT userid,gameid,transactionno,combination,straight,rumble,draw,datedraw,datetrn " +
-                            "FROM tblgamebets " +
-                            "WHERE userid IN (Select userid FROM testview)"
-                , "testview"
-                , "tblgamebets"
-                , "userid"
-                , "userid"
-                , "TicketHistory"
-                , gridControl1, "");
+            //Database.GridMasterDetailMysql("SELECT * FROM testview"
+            //    , "SELECT userid,gameid,transactionno,combination,straight,rumble,draw,datedraw,datetrn " +
+            //                "FROM tblgamebets " +
+            //                "WHERE userid IN (Select userid FROM testview)"
+            //    , "testview"
+            //    , "tblgamebets"
+            //    , "userid"
+            //    , "userid"
+            //    , "TicketHistory"
+            //    , gridControl1, "");
 
             Classes.DevXGridViewSettings.ShowFooterTotal(gridView1, "NumberOfTickets");
             Classes.DevXGridViewSettings.ShowFooterTotal(gridView1, "TotalAmountBet");

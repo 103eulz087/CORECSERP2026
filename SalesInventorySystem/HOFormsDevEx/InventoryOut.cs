@@ -31,7 +31,7 @@ namespace SalesInventorySystem.HOFormsDevEx
         void OutInventory()
         {
             // Ensure we have a valid item to insert
-            if (_currentItem == null || _currentItem.TotalCost <= 0)
+            if (_currentItem == null)// || _currentItem.TotalCost <= 0)
             {
                 XtraMessageBox.Show("Invalid item data. Please ensure all fields are populated.", "Error");
                 return;
@@ -59,7 +59,7 @@ namespace SalesInventorySystem.HOFormsDevEx
                 SqlCommand com = new SqlCommand(sp, con);
                 com.Parameters.AddWithValue("@parmorderno", txtbatchid.Text);
                 com.Parameters.AddWithValue("@parmtransdate", txtdatein.Text);
-                com.Parameters.AddWithValue("@parmbranchcode", txtbrcode.Text);
+                com.Parameters.AddWithValue("@parmbranchcode", _currentItem.BranchCode);
                 com.Parameters.AddWithValue("@parmprodcode", "");
                 com.Parameters.AddWithValue("@parmqty", txtqty.Value);
                 com.Parameters.AddWithValue("@parmoption", "2");
@@ -89,7 +89,7 @@ namespace SalesInventorySystem.HOFormsDevEx
                 string sp = "sp_InsertStockOutSummary";
                 SqlCommand com = new SqlCommand(sp, con);
                 com.Parameters.AddWithValue("@parmbatchid", txtbatchid.Text);
-                com.Parameters.AddWithValue("@parmbrcode", txtbrcode.Text);
+                com.Parameters.AddWithValue("@parmbrcode", _currentItem.BranchCode);
                 com.Parameters.AddWithValue("@parmcategory", txtcategory.Text);
                 com.Parameters.AddWithValue("@parmremarks", txtremarks.Text);
                 com.CommandType = CommandType.StoredProcedure;
@@ -111,7 +111,7 @@ namespace SalesInventorySystem.HOFormsDevEx
         {
             Database.display("SELECT * FROM StockOutDetails WHERE ID='" + txtbatchid.Text + "' and isDone=0 " +
                 "AND EncodeBy='" + Login.isglobalUserID + "' " +
-                "AND BranchCode='" + txtbrcode.Text + "' " +
+                //"AND BranchCode='" + txtbrcode.Text + "' " +
                 "AND DateEncode='" + DateTime.Now.ToShortDateString() + "'", gridControl1, gridView2);
         }
 
@@ -223,7 +223,7 @@ namespace SalesInventorySystem.HOFormsDevEx
                 //devrcptfrm.xrcaption1.Text = caption1;
                 //devrcptfrm.xrcaption2.Text = caption2;
                 devrcptfrm.xrdeliveredby.Text = Login.Fullname;
-                devrcptfrm.PaperKind = System.Drawing.Printing.PaperKind.A4;
+                devrcptfrm.PaperKind = (DevExpress.Drawing.Printing.DXPaperKind)System.Drawing.Printing.PaperKind.A4;
 
                 gridView2.Columns["ID"].Visible = false;
                 gridView2.Columns["BranchCode"].Visible = false;
@@ -431,7 +431,7 @@ namespace SalesInventorySystem.HOFormsDevEx
         private void txtproduct_EditValueChanged(object sender, EventArgs e)
         {
             // Populate product details from the SearchLookUp
-            object productCode = SearchLookUpClass.getSingleValue(txtproduct, "ProductCode");
+            object productCode = SearchLookUpClass.getSingleValue(txtproduct, "Product");
             object description = SearchLookUpClass.getSingleValue(txtproduct, "Description");
             object barcode = SearchLookUpClass.getSingleValue(txtproduct, "Barcode");
             object available = SearchLookUpClass.getSingleValue(txtproduct, "Available");

@@ -87,8 +87,9 @@
             // 
             this.groupControl1.Dock = System.Windows.Forms.DockStyle.Top;
             this.groupControl1.Location = new System.Drawing.Point(0, 0);
+            this.groupControl1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.groupControl1.Name = "groupControl1";
-            this.groupControl1.Size = new System.Drawing.Size(2141, 57);
+            this.groupControl1.Size = new System.Drawing.Size(1132, 36);
             this.groupControl1.TabIndex = 1;
             this.groupControl1.Text = "Master Account";
             // 
@@ -96,9 +97,10 @@
             // 
             this.panelControl1.Controls.Add(this.tablePanel1);
             this.panelControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelControl1.Location = new System.Drawing.Point(0, 57);
+            this.panelControl1.Location = new System.Drawing.Point(0, 36);
+            this.panelControl1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.panelControl1.Name = "panelControl1";
-            this.panelControl1.Size = new System.Drawing.Size(2141, 1208);
+            this.panelControl1.Size = new System.Drawing.Size(1132, 644);
             this.panelControl1.TabIndex = 2;
             // 
             // tablePanel1
@@ -117,12 +119,13 @@
             this.tablePanel1.Controls.Add(this.panelControl3);
             this.tablePanel1.Controls.Add(this.panelControl2);
             this.tablePanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tablePanel1.Location = new System.Drawing.Point(3, 3);
+            this.tablePanel1.Location = new System.Drawing.Point(2, 2);
+            this.tablePanel1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.tablePanel1.Name = "tablePanel1";
             this.tablePanel1.Rows.AddRange(new DevExpress.Utils.Layout.TablePanelRow[] {
             new DevExpress.Utils.Layout.TablePanelRow(DevExpress.Utils.Layout.TablePanelEntityStyle.Absolute, 56.5F),
             new DevExpress.Utils.Layout.TablePanelRow(DevExpress.Utils.Layout.TablePanelEntityStyle.Absolute, 26F)});
-            this.tablePanel1.Size = new System.Drawing.Size(2135, 1202);
+            this.tablePanel1.Size = new System.Drawing.Size(1128, 640);
             this.tablePanel1.TabIndex = 0;
             // 
             // labelControl5
@@ -130,10 +133,11 @@
             this.labelControl5.Appearance.Font = new System.Drawing.Font("Tahoma", 11.875F, System.Drawing.FontStyle.Bold);
             this.labelControl5.Appearance.Options.UseFont = true;
             this.tablePanel1.SetColumn(this.labelControl5, 0);
-            this.labelControl5.Location = new System.Drawing.Point(3, 9);
+            this.labelControl5.Location = new System.Drawing.Point(2, 6);
+            this.labelControl5.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.labelControl5.Name = "labelControl5";
             this.tablePanel1.SetRow(this.labelControl5, 0);
-            this.labelControl5.Size = new System.Drawing.Size(347, 39);
+            this.labelControl5.Size = new System.Drawing.Size(218, 24);
             this.labelControl5.TabIndex = 5;
             this.labelControl5.Text = "LEVEL 1 - PRESIDENT";
             // 
@@ -142,10 +146,11 @@
             this.labelControl4.Appearance.Font = new System.Drawing.Font("Tahoma", 11.875F, System.Drawing.FontStyle.Bold);
             this.labelControl4.Appearance.Options.UseFont = true;
             this.tablePanel1.SetColumn(this.labelControl4, 1);
-            this.labelControl4.Location = new System.Drawing.Point(576, 9);
+            this.labelControl4.Location = new System.Drawing.Point(305, 6);
+            this.labelControl4.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.labelControl4.Name = "labelControl4";
             this.tablePanel1.SetRow(this.labelControl4, 0);
-            this.labelControl4.Size = new System.Drawing.Size(201, 39);
+            this.labelControl4.Size = new System.Drawing.Size(126, 24);
             this.labelControl4.TabIndex = 4;
             this.labelControl4.Text = "LEVEL 2 - GL";
             // 
@@ -154,10 +159,11 @@
             this.labelControl2.Appearance.Font = new System.Drawing.Font("Tahoma", 11.875F, System.Drawing.FontStyle.Bold);
             this.labelControl2.Appearance.Options.UseFont = true;
             this.tablePanel1.SetColumn(this.labelControl2, 2);
-            this.labelControl2.Location = new System.Drawing.Point(1097, 9);
+            this.labelControl2.Location = new System.Drawing.Point(580, 6);
+            this.labelControl2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.labelControl2.Name = "labelControl2";
             this.tablePanel1.SetRow(this.labelControl2, 0);
-            this.labelControl2.Size = new System.Drawing.Size(287, 39);
+            this.labelControl2.Size = new System.Drawing.Size(180, 24);
             this.labelControl2.TabIndex = 3;
             this.labelControl2.Text = "LEVEL 3 - LEADER";
             // 
@@ -166,10 +172,11 @@
             this.labelControl1.Appearance.Font = new System.Drawing.Font("Tahoma", 11.875F, System.Drawing.FontStyle.Bold);
             this.labelControl1.Appearance.Options.UseFont = true;
             this.tablePanel1.SetColumn(this.labelControl1, 3);
-            this.labelControl1.Location = new System.Drawing.Point(1617, 9);
+            this.labelControl1.Location = new System.Drawing.Point(855, 6);
+            this.labelControl1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.labelControl1.Name = "labelControl1";
             this.tablePanel1.SetRow(this.labelControl1, 0);
-            this.labelControl1.Size = new System.Drawing.Size(303, 39);
+            this.labelControl1.Size = new System.Drawing.Size(190, 24);
             this.labelControl1.TabIndex = 2;
             this.labelControl1.Text = "LEVEL 4 - MEMBER";
             // 
@@ -178,21 +185,22 @@
             this.tablePanel1.SetColumn(this.panelControl5, 3);
             this.panelControl5.Controls.Add(this.gridControl4);
             this.panelControl5.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelControl5.Location = new System.Drawing.Point(1617, 60);
+            this.panelControl5.Location = new System.Drawing.Point(855, 38);
+            this.panelControl5.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.panelControl5.Name = "panelControl5";
             this.tablePanel1.SetRow(this.panelControl5, 1);
-            this.panelControl5.Size = new System.Drawing.Size(515, 1139);
+            this.panelControl5.Size = new System.Drawing.Size(271, 600);
             this.panelControl5.TabIndex = 1;
             // 
             // gridControl4
             // 
             this.gridControl4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControl4.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(6);
-            this.gridControl4.Location = new System.Drawing.Point(3, 3);
+            this.gridControl4.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.gridControl4.Location = new System.Drawing.Point(2, 2);
             this.gridControl4.MainView = this.gridView4;
-            this.gridControl4.Margin = new System.Windows.Forms.Padding(6);
+            this.gridControl4.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.gridControl4.Name = "gridControl4";
-            this.gridControl4.Size = new System.Drawing.Size(509, 1133);
+            this.gridControl4.Size = new System.Drawing.Size(267, 596);
             this.gridControl4.TabIndex = 2;
             this.gridControl4.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView4});
@@ -204,8 +212,7 @@
             this.gridView4.Appearance.HeaderPanel.Options.UseFont = true;
             this.gridView4.Appearance.Row.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.gridView4.Appearance.Row.Options.UseFont = true;
-            this.gridView4.DetailHeight = 673;
-            this.gridView4.FixedLineWidth = 3;
+            this.gridView4.DetailHeight = 431;
             this.gridView4.GridControl = this.gridControl4;
             this.gridView4.Name = "gridView4";
             this.gridView4.OptionsBehavior.Editable = false;
@@ -218,21 +225,22 @@
             this.tablePanel1.SetColumn(this.panelControl4, 2);
             this.panelControl4.Controls.Add(this.gridControl3);
             this.panelControl4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelControl4.Location = new System.Drawing.Point(1097, 60);
+            this.panelControl4.Location = new System.Drawing.Point(580, 38);
+            this.panelControl4.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.panelControl4.Name = "panelControl4";
             this.tablePanel1.SetRow(this.panelControl4, 1);
-            this.panelControl4.Size = new System.Drawing.Size(515, 1139);
+            this.panelControl4.Size = new System.Drawing.Size(271, 600);
             this.panelControl4.TabIndex = 1;
             // 
             // gridControl3
             // 
             this.gridControl3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControl3.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(6);
-            this.gridControl3.Location = new System.Drawing.Point(3, 3);
+            this.gridControl3.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.gridControl3.Location = new System.Drawing.Point(2, 2);
             this.gridControl3.MainView = this.gridView3;
-            this.gridControl3.Margin = new System.Windows.Forms.Padding(6);
+            this.gridControl3.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.gridControl3.Name = "gridControl3";
-            this.gridControl3.Size = new System.Drawing.Size(509, 1133);
+            this.gridControl3.Size = new System.Drawing.Size(267, 596);
             this.gridControl3.TabIndex = 2;
             this.gridControl3.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView3});
@@ -244,8 +252,7 @@
             this.gridView3.Appearance.HeaderPanel.Options.UseFont = true;
             this.gridView3.Appearance.Row.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.gridView3.Appearance.Row.Options.UseFont = true;
-            this.gridView3.DetailHeight = 673;
-            this.gridView3.FixedLineWidth = 3;
+            this.gridView3.DetailHeight = 431;
             this.gridView3.GridControl = this.gridControl3;
             this.gridView3.Name = "gridView3";
             this.gridView3.OptionsBehavior.Editable = false;
@@ -259,21 +266,22 @@
             this.tablePanel1.SetColumn(this.panelControl3, 1);
             this.panelControl3.Controls.Add(this.gridControl2);
             this.panelControl3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelControl3.Location = new System.Drawing.Point(576, 60);
+            this.panelControl3.Location = new System.Drawing.Point(305, 38);
+            this.panelControl3.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.panelControl3.Name = "panelControl3";
             this.tablePanel1.SetRow(this.panelControl3, 1);
-            this.panelControl3.Size = new System.Drawing.Size(515, 1139);
+            this.panelControl3.Size = new System.Drawing.Size(271, 600);
             this.panelControl3.TabIndex = 1;
             // 
             // gridControl2
             // 
             this.gridControl2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControl2.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(6);
-            this.gridControl2.Location = new System.Drawing.Point(3, 3);
+            this.gridControl2.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.gridControl2.Location = new System.Drawing.Point(2, 2);
             this.gridControl2.MainView = this.gridView2;
-            this.gridControl2.Margin = new System.Windows.Forms.Padding(6);
+            this.gridControl2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.gridControl2.Name = "gridControl2";
-            this.gridControl2.Size = new System.Drawing.Size(509, 1133);
+            this.gridControl2.Size = new System.Drawing.Size(267, 596);
             this.gridControl2.TabIndex = 2;
             this.gridControl2.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView2});
@@ -285,8 +293,7 @@
             this.gridView2.Appearance.HeaderPanel.Options.UseFont = true;
             this.gridView2.Appearance.Row.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.gridView2.Appearance.Row.Options.UseFont = true;
-            this.gridView2.DetailHeight = 673;
-            this.gridView2.FixedLineWidth = 3;
+            this.gridView2.DetailHeight = 431;
             this.gridView2.GridControl = this.gridControl2;
             this.gridView2.Name = "gridView2";
             this.gridView2.OptionsBehavior.Editable = false;
@@ -300,21 +307,22 @@
             this.tablePanel1.SetColumn(this.panelControl2, 0);
             this.panelControl2.Controls.Add(this.gridControl1);
             this.panelControl2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelControl2.Location = new System.Drawing.Point(3, 60);
+            this.panelControl2.Location = new System.Drawing.Point(2, 38);
+            this.panelControl2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.panelControl2.Name = "panelControl2";
             this.tablePanel1.SetRow(this.panelControl2, 1);
-            this.panelControl2.Size = new System.Drawing.Size(567, 1139);
+            this.panelControl2.Size = new System.Drawing.Size(299, 600);
             this.panelControl2.TabIndex = 0;
             // 
             // gridControl1
             // 
             this.gridControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControl1.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(6);
-            this.gridControl1.Location = new System.Drawing.Point(3, 3);
+            this.gridControl1.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.gridControl1.Location = new System.Drawing.Point(2, 2);
             this.gridControl1.MainView = this.gridView1;
-            this.gridControl1.Margin = new System.Windows.Forms.Padding(6);
+            this.gridControl1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.gridControl1.Name = "gridControl1";
-            this.gridControl1.Size = new System.Drawing.Size(561, 1133);
+            this.gridControl1.Size = new System.Drawing.Size(295, 596);
             this.gridControl1.TabIndex = 1;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1});
@@ -326,8 +334,7 @@
             this.gridView1.Appearance.HeaderPanel.Options.UseFont = true;
             this.gridView1.Appearance.Row.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.gridView1.Appearance.Row.Options.UseFont = true;
-            this.gridView1.DetailHeight = 673;
-            this.gridView1.FixedLineWidth = 3;
+            this.gridView1.DetailHeight = 431;
             this.gridView1.GridControl = this.gridControl1;
             this.gridView1.Name = "gridView1";
             this.gridView1.OptionsBehavior.Editable = false;
@@ -342,13 +349,13 @@
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.showPlayersToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(248, 46);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(179, 32);
             // 
             // showPlayersToolStripMenuItem
             // 
             this.showPlayersToolStripMenuItem.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.showPlayersToolStripMenuItem.Name = "showPlayersToolStripMenuItem";
-            this.showPlayersToolStripMenuItem.Size = new System.Drawing.Size(247, 42);
+            this.showPlayersToolStripMenuItem.Size = new System.Drawing.Size(178, 28);
             this.showPlayersToolStripMenuItem.Text = "Show Players";
             this.showPlayersToolStripMenuItem.Click += new System.EventHandler(this.showPlayersToolStripMenuItem_Click);
             // 
@@ -358,13 +365,13 @@
             this.contextMenuStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripMenuItem1});
             this.contextMenuStrip2.Name = "contextMenuStrip1";
-            this.contextMenuStrip2.Size = new System.Drawing.Size(248, 46);
+            this.contextMenuStrip2.Size = new System.Drawing.Size(179, 32);
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(247, 42);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(178, 28);
             this.toolStripMenuItem1.Text = "Show Players";
             this.toolStripMenuItem1.Click += new System.EventHandler(this.toolStripMenuItem1_Click);
             // 
@@ -374,13 +381,13 @@
             this.contextMenuStrip3.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripMenuItem2});
             this.contextMenuStrip3.Name = "contextMenuStrip1";
-            this.contextMenuStrip3.Size = new System.Drawing.Size(248, 46);
+            this.contextMenuStrip3.Size = new System.Drawing.Size(179, 32);
             // 
             // toolStripMenuItem2
             // 
             this.toolStripMenuItem2.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(247, 42);
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(178, 28);
             this.toolStripMenuItem2.Text = "Show Players";
             this.toolStripMenuItem2.Click += new System.EventHandler(this.toolStripMenuItem2_Click);
             // 
@@ -390,23 +397,24 @@
             this.contextMenuStrip4.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripMenuItem3});
             this.contextMenuStrip4.Name = "contextMenuStrip1";
-            this.contextMenuStrip4.Size = new System.Drawing.Size(248, 46);
+            this.contextMenuStrip4.Size = new System.Drawing.Size(179, 32);
             // 
             // toolStripMenuItem3
             // 
             this.toolStripMenuItem3.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-            this.toolStripMenuItem3.Size = new System.Drawing.Size(247, 42);
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(178, 28);
             this.toolStripMenuItem3.Text = "Show Players";
             this.toolStripMenuItem3.Click += new System.EventHandler(this.toolStripMenuItem3_Click);
             // 
             // SampleAccounts
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(2141, 1265);
+            this.ClientSize = new System.Drawing.Size(1132, 680);
             this.Controls.Add(this.panelControl1);
             this.Controls.Add(this.groupControl1);
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "SampleAccounts";
             this.Text = "SampleAccounts";
             this.Load += new System.EventHandler(this.SampleAccounts_Load);

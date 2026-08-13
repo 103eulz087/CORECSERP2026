@@ -12,6 +12,7 @@ using System.Threading;
 using System.Net;
 using System.Web;
 using DevExpress.XtraGrid.Views.Grid;
+using SalesInventorySystem.Classes;
 //using Excel = Microsoft.Office.Interop.Excel;
 
 namespace SalesInventorySystem
@@ -19,19 +20,24 @@ namespace SalesInventorySystem
     public partial class AddOrder : DevExpress.XtraEditors.XtraForm
     { 
         
-        object var = null;
+        object objprodcode = null;
+        object objprodcatname = null;
         private const int portNum = 8888;
         delegate void SetTextCallback(string text);
-        object custkey = null;
-        object srvcid = null,srvccustid=null; 
+        object objcustkey = null;
+        object objcreditmlimit = null;
+        object objbalance = null;
+        object objremaininglimit = null;
+        object srvcid = null,srvccustid=null;
         private const string hostName = "192.168.99.143";
         DataTable table;
+        DataTable serviceTable;
         //string itemno,desc,unitprice,sellingprice,prodname;
         //string number;
         public static string text_to_send="";
         public static string Isconnected = "";
         string company = Database.getSingleQuery("CompanyProfile", "CompanyName <> ''", "CompanyName");
-
+        decimal tot = 0m;
         public AddOrder()
         {
             InitializeComponent();
@@ -118,103 +124,250 @@ namespace SalesInventorySystem
             //MydataGridView1.CurrentCell = MydataGridView1.Rows[MydataGridView1.Rows.Count - 1].Cells[0];
         }
 
+        // Shared by the credit-limit trap and the invoice-lapsing trap: try the branch's remote
+        // approval relay first (Classes/ApprovalRelaySession.cs), falling back to the local
+        // AuthorizedConfirmationFrm flow if the relay isn't connected, the supervisor declines
+        // explicitly returns false immediately, or nobody responds within the timeout.
+        // Returns true if the transaction may proceed, false if it should be blocked.
+        bool RequestOverrideApproval(string alertTitle, string alertMessage, string reason,
+            decimal orderAmount, decimal referenceAmount, string logContext)
+        {
+            bool approved = false;
+
+            Classes.ApprovalRelaySession.Log(
+                $"{logContext}: Client={(Classes.ApprovalRelaySession.Client == null ? "null" : "present")}, " +
+                $"IsConnected={(Classes.ApprovalRelaySession.Client != null && Classes.ApprovalRelaySession.Client.IsConnected)}, " +
+                $"LastError={Classes.ApprovalRelaySession.Client?.LastError}");
+
+            if (Classes.ApprovalRelaySession.Client != null && Classes.ApprovalRelaySession.Client.IsConnected)
+            {
+                DialogResult confirm = BigAlert.Show(alertTitle, alertMessage, MessageBoxIcon.Warning, MessageBoxButtons.YesNo);
+
+                if (confirm == DialogResult.Yes)
+                {
+                    var request = new Classes.ApprovalRequest
+                    {
+                        RequestId = Guid.NewGuid().ToString(),
+                        Branch = Login.assignedBranch,
+                        RequestingUserID = Login.isglobalUserID,
+                        RequestingUserName = Login.Fullname,
+                        MachineName = GlobalVariables.computerName,
+                        CustomerName = txtcustomer.Text,
+                        OrderAmount = orderAmount,
+                        CreditLimit = referenceAmount,
+                        Reason = reason,
+                        RequestedAtUtc = DateTime.UtcNow
+                    };
+
+                    Classes.ApprovalRelaySession.Log($"Sending approval request {request.RequestId} ({reason}) for Branch {request.Branch}, amount {request.OrderAmount:N2}.");
+
+                    DevExpress.XtraSplashScreen.SplashScreenManager.ShowDefaultWaitForm();
+                    DevExpress.XtraSplashScreen.SplashScreenManager.Default.SetWaitFormCaption("Waiting for Supervisor Approval");
+                    DevExpress.XtraSplashScreen.SplashScreenManager.Default.SetWaitFormDescription("Your request has been sent -- waiting for a supervisor to respond...");
+                    Classes.ApprovalResponse response;
+                    try
+                    {
+                        response = Classes.ApprovalRelaySession.Client
+                            .RequestApprovalAsync(request, TimeSpan.FromSeconds(60))
+                            .GetAwaiter().GetResult();
+                    }
+                    finally
+                    {
+                        DevExpress.XtraSplashScreen.SplashScreenManager.CloseDefaultWaitForm();
+                    }
+
+                    Classes.ApprovalRelaySession.Log(response == null
+                        ? $"No response for request {request.RequestId} within timeout."
+                        : $"Response for request {request.RequestId}: {response.Message} by {response.ApproverUserID}.");
+
+                    if (response != null && response.Approved)
+                    {
+                        approved = true;
+                    }
+                    else if (response != null && !response.Approved)
+                    {
+                        XtraMessageBox.Show("The request was declined by " + response.ApproverName + ".");
+                        return false;
+                    }
+                    // response == null -> no reply within the timeout; fall through to the local
+                    // fallback below rather than blocking the cashier.
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            if (!approved)
+            {
+                AuthorizedConfirmationFrm authfrm = new AuthorizedConfirmationFrm();
+                authfrm.ShowDialog(this);
+                if (AuthorizedConfirmationFrm.isconfirmedLogin == true)
+                {
+                    AuthorizedConfirmationFrm.isconfirmedLogin = false;
+                    authfrm.Dispose();
+                    approved = true;
+                    // Supervisor override confirmed -- allow this order despite the trap.
+                }
+                else
+                {
+                    authfrm.Dispose();
+                    return false;
+                }
+            }
+
+            return approved;
+        }
+
+        // Detail text for the invoice-lapsing override prompt -- which invoices, balance, days
+        // overdue. Same Balance>0 + term-exceeded condition as func_checkLapseInvoice (see
+        // SQL/2026-08-09_CheckLapseInvoice_BalanceFilter.sql).
+        string BuildLapsedInvoiceDetail(string custkey)
+        {
+            var sb = new StringBuilder();
+            using (SqlConnection con = Database.getConnection())
+            {
+                con.Open();
+                SqlCommand com = new SqlCommand(
+                    "SELECT TOP 5 t.InvoiceNo, t.Balance, DATEDIFF(DAY, t.TransactionDate, GETDATE()) AS DaysOverdue " +
+                    "FROM TransactionChargeSales t " +
+                    "JOIN Customers c ON c.CustomerKey = t.CustomerKey " +
+                    "WHERE t.CustomerKey = @custkey AND t.Balance > 0 " +
+                    "AND DATEDIFF(DAY, t.TransactionDate, GETDATE()) > c.Term " +
+                    "ORDER BY t.TransactionDate ASC", con);
+                com.Parameters.AddWithValue("@custkey", custkey);
+                using (SqlDataReader reader = com.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        sb.AppendLine("Invoice " + reader["InvoiceNo"] + ": Balance " +
+                            Convert.ToDecimal(reader["Balance"]).ToString("N2") + ", " +
+                            reader["DaysOverdue"] + " day(s) overdue");
+                    }
+                }
+            }
+            return sb.ToString();
+        }
+
         void add2()
         {
             try
             {
-                var row = Database.getMultipleQuery("Customers", "CustomerName='" + txtcustomer.Text + "'", "CustomerID,isActive");
-                string custid = row["CustomerID"].ToString();// Database.getSingleQuery("Customers", "CustomerName='" + txtcustomer.Text + "'", "CustomerID");//Classes.ClientAccount.getClientID(txtcust.Text);
-                string isactive = row["isActive"].ToString();//Database.getSingleQuery("Customers", "CustomerName='" + txtcustomer.Text + "'", "isActive");//Classes.ClientAccount.getClientID(txtcust.Text);
-                string lapseTerm = Database.getSingleQuery("SalesSettings", "EnableInvoiceLapsingTerm is not null", "EnableInvoiceLapsingTerm");
-                string reamrks = "",specialprice="",sellingprice="";
-                string prodcatcode = Classes.Product.getProductCategoryCode(txtprodcat.Text);
-                //string itemcode = Database.getSingleQuery("Products", "Description='" + txtpname.Text + "' and ProductCategoryCode='" + prodcatcode + "' and BranchCode='888'", "ProductCode");
-                string itemcode = Classes.Product.getProductCode(txtpname.Text, prodcatcode);
-                string rs =Database.getSingleResultSet("SELECT dbo.func_checkLapseInvoice('" + custid + "')");
+                //var row = Database.getMultipleQuery("Customers", "CustomerName='" + txtcustomer.Text + "'", "CustomerID,isActive,CustomerCreditLimit");
+                string custid =  objcustkey.ToString();
+                string creditlimit = objcreditmlimit.ToString();
+                string balance = objbalance.ToString();
+                string remaininglimit = objremaininglimit.ToString();
 
+                //string custid = row["CustomerID"].ToString();
+                //string isactive = row["isActive"].ToString();//Database.getSingleQuery("Customers", "CustomerName='" + txtcustomer.Text + "'", "isActive");//Classes.ClientAccount.getClientID(txtcust.Text);
+                //string creditlimit = row["CustomerCreditLimit"].ToString();//Database.getSingleQuery("Customers", "CustomerName='" + txtcustomer.Text + "'", "isActive");//Classes.ClientAccount.getClientID(txtcust.Text);
+                string lapseTerm = Database.getSingleQuery("SalesSettings", "EnableInvoiceLapsingTerm is not null", "EnableInvoiceLapsingTerm");
+                string reamrks = "",specialprice="",sellingprice=""; 
+                //string itemcode = Database.getSingleQuery("Products", "DescriBption='" + txtpname.Text + "' and ProductCategoryCode='" + prodcatcode + "' and BranchCode='888'", "ProductCode");
+                string itemcode = objprodcode.ToString();
+                string rs =Database.getSingleResultSet("SELECT dbo.func_checkLapseInvoice('" + custid + "')");
+                decimal totalamount = 0;                                               
+               
 
                 //if (Login.assignedBranch == "888")
                 //{
-                    if(checkBox1.Checked==true)
-                    {
-                        reamrks = richTextBox1.Text.Trim();
-                    }
-                    else
-                    {
-                        reamrks = Database.getSingleQuery("CustomerProductSetting", "ProductCode = '" + itemcode + "' AND CustID='" + custid + "' ", "Remarks");
-                    }
-                    //check if item exist in customer table
-                    // bool prodexist = Database.checkifExist("SELECT * FROM Customers WHERE ItemCode = '" + itemcode + "' AND CustomerID='" + custid + "' ");// Database.getSingleQuery("Customers","ItemCode = '"+Classes.Product.getProductCode(txtprodname.Text,prodcatcode)+"',"sdd");
-                    bool prodexist = Database.checkifExist("SELECT 1 FROM view_custprodsettings WHERE ProductCode = '" + itemcode + "' AND CustID='" + custid + "' ");// Database.getSingleQuery("Customers","ItemCode = '"+Classes.Product.getProductCode(txtprodname.Text,prodcatcode)+"',"sdd");
+                 if(checkBox1.Checked==true)
+                 {
+                     reamrks = txtItemRemarks.Text.Trim();
+                 }
+                 else
+                 {
+                     reamrks = Database.getSingleQuery("CustomerProductSetting", "ProductCode = '" + itemcode + "' AND CustID='" + custid + "' ", "Remarks");
+                 }
+                 //check if item exist in customer table
+                 // bool prodexist = Database.checkifExist("SELECT * FROM Customers WHERE ItemCode = '" + itemcode + "' AND CustomerID='" + custid + "' ");// Database.getSingleQuery("Customers","ItemCode = '"+Classes.Product.getProductCode(txtprodname.Text,prodcatcode)+"',"sdd");
+                 bool prodexist = Database.checkifExist("SELECT 1 FROM view_custprodsettings WHERE ProductCode = '" + itemcode + "' AND CustID='" + custid + "' ");// Database.getSingleQuery("Customers","ItemCode = '"+Classes.Product.getProductCode(txtprodname.Text,prodcatcode)+"',"sdd");
 
-                    //reamrks = Database.getSingleQuery("Customers", "ItemCode = '" + itemcode + "' AND CustomerID='" + custid + "' ", "Remarks");
-                    //specialprice = Database.getSingleQuery("Customers", "ItemCode = '" + itemcode + "' AND CustomerID='" + custid + "' ", "SpecialPriceAmount");
+                 //reamrks = Database.getSingleQuery("Customers", "ItemCode = '" + itemcode + "' AND CustomerID='" + custid + "' ", "Remarks");
+                 //specialprice = Database.getSingleQuery("Customers", "ItemCode = '" + itemcode + "' AND CustomerID='" + custid + "' ", "SpecialPriceAmount");
+                 if (chckspecialprice.Checked == true)
+                 {
+                     specialprice = Database.getSingleQuery("CustomerProductSetting", "ProductCode = '" + itemcode + "' AND CustID='" + custid + "' ", "SpecialPriceAmount");
+                     if (String.IsNullOrEmpty(specialprice))
+                     {
+                         XtraMessageBox.Show("Please check your customer product settings.. No Special Price defined");
+                         return;
+                     }
+                     else
+                     {
+                         sellingprice = specialprice;
+                     }
 
-                    if (Convert.ToBoolean(lapseTerm) == true)
-                    {
-                        if (Convert.ToInt32(rs) > 0)
-                        {
-                            XtraMessageBox.Show("The System found out that One of these Invoices are already in lapse in term.. Please Visit this Account and Settle first all pastdue invoice/s...");
-                            return;
-                        }
-                    }
+                 }
+                 else
+                 {
+                     sellingprice = Database.getSingleQuery("Products", "ProductCode = '" + itemcode + "' AND BranchCode='" + Login.assignedBranch + "' ", "SellingPrice");
+                 }
 
-                    if (chckspecialprice.Checked == true)
-                    {
-                        specialprice = Database.getSingleQuery("CustomerProductSetting", "ProductCode = '" + itemcode + "' AND CustID='" + custid + "' ", "SpecialPriceAmount");
-                        if (String.IsNullOrEmpty(specialprice))
-                        {
-                            XtraMessageBox.Show("Please check your customer product settings.. No Special Price defined");
-                            return;
-                        }
-                        else
-                        {
-                            sellingprice = specialprice;
-                        }
-                           
-                    }
-                    else
-                    {
-                        sellingprice = Database.getSingleQuery("Products", "ProductCode = '" + itemcode + "' AND BranchCode='" + Login.assignedBranch + "' ", "SellingPrice");
-                    }
+                //decimal overalltotal = 0m;
+                totalamount = (Convert.ToDecimal(txtqty.Text) * Convert.ToDecimal(sellingprice));
 
-                    //specialprice = Database.getSingleQuery("CustomerProductSetting", "ProductCode = '" + itemcode + "' AND CustID='" + custid + "' ", "SpecialPriceAmount");
-                    //sellingprice = specialprice;
-                    //if (String.IsNullOrEmpty(specialprice) && chckspecialprice.Checked==true)
-                    //{
-                    //    XtraMessageBox.Show("Please check your customer product settings.. No Special Price defined");
-                    //    return;
-                    //}
-                    //else if (String.IsNullOrEmpty(specialprice) && chckspecialprice.Checked == false)
-                    //{
-                    //    sellingprice = Database.getSingleQuery("Products", "ProductCode = '" + itemcode + "' AND BranchCode='" + Login.assignedBranch + "' ", "SellingPrice");
-                    //}
-                //}
-                //else
+                if (Convert.ToBoolean(lapseTerm) == true)
+                 {
+                     if (Convert.ToInt32(rs) > 0)
+                     {
+                         string lapseDetail = BuildLapsedInvoiceDetail(custid);
+                         bool lapseOk = RequestOverrideApproval(
+                             "INVOICE LAPSING DETECTED",
+                             "The System found out that one or more invoices for this customer are already past their credit term.\n\n" +
+                             lapseDetail + "\nIf you want to continue, get it approved by your supervisor.",
+                             "Invoice lapsing term exceeded on Sales Order",
+                             totalamount, 0m,
+                             $"Invoice lapse trapped for customer {custid}, PO {textEdit1.Text}");
+                         if (!lapseOk)
+                             return;
+                     }
+                 }
+                //for (int i = 0;i<=gridView1.RowCount-1;i++)
                 //{
-                //    reamrks = richTextBox1.Text.Trim();
-                //    sellingprice = Database.getSingleQuery("Products", "ProductCode = '" + itemcode + "' AND BranchCode='" + Login.assignedBranch + "' ", "SellingPrice");
+                //    overalltotal += Convert.ToDecimal(gridView1.GetRowCellValue(i,"Qty").ToString()) * Convert.ToDecimal(gridView1.GetRowCellValue(i, "SellingPrice").ToString());
                 //}
-                //if realtime inventory.. global settings
-                if(chckfinal.Checked.Equals(true))
-                {
-                    if (Convert.ToInt32(txtqty.Text) > Database.getTotalSummation2("Inventory", "Branch='" + Login.assignedBranch + "' and Available > 0 and Product='" + getProductCode() + "' ", "Available"))
-                    {
-                        XtraMessageBox.Show("The System found out that the Quantity you Entered is Greater than your Inventory Stocks..");
-                        return;
-                    }
-                    else
-                    {
-                        Database.ExecuteQuery($"EXEC dbo.sp_FiFoMapping '{DateTime.Now.ToShortDateString()}','{Login.assignedBranch}','{getProductCode()}','{txtqty.Text}','1' ");
-                    }
-                }
+                //double getCurrentBalance = Database.getTotalSummation2("ClientAccounts", "AccountID='" + custid + "'", "AccountBalance");
+                tot += totalamount;
+                string amountPending = Database.getSingleResultSet($"SELECT dbo.[func_getTotalAmountOfPendingPO]('{textEdit1.Text}','{custid}')");
+                decimal outstandinglimitbalance = (Convert.ToDecimal(remaininglimit) - Convert.ToDecimal(amountPending));
+                // EnableCreditLimit gate was missing here -- addServices()/other flows in this same
+                // file already check it before enforcing the limit; this one didn't, so the credit
+                // limit was always enforced regardless of the setting.
+                string enableCreditLimit = Database.getSingleQuery("SalesSettings", "EnableCreditLimit is not null", "EnableCreditLimit");
+                if (Convert.ToBoolean(enableCreditLimit) == true && tot > outstandinglimitbalance)
+                 {
+                     bool creditOk = RequestOverrideApproval(
+                         "CREDIT LIMIT REACHED",
+                         "The customer has reached their credit limit. The remaining limit is only " + remaininglimit +
+                         ".\n\nIf you want to continue, get it approved by your supervisor.",
+                         "Credit limit exceeded on Sales Order",
+                         tot, Convert.ToDecimal(remaininglimit),
+                         $"Credit limit trapped for PO {textEdit1.Text}");
+                     if (!creditOk)
+                         return;
+                 }
+
+                //if(chckfinal.Checked.Equals(true))
+                //{
+                //    if (Convert.ToInt32(txtqty.Text) > Database.getTotalSummation2("Inventory", "Branch='" + Login.assignedBranch + "' and Available > 0 and Product='" + getProductCode() + "' ", "Available"))
+                //    {
+                //        XtraMessageBox.Show("The System found out that the Quantity you Entered is Greater than your Inventory Stocks..");
+                //        return;
+                //    }
+                //    else
+                //    {
+                //        Database.ExecuteQuery($"EXEC dbo.sp_FiFoMapping '{DateTime.Now.ToShortDateString()}','{Login.assignedBranch}','{getProductCode()}','{txtqty.Text}','1' ");
+                //    }
+                //}
                 //string itemremarks = richTextBox1.Text.Trim();
               
                 string prodcode = Database.getSingleQuery("Products", "Description='" + txtpname.Text + "'", "ProductCode");
                 DataRow newRow = table.NewRow();
                 //newRow["PONumber"] = textEdit1.Text;
                 //newRow["BranchCode"] = Login.assignedBranch;
-                newRow["ProductCode"] = getProductCode();
+                newRow["ProductCode"] = objprodcode.ToString();
                 newRow["ProductName"] = txtpname.Text;
                 newRow["Qty"] = txtqty.Text;
                 newRow["Units"] = comboBox1.Text;
@@ -226,7 +379,7 @@ namespace SalesInventorySystem
                 gridControl1.DataSource = table;
                 txtqty.Text = "";
                 txtpname.Text = "";
-                richTextBox1.Text = "";
+                txtItemRemarks.Text = "";
                 txtpname.Focus();
             }
             catch(Exception ex)
@@ -240,43 +393,45 @@ namespace SalesInventorySystem
             try
             {
 
-                string custid = Database.getSingleQuery("Customers", "CustomerName='" + txtcustomersservices.Text + "'", "CustomerID");//Classes.ClientAccount.getClientID(txtcust.Text);
-                string isactive = Database.getSingleQuery("Customers", "CustomerName='" + txtcustomersservices.Text + "'", "isActive");//Classes.ClientAccount.getClientID(txtcust.Text);
+                string custkey = srvccustid?.ToString() ?? "";
                 string lapseTerm = Database.getSingleQuery("SalesSettings", "EnableInvoiceLapsingTerm is not null", "EnableInvoiceLapsingTerm");
 
-                //string itemcode = Database.getSingleQuery("Products", "Description='" + txtpname.Text + "' and ProductCategoryCode='" + prodcatcode + "' and BranchCode='888'", "ProductCode");
                 string sellingprice = "";
-                string rs = Database.getSingleResultSet("SELECT dbo.func_checkLapseInvoice('" + custid + "')");
+                string rs = Database.getSingleResultSet("SELECT dbo.func_checkLapseInvoice('" + custkey + "')");
 
 
                 if (Login.assignedBranch == "888")
                 {
-                    
-                    
+                    sellingprice = Database.getSingleQuery("CustomerProductSetting", "ProductCode = '" + srvcid + "' AND CustID='"+srvccustid+"'  ", "SpecialPriceAmount");
+
                     if (Convert.ToBoolean(lapseTerm) == true)
                     {
                         if (Convert.ToInt32(rs) > 0)
                         {
-                            XtraMessageBox.Show("The System found out that One of these Invoices are already in lapse in term.. Please Visit this Account and Settle first all pastdue invoice/s...");
-                            return;
+                            decimal svcAmount = Convert.ToDecimal(txtqtyservices.Text) * Convert.ToDecimal(sellingprice);
+                            string lapseDetail = BuildLapsedInvoiceDetail(custkey);
+                            bool lapseOk = RequestOverrideApproval(
+                                "INVOICE LAPSING DETECTED",
+                                "The System found out that one or more invoices for this customer are already past their credit term.\n\n" +
+                                lapseDetail + "\nIf you want to continue, get it approved by your supervisor.",
+                                "Invoice lapsing term exceeded on Sales Order (Services)",
+                                svcAmount, 0m,
+                                $"Invoice lapse trapped for customer {custkey}, SVC {txtposervices.Text} (services)");
+                            if (!lapseOk)
+                                return;
                         }
                     }
-
-                    sellingprice = Database.getSingleQuery("CustomerProductSetting", "ProductCode = '" + srvcid + "' AND CustID='"+srvccustid+"'  ", "SpecialPriceAmount");
                 }
               
                  
-                DataRow newRow = table.NewRow();
-                //newRow["PONumber"] = textEdit1.Text;
-                //newRow["BranchCode"] = Login.assignedBranch;
+                DataRow newRow = serviceTable.NewRow();
                 newRow["ServiceCode"] = srvcid;
                 newRow["ServiceName"] = txtservices.Text;
                 newRow["Qty"] = txtqtyservices.Text;
                 newRow["SellingPrice"] = sellingprice;
-               
 
-                table.Rows.Add(newRow);
-                gridControlitem.DataSource = table;
+                serviceTable.Rows.Add(newRow);
+                gridControlitem.DataSource = serviceTable;
                 txtqtyservices.Text = "";
                 txtservices.Text = "";
                 txtservices.Focus();
@@ -296,30 +451,30 @@ namespace SalesInventorySystem
        
         private void AddOrder_Load(object sender, EventArgs e)
         {
-            this.ActiveControl = txtprodcat;
+            //this.ActiveControl = txtprodcat;
             comboBox1.Text = "Kg";
             panel1.Visible = true;
             checkBox1.Visible = true;
             chckspecialprice.Visible = true;
             //if (Login.assignedBranch == "888")
             //{
-                
-            //}
 
+            //}
+           
 
         }
 
 
         void loadMetrics()
-        {
-            Database.displayComboBoxItems("SELECT * FROM Metrics", "Metrics", comboBox1);
+        { 
+            Database.displayDevComboBoxItems("SELECT * FROM Metrics", "Metrics", comboBox1);
         }
       
 
         void populateCustomer(SearchLookUpEdit edit)
         {
             //Database.displayComboBoxItems("SELECT CustomerName FROM Customers", "CustomerName", txtcustomer);
-            Database.displaySearchlookupEdit("Select CustomerKey,CustomerName FROM Customers", edit, "CustomerName", "CustomerName");
+            Database.displaySearchlookupEdit("Select * FROM view_CustomerWithCreditLimit", edit, "CustomerName", "CustomerName");
         }
         
         private void simpleButton2_Click(object sender, EventArgs e)
@@ -351,11 +506,6 @@ namespace SalesInventorySystem
         {
             try
             {
-                int ctr = 1;
-                double totalqty = 0.0;
-                string dateapproved = "", approvedby = "";
-                DateTime dt = DateTime.Now;
-
                 if (panel1.Visible == true)
                 {
                     if (txtcustomer.Enabled == true && txtcustomer.Text == "")
@@ -364,61 +514,51 @@ namespace SalesInventorySystem
                         return;
                     }
                 }
-            
-                dateapproved = "";
-                approvedby = "";
-               
+
+                DataTable lines = new DataTable();
+                lines.Columns.Add("ProductCode", typeof(string));
+                lines.Columns.Add("ProductName", typeof(string));
+                lines.Columns.Add("Qty", typeof(decimal));
+                lines.Columns.Add("Units", typeof(string));
+                lines.Columns.Add("Remarks", typeof(string));
+                lines.Columns.Add("SellingPrice", typeof(decimal));
 
                 for (int i = 0; i <= gridView1.RowCount - 1; i++)
                 {
-                    Database.ExecuteQuery("INSERT INTO PurchaseOrderDetails VALUES( '" + ctr + "','" + textEdit1.Text + "'," +
-                        "'" + gridView1.GetRowCellValue(i, "ProductCode").ToString() + "'," +
-                        "'" + gridView1.GetRowCellValue(i, "ProductName").ToString() + "'," +
-                        "'" + gridView1.GetRowCellValue(i, "Qty").ToString() + "'," +
-                        "'" + gridView1.GetRowCellValue(i, "Units").ToString() + "'," +
-                        "'0'," +
-                        "'" + gridView1.GetRowCellValue(i, "Remarks").ToString() + "'," +
-                        "'" + gridView1.GetRowCellValue(i, "SellingPrice").ToString() + "')");
-                    totalqty += Convert.ToDouble(gridView1.GetRowCellValue(i, "Qty").ToString());
-                    ctr += 1;
+                    lines.Rows.Add(
+                        gridView1.GetRowCellValue(i, "ProductCode").ToString(),
+                        gridView1.GetRowCellValue(i, "ProductName").ToString(),
+                        Convert.ToDecimal(gridView1.GetRowCellValue(i, "Qty")),
+                        gridView1.GetRowCellValue(i, "Units").ToString(),
+                        gridView1.GetRowCellValue(i, "Remarks")?.ToString() ?? "",
+                        Convert.ToDecimal(gridView1.GetRowCellValue(i, "SellingPrice")));
                 }
 
-               
-                string stat = "FOR APPROVAL";
-                if (GlobalCache.CompanyName == "JFC")
+                using (SqlConnection con = Database.getConnection())
                 {
-                    bool isAutoApproved = false;
-                    isAutoApproved = Database.checkifExist("SELECT 1 FROM dbo.ApprovalSettings " +
-                        "WHERE Module='AddSalesOrder' and isAuto=1");
-                    if (isAutoApproved)
-                    {
-                        stat = "APPROVED";
-                    }
+                    con.Open();
+                    SqlCommand com = new SqlCommand("sp_AddSalesOrderRequest", con);
+                    com.CommandType = CommandType.StoredProcedure;
+                    com.Parameters.AddWithValue("@parmpono", textEdit1.Text);
+                    com.Parameters.AddWithValue("@parmcustomerkey", objcustkey.ToString());
+                    com.Parameters.AddWithValue("@parmbranchcode", Login.assignedBranch);
+                    com.Parameters.AddWithValue("@parmeffectivitydate", Convert.ToDateTime(txteffectivedate.Text));
+                    com.Parameters.AddWithValue("@parmrequestedby", Login.Fullname);
+                    com.Parameters.AddWithValue("@parmnotes", txtnote.Text);
+                    com.Parameters.AddWithValue("@parmordertype", ordertype.Text);
+                    com.Parameters.AddWithValue("@parmpaymenttype", txtpaytype.Text);
+                    var tvpParam = com.Parameters.AddWithValue("@Lines", lines);
+                    tvpParam.SqlDbType = SqlDbType.Structured;
+                    tvpParam.TypeName = "dbo.tt_PurchaseOrderLines";
+                    com.ExecuteNonQuery();
                 }
 
-
-                Database.ExecuteQuery("UPDATE PurchaseOrderDetails SET Remarks=Replace(replace(Remarks, char(10), ''), char(13), '') WHERE PONumber='" + textEdit1.Text + "' ");
-                //Database.ExecuteQuery("INSERT INTO PurchaseOrderSummary VALUES('" + textEdit1.Text + "', '" + txtcustomer.Text + "','" + Login.assignedBranch + "','" + totalqty + "','Kg','" + approvalstatus + "','" + String.Format("{0:MM/dd/yyyy}", dt) + "','" + txteffectivedate.Text + "','" + Login.Fullname + "','" + approvedby + "','" + dateapproved + "','" + txtnote.Text + "','','0','0','"+ordertype.Text+"','"+reqtype+"','"+txtpaytype.Text+"')", "Request Successfully Updated!");
-                Database.ExecuteQuery("INSERT INTO PurchaseOrderSummary (PONumber, Customer, BranchCode, Qty, Status, Dateadded, EffectivityDate, RequestedBy, ApprovedBy, DateApproved, Notes, Remarks, isProcess, OrderType, PaymentType)" +
-                    " VALUES('" + textEdit1.Text + "', " +
-                    "'" + custkey+ "'," +
-                    "'" + Login.assignedBranch + "'," +
-                    "'" + totalqty + "','"+ stat + "'," +
-                    "'" + DateTime.Now.ToString() + "'," +
-                    "'" + txteffectivedate.Text + "'," +
-                    "'" + Login.Fullname + "'," +
-                    "'" + approvedby + "'," +
-                    "'" + dateapproved + "'," +
-                    "'" + txtnote.Text + "'," +
-                    "' '," +
-                    "'0'," +
-                    "'" + ordertype.Text + "'," +
-                    "'" + txtpaytype.Text + "')", "Request Successfully Updated!");
                 table.Clear();
                 gridControl1.DataSource = null;
                 gridView1.Columns.Clear();
 
-               
+                XtraMessageBox.Show("Succesfully Saved");
+              
                 Isconnected = "OK";
                 if(chckfinal.Checked.Equals(true))
                 {
@@ -461,11 +601,6 @@ namespace SalesInventorySystem
         {
             try
             {
-                int ctr = 1;
-                double totalqty = 0.0;
-                string dateapproved = "", approvedby = "";
-                DateTime dt = DateTime.Now;
-
                 if (panel1.Visible == true)
                 {
                     if (txtcustomer.Enabled == true && txtcustomer.Text == "")
@@ -475,18 +610,40 @@ namespace SalesInventorySystem
                     }
                 }
 
-                dateapproved = "";
-                approvedby =   "";
+                DataTable lines = new DataTable();
+                lines.Columns.Add("ServiceCode", typeof(string));
+                lines.Columns.Add("ServiceName", typeof(string));
+                lines.Columns.Add("Qty", typeof(decimal));
+                lines.Columns.Add("SellingPrice", typeof(decimal));
 
                 for (int i = 0; i <= gridViewitem.RowCount - 1; i++)
                 {
-                    Database.ExecuteQuery("INSERT INTO PurchaseOrderDetails VALUES( '" + ctr + "','" + txtposervices.Text + "','" + gridViewitem.GetRowCellValue(i, "ServiceCode").ToString() + "','" + gridViewitem.GetRowCellValue(i, "ServiceName").ToString() + "','" + gridViewitem.GetRowCellValue(i, "Qty").ToString() + "',' ','0',' ')");
-                    totalqty += Convert.ToDouble(gridViewitem.GetRowCellValue(i, "Qty").ToString());
-                    ctr += 1;
+                    lines.Rows.Add(
+                        gridViewitem.GetRowCellValue(i, "ServiceCode").ToString(),
+                        gridViewitem.GetRowCellValue(i, "ServiceName").ToString(),
+                        Convert.ToDecimal(gridViewitem.GetRowCellValue(i, "Qty")),
+                        Convert.ToDecimal(gridViewitem.GetRowCellValue(i, "SellingPrice")));
                 }
-                Database.ExecuteQuery("UPDATE PurchaseOrderDetails SET Remarks=Replace(replace(Remarks, char(10), ''), char(13), '') WHERE PONumber='" + txtposervices.Text + "' ");
-                Database.ExecuteQuery("INSERT INTO PurchaseOrderSummary VALUES('" + txtposervices.Text + "', '" + srvccustid.ToString() + "','" + Login.assignedBranch + "','" + totalqty + "','FOR APPROVAL','" + DateTime.Now.ToString() + "',' ','" + Login.Fullname + "','" + approvedby + "','" + dateapproved + "',' ',' ','0','MAIN','" + txtpaytypeservices.Text + "')", "Request Successfully Updated!");
-                table.Clear();
+
+                using (SqlConnection con = Database.getConnection())
+                {
+                    con.Open();
+                    SqlCommand com = new SqlCommand("sp_AddServiceOrderRequest", con);
+                    com.CommandType = CommandType.StoredProcedure;
+                    com.Parameters.AddWithValue("@SVCNumber", txtposervices.Text);
+                    com.Parameters.AddWithValue("@CustomerKey", srvccustid.ToString());
+                    com.Parameters.AddWithValue("@BranchCode", Login.assignedBranch);
+                    com.Parameters.AddWithValue("@PaymentType", txtpaytypeservices.Text);
+                    com.Parameters.AddWithValue("@RequestedBy", Login.Fullname);
+                    var tvpParam = com.Parameters.AddWithValue("@Lines", lines);
+                    tvpParam.SqlDbType = SqlDbType.Structured;
+                    tvpParam.TypeName = "dbo.tt_ServiceOrderLines";
+                    com.ExecuteNonQuery();
+                }
+
+                XtraMessageBox.Show("Request Successfully Updated!");
+
+                serviceTable.Clear();
                 gridControlitem.DataSource = null;
                 gridViewitem.Columns.Clear();
 
@@ -572,34 +729,13 @@ namespace SalesInventorySystem
             //Database.displayComboBoxItems("SELECT Description FROM ProductCategory", "Description", txtprodcat);
         }
 
-        String getProductCategoryCode()
-        {
-            string str;
-            str = Database.getSingleQuery("ProductCategory", "Description='" + txtprodcat.Text.Trim() + "'", "ProductCategoryID");
-            return str;
-        }
-
-        String getProductCode()
-        {
-            string str;
-            str = Database.getSingleQuery("Products", "Description='" + txtpname.Text.Trim() + "' AND ProductCategoryCode='"+getProductCategoryCode()+"'", "ProductCode");
-            return str;
-        }
-
+       
         private void txtprodname_SelectedIndexChanged(object sender, EventArgs e)
         {
             txtqty.Focus();
         }
 
-        private void txtprodcat_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            txtpname.Text="";
-            Database.displaySearchlookupEdit("SELECT ProductCode,Description FROM Products WHERE BranchCode='" + Login.assignedBranch + "' and ProductCategoryCode='" + getProductCategoryCode() + "'", txtpname, "Description", "Description");
-            
-            txtpname.Focus();
-        }
-
-      
+        
        
         private void simpleButton6_Click(object sender, EventArgs e)
         {
@@ -682,9 +818,9 @@ namespace SalesInventorySystem
         private void simpleButton8_Click(object sender, EventArgs e)
         {
             textEdit1.Text = IDGenerator.getIDNumberSP("sp_GetPurchaseOrderNumber", "PONumber"); //IDGenerator.getPONumber();
-            txtprodcat.Enabled = true;
+            
             txtpname.Enabled = true;
-            txtprodcat.Focus();
+            
 
             populateCustomer(txtcustomer);
             loadMetrics();
@@ -704,13 +840,14 @@ namespace SalesInventorySystem
 
         private void txtpname_EditValueChanged(object sender, EventArgs e)
         {
-            var = SearchLookUpClass.getSingleValue(txtpname, "ProductCode");
+            objprodcode = SearchLookUpClass.getSingleValue(txtpname, "ProductCode");
+            objprodcatname = SearchLookUpClass.getSingleValue(txtpname, "ProductCategory");
             txtqty.Focus();
         }
 
         private void btnnew_Click(object sender, EventArgs e)
         {
-            Database.displayComboBoxItems("SELECT Description FROM ProductCategory", "Description", txtprodcat);
+            
             table = new DataTable();
             table.Columns.Add("ProductCode");
             table.Columns.Add("ProductName"); //UnitPrice
@@ -722,10 +859,9 @@ namespace SalesInventorySystem
             gridView1.BestFitColumns();
 
             textEdit1.Text = IDGenerator.getIDNumberSP("sp_GetPurchaseOrderNumber", "PONumber"); //IDGenerator.getPONumber();
-            txtprodcat.Enabled = true;
+           
             txtpname.Enabled = true;
-            txtprodcat.Focus();
-
+            Database.displaySearchlookupEdit("SELECT ProductCategory,ProductCode,Description FROM view_Products WHERE BranchCode='" + Login.assignedBranch + "' ", txtpname, "Description", "Description");
             populateCustomer(txtcustomer);
             loadMetrics();
         }
@@ -790,8 +926,9 @@ namespace SalesInventorySystem
         private void btnsave_Click(object sender, EventArgs e)
         {
             string creditlimit = Database.getSingleQuery("Customers", "CustomerName='" + txtcustomer.Text + "'", "CustomerCreditLimit");
-            string accountbalance = Database.getSingleQuery("ClientAccounts", "AccountID='" + Customers.getCustAccountID(txtcustomer.Text) + "'", "AccountBalance");
-            string enableCreditLimit = Database.getSingleQuery("SalesSettings", "EnableCreditLimit is not null", "EnableCreditLimit");
+            //string accountbalance = Database.getSingleQuery("ClientAccounts", "AccountID='" + Customers.getCustAccountID(txtcustomer.Text) + "'", "AccountBalance");
+            string accountbalance = Database.getSingleQuery("ClientAccounts", "AccountKey='" + objcustkey.ToString() + "'", "AccountBalance");
+            string enableCreditLimit = Database.getSingleQuery("SalesSettings", "EnableCreditLimit is not null", "EnableCreditLimit"); //temporary 0 no effect
 
             if (Convert.ToBoolean(enableCreditLimit) == true)
             {
@@ -819,6 +956,7 @@ namespace SalesInventorySystem
             else
             {
                 saveAll();
+                tot = 0;
             }
         }
 
@@ -831,6 +969,7 @@ namespace SalesInventorySystem
             else
             {
                 gridView1.DeleteSelectedRows();
+                tot -= Convert.ToDecimal(gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "Qty").ToString()) * Convert.ToDecimal(gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "SellingPrice").ToString());
             }
         }
 
@@ -878,8 +1017,10 @@ namespace SalesInventorySystem
 
         private void txtcustomer_EditValueChanged(object sender, EventArgs e)
         {
-            custkey = SearchLookUpClass.getSingleValue(txtcustomer, "CustomerKey");
-
+            objcustkey = SearchLookUpClass.getSingleValue(txtcustomer, "CustomerKey");
+            objcreditmlimit = SearchLookUpClass.getSingleValue(txtcustomer, "CreditLimit");
+            objbalance = SearchLookUpClass.getSingleValue(txtcustomer, "Balance");
+            objremaininglimit = SearchLookUpClass.getSingleValue(txtcustomer, "RemainingLimit");
         }
 
         void populateServices()
@@ -888,12 +1029,12 @@ namespace SalesInventorySystem
         }
         private void btnnewservices_Click(object sender, EventArgs e)
         {
-            table = new DataTable();
-            table.Columns.Add("ServiceCode");
-            table.Columns.Add("ServiceName"); //UnitPrice
-            table.Columns.Add("Qty"); //Total UnitPrice * weight
-            table.Columns.Add("SellingPrice"); 
-            gridControlitem.DataSource = table;
+            serviceTable = new DataTable();
+            serviceTable.Columns.Add("ServiceCode");
+            serviceTable.Columns.Add("ServiceName"); //UnitPrice
+            serviceTable.Columns.Add("Qty"); //Total UnitPrice * weight
+            serviceTable.Columns.Add("SellingPrice");
+            gridControlitem.DataSource = serviceTable;
             gridViewitem.BestFitColumns();
 
             txtposervices.Text = IDGenerator.getIDNumberSP("sp_GetPurchaseOrderNumber", "PONumber"); //IDGenerator.getPONumber();
@@ -1034,6 +1175,12 @@ namespace SalesInventorySystem
             {
                 e.Cancel = true;
             }
+        }
+
+        private void txtqty_KeyDown_1(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+                btnadd.PerformClick();
         }
 
         private void txtcustomersservices_EditValueChanged(object sender, EventArgs e)

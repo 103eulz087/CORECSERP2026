@@ -30,7 +30,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             public long BatchReferenceID { get; set; }
             public string BranchCode { get; set; }
             public string InvoiceNo { get; set; }
-            public string SequenceReferenceNumber { get; set; }
+            //public string SequenceReferenceNumber { get; set; }
             public DateTime InvoiceDate { get; set; }
             public decimal ActualCost { get; set; }
             public decimal AmountPaid { get; set; }
@@ -38,12 +38,16 @@ namespace SalesInventorySystem.HOFormsDevEx
             public decimal DiscountAmount { get; set; }
             public decimal EWTAmount { get; set; }
             public decimal ReturnAllowances { get; set; }
+
+            public decimal Variance { get; set; }   // NEW
             public decimal OffsetAmount { get; set; }
             public string Description { get; set; }
         }
-
+        private bool _isRecalculating = false;
         private int _loadedYear = 0;
+        private int _loadedMonth = 0;
         private int _currentYearSequence = 0;
+        private int _currentMonthSequence = 0;
         private void GenerateVoucherNumber()
         {
             // 1. Ensure we have a date selected before building the prefix
@@ -63,13 +67,20 @@ namespace SalesInventorySystem.HOFormsDevEx
 
             // 4. Get the incremental sequence for the year
             // We only query the database if the year changes to prevent UI lag
-            if (_loadedYear != year)
+            //if (_loadedYear != year)
+            //{
+            //    //_currentYearSequence = GetNextSequenceForYear(year);
+            //    _currentYearSequence = GetNextSequenceForMonth(year,month);
+            //    _loadedYear = year;
+            //}
+            if (_loadedMonth != month)
             {
                 //_currentYearSequence = GetNextSequenceForYear(year);
-                _currentYearSequence = GetNextSequenceForMonth(year,month);
-                _loadedYear = year;
+                _currentMonthSequence = GetNextSequenceForMonth(year, month);
+                _loadedMonth = month;
             }
-            string seq = _currentYearSequence.ToString("D3"); // Pads to 3 digits, e.g., "006"
+            //string seq = _currentYearSequence.ToString("D3"); // Pads to 3 digits, e.g., "006"
+            string seq = _currentMonthSequence.ToString("D3"); // Pads to 3 digits, e.g., "006"
 
             // 5. Get the Bank Code
             // If cmbBank is a SearchLookUpEdit, .Text will grab the display member (e.g., "BDO").
@@ -88,8 +99,21 @@ namespace SalesInventorySystem.HOFormsDevEx
         }
         private string GetLastCheckNo()
         {
-            return Database.getSingleQuery($"SELECT TOP(1) ISNULL(RIGHT(CheckNo,9),'') AS CheckNo FROM dbo.CheckVoucher ORDER BY SequenceNumber DESC", "CheckNo");
+            string sql = @"
+                        SELECT TOP(1) ISNULL(RIGHT(CheckNo,9),'') AS CheckNo
+                        FROM dbo.CheckVoucher
+                        WHERE VoucherID = (SELECT MAX(VoucherID) FROM dbo.CheckVoucher)
+                          AND NotedBy = @NotedBy
+                        ORDER BY SequenceNumber DESC";
+
+            string lastCheckNo = Database.getSingleQuery(sql, "CheckNo",new SqlParameter("@NotedBy", searchLookUpEdit1.EditValue ?? (object)DBNull.Value));
+
+            if (string.IsNullOrEmpty(lastCheckNo))
+                return "100000000";
+
+            return lastCheckNo;
         }
+
         private string GetBank(string AcctCode)
         {
             // Grab the value and safely convert it to a string
@@ -174,9 +198,9 @@ namespace SalesInventorySystem.HOFormsDevEx
                 {
                     SequenceNumber = Convert.ToInt64(gridViewMaster.GetRowCellValue(i, "SequenceNumber") ?? 0),
                     BatchReferenceID = Convert.ToInt64(gridViewMaster.GetRowCellValue(i, "BatchReferenceID") ?? 0),
-                    BranchCode = Convert.ToString(gridViewMaster.GetRowCellValue(i, "BranchCode") ?? ""),
+                    BranchCode = "",//Convert.ToString(gridViewMaster.GetRowCellValue(i, "BranchCode") ?? ""),
                     InvoiceNo = Convert.ToString(gridViewMaster.GetRowCellValue(i, "InvoiceNo") ?? ""),
-                    SequenceReferenceNumber = Convert.ToString(gridViewMaster.GetRowCellValue(i, "SequenceReferenceNumber") ?? ""),
+                    //SequenceReferenceNumber = Convert.ToString(gridViewMaster.GetRowCellValue(i, "SequenceReferenceNumber") ?? ""),
                     InvoiceDate = Convert.ToDateTime(gridViewMaster.GetRowCellValue(i, "InvoiceDate") ?? DateTime.MinValue),
                     ActualCost = Convert.ToDecimal(gridViewMaster.GetRowCellValue(i, "ActualCost") ?? 0m), //NET
                     AmountPaid = Convert.ToDecimal(gridViewMaster.GetRowCellValue(i, "AmountPaid") ?? 0m), //NET
@@ -185,6 +209,7 @@ namespace SalesInventorySystem.HOFormsDevEx
                     EWTAmount = Convert.ToDecimal(gridViewMaster.GetRowCellValue(i, "EWTAmount") ?? 0m),
                     ReturnAllowances = Convert.ToDecimal(gridViewMaster.GetRowCellValue(i, "ReturnAllowances") ?? 0m),
                     OffsetAmount = Convert.ToDecimal(gridViewMaster.GetRowCellValue(i, "OffsetAmount") ?? 0m),
+                    Variance = Convert.ToDecimal(gridViewMaster.GetRowCellValue(i, "Variance") ?? 0m),   // NEW
                     Description = Convert.ToString(gridViewMaster.GetRowCellValue(i, "Description") ?? "")
                 });
             }
@@ -237,10 +262,17 @@ namespace SalesInventorySystem.HOFormsDevEx
             if (radCashVoucher.Checked == true)
             {
                 panelCheckVoucher.Visible = false;
+                paneltelegraphic.Visible = true;
             }
             else if (radCheckVoucher.Checked == true)
             {
                 panelCheckVoucher.Visible = true;
+                paneltelegraphic.Visible = false;
+            }
+            else if (radtelegraphic.Checked == true)
+            {
+                panelCheckVoucher.Visible = false;
+                paneltelegraphic.Visible = true;
             }
         }
 
@@ -262,14 +294,82 @@ namespace SalesInventorySystem.HOFormsDevEx
             Database.displayRepositorySearchlookupEdit("SELECT AccountCode,Description FROM ChartOfAccounts WHERE AccountType='D'", repositoryItemSearchLookUpEditoffsetCreditGLCode, "AccountCode", "AccountCode");
             Database.displayRepositorySearchlookupEdit("SELECT AccountCode,Description FROM ChartOfAccounts WHERE AccountType='D'", repositoryItemSearchLookUpEditdiscountglcode, "AccountCode", "AccountCode");
         }
-        
+
+        //private void btnadd_Click(object sender, EventArgs e)
+        //{
+
+        //    var lines = GetSelectedLines();
+        //    if (lines.Count == 0)
+        //    {
+        //        XtraMessageBox.Show("No Payments Executed!");
+        //        return;
+        //    }
+
+        //    if (radCheckVoucher.Checked && (String.IsNullOrEmpty(txtcheckno.Text) || String.IsNullOrEmpty(txtcheckdate.Text)))
+        //    {
+        //        XtraMessageBox.Show("Control No and Date must not Empty");
+        //        return;
+        //    }
+        //    else if (radCashVoucher.Checked && (String.IsNullOrEmpty(txtctrlno.Text) || String.IsNullOrEmpty(txtdate.Text)))
+        //    {
+        //        XtraMessageBox.Show("Control No and Date must not Empty");
+        //        return;
+        //    }
+        //    else if (radtelegraphic.Checked && (String.IsNullOrEmpty(txtctrlno.Text) || String.IsNullOrEmpty(txtdate.Text)))
+        //    {
+        //        XtraMessageBox.Show("Control No and Date must not Empty");
+        //        return;
+        //    }
+        //    // validate totals per invoice
+        //    foreach (var ln in lines)
+        //    {
+        //        decimal balance = Convert.ToDecimal(
+        //            gridViewMaster.GetRowCellValue(
+        //                gridViewMaster.LocateByValue("InvoiceNo", ln.InvoiceNo), "Balance") ?? 0m);
+
+        //        var total = ln.AmountPaid + ln.EWTAmount + ln.DiscountAmount + ln.ReturnAllowances;
+        //        if (total > ln.Balance)
+        //        {
+        //            XtraMessageBox.Show($"Invoice {ln.InvoiceNo}: total payment exceeds balance.");
+        //            return;
+        //        }
+
+        //    }
+
+        //    PostSupplierPayment(lines); // ONE call
+        //    populate();
+
+        //    txtctrlno.Text = "";
+        //    txtdate.Text = "";
+
+        //    txtlastchecknum.Text = "";
+        //    txtcheckno.Text = "";
+        //    txtcheckcoding.Text = "";
+        //    txtcheckdate.Text = "";
+        //    searchLookUpEdit1.Text = "";
+        //}
+
         private void btnadd_Click(object sender, EventArgs e)
         {
-
             var lines = GetSelectedLines();
             if (lines.Count == 0)
             {
                 XtraMessageBox.Show("No Payments Executed!");
+                return;
+            }
+            if (radCheckVoucher.Checked && (String.IsNullOrEmpty(txtcheckno.Text) || String.IsNullOrEmpty(txtcheckdate.Text)))
+            {
+                XtraMessageBox.Show("Control No and Date must not Empty");
+                return;
+            }
+            else if (radCashVoucher.Checked && (String.IsNullOrEmpty(txtctrlno.Text) || String.IsNullOrEmpty(txtdate.Text)))
+            {
+                XtraMessageBox.Show("Control No and Date must not Empty");
+                return;
+            }
+            else if (radtelegraphic.Checked && (String.IsNullOrEmpty(txtctrlno.Text) || String.IsNullOrEmpty(txtdate.Text)))
+            {
+                XtraMessageBox.Show("Control No and Date must not Empty");
                 return;
             }
 
@@ -281,17 +381,24 @@ namespace SalesInventorySystem.HOFormsDevEx
                         gridViewMaster.LocateByValue("InvoiceNo", ln.InvoiceNo), "Balance") ?? 0m);
 
                 var total = ln.AmountPaid + ln.EWTAmount + ln.DiscountAmount + ln.ReturnAllowances;
-                if (total > ln.Balance)
+
+                // CHANGED: compare against Balance + Variance, not Balance alone -
+                // that's what "total" now actually reconciles to
+                var expectedTotal = ln.Balance + ln.Variance;
+
+                if (Math.Abs(total - expectedTotal) > 0.01m)
                 {
-                    XtraMessageBox.Show($"Invoice {ln.InvoiceNo}: total payment exceeds balance.");
+                    XtraMessageBox.Show($"Invoice {ln.InvoiceNo}: totals don't reconcile - " +
+                        $"AmountPaid+EWT+Discount+Offset ({total:N2}) should equal Balance+Variance ({expectedTotal:N2}).");
                     return;
                 }
-
             }
 
             PostSupplierPayment(lines); // ONE call
             populate();
 
+            txtctrlno.Text = "";
+            txtdate.Text = "";
             txtlastchecknum.Text = "";
             txtcheckno.Text = "";
             txtcheckcoding.Text = "";
@@ -299,7 +406,6 @@ namespace SalesInventorySystem.HOFormsDevEx
             searchLookUpEdit1.Text = "";
         }
 
-        
         private void populate()
         {
             if (!DateTime.TryParse(dateFrom.Text, out var fromDate)) fromDate = DateTime.Today.AddMonths(-1);
@@ -397,6 +503,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             dt.Columns.Add("DiscountAmount", typeof(decimal));
             dt.Columns.Add("ReturnAllowances", typeof(decimal));
             dt.Columns.Add("Description", typeof(string));
+            dt.Columns.Add("Variance", typeof(decimal));   // NEW - must stay last
 
             foreach (var ln in lines)
             {
@@ -411,7 +518,8 @@ namespace SalesInventorySystem.HOFormsDevEx
                     ln.EWTAmount,
                     ln.DiscountAmount,
                     ln.ReturnAllowances,
-                    ln.Description
+                    ln.Description,
+                    ln.Variance                 // NEW - appended last
                 );
               
 
@@ -419,11 +527,24 @@ namespace SalesInventorySystem.HOFormsDevEx
             return dt;
         }
         private void PostSupplierPayment(List<PaymentLine> lines)
-        {
+         {
             // Generate IDs
             _referenceNo = IDGenerator.getIDNumberSP("sp_GetReferenceNumber", "ReferenceNumber");
             _voucherId = IDGenerator.getIDNumberSP("sp_GetVoucherNumber", "TicketNumber");
-            _voucherType = radCheckVoucher.Checked ? "CHECK" : "CASH";
+            if(radCheckVoucher.Checked)
+            {
+                //_voucherType = radCheckVoucher.Checked ? "CHECK" : "CASH";
+                _voucherType = "CHECK";
+            }
+            else if (radCashVoucher.Checked)
+            {
+                _voucherType = "CASH";
+            }
+            else if (radtelegraphic.Checked)
+            {
+                _voucherType = "TELEGRAPHIC";
+            }
+            //_voucherType = radCheckVoucher.Checked ? "CHECK" : "CASH";
             _payMethod = radioButtonPurchase.Checked ? "PURCHASE" : "EXPENSE";
 
             using (var con = Database.getConnection())
@@ -441,10 +562,19 @@ namespace SalesInventorySystem.HOFormsDevEx
                     decimal.Parse(txtamounttopay.Text.Replace(",", ""), CultureInfo.InvariantCulture);
                 cmd.Parameters.Add("@parmcheckcoding", SqlDbType.VarChar, 50).Value = txtcheckcoding.Text.Trim()+txtcheckno.Text.Trim();
                 cmd.Parameters.Add("@parmcheckno", SqlDbType.VarChar, 50).Value = txtcheckno.Text.Trim();
+
+                cmd.Parameters.Add("@parmcontrolno", SqlDbType.VarChar, 50).Value = txtctrlno.Text.Trim();
+               
+                cmd.Parameters.Add("@parmdate", SqlDbType.VarChar, 50).Value =
+                      string.IsNullOrWhiteSpace(txtdate.Text)
+                        ? (object)DBNull.Value
+                        : DateTime.Parse(txtdate.Text);
+
                 cmd.Parameters.Add("@parmcheckdate", SqlDbType.Date).Value =
                     string.IsNullOrWhiteSpace(txtcheckdate.Text)
                         ? (object)DBNull.Value
                         : DateTime.Parse(txtcheckdate.Text);
+
                 cmd.Parameters.Add("@parmcheckremarks", SqlDbType.VarChar, 2000).Value = txtremakrs.Text.Trim();
                 cmd.Parameters.Add("@parmpreparedby", SqlDbType.VarChar, 30).Value = Login.Fullname;
                 cmd.Parameters.Add("@parmglcode", SqlDbType.VarChar, 30).Value = searchLookUpEdit1.Text.Trim();
@@ -515,10 +645,19 @@ namespace SalesInventorySystem.HOFormsDevEx
         private void ResetRowPayment(int rowHandle)
         {
             // Turn off amounts when Pay is unchecked
-            gridViewMaster.SetRowCellValue(rowHandle, "AmountPaid", 0m);
-            gridViewMaster.SetRowCellValue(rowHandle, "DiscountAmount", 0m);
-            gridViewMaster.SetRowCellValue(rowHandle, "EWTAmount", 0m);
-            gridViewMaster.SetRowCellValue(rowHandle, "ReturnAllowances", 0m);
+            _isRecalculating = true;
+            try
+            {
+                gridViewMaster.SetRowCellValue(rowHandle, "AmountPaid", 0m);
+                gridViewMaster.SetRowCellValue(rowHandle, "DiscountAmount", 0m);
+                gridViewMaster.SetRowCellValue(rowHandle, "EWTAmount", 0m);
+                gridViewMaster.SetRowCellValue(rowHandle, "ReturnAllowances", 0m);
+                gridViewMaster.SetRowCellValue(rowHandle, "Variance", 0m);   // NEW
+            }
+            finally
+            {
+                _isRecalculating = false;
+            }
 
             // Optional: reset other fields if you have them
             // gridViewMaster.SetRowCellValue(rowHandle, "Variance", 0m);
@@ -528,13 +667,22 @@ namespace SalesInventorySystem.HOFormsDevEx
         {
             decimal balance = ToDecimal(gridViewMaster.GetRowCellValue(rowHandle, "Balance"));
 
-            // Default values
-            gridViewMaster.SetRowCellValue(rowHandle, "EWTAmount", 0m);
-            gridViewMaster.SetRowCellValue(rowHandle, "DiscountAmount", 0m);
-            gridViewMaster.SetRowCellValue(rowHandle, "ReturnAllowances", 0m);
+            _isRecalculating = true;
+            try
+            {
+                gridViewMaster.SetRowCellValue(rowHandle, "EWTAmount", 0m);
+                gridViewMaster.SetRowCellValue(rowHandle, "DiscountAmount", 0m);
+                gridViewMaster.SetRowCellValue(rowHandle, "ReturnAllowances", 0m);
+                gridViewMaster.SetRowCellValue(rowHandle, "Variance", 0m);   // NEW
 
-            // AmountPaid starts as full balance
-            gridViewMaster.SetRowCellValue(rowHandle, "AmountPaid", balance);
+                // AmountPaid starts as full balance (no variance assumed until
+                // the user actually types a different actual-cash figure)
+                gridViewMaster.SetRowCellValue(rowHandle, "AmountPaid", balance);
+            }
+            finally
+            {
+                _isRecalculating = false;
+            }
         }
         private void RecalculateRowAmount(int rowHandle)
         {
@@ -542,6 +690,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             decimal ewt = ToDecimal(gridViewMaster.GetRowCellValue(rowHandle, "EWTAmount"));
             decimal discount = ToDecimal(gridViewMaster.GetRowCellValue(rowHandle, "DiscountAmount"));
             decimal offset = ToDecimal(gridViewMaster.GetRowCellValue(rowHandle, "ReturnAllowances"));
+            decimal variance = ToDecimal(gridViewMaster.GetRowCellValue(rowHandle, "Variance"));   // NEW
 
             decimal totalDeduction = ewt + discount + offset;
 
@@ -551,16 +700,49 @@ namespace SalesInventorySystem.HOFormsDevEx
                 return;
             }
 
-            decimal newAmount = balance - totalDeduction;
+            // Variance adjusts the expected cash outlay - positive means MORE
+            // cash goes out (FX Loss), negative means LESS (FX Gain)
+            decimal newAmount = balance - totalDeduction + variance;
 
             if (newAmount < 0)
                 newAmount = 0;
 
-            gridViewMaster.SetRowCellValue(rowHandle, "AmountPaid", newAmount);
+            _isRecalculating = true;
+            try
+            {
+                gridViewMaster.SetRowCellValue(rowHandle, "AmountPaid", newAmount);
+            }
+            finally
+            {
+                _isRecalculating = false;
+            }
 
             gridViewMaster.ClearColumnErrors();
         }
 
+        // ── NEW: the reverse direction - user types the actual AmountPaid,
+        //    system back-solves what Variance that implies ──
+        private void RecalculateRowVariance(int rowHandle)
+        {
+            decimal balance = ToDecimal(gridViewMaster.GetRowCellValue(rowHandle, "Balance"));
+            decimal ewt = ToDecimal(gridViewMaster.GetRowCellValue(rowHandle, "EWTAmount"));
+            decimal discount = ToDecimal(gridViewMaster.GetRowCellValue(rowHandle, "DiscountAmount"));
+            decimal offset = ToDecimal(gridViewMaster.GetRowCellValue(rowHandle, "ReturnAllowances"));
+            decimal amountPaid = ToDecimal(gridViewMaster.GetRowCellValue(rowHandle, "AmountPaid"));
+
+            decimal expectedWithoutVariance = balance - ewt - discount - offset;
+            decimal variance = amountPaid - expectedWithoutVariance;
+
+            _isRecalculating = true;
+            try
+            {
+                gridViewMaster.SetRowCellValue(rowHandle, "Variance", variance);
+            }
+            finally
+            {
+                _isRecalculating = false;
+            }
+        }
         private void MoveToNextEditableCell(int rowHandle)
         {
             gridViewMaster.FocusedRowHandle = rowHandle;
@@ -578,6 +760,7 @@ namespace SalesInventorySystem.HOFormsDevEx
 
         private void gridViewMaster_CellValueChanged(object sender, DevExpress.XtraGrid.Views.Base.CellValueChangedEventArgs e)
         {
+            if (_isRecalculating) return;   // NEW - suppress nested/cascading recalculation
 
             string col = e.Column.FieldName;
 
@@ -594,22 +777,19 @@ namespace SalesInventorySystem.HOFormsDevEx
                 return;
             }
 
-            // ✅ Only recalc IF already checked
-            if (col == "EWTAmount" || col == "DiscountAmount" || col == "ReturnAllowances")
-            {
-                if (!ToBool(gridViewMaster.GetRowCellValue(e.RowHandle, "Pay")))
-                    return; // ✅ DO NOTHING if not checked
+            if (!ToBool(gridViewMaster.GetRowCellValue(e.RowHandle, "Pay")))
+                return; // do nothing if row isn't checked for payment
 
+            if (col == "EWTAmount" || col == "DiscountAmount" || col == "ReturnAllowances" || col == "Variance")
+            {
                 RecalculateRowAmount(e.RowHandle);
                 UpdateTotalAmountToPay();
             }
-
-            if (col == "AmountPaid")
+            else if (col == "AmountPaid")
             {
+                RecalculateRowVariance(e.RowHandle);   // NEW - back-solve Variance
                 UpdateTotalAmountToPay();
             }
-
-            
 
         }
 
@@ -697,7 +877,16 @@ namespace SalesInventorySystem.HOFormsDevEx
         {
             populate();
 
-            gridViewMaster.Columns[0].Visible = false; 
+            gridViewMaster.Columns[0].Visible = false;
+
+            gridViewMaster.Columns["ShipmentNo"].Visible = false;
+            gridViewMaster.Columns["BranchCode"].Visible = false;
+            gridViewMaster.Columns["ReferenceNo"].Visible = false;
+            gridViewMaster.Columns["BatchReferenceID"].Visible = false;
+            gridViewMaster.Columns["ReturnAllowances"].Visible = false;
+            gridViewMaster.Columns["Type"].Visible = false;
+
+
             Classes.DevXGridViewSettings.ShowFooterTotal(gridViewMaster, "ActualCost");
              
             if (radioButtonPurchase.Checked == true)
@@ -736,7 +925,7 @@ namespace SalesInventorySystem.HOFormsDevEx
                 xct.xrcaption2.Text = caption2;
                 xct.xrcheckno.Text = txtcheckno.Text;
 
-                xct.PaperKind = System.Drawing.Printing.PaperKind.A4; 
+                xct.PaperKind = (DevExpress.Drawing.Printing.DXPaperKind)System.Drawing.Printing.PaperKind.A4; 
                 double amounttopay = Convert.ToDouble(txtamounttopay.Text);
 
                 string paytype = "";
@@ -804,7 +993,7 @@ namespace SalesInventorySystem.HOFormsDevEx
                 xct.xrcaption1.Text = caption1;
                 xct.xrcaption2.Text = caption2;
 
-                xct.PaperKind = System.Drawing.Printing.PaperKind.A4; 
+                xct.PaperKind = (DevExpress.Drawing.Printing.DXPaperKind)System.Drawing.Printing.PaperKind.A4; 
                 double amounttopay = Convert.ToDouble(txtamounttopay.Text);
 
 
@@ -902,7 +1091,8 @@ namespace SalesInventorySystem.HOFormsDevEx
         private void gridControlMaster_MouseUp(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
-                contextMenuStrip1.Show(gridControlMaster, e.Location);
+                //contextMenuStrip1.Show(gridControlMaster, e.Location);
+                contextMenuShowInvoices.Show(gridControlMaster, e.Location);
         }
 
         void ClearUncheckedPayRows()
@@ -943,6 +1133,24 @@ namespace SalesInventorySystem.HOFormsDevEx
         private void labelControl6_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void showInvoiceDetailsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if(radioButtonExpense.Checked==true)
+            {
+                ViewExpenseDetailsDevEx viewdetdevex = new ViewExpenseDetailsDevEx();
+                viewdetdevex.groupControl1.Visible = false;
+                Database.display($"SELECT * FROM dbo.view_ExpenseMasterDetails with(nolock) " +
+                 $"WHERE BatchReferenceID ='{Convert.ToInt64(gridViewMaster.GetRowCellValue(gridViewMaster.FocusedRowHandle, "BatchReferenceID") ?? 0)}' " +
+                 $"AND InvoiceNo='{Convert.ToString(gridViewMaster.GetRowCellValue(gridViewMaster.FocusedRowHandle, "InvoiceNo") ?? "")}' ", viewdetdevex.gridControl2, viewdetdevex.gridView2);
+                viewdetdevex.ShowDialog(this);
+            }
+        }
+
+        private void radtelegraphic_CheckedChanged(object sender, EventArgs e)
+        {
+            radChanged();
         }
 
         private void btnfilter_Click(object sender, EventArgs e)

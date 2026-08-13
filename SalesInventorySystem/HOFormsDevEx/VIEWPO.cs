@@ -206,19 +206,47 @@ namespace SalesInventorySystem.HOFormsDevEx
             viewpod.txtordertype.Text = view.GetRowCellValue(view.FocusedRowHandle, "OrderType").ToString();
             viewpod.txtbrcode.Text = view.GetRowCellValue(view.FocusedRowHandle, "BranchCode").ToString();
             //Database.display("SELECT ItemCode, FROM view_PODETAILS WHERE ShipmentNo='" + gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "ShipmentNo").ToString() + "' AND SupplierID='" + gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "SupplierID").ToString() + "' and OrderType='" + gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "OrderType").ToString() + "'", viewpod.gridControl2, viewpod.gridView2);
-            Database.display("SELECT * FROM funcview_PODetails('" + view.GetRowCellValue(view.FocusedRowHandle, "ShipmentNo").ToString() + "'" +
+            
+            if(GlobalCache.CompanyName=="JFC")
+            {
+                
+                Database.display("SELECT * FROM funcview_PODetails_JFC('" + view.GetRowCellValue(view.FocusedRowHandle, "ShipmentNo").ToString() + "'" +
                     ",'" + view.GetRowCellValue(view.FocusedRowHandle, "SupplierID").ToString() + "'" +
                     ",'" + view.GetRowCellValue(view.FocusedRowHandle, "OrderType").ToString() + "')"
                     , viewpod.gridControl2, viewpod.gridView2);
+            }
+            else
+            {
+                Database.display("SELECT * FROM funcview_PODetails('" + view.GetRowCellValue(view.FocusedRowHandle, "ShipmentNo").ToString() + "'" +
+                       ",'" + view.GetRowCellValue(view.FocusedRowHandle, "SupplierID").ToString() + "'" +
+                       ",'" + view.GetRowCellValue(view.FocusedRowHandle, "OrderType").ToString() + "')"
+                       , viewpod.gridControl2, viewpod.gridView2);
+            }
+               
             HOFormsDevEx.VIEWPODETAILS.shipmentno = viewpod.txtshipmentno.Text;
             HOFormsDevEx.VIEWPODETAILS.supplierid = viewpod.txtsupplierid.Text;
             viewpod.ShowDialog(this);
             if (VIEWPODETAILS.isdone == true)
             {
-                Database.display("SELECT * FROM funcview_PODetails('" + view.GetRowCellValue(view.FocusedRowHandle, "ShipmentNo").ToString() + "'" +
-                   ",'" + view.GetRowCellValue(view.FocusedRowHandle, "SupplierID").ToString() + "'" +
-                   ",'" + view.GetRowCellValue(view.FocusedRowHandle, "OrderType").ToString() + "')"
-                   , viewpod.gridControl2, viewpod.gridView2);
+                if (GlobalCache.CompanyName == "JFC")
+                {
+
+                    Database.display("SELECT * FROM funcview_PODetails_JFC('" + view.GetRowCellValue(view.FocusedRowHandle, "ShipmentNo").ToString() + "'" +
+                        ",'" + view.GetRowCellValue(view.FocusedRowHandle, "SupplierID").ToString() + "'" +
+                        ",'" + view.GetRowCellValue(view.FocusedRowHandle, "OrderType").ToString() + "')"
+                        , viewpod.gridControl2, viewpod.gridView2);
+                }
+                else
+                {
+                    Database.display("SELECT * FROM funcview_PODetails('" + view.GetRowCellValue(view.FocusedRowHandle, "ShipmentNo").ToString() + "'" +
+                           ",'" + view.GetRowCellValue(view.FocusedRowHandle, "SupplierID").ToString() + "'" +
+                           ",'" + view.GetRowCellValue(view.FocusedRowHandle, "OrderType").ToString() + "')"
+                           , viewpod.gridControl2, viewpod.gridView2);
+                }
+                //Database.display("SELECT * FROM funcview_PODetails('" + view.GetRowCellValue(view.FocusedRowHandle, "ShipmentNo").ToString() + "'" +
+                //   ",'" + view.GetRowCellValue(view.FocusedRowHandle, "SupplierID").ToString() + "'" +
+                //   ",'" + view.GetRowCellValue(view.FocusedRowHandle, "OrderType").ToString() + "')"
+                //   , viewpod.gridControl2, viewpod.gridView2);
                 VIEWPODETAILS.isdone = false;
                 viewpod.Dispose();
                 //filtertab();

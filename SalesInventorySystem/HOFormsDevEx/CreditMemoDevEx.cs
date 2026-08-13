@@ -21,11 +21,16 @@ namespace SalesInventorySystem.HOFormsDevEx
             InitializeComponent();
         }
 
+        static bool IsRowAlreadyReturned(GridView view, int rowHandle)
+        {
+            object val = view.GetRowCellValue(rowHandle, "isReturned");
+            return val != null && val != DBNull.Value && Convert.ToBoolean(val);
+        }
+
         private void gridView4_CellValueChanged(object sender, DevExpress.XtraGrid.Views.Base.CellValueChangedEventArgs e)
         {
             double sellingprice = 0.0,qty=0.0,variance=0.0,actualqty=0.0,total=0.0,totalamount=0.0,discountamount=0.0;
-            bool isReturned = false;
-            //isReturned = Convert.ToBoolean(gridView4.GetRowCellValue(gridView4.FocusedRowHandle, "isReturned").ToString());
+            bool isReturned = IsRowAlreadyReturned((GridView)sender, gridView4.FocusedRowHandle);
             totalamount = Convert.ToDouble(gridView4.GetRowCellValue(gridView4.FocusedRowHandle, "TotalAmount").ToString());
             qty = Convert.ToDouble(gridView4.GetRowCellValue(gridView4.FocusedRowHandle, "QtyDelivered").ToString());
             actualqty = Convert.ToDouble(gridView4.GetRowCellValue(gridView4.FocusedRowHandle, "ActualQty").ToString());
@@ -60,35 +65,7 @@ namespace SalesInventorySystem.HOFormsDevEx
                     XtraMessageBox.Show("Invoice Number must be updated first..please go to Print Delivery Receipt Option!...");
                     return;
                 }
-                //bool isUpdated = false;
-                //for (int i = 0; i <= gridView4.RowCount - 1; i++)
-                //{
-                //    if (Convert.ToDouble(gridView4.GetRowCellValue(i, "Variance").ToString()) != 0)
-                //    {
-                //        isUpdated = true;
-                //        break;
-                //    }
-                //}
-                //if (isUpdated)
-                //{
-                //    XtraMessageBox.Show("The System found out that there are items that already executed");
-                //    return;
-                //}
-                //bool checkReturned = Database.checkifExist("Select isReturned FROM DeliveryDetails WHERE isReturned=1 AND PONumber='" + txtpono.Text + "' and ProductNo='" + txtprodno.Text + "'");
-                //if (checkReturned == true)
-                //{
-                //    XtraMessageBox.Show("This item is already executed as CreditMemo!");
-                //    return;
-                //}
-                for (int i = 0; i <= gridView4.RowCount - 1; i++)
-                {
-                    //Database.ExecuteQuery("Update DeliveryDetails set ActualQty='" + gridView4.GetRowCellValue(i, "ActualQty").ToString() + "',isCreditMemo='1'  WHERE PONumber='" + txtpono.Text + "' and ProductNo='" + gridView4.GetRowCellValue(i, "ProductNo").ToString() + "' and SequenceNo='"+ gridView4.GetRowCellValue(i, "SequenceNo").ToString() + "' and Variance <> 0");
-                    if (Convert.ToDouble(gridView4.GetRowCellValue(i, "Variance").ToString()) != 0)
-                    {
-                        Database.ExecuteQuery("Update DeliveryDetails set ActualQty='" + gridView4.GetRowCellValue(i, "ActualQty").ToString() + "',isCreditMemo='1'  WHERE PONumber='" + txtpono.Text + "' and ProductNo='" + gridView4.GetRowCellValue(i, "ProductNo").ToString() + "' and SeqNo='" + gridView4.GetRowCellValue(i, "SeqNo").ToString() + "' AND isCreditMemo=0");
-                    }
-                }
-                    executeSP();
+                executeSP(BuildCreditMemoLinesTVP());
                 XtraMessageBox.Show("Payment Successfully Posted");
                 //this.Dispose();
                 //button2.PerformClick();
@@ -99,7 +76,34 @@ namespace SalesInventorySystem.HOFormsDevEx
             }
         }
 
-        void executeSP()
+        // Rows the user edited in the grid (Variance <> 0), as the (SeqNo, ProductNo,
+        // ActualQty) TVP sp_CreditMemo now applies server-side -- ActualQty, Variance,
+        // and isCreditMemo are all set together in one statement inside the SP's
+        // transaction, instead of a per-row UPDATE loop from here.
+        DataTable BuildCreditMemoLinesTVP()
+        {
+            DataTable dt = new DataTable();
+            dt.Columns.Add("SeqNo", typeof(decimal));
+            dt.Columns.Add("ProductNo", typeof(string));
+            dt.Columns.Add("ActualQty", typeof(decimal));
+
+            for (int i = 0; i <= gridView4.RowCount - 1; i++)
+            {
+                if (IsRowAlreadyReturned(gridView4, i))
+                    continue;
+
+                if (Convert.ToDouble(gridView4.GetRowCellValue(i, "Variance").ToString()) != 0)
+                {
+                    dt.Rows.Add(
+                        Convert.ToDecimal(gridView4.GetRowCellValue(i, "SeqNo")),
+                        gridView4.GetRowCellValue(i, "ProductNo").ToString(),
+                        Convert.ToDecimal(gridView4.GetRowCellValue(i, "ActualQty")));
+                }
+            }
+            return dt;
+        }
+
+        void executeSP(DataTable lines)
         {
             SqlConnection con = Database.getConnection();
             con.Open();
@@ -110,6 +114,9 @@ namespace SalesInventorySystem.HOFormsDevEx
                 com.Parameters.AddWithValue("@parmpono", txtpono.Text);
                 com.Parameters.AddWithValue("@parmuser", Login.Fullname);
                 com.Parameters.AddWithValue("@parmstat", txtstatus.Text);
+                var tvpParam = com.Parameters.AddWithValue("@Lines", lines);
+                tvpParam.SqlDbType = SqlDbType.Structured;
+                tvpParam.TypeName = "dbo.tt_CreditMemoLines";
                 com.CommandType = CommandType.StoredProcedure;
                 com.CommandText = query;
                 com.ExecuteNonQuery();
@@ -123,13 +130,38 @@ namespace SalesInventorySystem.HOFormsDevEx
                 con.Close();
             }
         }
-       
+
 
         private void gridView4_ShowingEditor(object sender, CancelEventArgs e)
         {
             GridView view = sender as GridView;
             if (view.FocusedColumn.FieldName != "ActualQty")
+            {
                 e.Cancel = true;
+                return;
+            }
+            if (IsRowAlreadyReturned(view, view.FocusedRowHandle))
+            {
+                e.Cancel = true;
+            }
+        }
+
+        // Rows already returned (isReturned=1 in view_CreditMemoDetails) are highlighted red
+        // and can't be edited (see gridView4_ShowingEditor) -- they've already been reversed
+        // via Sales Return, so there's nothing left to adjust here.
+        private void gridView4_RowStyle(object sender, DevExpress.XtraGrid.Views.Grid.RowStyleEventArgs e)
+        {
+            GridView view = sender as GridView;
+            if (e.RowHandle < 0)
+                return;
+
+            if (IsRowAlreadyReturned(view, e.RowHandle))
+            {
+                e.Appearance.BackColor = Color.Red;
+                e.Appearance.BackColor2 = Color.IndianRed;
+                e.Appearance.ForeColor = Color.White;
+                e.HighPriority = true;
+            }
         }
 
         private void CreditMemoDevEx_Load(object sender, EventArgs e)
@@ -233,20 +265,7 @@ namespace SalesInventorySystem.HOFormsDevEx
                     bool confirm = HelperFunction.ConfirmDialog("Are you sure?", "Confirm Transaction");
                     if (confirm)
                     {
-                        for (int i = 0; i <= gridView4.RowCount - 1; i++)
-                        {
-                            //Database.ExecuteQuery("Update DeliveryDetails set ActualQty='" + gridView4.GetRowCellValue(i, "ActualQty").ToString() + "',isCreditMemo='1'  WHERE PONumber='" + txtpono.Text + "' and ProductNo='" + gridView4.GetRowCellValue(i, "ProductNo").ToString() + "' and SequenceNo='"+ gridView4.GetRowCellValue(i, "SequenceNo").ToString() + "' and Variance <> 0");
-                            if (Convert.ToDouble(gridView4.GetRowCellValue(i, "Variance").ToString()) != 0)
-                            {
-                                Database.ExecuteQuery("Update DeliveryDetails set ActualQty='" + gridView4.GetRowCellValue(i, "ActualQty").ToString() + "'" +
-                                    ",isCreditMemo='1'  " +
-                                    "WHERE PONumber='" + txtpono.Text + "' " +
-                                    "and ProductNo='" + gridView4.GetRowCellValue(i, "ProductNo").ToString() + "' " +
-                                    "and SeqNo='" + gridView4.GetRowCellValue(i, "SeqNo").ToString() + "' " +
-                                    "AND isCreditMemo=0");
-                            }
-                        }
-                        executeSP();
+                        executeSP(BuildCreditMemoLinesTVP());
                         XtraMessageBox.Show("Successfully Executed!..");
                     }
                     else

@@ -8,13 +8,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using DevExpress.XtraEditors;
 using DevExpress.XtraGrid.Columns;
 using DevExpress.XtraGrid.Views.Grid;
 using DevExpress.XtraReports.UI;
 
 namespace SalesInventorySystem.Reporting
 {
-    public partial class StocksOrder : Form
+    public partial class StocksOrder : XtraForm
     {
         int totalreceive = 0;
         public static bool isdone = false;
@@ -98,7 +99,7 @@ namespace SalesInventorySystem.Reporting
             xct.xrcaption2.Text = caption2;
 
             xct.Landscape = false;
-            xct.PaperKind = System.Drawing.Printing.PaperKind.A4;
+            xct.PaperKind = (DevExpress.Drawing.Printing.DXPaperKind)System.Drawing.Printing.PaperKind.A4;
             xct.Margins = new System.Drawing.Printing.Margins(100, 100, 100, 100);
 
             string branchname = Database.getSingleQuery("Branches", "BranchCode='" + txtbranch.Text + "'", "BranchName");
@@ -152,11 +153,39 @@ namespace SalesInventorySystem.Reporting
            
         }
 
+        // Which DeliveryNo a given (PONumber, SeqNo) line actually belongs to.
+        // spr_STSSummary (feeding gridView1) doesn't return DeliveryNo per row, and a
+        // single STS PO can span more than one delivery batch, so this can't just be
+        // read from a single form-wide field - it has to be looked up per selected line.
+        string getDeliveryNoForLine(string pono, string seqno)
+        {
+            using (SqlConnection con = Database.getConnection())
+            using (SqlCommand cmd = new SqlCommand(
+                "SELECT DeliveryNo FROM DeliveryDetails WHERE PONumber = @pono AND SeqNo = @seqno", con))
+            {
+                cmd.Parameters.AddWithValue("@pono", pono);
+                cmd.Parameters.AddWithValue("@seqno", Convert.ToDecimal(seqno));
+                con.Open();
+                object result = cmd.ExecuteScalar();
+                return result?.ToString() ?? "";
+            }
+        }
+
         void returnOrder(string devno,string refno,string pono,string prodno,string qty,string brcode,string devseqno)
         {
             SqlConnection con = Database.getConnection();
             con.Open();
-            string query = "sp_CancelDelivery";
+            // sp_ReverseSTSInventoryTransfer wraps sp_CancelDelivery / sp_CancelDeliveryFIFOJFC
+            // (it picks the right one internally via CompanyProfile.CompanyName, same JFC
+            // branching Orders/AddBranchOrderSTS.cs's returnOrder() uses) -- the inventory
+            // refund itself is unchanged. On top of that, if this PO's STS transfer was
+            // actually confirmed (TransferOrderSummary.isProcess=1, set by
+            // sp_ConfirmBranchOrderSTS when AddBranchOrderSTS.cs's Save books the
+            // IT-HO-VAT/IT-HO-VATEX ticket), it also posts the matching ITR-HO-VAT/ITR-HO-VATEX
+            // reversal ticket for exactly the cost of what THIS call actually refunded --
+            // not the whole PO, so returning specific items now and the rest later still
+            // reverses the correct partial amount each time.
+            string query = "sp_ReverseSTSInventoryTransfer";
             try
             {
                 SqlCommand com = new SqlCommand(query, con);
@@ -200,7 +229,22 @@ namespace SalesInventorySystem.Reporting
                     totalreceive = rowHandle;
                     if (rowHandle >= 0)
                     {
-                        returnOrder(txtdevno.Text, "", txtpono.Text, productcode, quantity,txtbranchdestination.Text, seqno);
+                        // txtdevno/txtbranchdestination are never populated by the STS
+                        // "For Delivery" flow that opens this form (showSTSDetails() in
+                        // POForApprovalSTS.cs only sets txtpono/txtbranch/etc.), so those
+                        // were always going in blank - sp_CancelDelivery would match zero
+                        // InventoryDeliveryFIFO rows and silently skip the inventory refund
+                        // while still deleting the DeliveryDetails line (which only needs
+                        // PONumber+SeqNo). Look up the real DeliveryNo per line, and use
+                        // txtbranch (InitiatingBranch, already set correctly) as the branch
+                        // whose inventory gets refunded - same as AddBranchOrderSTS.cs.
+                        string devno = getDeliveryNoForLine(txtpono.Text, seqno);
+                        if (string.IsNullOrEmpty(devno))
+                        {
+                            MessageBox.Show($"Could not find a DeliveryNo for PO {txtpono.Text}, SeqNo {seqno} - skipped, inventory not touched for this line.");
+                            continue;
+                        }
+                        returnOrder(devno, "", txtpono.Text, productcode, quantity, txtbranch.Text, seqno);
                     }
                 }
                 totalreceive = gridView1.SelectedRowsCount;

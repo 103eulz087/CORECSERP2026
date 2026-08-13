@@ -32,76 +32,76 @@ namespace SalesInventorySystem
         private void tabfilter()
         {
 
-            if (tabMain.SelectedTabPage.Equals(tabPending))//if (tabControl1.SelectedTab.Equals(Pending))
-            {
-                //Database.display("SELECT * FROM view_BranchOrder WHERE isProcess = '0' AND Status='APPROVED' and DateApproved >= '" + datefrompending.Text + "' and DateApproved <= '" + datetopending.Text + "'", gridControl1, gridView1);
-                //gridView1.Focus();
-                if (company != "JFC")
-                {
-                    Database.display("SELECT * FROM view_BranchOrder WHERE isProcess = '0' AND Status='APPROVED' and DateApproved >= '" + datefrompending.Text + "' and DateApproved <= '" + datetopending.Text + "'", gridControl1, gridView1);
-                    gridView1.Focus();
-                }
-                else
-                {
-                    if (Login.assignedBranch == "888")
-                    {
-                        Database.display("SELECT * FROM view_BranchOrder WHERE isProcess = '0' AND Status='APPROVED' and DateApproved >= '" + datefrompending.Text + "' and DateApproved <= '" + datetopending.Text + "'  ", gridControl1, gridView1);
-                        gridView1.Focus();
-                    }
-                    else
-                    {
-                        Database.display("SELECT * FROM view_BranchOrder WHERE isProcess = '0' AND Status='APPROVED' and DateApproved >= '" + datefrompending.Text + "' and DateApproved <= '" + datetopending.Text + "' AND RequestType='BranchOrder' AND BranchCode='" + Login.assignedBranch + "'", gridControl1, gridView1);
-                        gridView1.Focus();
-                    }
+            //if (tabMain.SelectedTabPage.Equals(tabPending))//if (tabControl1.SelectedTab.Equals(Pending))
+            //{
+            //    //Database.display("SELECT * FROM view_BranchOrder WHERE isProcess = '0' AND Status='APPROVED' and DateApproved >= '" + datefrompending.Text + "' and DateApproved <= '" + datetopending.Text + "'", gridControl1, gridView1);
+            //    //gridView1.Focus();
+            //    if (company != "JFC")
+            //    {
+            //        Database.display("SELECT * FROM view_BranchOrder WHERE isProcess = '0' AND Status='APPROVED' and DateApproved >= '" + datefrompending.Text + "' and DateApproved <= '" + datetopending.Text + "'", gridControl1, gridView1);
+            //        gridView1.Focus();
+            //    }
+            //    else
+            //    {
+            //        if (Login.assignedBranch == "888")
+            //        {
+            //            Database.display("SELECT * FROM view_BranchOrder WHERE isProcess = '0' AND Status='APPROVED' and DateApproved >= '" + datefrompending.Text + "' and DateApproved <= '" + datetopending.Text + "'  ", gridControl1, gridView1);
+            //            gridView1.Focus();
+            //        }
+            //        else
+            //        {
+            //            Database.display("SELECT * FROM view_BranchOrder WHERE isProcess = '0' AND Status='APPROVED' and DateApproved >= '" + datefrompending.Text + "' and DateApproved <= '" + datetopending.Text + "' AND RequestType='BranchOrder' AND BranchCode='" + Login.assignedBranch + "'", gridControl1, gridView1);
+            //            gridView1.Focus();
+            //        }
 
-                }
-            }
-            else if (tabMain.SelectedTabPage.Equals(tabForDelivery)) //if (tabControl1.SelectedTab.Equals(Approved))
-            {
-                //Database.display("SELECT * FROM view_ForDelivery WHERE Status='FOR DELIVERY' and DateAdded >= '" + datefromfordev.Text + "' and DateAdded <= '" + datetofordev.Text+ "'", gridControl2, gridView2);
-                //gridView2.Focus();
-                if (company != "JFC")
-                {
-                    Database.display("SELECT * FROM view_ForDelivery WHERE Status='FOR DELIVERY' and EffectivityDate >= '" + datefromfordev.Text + "' and EffectivityDate <= '" + datetofordev.Text + "'", gridControl2, gridView2);
-                    gridView2.Focus();
-                }
-                else
-                {
-                    if (Login.assignedBranch == "888")
-                    {
-                        Database.display("SELECT * FROM view_ForDelivery WHERE Status='FOR DELIVERY' and EffectivityDate >= '" + datefromfordev.Text + "' and EffectivityDate <= '" + datetofordev.Text + "' ", gridControl2, gridView2);
-                        gridView2.Focus();
-                    }
-                    else
-                    {
-                        Database.display("SELECT * FROM view_ForDelivery WHERE Status='FOR DELIVERY' and EffectivityDate >= '" + datefromfordev.Text + "' and EffectivityDate <= '" + datetofordev.Text + "' AND BranchCode='" + Login.assignedBranch + "'", gridControl2, gridView2);
-                        gridView2.Focus();
-                    }
-                }
-            }
-            else if (tabMain.SelectedTabPage.Equals(tabRejected))// if (tabControl1.SelectedTab.Equals(Rejected))
-            {
-                //Database.display("SELECT * FROM view_ForDelivery WHERE Status='REJECTED' and DateAdded >= '" + datefromrej.Text + "' and DateAdded <= '" + datetorej.Text + "'", gridControl3, gridView3);
-                //gridView3.Focus();
-                if (company != "JFC")
-                {
-                    Database.display("SELECT * FROM view_ForDelivery WHERE Status='REJECTED' and DateAdded >= '" + datefromrej.Text + "' and DateAdded <= '" + datetorej.Text + "'", gridControl3, gridView3);
-                    gridView3.Focus();
-                }
-                else
-                {
-                    if (Login.assignedBranch == "888")
-                    {
-                        Database.display("SELECT * FROM view_ForDelivery WHERE Status='REJECTED' and DateAdded >= '" + datefromrej.Text + "' and DateAdded <= '" + datetorej.Text + "' ", gridControl3, gridView3);
-                        gridView3.Focus();
-                    }
-                    else
-                    {
-                        Database.display("SELECT * FROM view_ForDelivery WHERE Status='REJECTED' and DateAdded >= '" + datefromrej.Text + "' and DateAdded <= '" + datetorej.Text + "' AND BranchCode='" + Login.assignedBranch + "' AND RequestType='BranchOrder' ", gridControl3, gridView3);
-                        gridView3.Focus();
-                    }
-                }
-            }
+            //    }
+            //}
+            //else if (tabMain.SelectedTabPage.Equals(tabForDelivery)) //if (tabControl1.SelectedTab.Equals(Approved))
+            //{
+            //    //Database.display("SELECT * FROM view_ForDelivery WHERE Status='FOR DELIVERY' and DateAdded >= '" + datefromfordev.Text + "' and DateAdded <= '" + datetofordev.Text+ "'", gridControl2, gridView2);
+            //    //gridView2.Focus();
+            //    if (company != "JFC")
+            //    {
+            //        Database.display("SELECT * FROM view_ForDelivery WHERE Status='FOR DELIVERY' and EffectivityDate >= '" + datefromfordev.Text + "' and EffectivityDate <= '" + datetofordev.Text + "'", gridControl2, gridView2);
+            //        gridView2.Focus();
+            //    }
+            //    else
+            //    {
+            //        if (Login.assignedBranch == "888")
+            //        {
+            //            Database.display("SELECT * FROM view_ForDelivery WHERE Status='FOR DELIVERY' and EffectivityDate >= '" + datefromfordev.Text + "' and EffectivityDate <= '" + datetofordev.Text + "' ", gridControl2, gridView2);
+            //            gridView2.Focus();
+            //        }
+            //        else
+            //        {
+            //            Database.display("SELECT * FROM view_ForDelivery WHERE Status='FOR DELIVERY' and EffectivityDate >= '" + datefromfordev.Text + "' and EffectivityDate <= '" + datetofordev.Text + "' AND BranchCode='" + Login.assignedBranch + "'", gridControl2, gridView2);
+            //            gridView2.Focus();
+            //        }
+            //    }
+            //}
+            //else if (tabMain.SelectedTabPage.Equals(tabRejected))// if (tabControl1.SelectedTab.Equals(Rejected))
+            //{
+            //    //Database.display("SELECT * FROM view_ForDelivery WHERE Status='REJECTED' and DateAdded >= '" + datefromrej.Text + "' and DateAdded <= '" + datetorej.Text + "'", gridControl3, gridView3);
+            //    //gridView3.Focus();
+            //    if (company != "JFC")
+            //    {
+            //        Database.display("SELECT * FROM view_ForDelivery WHERE Status='REJECTED' and DateAdded >= '" + datefromrej.Text + "' and DateAdded <= '" + datetorej.Text + "'", gridControl3, gridView3);
+            //        gridView3.Focus();
+            //    }
+            //    else
+            //    {
+            //        if (Login.assignedBranch == "888")
+            //        {
+            //            Database.display("SELECT * FROM view_ForDelivery WHERE Status='REJECTED' and DateAdded >= '" + datefromrej.Text + "' and DateAdded <= '" + datetorej.Text + "' ", gridControl3, gridView3);
+            //            gridView3.Focus();
+            //        }
+            //        else
+            //        {
+            //            Database.display("SELECT * FROM view_ForDelivery WHERE Status='REJECTED' and DateAdded >= '" + datefromrej.Text + "' and DateAdded <= '" + datetorej.Text + "' AND BranchCode='" + Login.assignedBranch + "' AND RequestType='BranchOrder' ", gridControl3, gridView3);
+            //            gridView3.Focus();
+            //        }
+            //    }
+            //}
            
         }
 
@@ -147,8 +147,8 @@ namespace SalesInventorySystem
                 addbrorder.txteffectivedate.Text = effectivedate;
                 
                 Database.display("SELECT * FROM view_PurchaseOrderDetails WHERE PONumber='" + addbrorder.txtponum.Text + "'", addbrorder.gridControl1, addbrorder.gridView1);
-                Database.display("SELECT SeqNo,ProductNo,BarcodeNo,ProductName,QtyDelivered,Status,ProcessedBy FROM DeliveryDetails WHERE DeliveryNo='" + addbrorder.txtdevno.Text + "' AND PONumber='" + addbrorder.txtponum.Text + "' and Status = 'PENDING'", addbrorder.gridControl2, addbrorder.gridView2);
-                addbrorder.gridView2.Columns["SeqNo"].Visible = false;
+                Database.display($"SELECT * FROM dbo.funcview_ProcessOrderItemsSales('{addbrorder.txtponum.Text}') ORDER BY SeqNo ASC", addbrorder.gridControl2, addbrorder.gridView2);
+                //addbrorder.gridView2.Columns["SeqNo"].Visible = false;
                 addbrorder.gridView1.ExpandAllGroups();
 
                 addbrorder.gridView1.Columns["PONumber"].Summary.Add(DevExpress.Data.SummaryItemType.Count, "PONumber", "{0:n2}");
@@ -158,15 +158,12 @@ namespace SalesInventorySystem
                 {
                     Database.displaySearchlookupEdit($"SELECT * FROM dbo.funcview_populateProductsJFC('{Login.assignedBranch}') " +
                     $"WHERE ProductCode in (Select distinct ProductCode FROM PurchaseOrderDetails WHERE PONumber='{ponumber}')", addbrorder.txtsearchlookupproduct, "Description", "Description");
-
                 }
                 else
                 {
                     Database.displaySearchlookupEdit($"SELECT * FROM dbo.funcview_populateProducts('{Login.assignedBranch}') " +
                      $"WHERE ProductCode in (Select distinct ProductCode FROM PurchaseOrderDetails WHERE PONumber='{ponumber}')", addbrorder.txtsearchlookupproduct, "Description", "Description");
-
                 }
-
             }
             else
             {
@@ -303,7 +300,7 @@ namespace SalesInventorySystem
             //    }
 
             //}
-            Database.display("SELECT * FROM view_BranchOrder WHERE isProcess = '0' AND Status='APPROVED' and EffectivityDate >= '" + datefrompending.Text + "' and EffectivityDate <= '" + datetopending.Text + "'", gridControl1, gridView1);
+            Database.display("SELECT * FROM view_BranchOrder WHERE BranchCode='"+Login.assignedBranch+"' AND isProcess = '0' AND Status='APPROVED' and EffectivityDate >= '" + datefrompending.Text + "' and EffectivityDate <= '" + datetopending.Text + "'", gridControl1, gridView1);
             gridView1.Focus();
         }
 
@@ -318,12 +315,12 @@ namespace SalesInventorySystem
             {
                 if (Login.assignedBranch == "888")
                 {
-                    Database.display("SELECT * FROM view_ForDelivery WHERE Status='FOR DELIVERY' and DateAdded >= '" + datefromfordev.Text + "' and DateAdded <= '" + datetofordev.Text + "' ", gridControl2, gridView2);
+                    Database.display("SELECT * FROM view_ForDelivery WHERE BranchCode='" + Login.assignedBranch + "' AND Status='FOR DELIVERY' and DateAdded >= '" + datefromfordev.Text + "' and DateAdded <= '" + datetofordev.Text + "' ", gridControl2, gridView2);
                     gridView2.Focus();
                 }
                 else
                 {
-                    Database.display("SELECT * FROM view_ForDelivery WHERE Status='FOR DELIVERY' and DateAdded >= '" + datefromfordev.Text + "' and DateAdded <= '" + datetofordev.Text + "'  AND BranchCode='" + Login.assignedBranch + "'", gridControl2, gridView2);
+                    Database.display("SELECT * FROM view_ForDelivery WHERE BranchCode='" + Login.assignedBranch + "' AND Status='FOR DELIVERY' and DateAdded >= '" + datefromfordev.Text + "' and DateAdded <= '" + datetofordev.Text + "'  ", gridControl2, gridView2);
                     gridView2.Focus();
                 }
             }
@@ -340,12 +337,12 @@ namespace SalesInventorySystem
             {
                 if (Login.assignedBranch == "888")
                 {
-                    Database.display("SELECT * FROM view_ForDelivery WHERE Status='REJECTED' and DateAdded >= '" + datefromrej.Text + "' and DateAdded <= '" + datetorej.Text + "' AND (RequestType='Products' OR RequestType='STS')", gridControl3, gridView3);
+                    Database.display("SELECT * FROM view_ForDelivery WHERE Status='REJECTED' and BranchCode='" + Login.assignedBranch + "' AND DateAdded >= '" + datefromrej.Text + "' and DateAdded <= '" + datetorej.Text + "' ", gridControl3, gridView3);
                     gridView3.Focus();
                 }
                 else
                 {
-                    Database.display("SELECT * FROM view_ForDelivery WHERE Status='REJECTED' and DateAdded >= '" + datefromrej.Text + "' and DateAdded <= '" + datetorej.Text + "' AND BranchCode='" + Login.assignedBranch + "' AND RequestType='BranchOrder' ", gridControl3, gridView3);
+                    Database.display("SELECT * FROM view_ForDelivery WHERE Status='REJECTED' AND BranchCode='" + Login.assignedBranch + "' AND DateAdded >= '" + datefromrej.Text + "' and DateAdded <= '" + datetorej.Text + "'  ", gridControl3, gridView3);
                     gridView3.Focus();
                 }
             }

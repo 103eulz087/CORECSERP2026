@@ -19,39 +19,98 @@ namespace SalesInventorySystem.Orders
         {
             InitializeComponent();
         }
+
+        static bool IsRowAlreadyReturned(GridView view, int rowHandle)
+        {
+            object val = view.GetRowCellValue(rowHandle, "isReturned");
+            return val != null && val != DBNull.Value && Convert.ToBoolean(val);
+        }
+
+        // Rows already returned (isReturned=1 in view_BranchOrderDetails / DeliveryDetails) are
+        // highlighted red and can't stay checked -- same "veto the checkbox in SelectionChanged"
+        // pattern already used for CheckBoxRowSelect grids elsewhere (see
+        // Orders/AddBranchOrderSTSBatchMode.cs, Orders/SearchProductBatchMode.cs).
+        private void gridView1_RowStyle(object sender, DevExpress.XtraGrid.Views.Grid.RowStyleEventArgs e)
+        {
+            GridView view = sender as GridView;
+            if (e.RowHandle < 0)
+                return;
+
+            if (IsRowAlreadyReturned(view, e.RowHandle))
+            {
+                e.Appearance.BackColor = Color.Red;
+                e.Appearance.BackColor2 = Color.IndianRed;
+                e.Appearance.ForeColor = Color.White;
+                e.HighPriority = true;
+            }
+        }
+
+        private void gridView1_SelectionChanged(object sender, DevExpress.Data.SelectionChangedEventArgs e)
+        {
+            int rowHandle = e.ControllerRow;
+            if (rowHandle >= 0 && IsRowAlreadyReturned(gridView1, rowHandle))
+            {
+                gridView1.UnselectRow(rowHandle);
+            }
+
+            if (gridView1.SelectedRowsCount == gridView1.DataRowCount) // "Select All" clicked
+            {
+                for (int i = 0; i < gridView1.DataRowCount; i++)
+                {
+                    if (IsRowAlreadyReturned(gridView1, i))
+                    {
+                        gridView1.UnselectRow(i);
+                    }
+                }
+            }
+        }
+
         void executeTransfer()
         {
             try
             {
-
                 GridView view = gridControl1.FocusedView as GridView;
                 view.SortInfo.Clear();
 
-                //string id = IDGenerator.getIDNumberSP("sp_GetTransNumber", "BatchNumber");// IDGenerator.getTransferedNumber();
                 int[] selectedRows = gridView1.GetSelectedRows();
+
+                DataTable dt = new DataTable();
+                dt.Columns.Add("SeqNo", typeof(decimal));
+                dt.Columns.Add("ProductNo", typeof(string));
+                dt.Columns.Add("ProductName", typeof(string));
+                dt.Columns.Add("BarcodeNo", typeof(string));
+                dt.Columns.Add("QtyDelivered", typeof(decimal));
+                dt.Columns.Add("Cost", typeof(decimal));
+                dt.Columns.Add("SellingPrice", typeof(decimal));
+                dt.Columns.Add("ActualQty", typeof(decimal));
+                dt.Columns.Add("Variance", typeof(double));
+                dt.Columns.Add("isVat", typeof(bool));
 
                 foreach (int rowHandle in selectedRows)
                 {
                     if (rowHandle >= 0)
                     {
-                        string devno = gridView1.GetRowCellValue(rowHandle, "DeliveryNo").ToString();//dataGridView1.Rows[0].Cells["Product"].Value.ToString();
-                        string pono = gridView1.GetRowCellValue(rowHandle, "PONumber").ToString();// dataGridView1.Rows[0].Cells["Description"].Value.ToString();
-                        string barcode = gridView1.GetRowCellValue(rowHandle, "BarcodeNo").ToString();//dataGridView1.Rows[0].Cells["Barcode"].Value.ToString();
-                        //string brcode = gridView1.GetRowCellValue(rowHandle, "BranchCode").ToString();//dataGridView1.Rows[0].Cells["Quantity"].Value.ToString();
-                        string prodno = gridView1.GetRowCellValue(rowHandle, "ProductNo").ToString();//dataGridView1.Rows[0].Cells["Quantity"].Value.ToString();
-                        string desc = gridView1.GetRowCellValue(rowHandle, "ProductName").ToString();//dataGridView1.Rows[0].Cells["Quantity"].Value.ToString();
-                        string cost = gridView1.GetRowCellValue(rowHandle, "Cost").ToString();//dataGridView1.Rows[0].Cells["Quantity"].Value.ToString();
-                        string sprice = gridView1.GetRowCellValue(rowHandle, "SellingPrice").ToString();//dataGridView1.Rows[0].Cells["Quantity"].Value.ToString();
-                        string qty = gridView1.GetRowCellValue(rowHandle, "QtyDelivered").ToString();//dataGridView1.Rows[0].Cells["Quantity"].Value.ToString();
-                        string actualqty = gridView1.GetRowCellValue(rowHandle, "ActualQty").ToString();//dataGridView1.Rows[0].Cells["Quantity"].Value.ToString();
-                        string variance = gridView1.GetRowCellValue(rowHandle, "Variance").ToString();//dataGridView1.Rows[0].Cells["Quantity"].Value.ToString();
-                        string seqno = gridView1.GetRowCellValue(rowHandle, "SeqNo").ToString();//dataGridView1.Rows[0].Cells["Quantity"].Value.ToString();
-                        string isvat = gridView1.GetRowCellValue(rowHandle, "isVat").ToString();//dataGridView1.Rows[0].Cells["Quantity"].Value.ToString();
-
-                        Database.ExecuteQuery("insert into ReturnedOrderDetails values ('" + seqno + "', '" + pono + "', '" + prodno + "', '" + desc + "', '" + barcode + "', '" + qty + "', '" + cost + "', '" + sprice + "', '" + actualqty + "', '" + variance + "', '" + isvat + "', '" + Login.Fullname + "','" + DateTime.Now.ToShortDateString() + "')");
+                        dt.Rows.Add(
+                            Convert.ToDecimal(gridView1.GetRowCellValue(rowHandle, "SeqNo")),
+                            gridView1.GetRowCellValue(rowHandle, "ProductNo").ToString(),
+                            gridView1.GetRowCellValue(rowHandle, "ProductName").ToString(),
+                            gridView1.GetRowCellValue(rowHandle, "BarcodeNo").ToString(),
+                            Convert.ToDecimal(gridView1.GetRowCellValue(rowHandle, "QtyDelivered")),
+                            Convert.ToDecimal(gridView1.GetRowCellValue(rowHandle, "Cost")),
+                            Convert.ToDecimal(gridView1.GetRowCellValue(rowHandle, "SellingPrice")),
+                            Convert.ToDecimal(gridView1.GetRowCellValue(rowHandle, "ActualQty")),
+                            Convert.ToDouble(gridView1.GetRowCellValue(rowHandle, "Variance")),
+                            Convert.ToBoolean(gridView1.GetRowCellValue(rowHandle, "isVat")));
                     }
                 }
-                sp();
+
+                if (dt.Rows.Count == 0)
+                {
+                    XtraMessageBox.Show("Please select at least one item to return (Checked column).");
+                    return;
+                }
+
+                sp(dt);
                 XtraMessageBox.Show("Successfully Returned!..");
                 this.Dispose();
             }
@@ -61,7 +120,7 @@ namespace SalesInventorySystem.Orders
             }
         }
 
-        void sp()
+        void sp(DataTable lines)
         {
             SqlConnection con = Database.getConnection();
             con.Open();
@@ -74,7 +133,11 @@ namespace SalesInventorySystem.Orders
                 com.Parameters.AddWithValue("@parmdevno", txtdevno.Text);
                 com.Parameters.AddWithValue("@parmuser", Login.Fullname);
                 com.Parameters.AddWithValue("@parmreturnstatus", txtstatus.Text);
+                com.Parameters.AddWithValue("@parmreason", txtreason.Text);
                 com.Parameters.AddWithValue("@parmmachinename", GlobalVariables.computerName);
+                var tvpParam = com.Parameters.AddWithValue("@Lines", lines);
+                tvpParam.SqlDbType = SqlDbType.Structured;
+                tvpParam.TypeName = "dbo.tt_ReturnSalesOrderLines";
                 com.CommandType = CommandType.StoredProcedure;
                 com.CommandText = query;
                 com.ExecuteNonQuery();
@@ -90,7 +153,15 @@ namespace SalesInventorySystem.Orders
         }
         private void simpleButton1_Click(object sender, EventArgs e)
         {
-            executeTransfer();
+            if(String.IsNullOrEmpty(txtreason.Text))
+            {
+                XtraMessageBox.Show("Please enter a reason for the return.");
+                return;
+            }
+            else
+            {
+                executeTransfer();
+            }
         }
 
         private void ReturnSalesOrder_Load(object sender, EventArgs e)

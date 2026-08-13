@@ -84,7 +84,7 @@
             // 
             // xrcompanyname
             // 
-            this.xrcompanyname.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold);
+            this.xrcompanyname.Font = new DevExpress.Drawing.DXFont("Arial", 9.75F, DevExpress.Drawing.DXFontStyle.Bold);
             this.xrcompanyname.LocationFloat = new DevExpress.Utils.PointFloat(574.5834F, 10.00001F);
             this.xrcompanyname.Name = "xrcompanyname";
             this.xrcompanyname.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -96,7 +96,7 @@
             // 
             // xrcompanyaddress
             // 
-            this.xrcompanyaddress.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold);
+            this.xrcompanyaddress.Font = new DevExpress.Drawing.DXFont("Arial", 9.75F, DevExpress.Drawing.DXFontStyle.Bold);
             this.xrcompanyaddress.LocationFloat = new DevExpress.Utils.PointFloat(574.5834F, 28.83334F);
             this.xrcompanyaddress.Name = "xrcompanyaddress";
             this.xrcompanyaddress.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -108,7 +108,7 @@
             // 
             // xrvatregtin
             // 
-            this.xrvatregtin.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold);
+            this.xrvatregtin.Font = new DevExpress.Drawing.DXFont("Arial", 9.75F, DevExpress.Drawing.DXFontStyle.Bold);
             this.xrvatregtin.LocationFloat = new DevExpress.Utils.PointFloat(574.5834F, 47.66668F);
             this.xrvatregtin.Name = "xrvatregtin";
             this.xrvatregtin.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -120,7 +120,7 @@
             // 
             // xrsoftwarename
             // 
-            this.xrsoftwarename.Font = new System.Drawing.Font("Arial", 9.75F);
+            this.xrsoftwarename.Font = new DevExpress.Drawing.DXFont("Arial", 9.75F);
             this.xrsoftwarename.LocationFloat = new DevExpress.Utils.PointFloat(9.999998F, 47.66668F);
             this.xrsoftwarename.Name = "xrsoftwarename";
             this.xrsoftwarename.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -130,7 +130,7 @@
             // 
             // xrserialno
             // 
-            this.xrserialno.Font = new System.Drawing.Font("Arial", 9.75F);
+            this.xrserialno.Font = new DevExpress.Drawing.DXFont("Arial", 9.75F);
             this.xrserialno.LocationFloat = new DevExpress.Utils.PointFloat(10.00001F, 66.50003F);
             this.xrserialno.Name = "xrserialno";
             this.xrserialno.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -140,7 +140,7 @@
             // 
             // xrminno
             // 
-            this.xrminno.Font = new System.Drawing.Font("Arial", 9.75F);
+            this.xrminno.Font = new DevExpress.Drawing.DXFont("Arial", 9.75F);
             this.xrminno.LocationFloat = new DevExpress.Utils.PointFloat(9.999998F, 85.33334F);
             this.xrminno.Name = "xrminno";
             this.xrminno.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -150,7 +150,7 @@
             // 
             // xrposterminalno
             // 
-            this.xrposterminalno.Font = new System.Drawing.Font("Arial", 9.75F);
+            this.xrposterminalno.Font = new DevExpress.Drawing.DXFont("Arial", 9.75F);
             this.xrposterminalno.LocationFloat = new DevExpress.Utils.PointFloat(9.999998F, 104.1667F);
             this.xrposterminalno.Name = "xrposterminalno";
             this.xrposterminalno.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -160,7 +160,7 @@
             // 
             // xrdatetime
             // 
-            this.xrdatetime.Font = new System.Drawing.Font("Arial", 9.75F);
+            this.xrdatetime.Font = new DevExpress.Drawing.DXFont("Arial", 9.75F);
             this.xrdatetime.LocationFloat = new DevExpress.Utils.PointFloat(9.999998F, 123.0001F);
             this.xrdatetime.Name = "xrdatetime";
             this.xrdatetime.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -170,7 +170,7 @@
             // 
             // xruserid
             // 
-            this.xruserid.Font = new System.Drawing.Font("Arial", 9.75F);
+            this.xruserid.Font = new DevExpress.Drawing.DXFont("Arial", 9.75F);
             this.xruserid.LocationFloat = new DevExpress.Utils.PointFloat(10.00001F, 141.8334F);
             this.xruserid.Name = "xruserid";
             this.xruserid.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -180,7 +180,7 @@
             // 
             // xrannex
             // 
-            this.xrannex.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold);
+            this.xrannex.Font = new DevExpress.Drawing.DXFont("Arial", 9.75F, DevExpress.Drawing.DXFontStyle.Bold);
             this.xrannex.LocationFloat = new DevExpress.Utils.PointFloat(1252.292F, 10.00001F);
             this.xrannex.Name = "xrannex";
             this.xrannex.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -192,7 +192,7 @@
             // 
             // xrreporttitle
             // 
-            this.xrreporttitle.Font = new System.Drawing.Font("Arial", 12.75F, System.Drawing.FontStyle.Bold);
+            this.xrreporttitle.Font = new DevExpress.Drawing.DXFont("Arial", 12.75F, DevExpress.Drawing.DXFontStyle.Bold);
             this.xrreporttitle.LocationFloat = new DevExpress.Utils.PointFloat(396.4583F, 141.8334F);
             this.xrreporttitle.Name = "xrreporttitle";
             this.xrreporttitle.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -210,12 +210,12 @@
             this.Detail,
             this.PageHeader,
             this.ReportFooter});
-            this.Font = new System.Drawing.Font("Arial", 9.75F);
+            this.Font = new DevExpress.Drawing.DXFont("Arial", 9.75F);
             this.Landscape = true;
-            this.Margins = new System.Drawing.Printing.Margins(34, 31, 14, 10);
+            this.Margins = new DevExpress.Drawing.DXMargins(34, 31, 14, 10);
             this.PageHeight = 850;
             this.PageWidth = 1400;
-            this.PaperKind = System.Drawing.Printing.PaperKind.Legal;
+            this.PaperKind = DevExpress.Drawing.Printing.DXPaperKind.Legal;
             this.Version = "19.2";
             ((System.ComponentModel.ISupportInitialize)(this)).EndInit();
 

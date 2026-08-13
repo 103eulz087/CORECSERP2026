@@ -81,7 +81,7 @@ namespace SalesInventorySystem.Accounting
             {
                 DevExReportTemplate.CheckVoucher xct = new DevExReportTemplate.CheckVoucher();
                 xct.Landscape = false;
-                xct.PaperKind = System.Drawing.Printing.PaperKind.Legal;
+                xct.PaperKind = (DevExpress.Drawing.Printing.DXPaperKind)System.Drawing.Printing.PaperKind.Legal;
                 //xct.Margins = new System.Drawing.Printing.Margins(100, 100, 100, 100);
                 xct.xrcheckno.Text = txtcheckno.Text;
                 xct.xrcheckdate.Text = txtcheckdate.Text;

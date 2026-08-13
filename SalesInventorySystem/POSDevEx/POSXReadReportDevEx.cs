@@ -229,7 +229,7 @@ namespace SalesInventorySystem.POSDevEx
         {
             DevExReportTemplate.POSAuditLogs xct = new DevExReportTemplate.POSAuditLogs();
             xct.Landscape = false;
-            xct.PaperKind = System.Drawing.Printing.PaperKind.Letter;
+            xct.PaperKind = (DevExpress.Drawing.Printing.DXPaperKind)System.Drawing.Printing.PaperKind.Letter;
             xct.Margins = new System.Drawing.Printing.Margins(100, 100, 100, 100);
             
             xct.xrdate.Text = txtsalesdatefrom.Text;
@@ -967,7 +967,7 @@ namespace SalesInventorySystem.POSDevEx
                 xct.Landscape = true;
 
 
-                xct.PaperKind = System.Drawing.Printing.PaperKind.Legal;
+                xct.PaperKind = (DevExpress.Drawing.Printing.DXPaperKind)System.Drawing.Printing.PaperKind.Legal;
 
                 xct.xrsoftwarename.Text = "Software: SPARK POS ver 2.0";
                 xct.xrserialno.Text = "Serial No:. XXXXX XXXX XXXXX";
@@ -1056,7 +1056,7 @@ namespace SalesInventorySystem.POSDevEx
                 link.CreateDocument(); // Important: triggers layout rendering
                 link.Margins = new System.Drawing.Printing.Margins(50, 50, 50, 50);
                 link.Landscape = true;
-                link.PaperKind = System.Drawing.Printing.PaperKind.Legal;
+                link.PaperKind = (DevExpress.Drawing.Printing.DXPaperKind)System.Drawing.Printing.PaperKind.Legal;
                 link.PrintingSystem.Document.AutoFitToPagesWidth = 1;
 
                 ReportPrintTool printTool = new ReportPrintTool(xct);
@@ -1328,20 +1328,20 @@ namespace SalesInventorySystem.POSDevEx
         private void simpleButton12_Click(object sender, EventArgs e)
         {
             //string filepath = "C:\\POSTransaction\\DailySales\\" + DateTime.Now.ToString("yyyyMMdd") + "\\";
-            DateTime dt = Convert.ToDateTime(txtsalesdatefrom.Text);
-            string filepath = "C:\\MyFiles\\CSV\\";
-            Classes.Utilities.createDirectoryFolder(filepath);
-            string filename = txtbranch.Text + "_" + reportype + "_" + dt.ToString("yyyyMMdd") + ".csv";
-            string file = filepath + filename;
-            CsvExportOptionsEx opt = new CsvExportOptionsEx();
-            //opt.ExportType = DevExpress.Export.ExportType.WYSIWYG;
-            opt.Encoding = Encoding.Unicode;
-            opt.Separator = CultureInfo.CurrentCulture.TextInfo.ListSeparator.ToString();
+            //DateTime dt = Convert.ToDateTime(txtsalesdatefrom.Text);
+            //string filepath = "C:\\MyFiles\\CSV\\";
+            //Classes.Utilities.createDirectoryFolder(filepath);
+            //string filename = txtbranch.Text + "_" + reportype + "_" + dt.ToString("yyyyMMdd") + ".csv";
+            //string file = filepath + filename;
+            //CsvExportOptionsEx opt = new CsvExportOptionsEx();
+            ////opt.ExportType = DevExpress.Export.ExportType.WYSIWYG;
+            //opt.Encoding = Encoding.Unicode;
+            //opt.Separator = CultureInfo.CurrentCulture.TextInfo.ListSeparator.ToString();
 
-            //opt.QuoteStringsWithSeparators = true;
-            //gridControl1.ExportToCsv(file);
-            gridView1.ExportToCsv(file);
-            XtraMessageBox.Show("Export Success");
+            ////opt.QuoteStringsWithSeparators = true;
+            ////gridControl1.ExportToCsv(file);
+            //gridView1.ExportToCsv(file);
+            //XtraMessageBox.Show("Export Success");
         }
 
         private void showCreditDetailsToolStripMenuItem_Click(object sender, EventArgs e)

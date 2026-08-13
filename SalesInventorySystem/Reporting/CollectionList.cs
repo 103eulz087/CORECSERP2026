@@ -38,7 +38,7 @@ namespace SalesInventorySystem.Reporting
         {
             DevExReportTemplate.CollectionList xct = new DevExReportTemplate.CollectionList();
             xct.Landscape = false;
-            xct.PaperKind = System.Drawing.Printing.PaperKind.Letter;
+            xct.PaperKind = (DevExpress.Drawing.Printing.DXPaperKind)System.Drawing.Printing.PaperKind.Letter;
             xct.Margins = new System.Drawing.Printing.Margins(100, 100, 100, 100);
             xct.xrcollectiondate.Text = datefrom.Text;
             xct.xrpreparedby.Text = Login.Fullname;

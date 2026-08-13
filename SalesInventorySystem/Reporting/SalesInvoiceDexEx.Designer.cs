@@ -51,6 +51,7 @@
             this.txtvatablesale = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.txtpono = new System.Windows.Forms.TextBox();
+            this.txtinvoiceno = new System.Windows.Forms.TextBox();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl4)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView4)).BeginInit();
@@ -107,10 +108,12 @@
             this.gridView4.OptionsView.ShowFooter = true;
             this.gridView4.OptionsView.ShowGroupPanel = false;
             this.gridView4.OptionsView.ShowHorizontalLines = DevExpress.Utils.DefaultBoolean.False;
+            this.gridView4.OptionsView.ShowIndicator = false;
             this.gridView4.OptionsView.ShowVerticalLines = DevExpress.Utils.DefaultBoolean.False;
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.txtinvoiceno);
             this.groupBox1.Controls.Add(this.txtzeroratedsale);
             this.groupBox1.Controls.Add(this.txtdiscount);
             this.groupBox1.Controls.Add(this.txtcusttin);
@@ -328,7 +331,7 @@
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(194, 26);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(45, 17);
+            this.label2.Size = new System.Drawing.Size(41, 16);
             this.label2.TabIndex = 5;
             this.label2.Text = "PO #:";
             // 
@@ -340,6 +343,15 @@
             this.txtpono.ReadOnly = true;
             this.txtpono.Size = new System.Drawing.Size(132, 23);
             this.txtpono.TabIndex = 4;
+            // 
+            // txtinvoiceno
+            // 
+            this.txtinvoiceno.Location = new System.Drawing.Point(248, 47);
+            this.txtinvoiceno.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.txtinvoiceno.Name = "txtinvoiceno";
+            this.txtinvoiceno.ReadOnly = true;
+            this.txtinvoiceno.Size = new System.Drawing.Size(132, 23);
+            this.txtinvoiceno.TabIndex = 23;
             // 
             // SalesInvoiceDexEx
             // 
@@ -387,5 +399,6 @@
         public System.Windows.Forms.TextBox txtcustkey;
         public System.Windows.Forms.TextBox txtdiscount;
         public System.Windows.Forms.TextBox txtzeroratedsale;
+        public System.Windows.Forms.TextBox txtinvoiceno;
     }
 }

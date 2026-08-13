@@ -40,7 +40,7 @@ namespace SalesInventorySystem.HOForms
         {
             txtacctid.Text = Classes.Suppliers.getSupplierID(searchLookUpEdit1.Text);
             txtacctstatus.Text = Classes.Suppliers.getSupplierStatus(searchLookUpEdit1.Text);
-            txtacctbalance.Text = Classes.Suppliers.getSupplierBalance(searchLookUpEdit1.Text);
+            txtacctbalance.Text = Classes.Suppliers.GetSupplierBalance(searchLookUpEdit1.Text).ToString();
             txtmvmtdate.Text = Classes.Suppliers.getSupplierLastMovementDate(searchLookUpEdit1.Text);
             //loadLedger();
             
@@ -152,7 +152,7 @@ namespace SalesInventorySystem.HOForms
                 txtmvmtdate.Text = "";
                 txtacctid.Text = Classes.Suppliers.getSupplierID(adhipma.txtsuppliername.Text);
                 txtacctstatus.Text = Classes.Suppliers.getSupplierStatus(adhipma.txtsuppliername.Text);
-                txtacctbalance.Text = Classes.Suppliers.getSupplierBalance(adhipma.txtsuppliername.Text);
+                txtacctbalance.Text = Classes.Suppliers.GetSupplierBalance(adhipma.txtsuppliername.Text).ToString();
                 txtmvmtdate.Text = Classes.Suppliers.getSupplierLastMovementDate(adhipma.txtsuppliername.Text);
 
                 TransactionPayment.isdone = false;

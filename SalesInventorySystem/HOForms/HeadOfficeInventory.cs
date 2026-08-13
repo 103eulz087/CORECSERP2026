@@ -56,7 +56,7 @@ namespace SalesInventorySystem
         {
             DevExReportTemplate.ConsolidatedInventory xct = new DevExReportTemplate.ConsolidatedInventory();
             xct.Landscape = false;
-            xct.PaperKind = System.Drawing.Printing.PaperKind.Legal;
+            xct.PaperKind = (DevExpress.Drawing.Printing.DXPaperKind)System.Drawing.Printing.PaperKind.Legal;
             xct.Margins = new System.Drawing.Printing.Margins(100, 100, 100, 100);
             xct.inventoryowner.Text = inventoryowner;
             xct.Bands[BandKind.Detail].Controls.Add(HelperFunction.CopyGridControl(this.gridControl1));

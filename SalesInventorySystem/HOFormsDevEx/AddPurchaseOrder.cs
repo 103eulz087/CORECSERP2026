@@ -52,10 +52,25 @@ namespace SalesInventorySystem.HOFormsDevEx
         private void searchLookUpEdit1_EditValueChanged(object sender, EventArgs e)
         {
             suppkey = SearchLookUpClass.getSingleValue(searchLookUpEdit1, "SupplierKey");
-            if(radProducts.Checked==true)
-                Database.display("SELECT * FROM func_viewPurchaseOrder('" + Login.assignedBranch + "','" + suppkey + "')", gridControl1, gridView1);
+           
+            if (GlobalCache.CompanyName=="JFC")
+            {
+                Database.display("SELECT * FROM func_viewPurchaseOrderJFC('" + Login.assignedBranch + "','" + suppkey + "')", gridControl1, gridView1);
+            }
             else
-                Database.display("SELECT * FROM func_viewServicesOrder('" + Login.assignedBranch + "','" + suppkey + "')", gridControl1, gridView1);
+            {
+                Database.display("SELECT * FROM func_viewPurchaseOrder('" + Login.assignedBranch + "','" + suppkey + "')", gridControl1, gridView1);
+            }
+            //if (radProducts.Checked==true)
+            //{
+            //    Database.display("SELECT * FROM func_viewPurchaseOrder('" + Login.assignedBranch + "','" + suppkey + "')", gridControl1, gridView1);
+            //}
+            //else
+            //{
+            //    Database.display("SELECT * FROM func_viewServicesOrder('" + Login.assignedBranch + "','" + suppkey + "')", gridControl1, gridView1);
+
+            //}
+            
             //Database.display("SELECT a.ProductCode" +
             //       ",a.ProductName" +
             //       ",a.CostKg as Cost " +
@@ -111,16 +126,20 @@ namespace SalesInventorySystem.HOFormsDevEx
                 DataRow dr = dt.NewRow();
                 dr["ShipmentNo"] = txtshipmentno.Text;
                 dr["SupplierID"] = suppkey;
-                dr["OrderType"] = radProducts.Checked ? "P" : "S";
-                dr["OrderCode"] = radProducts.Checked
-                    ? gridView1.GetRowCellValue(rowHandle, "ProductCode").ToString()
-                    : gridView1.GetRowCellValue(rowHandle, "ServiceCode").ToString();
+                //dr["OrderType"] = radProducts.Checked ? "P" : "S";
+                //dr["OrderCode"] = radProducts.Checked
+                //    ? gridView1.GetRowCellValue(rowHandle, "ProductCode").ToString()
+                //    : gridView1.GetRowCellValue(rowHandle, "ServiceCode").ToString();
+
+                dr["OrderType"] ="P";
+                dr["OrderCode"] = gridView1.GetRowCellValue(rowHandle, "ProductCode").ToString();
+                //    ? gridView1.GetRowCellValue(rowHandle, "ProductCode").ToString()
+                //    : gridView1.GetRowCellValue(rowHandle, "ServiceCode").ToString();
                 dr["Quantity"] = Convert.ToDecimal(gridView1.GetRowCellValue(rowHandle, "Quantity"));
                 dr["Cost"] = Convert.ToDecimal(gridView1.GetRowCellValue(rowHandle, "Cost"));
                 dr["TotalCost"] = 0;
-                dr["Unit"] = radProducts.Checked
-                    ? gridView1.GetRowCellValue(rowHandle, "Units").ToString()
-                    : " ";
+                dr["Unit"] = gridView1.GetRowCellValue(rowHandle, "Units").ToString();
+                    
                 dr["ActualQuantity"] = 0;
                 dr["ActualCost"] = 0;
                 dr["ActualTotalCost"] = 0;
@@ -151,7 +170,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             dt.Columns.Add("ActualTotalCost", typeof(decimal));
             dt.Columns.Add("isVat", typeof(bool));
 
-            bool isProduct = radProducts.Checked;
+            bool isProduct = true;//radProducts.Checked;
 
             // Loop through data rows (ignore group rows, filter rows, etc.)
             for (int i = 0; i < gridView1.DataRowCount; i++)
@@ -173,9 +192,10 @@ namespace SalesInventorySystem.HOFormsDevEx
                 if (costObj != null && costObj != DBNull.Value)
                     decimal.TryParse(costObj.ToString(), out cost);
 
-                string orderCode = isProduct
-                    ? Convert.ToString(gridView1.GetRowCellValue(rowHandle, "ProductCode"))
-                    : Convert.ToString(gridView1.GetRowCellValue(rowHandle, "ServiceCode"));
+                string orderCode = Convert.ToString(gridView1.GetRowCellValue(rowHandle, "ProductCode"));
+                //string orderCode = isProduct
+                //    ? Convert.ToString(gridView1.GetRowCellValue(rowHandle, "ProductCode"))
+                //    : Convert.ToString(gridView1.GetRowCellValue(rowHandle, "ServiceCode"));
 
                 // Skip if no code
                 if (string.IsNullOrWhiteSpace(orderCode))
@@ -184,7 +204,8 @@ namespace SalesInventorySystem.HOFormsDevEx
                 DataRow dr = dt.NewRow();
                 dr["ShipmentNo"] = txtshipmentno.Text;
                 dr["SupplierID"] = suppkey;
-                dr["OrderType"] = isProduct ? "P" : "S";
+                //dr["OrderType"] = isProduct ? "P" : "S";
+                dr["OrderType"] = "P";
                 dr["OrderCode"] = orderCode;
                 dr["Quantity"] = qty;
                 dr["Cost"] = cost;
@@ -192,10 +213,84 @@ namespace SalesInventorySystem.HOFormsDevEx
                 // If you want to calculate TotalCost client-side:
                 dr["TotalCost"] = qty * cost;  // or 0 if server computes
 
-                dr["Unit"] = isProduct
-                    ? Convert.ToString(gridView1.GetRowCellValue(rowHandle, "Units"))
-                    : " ";
+                dr["Unit"] = Convert.ToString(gridView1.GetRowCellValue(rowHandle, "Units"));
 
+                dr["ActualQuantity"] = 0m;
+                dr["ActualCost"] = 0m;
+                dr["ActualTotalCost"] = 0m;
+                dr["isVat"] = true; // you can map this from grid too if you have a column
+
+                dt.Rows.Add(dr);
+            }
+
+            return dt;
+        }
+        private DataTable BuildPODetailsTable_ByQty_JFC()
+        {
+            // Ensure any in-place editor value is committed to the datasource
+            gridView1.CloseEditor();
+            gridView1.UpdateCurrentRow();
+
+            DataTable dt = new DataTable();
+            dt.Columns.Add("ShipmentNo", typeof(string));
+            dt.Columns.Add("SupplierID", typeof(string));
+            dt.Columns.Add("OrderType", typeof(string));
+            dt.Columns.Add("OrderCode", typeof(string));
+            dt.Columns.Add("Quantity", typeof(decimal));
+            dt.Columns.Add("Cost", typeof(decimal));
+            dt.Columns.Add("TotalCost", typeof(decimal));
+            dt.Columns.Add("Unit", typeof(string));
+            dt.Columns.Add("ReferenceCode", typeof(string));
+            dt.Columns.Add("ActualQuantity", typeof(decimal));
+            dt.Columns.Add("ActualCost", typeof(decimal));
+            dt.Columns.Add("ActualTotalCost", typeof(decimal));
+            dt.Columns.Add("isVat", typeof(bool));
+
+            bool isProduct = true;//radProducts.Checked;
+
+            // Loop through data rows (ignore group rows, filter rows, etc.)
+            for (int i = 0; i < gridView1.DataRowCount; i++)
+            {
+                int rowHandle = gridView1.GetVisibleRowHandle(i);
+                if (!gridView1.IsDataRow(rowHandle)) continue;
+
+                // Safely read Quantity
+                object qtyObj = gridView1.GetRowCellValue(rowHandle, "Quantity");
+                decimal qty = 0m;
+                if (qtyObj != null && qtyObj != DBNull.Value)
+                    decimal.TryParse(qtyObj.ToString(), out qty);
+
+                if (qty <= 0m) continue; // <-- THE MAIN RULE
+
+                // Safely read Cost
+                object costObj = gridView1.GetRowCellValue(rowHandle, "Cost");
+                decimal cost = 0m;
+                if (costObj != null && costObj != DBNull.Value)
+                    decimal.TryParse(costObj.ToString(), out cost);
+
+                string orderCode = Convert.ToString(gridView1.GetRowCellValue(rowHandle, "ProductCode"));
+                //string orderCode = isProduct
+                //    ? Convert.ToString(gridView1.GetRowCellValue(rowHandle, "ProductCode"))
+                //    : Convert.ToString(gridView1.GetRowCellValue(rowHandle, "ServiceCode"));
+
+                // Skip if no code
+                if (string.IsNullOrWhiteSpace(orderCode))
+                    continue;
+
+                DataRow dr = dt.NewRow();
+                dr["ShipmentNo"] = txtshipmentno.Text;
+                dr["SupplierID"] = suppkey;
+                //dr["OrderType"] = isProduct ? "P" : "S";
+                dr["OrderType"] = "P";
+                dr["OrderCode"] = orderCode;
+                dr["Quantity"] = qty;
+                dr["Cost"] = cost;
+
+                // If you want to calculate TotalCost client-side:
+                dr["TotalCost"] = qty * cost;  // or 0 if server computes
+
+                dr["Unit"] = Convert.ToString(gridView1.GetRowCellValue(rowHandle, "Units"));
+                dr["ReferenceCode"] = Convert.ToString(gridView1.GetRowCellValue(rowHandle, "ReferenceCode"));
                 dr["ActualQuantity"] = 0m;
                 dr["ActualCost"] = 0m;
                 dr["ActualTotalCost"] = 0m;
@@ -211,31 +306,55 @@ namespace SalesInventorySystem.HOFormsDevEx
             try
             {
                 DataTable dtDetails = BuildPODetailsTable_ByQty();
-
+                string spname = "sp_BulkInsertPODetails";
+                string tvpname = "";
+                if (GlobalCache.CompanyName == "JFC")
+                {
+                    dtDetails = BuildPODetailsTable_ByQty_JFC();
+                    tvpname = "dbo.PODetailsType_JFC";
+                }
+                else
+                {
+                    dtDetails = BuildPODetailsTable_ByQty();
+                    tvpname = "dbo.PODetailsType";
+                }
+                   
+                 
                 if (dtDetails.Rows.Count == 0)
                 {
                     XtraMessageBox.Show("No items to insert. Please enter Quantity > 0.");
                     return;
                 }
 
-                using (SqlConnection conn = Database.getConnection())
-                using (SqlCommand cmd = new SqlCommand("sp_BulkInsertPODetails", conn))
+                if(GlobalCache.CompanyName=="JFC")
                 {
-                    cmd.CommandType = CommandType.StoredProcedure;
-
-                    SqlParameter tvpParam = cmd.Parameters.AddWithValue("@Items", dtDetails);
-                    tvpParam.SqlDbType = SqlDbType.Structured;
-                    tvpParam.TypeName = "dbo.PODetailsType";
-
-                    conn.Open();
-                    cmd.ExecuteNonQuery();
+                    spname = "sp_BulkInsertPODetails_JFC";
+                    
                 }
+                else
+                {
+                    spname = "sp_BulkInsertPODetails";
+                }
+
+                    using (SqlConnection conn = Database.getConnection())
+                    using (SqlCommand cmd = new SqlCommand(spname, conn))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+
+                        SqlParameter tvpParam = cmd.Parameters.AddWithValue("@Items", dtDetails);
+                        tvpParam.SqlDbType = SqlDbType.Structured;
+                        tvpParam.TypeName = tvpname;
+
+                        conn.Open();
+                        cmd.ExecuteNonQuery();
+                    }
             }
             catch (Exception ex)
             {
                 XtraMessageBox.Show(ex.Message);
             }
         }
+
         //private void insert()
         //{
         //    try
@@ -271,6 +390,7 @@ namespace SalesInventorySystem.HOFormsDevEx
                 com.Parameters.AddWithValue("@parmshipmentno", txtshipmentno.Text);
                 com.Parameters.AddWithValue("@parmbranch", txtbranch.Text);
                 com.Parameters.AddWithValue("@parmtargetdate", txtdate.Text);
+                //com.Parameters.AddWithValue("@parmremarks", txtremakrs.Text);
                 com.Parameters.AddWithValue("@parmremarks", txtremakrs.Text);
                 com.Parameters.AddWithValue("@parmorderedby", Login.Fullname);
                 com.Parameters.AddWithValue("@parmaction", anaction);
@@ -294,7 +414,7 @@ namespace SalesInventorySystem.HOFormsDevEx
         private void gridView1_ShowingEditor(object sender, CancelEventArgs e)
         {
             GridView view = sender as GridView;
-            if (view.FocusedColumn.FieldName != "Quantity" && view.FocusedColumn.FieldName != "Units")
+            if (view.FocusedColumn.FieldName != "Quantity" && view.FocusedColumn.FieldName != "Units" && view.FocusedColumn.FieldName != "ReferenceCode")
                 e.Cancel = true;
         }
 
@@ -378,15 +498,15 @@ namespace SalesInventorySystem.HOFormsDevEx
        
         void ExecuteSP()
         {
-            string ordertype = "";
-            if(radProducts.Checked==true)
-            {
-                ordertype = "P";
-            }
-            else
-            {
-                ordertype = "S";
-            }
+            string ordertype = "P";
+            //if(radProducts.Checked==true)
+            //{
+            //    ordertype = "P";
+            //}
+            //else
+            //{
+            //    ordertype = "S";
+            //}
             SqlConnection con = Database.getConnection();
             con.Open();
             try

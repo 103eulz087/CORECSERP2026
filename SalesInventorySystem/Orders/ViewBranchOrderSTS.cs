@@ -504,7 +504,14 @@ namespace SalesInventorySystem.Orders
 
                 //Database.displaySearchlookupEdit($"SELECT * FROM dbo.funcview_populateProducts('{Login.assignedBranch}') " +
                 //  $"WHERE ProductCode in (Select distinct ProductCode FROM TransferOrderDetails WHERE PONumber='{ponumber}')", addbrorder.txtsearchlookupproduct, "Description", "Description");
-                Database.displaySearchlookupEdit($"SELECT * FROM dbo.funcview_populateProductsInPO('{Login.assignedBranch}','{ponumber}','{addbrorder.txteffectivedate.Text}')", addbrorder.txtsearchlookupproduct, "Description", "Description");
+                if(GlobalCache.CompanyName=="JFC")
+                {
+                    Database.displaySearchlookupEdit($"SELECT * FROM dbo.funcview_populateProductsInPOJFC('{Login.assignedBranch}','{ponumber}','{addbrorder.txteffectivedate.Text}')", addbrorder.txtsearchlookupproduct, "Description", "Description");
+                }
+                else
+                {
+                    Database.displaySearchlookupEdit($"SELECT * FROM dbo.funcview_populateProductsInPO('{Login.assignedBranch}','{ponumber}','{addbrorder.txteffectivedate.Text}')", addbrorder.txtsearchlookupproduct, "Description", "Description");
+                }
 
                 if (Orders.AddBranchOrderSTS.isdone == true)
                 {

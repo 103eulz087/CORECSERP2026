@@ -13,13 +13,118 @@ using DevExpress.XtraGrid.Views.Grid;
 
 namespace SalesInventorySystem.AccountingDevEx
 {
-    public partial class ViewCheckVoucherDevEx : DevExpress.XtraEditors.XtraForm
+    public partial class ViewCheckVoucherDevEx : DevExpress.XtraEditors.XtraUserControl
     { 
         public static string supplierid,refno,vouchid, paidto, checkno, checkdate, pariculars, amount, vouchertype,dateadded, preparedby;
         string reason = "";
         public ViewCheckVoucherDevEx()
         {
             InitializeComponent();
+        }
+
+        private void btnCashVoucher_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Cursor.Current = Cursors.WaitCursor;
+                this.UseWaitCursor = true;
+                using (var con = Database.getConnection())
+                using (var cmd = new SqlCommand(@"
+                    SELECT *
+                    FROM dbo.view_VoucherCash
+                    WHERE DateAdded >= @fromDate
+                      AND DateAdded <  DATEADD(day,1,@toDate)
+                      AND (@showAll = 1 OR isErrorCorrect = 0)
+                    ORDER BY VoucherID,DateAdded DESC", con))
+                {
+                    cmd.Parameters.Add("@fromDate", SqlDbType.Date)
+                        .Value = Convert.ToDateTime(dateFromCashVoucher.Text);
+
+                    cmd.Parameters.Add("@toDate", SqlDbType.Date)
+                        .Value = Convert.ToDateTime(dateToCashVoucher.Text);
+
+                    cmd.Parameters.Add("@showAll", SqlDbType.Bit)
+                        .Value = chckboxCashVoucher.Checked;
+
+                    Database.display(cmd, gridControlCashVoucher, gridViewCashVoucher);
+                }
+            }
+            finally
+            {
+                this.UseWaitCursor = false;
+                Cursor.Current = Cursors.Default;
+            }
+        }
+
+        private void btnTelegraphic_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Cursor.Current = Cursors.WaitCursor;
+                this.UseWaitCursor = true;
+                using (var con = Database.getConnection())
+                using (var cmd = new SqlCommand(@"
+                    SELECT *
+                    FROM dbo.view_VoucherTelegraphic
+                    WHERE DateAdded >= @fromDate
+                      AND DateAdded <  DATEADD(day,1,@toDate)
+                      AND (@showAll = 1 OR isErrorCorrect = 0)
+                    ORDER BY VoucherID,DateAdded DESC", con))
+                {
+                    cmd.Parameters.Add("@fromDate", SqlDbType.Date)
+                        .Value = Convert.ToDateTime(dateFromTelegraphic.Text);
+
+                    cmd.Parameters.Add("@toDate", SqlDbType.Date)
+                        .Value = Convert.ToDateTime(dateToTelegraphic.Text);
+
+                    cmd.Parameters.Add("@showAll", SqlDbType.Bit)
+                        .Value = chckboxTelegraphic.Checked;
+
+                    Database.display(cmd, gridControlTelegraphic, gridViewTelegraphic);
+                }
+            }
+            finally
+            {
+                this.UseWaitCursor = false;
+                Cursor.Current = Cursors.Default;
+            }
+        }
+
+        private void gridControlCashVoucher_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void gridControlCashVoucher_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+                contextMenuStripCashVoucher.Show(gridControlCashVoucher, e.Location);
+        }
+
+        private void gridControlTelegraphic_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+                contextMenuStripTelegraphic.Show(gridControlTelegraphic, e.Location);
+        }
+
+        private void toolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            viewVoucherDetails();
+        }
+
+        private void toolStripMenuItem3_Click(object sender, EventArgs e)
+        {
+            viewVoucherDetails();
+        }
+
+        private void toolStripMenuItem4_Click(object sender, EventArgs e)
+        {
+            HandleCancelCheque(gridViewTelegraphic);
+        }
+
+        private void toolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+            HandleCancelCheque(gridViewCashVoucher);
         }
 
         private void btnsearch_Click(object sender, EventArgs e)
@@ -35,7 +140,7 @@ namespace SalesInventorySystem.AccountingDevEx
                     WHERE DateAdded >= @fromDate
                       AND DateAdded <  DATEADD(day,1,@toDate)
                       AND (@showAll = 1 OR isErrorCorrect = 0)
-                    ORDER BY DateAdded DESC", con))
+                    ORDER BY VoucherID,DateAdded DESC", con))
                 {
                     cmd.Parameters.Add("@fromDate", SqlDbType.Date)
                         .Value = Convert.ToDateTime(datefrom.Text);
@@ -69,8 +174,8 @@ namespace SalesInventorySystem.AccountingDevEx
             supplierid = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "SupplierID").ToString();
             vouchid = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "VoucherID").ToString();
             paidto = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "PaidTo").ToString();
-            checkno = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "CheckNo").ToString();
-            checkdate = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "CheckDate").ToString();
+                checkno = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "CheckNo").ToString();
+                checkdate = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "CheckDate").ToString();
             pariculars = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "Particulars").ToString();
             amount = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "Amount").ToString();
             vouchertype = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "VoucherType").ToString();
@@ -93,9 +198,9 @@ namespace SalesInventorySystem.AccountingDevEx
         {
             viewVoucherDetails();
         }
-        private void CancelledCheque()
+        private void CancelledCheque(GridView gridview)
         {
-            if (gridView1.FocusedRowHandle < 0)
+            if (gridview.FocusedRowHandle < 0)
             {
                 XtraMessageBox.Show("Please select a voucher to cancel.");
                 return;
@@ -116,15 +221,15 @@ namespace SalesInventorySystem.AccountingDevEx
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 cmd.Parameters.Add("@parmsupplierid", SqlDbType.VarChar, 30)
-                    .Value = gridView1.GetFocusedRowCellValue("SupplierID");
-                cmd.Parameters.Add("@parmcheckno", SqlDbType.VarChar, 50)
-                    .Value = gridView1.GetFocusedRowCellValue("CheckNo");
+                    .Value = gridview.GetFocusedRowCellValue("SupplierID");
+                //cmd.Parameters.Add("@parmcheckno", SqlDbType.VarChar, 50)
+                //    .Value = gridview.GetFocusedRowCellValue("CheckNo");
                 cmd.Parameters.Add("@parmreferenceno", SqlDbType.VarChar, 20)
-                    .Value = gridView1.GetFocusedRowCellValue("ReferenceNumber");
+                    .Value = gridview.GetFocusedRowCellValue("ReferenceNumber");
                 cmd.Parameters.Add("@parmvoucherid", SqlDbType.VarChar, 10)
-                    .Value = gridView1.GetFocusedRowCellValue("VoucherID");
+                    .Value = gridview.GetFocusedRowCellValue("VoucherID");
                 cmd.Parameters.Add("@parmvouchertype", SqlDbType.VarChar, 20)
-                    .Value = gridView1.GetFocusedRowCellValue("VoucherType");
+                    .Value = gridview.GetFocusedRowCellValue("VoucherType");
                 cmd.Parameters.Add("@parmreason", SqlDbType.VarChar, 300)
                     .Value = reason.Trim();
                 cmd.Parameters.Add("@parmuser", SqlDbType.VarChar, 50)
@@ -177,33 +282,39 @@ namespace SalesInventorySystem.AccountingDevEx
         //        con.Close();
         //    }
         //}
-        private void errorCorrecToolStripMenuItem_Click(object sender, EventArgs e)
+        private void HandleCancelCheque(DevExpress.XtraGrid.Views.Grid.GridView gridView)
         {
-            string id = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "VoucherID").ToString();
-            string suppid = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "SupplierID").ToString();
-            string refno = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "ReferenceNumber").ToString();
-            if (Convert.ToBoolean(gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "isErrorCorrect").ToString()) == true)
+            string id = gridView.GetRowCellValue(gridView.FocusedRowHandle, "VoucherID").ToString();
+            string suppid = gridView.GetRowCellValue(gridView.FocusedRowHandle, "SupplierID").ToString();
+            string refno = gridView.GetRowCellValue(gridView.FocusedRowHandle, "ReferenceNumber").ToString();
+
+            if (Convert.ToBoolean(gridView.GetRowCellValue(gridView.FocusedRowHandle, "isErrorCorrect").ToString()))
             {
                 XtraMessageBox.Show("Entry Already Corrected!");
                 return;
             }
-            bool confirm = HelperFunction.ConfirmDialog("Are you sure you want to Cancel this Cheque? if yes All Ticket Entries in this Transaction Voucher will automatically create reversal entries..", "Cancelled Cheque");
+
+            bool confirm = HelperFunction.ConfirmDialog(
+                "Are you sure you want to Cancel this Cheque? if yes All Ticket Entries in this Transaction Voucher will automatically create reversal entries..",
+                "Cancelled Cheque");
+
             if (confirm)
             {
-                CancelledCheckVoucher canfrm = new CancelledCheckVoucher();
-                canfrm.ShowDialog(this);
-                if(CancelledCheckVoucher.isdone==true)
+                using (CancelledCheckVoucher canfrm = new CancelledCheckVoucher())
                 {
-                    reason = CancelledCheckVoucher.reason;
-                    CancelledCheque();
-                    canfrm.Dispose();
+                    canfrm.ShowDialog(this);
+                    if (CancelledCheckVoucher.isdone)
+                    {
+                        reason = CancelledCheckVoucher.reason;
+                        CancelledCheque(gridView);
+                    }
                 }
-               
             }
-            else
-            {
-                return;
-            }
+        }
+
+        private void errorCorrecToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            HandleCancelCheque(gridView1);
         }
 
         private void liquidateToolStripMenuItem_Click(object sender, EventArgs e)
@@ -247,14 +358,19 @@ namespace SalesInventorySystem.AccountingDevEx
 
         private void ViewCheckVoucherDevEx_Load(object sender, EventArgs e)
         {
-            DateTime now = DateTime.Now;
-            DateTime date = new DateTime(now.Year, now.Month, 1);
-            datefrom.Text = date.ToShortDateString();
-            var now2 = DateTime.Now;
-            var startOfMonth = new DateTime(now2.Year, now2.Month, 1);
-            var DaysInMonth = DateTime.DaysInMonth(now2.Year, now2.Month);
-            var lastDay = new DateTime(now2.Year, now2.Month, DaysInMonth);
-            dateto.Text = lastDay.ToShortDateString();
+            //DateTime now = DateTime.Now;
+            //DateTime date = new DateTime(now.Year, now.Month, 1);
+            //datefrom.Text = date.ToShortDateString();
+            //var now2 = DateTime.Now;
+            //var startOfMonth = new DateTime(now2.Year, now2.Month, 1);
+            //var DaysInMonth = DateTime.DaysInMonth(now2.Year, now2.Month);
+            //var lastDay = new DateTime(now2.Year, now2.Month, DaysInMonth);
+            //dateto.Text = lastDay.ToShortDateString();
+            xtraTabControl1.TabPages[2].PageVisible = false;
+
+            HelperFunction.SetQuarterDateRange(datefrom, dateto);
+            HelperFunction.SetQuarterDateRange(dateFromCashVoucher, dateToCashVoucher);
+            HelperFunction.SetQuarterDateRange(dateFromTelegraphic, dateToTelegraphic);
         }
 
         private void gridView1_DoubleClick(object sender, EventArgs e)
@@ -268,7 +384,7 @@ namespace SalesInventorySystem.AccountingDevEx
             bool check = Convert.ToBoolean(view.GetRowCellValue(e.RowHandle, "isErrorCorrect"));
             if (check)
             {
-                e.Appearance.Font = new System.Drawing.Font(e.Appearance.Font, FontStyle.Strikeout);
+                //e.Appearance.Font = new System.Drawing.Font(e.Appearance.Font, FontStyle.Strikeout);
                 e.Appearance.ForeColor = Color.Red;
             }
         }

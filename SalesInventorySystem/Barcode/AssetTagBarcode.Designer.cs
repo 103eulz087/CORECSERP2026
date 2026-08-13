@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            DevExpress.XtraPrinting.BarCode.Code128Generator code128Generator1 = new DevExpress.XtraPrinting.BarCode.Code128Generator();
+            //DevExpress.XtraPrinting.BarCode.Code128Generator code128Generator1 = new DevExpress.XtraPrinting.BarCode.Code128Generator();
             this.Detail = new DevExpress.XtraReports.UI.DetailBand();
             this.TopMargin = new DevExpress.XtraReports.UI.TopMarginBand();
             this.BottomMargin = new DevExpress.XtraReports.UI.BottomMarginBand();
@@ -69,7 +69,7 @@
             // xrBarCode2
             // 
             this.xrBarCode2.AutoModule = true;
-            this.xrBarCode2.Font = new System.Drawing.Font("Arial", 8.75F);
+            this.xrBarCode2.Font = new DevExpress.Drawing.DXFont("Arial", 8.75F);
             this.xrBarCode2.LocationFloat = new DevExpress.Utils.PointFloat(9.999967F, 40.29168F);
             this.xrBarCode2.Name = "xrBarCode2";
             this.xrBarCode2.Padding = new DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100F);
@@ -77,14 +77,14 @@
             this.xrBarCode2.StylePriority.UseFont = false;
             this.xrBarCode2.StylePriority.UsePadding = false;
             this.xrBarCode2.StylePriority.UseTextAlignment = false;
-            code128Generator1.CharacterSet = DevExpress.XtraPrinting.BarCode.Code128Charset.CharsetAuto;
-            this.xrBarCode2.Symbology = code128Generator1;
+            //code128Generator1.CharacterSet = DevExpress.XtraPrinting.BarCode.Code128Charset.CharsetAuto;
+            //this.xrBarCode2.Symbology = code128Generator1;
             this.xrBarCode2.Text = "888100001000";
             this.xrBarCode2.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
             // 
             // xrLabel5
             // 
-            this.xrLabel5.Font = new System.Drawing.Font("Arial", 9.25F);
+            this.xrLabel5.Font = new DevExpress.Drawing.DXFont("Arial", 9.25F);
             this.xrLabel5.LocationFloat = new DevExpress.Utils.PointFloat(9.999927F, 20.41667F);
             this.xrLabel5.Name = "xrLabel5";
             this.xrLabel5.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -94,7 +94,7 @@
             // 
             // lbldate
             // 
-            this.lbldate.Font = new System.Drawing.Font("Arial", 10.25F, System.Drawing.FontStyle.Bold);
+            this.lbldate.Font = new DevExpress.Drawing.DXFont("Arial", 10.25F, DevExpress.Drawing.DXFontStyle.Bold);
             this.lbldate.LocationFloat = new DevExpress.Utils.PointFloat(126.2499F, 19.875F);
             this.lbldate.Name = "lbldate";
             this.lbldate.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -104,7 +104,7 @@
             // 
             // xrLabel1
             // 
-            this.xrLabel1.Font = new System.Drawing.Font("Arial", 9.25F);
+            this.xrLabel1.Font = new DevExpress.Drawing.DXFont("Arial", 9.25F);
             this.xrLabel1.LocationFloat = new DevExpress.Utils.PointFloat(9.999935F, 0F);
             this.xrLabel1.Name = "xrLabel1";
             this.xrLabel1.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -114,7 +114,7 @@
             // 
             // lbldescription
             // 
-            this.lbldescription.Font = new System.Drawing.Font("Arial", 8.25F);
+            this.lbldescription.Font = new DevExpress.Drawing.DXFont("Arial", 8.25F);
             this.lbldescription.LocationFloat = new DevExpress.Utils.PointFloat(88.74986F, 0F);
             this.lbldescription.Name = "lbldescription";
             this.lbldescription.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -128,10 +128,10 @@
             this.Detail,
             this.TopMargin,
             this.BottomMargin});
-            this.Margins = new System.Drawing.Printing.Margins(0, 0, 102, 0);
+            this.Margins = new DevExpress.Drawing.DXMargins(0, 0, 102, 0);
             this.PageHeight = 220;
             this.PageWidth = 300;
-            this.PaperKind = System.Drawing.Printing.PaperKind.Custom;
+            this.PaperKind = DevExpress.Drawing.Printing.DXPaperKind.Custom;
             this.Version = "15.1";
             ((System.ComponentModel.ISupportInitialize)(this)).EndInit();
 

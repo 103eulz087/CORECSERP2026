@@ -1,20 +1,21 @@
-﻿using System;
+﻿using DevExpress.CodeParser;
+using DevExpress.XtraEditors;
+using DevExpress.XtraGrid;
+using DevExpress.XtraGrid.Columns;
+using DevExpress.XtraGrid.Views.Grid;
+using DevExpress.XtraReports.UI;
+using SalesInventorySystem.Classes;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.SqlClient;
 using System.Drawing;
-using System.Text;
+using System.IO.Ports;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using DevExpress.XtraEditors;
-using System.Data.SqlClient;
-using DevExpress.XtraReports.UI;
-using System.IO.Ports;
-using DevExpress.XtraGrid.Views.Grid;
-using DevExpress.XtraGrid.Columns;
-using DevExpress.XtraGrid;
-using SalesInventorySystem.Classes;
 
 namespace SalesInventorySystem
 {
@@ -29,9 +30,7 @@ namespace SalesInventorySystem
         string primalproductcode="";
         string globaltxtbarcodescanning = "",globalproductcode="";
         bool isFifo = Database.checkifExist("SELECT isFifo FROM InventorySettings WHERE isFifo=1");
-        bool isusedSearch = false;
-        object objprodcode = null;
-        object objshipmentno = null;
+        object pcode, catcode, referencecode, shipmentno;
         // string reamrks = "", specialprice = "", sellingprice = "";
         public AddBranchOrder()
         {
@@ -56,18 +55,15 @@ namespace SalesInventorySystem
                 barcodescanning.Checked = false;
                 panel1.Visible = false;
                 panel2.Visible = false;
-                panel3.Visible = false;
                 panel4.Visible = true;
             }
             else
             {
                 barcodescanning.Checked = true;
-                panel1.Visible = true;
-                
+                panel1.Visible = false;
+                panel2.Visible = true;
+                panel4.Visible = false;
             }
-
-            Database.displayComboBoxItems("SELECT Description FROM ProductCategory", "Description", txtprodcat);
-            //displayComboBoxItems();
 
             bool fExst = Database.checkifExist("SELECT TOP 1 PONumber FROM DeliveryDetails WHERE PONumber='" + ViewBranchOrder.ponumber + "'");
             string getID=Database.getSingleData("DeliveryDetails","PONumber",ViewBranchOrder.ponumber,"DeliveryNo");
@@ -103,10 +99,6 @@ namespace SalesInventorySystem
             {
                 simpleButton10.PerformClick();
             }
-            if (keyData == Keys.F1)
-            {
-                simpleButton3.PerformClick();
-            } 
             if (keyData == Keys.F5)
             {
                 btnchecker.PerformClick();
@@ -118,12 +110,6 @@ namespace SalesInventorySystem
         {
             string[] ports = SerialPort.GetPortNames();
             txtcomport.Items.AddRange(ports);
-        }
-
-        void displayComboBoxItems()
-        {
-            Database.displayComboBoxItems("SELECT Description FROM Products WHERE BranchCode='888' ORDER BY Description", "Description", txtproduct);
-            Database.displayComboBoxItems("SELECT Description FROM ProductCategory", "Description", txtprodcat);
         }
 
         /*****************************************NEW*****************************/
@@ -138,16 +124,26 @@ namespace SalesInventorySystem
         {
             gridControl2.BeginUpdate();
             //     Database.display("SELECT QtyDelivered,BarcodeNo,ProductNo,ProductName,FORMAT(Cost,'N','en-us')AS Cost,SequenceNo FROM DeliveryDetails WHERE DeliveryNo='" + txtdevno.Text + "'", gridControl2, gridView2);
-            Database.display("SELECT SeqNo" +
-                ",ProductNo" +
-                ",ProductName" +
-                ",BarcodeNo" +
-                ",QtyDelivered " +
-                "FROM DeliveryDetails " +
-                "WHERE DeliveryNo='" + txtdevno.Text + "' " +
-                "AND Status='PENDING'", gridControl2, gridView2);
 
-            gridView2.Columns["SeqNo"].Visible = false;
+            if(GlobalCache.CompanyName=="JFC")
+            {
+
+                Database.display($"SELECT * FROM dbo.funcview_ProcessOrderItemsSales('{txtponum.Text}')  ORDER BY SeqNo ASC", gridControl2, gridView2);
+            }
+            else
+            {
+                Database.display("SELECT SeqNo" +
+               ",ProductNo" +
+               ",ProductName" +
+               ",BarcodeNo" +
+               ",QtyDelivered " +
+               "FROM DeliveryDetails " +
+               "WHERE DeliveryNo='" + txtdevno.Text + "' " +
+               "AND Status='PENDING' AND isCancelled=0 ORDER BY SeqNo ASC", gridControl2, gridView2);
+            }
+           
+
+            //gridView2.Columns["SeqNo"].Visible = false;
             gridView2.Columns["ProductNo"].Summary.Clear();
             gridView2.Columns["ProductNo"].Summary.Add(DevExpress.Data.SummaryItemType.Count, "ProductNo", "{0:n2}");
             gridControl2.EndUpdate();
@@ -184,8 +180,7 @@ namespace SalesInventorySystem
 
                 if (GlobalCache.CompanyName == "JFC")
                 {
-                    com.Parameters.AddWithValue("@parmshipmentno", objshipmentno.ToString());
-                    //com.Parameters.AddWithValue("@parmreferencecode", objshipmentno.ToString());
+                    com.Parameters.AddWithValue("@parmshipmentno", shipmentno?.ToString() ?? "");
                 }
                 
                 com.Parameters.AddWithValue("@parmqty", txtweight.Text);
@@ -264,124 +259,6 @@ namespace SalesInventorySystem
         }
         
 
-        private void simpleButton2_Click(object sender, EventArgs e)
-        {
-            //bool isnot = Database.checkifExist("SELECT * FROM PurchaseOrderDetails where ProductCode not in (SELECT ProductNo FROM DeliveryDetails WHERE PONumber='" + txtponum.Text + "') and PONumber='" + txtponum.Text + "' ");
-            if (gridView2.RowCount == 0)
-            {
-                XtraMessageBox.Show("Cant Save no Order to be Processed!");
-                return;
-            }
-            //if (isnot == true)
-            //{
-            //    XtraMessageBox.Show("Cant Proceed there are some items that you need to processed!...");
-            //    return;
-            //}
-           
-            bool confirm = HelperFunction.ConfirmDialog("Are you sure all order has been Processed?", "Save Transaction");
-            if(!confirm)
-            {
-                return;
-            }
-            else
-            {
-                ConfirmBranchOrder();
-                isdone = true;
-                XtraMessageBox.Show("Transaction Successfully Saved!");
-                this.Close();
-            }
-          
-        }
-
-        private void simpleButton1_Click(object sender, EventArgs e)
-        {
-            gridControl2.BeginUpdate();
-            try
-            {
-                if (txtsku.Text == "")
-                {
-                    XtraMessageBox.Show("Please Input Valid Fields");
-                    return;
-                }
-                else
-                {
-                    string qty = txtweight.Text;
-                    if (barcodescanning.Checked == false)
-                    {
-                        productcategorycode = Classes.Product.getProductCategoryCode(txtprodcat.Text);//Database.getSingleQuery("Products", "ProductCode='" + primalproductcode + "' AND BranchCode='" + Login.assignedBranch + "' ", "ProductCategoryCode");
-                        primalproductcode = Classes.Product.getProductCode(txtproduct.Text, productcategorycode);//Classes.BarcodeSettings.getBarcodePrimalProductCode(txtsku.Text);
-                    }
-                    else
-                    {
-                        //old barcode scanning picking per barcode per plastic
-                        //primalproductcode = Database.getSingleQuery("Inventory", "Barcode='" + globaltxtbarcodescanning + "' and isWarehouse=1 and Available > 0 and Branch='888' and IsStock=1", "Product");
-                        //productcategorycode = primalproductcode.Substring(0, 2);
-                        primalproductcode = globalproductcode;
-                        productcategorycode = primalproductcode.Substring(0, 2);
-                    }
-                    bool requestedProductExist = false;
-                    for (int j = 0; j <= gridView1.RowCount - 1; j++)
-                    {
-                        if (gridView1.GetRowCellValue(j, "ProductCode").ToString() == primalproductcode)
-                            requestedProductExist = true;
-                        if (requestedProductExist)
-                            break;
-                    }
-                    bool inventoryExist = Database.checkifExist("SELECT Product FROM Inventory WHERE Product='" + primalproductcode + "' AND Branch='" + Login.assignedBranch + "' AND IsStock='1'");
-                    // if ((txtsku.Text.Substring(0, 2).Trim() != getProductCategoryCode()) && barcodescanning.Checked==false)//!isnvalidproduct)
-                    //if ((txtsku.Text.Substring(0, 2).Trim() != getProductCategoryCode()) && barcodescanning.Checked == false)//!isnvalidproduct)
-                    //{
-                    //    XtraMessageBox.Show("Invalid ProductCategoryCode for this Product");
-                    //    txtsku.Text = "";
-                    //}
-                    //else
-                   
-                     if (!requestedProductExist)
-                    {
-                        XtraMessageBox.Show("You cant add this Product because it is not available in Purchase Order List!");
-                        txtsku.Text = "";
-                    }
-                    else if (!inventoryExist)
-                    {
-                        XtraMessageBox.Show("No Product Inventory");
-                        txtsku.Text = "";
-                    }
-                        //kung imong gi encode na quantity is greater than sa total quantity sa imong Inventory sa commisary
-                    else if (Convert.ToDouble(txtweight.Text) > Database.getTotalSummation2("Inventory", "Product = '" + primalproductcode + "' AND Branch='" + Login.assignedBranch + "' AND IsStock='1' and Available > 0 ", "Available")) //Database.getTotalSummation("Inventory", "Product", txtsku.Text.Substring(1, 6), "Quantity"))
-                    {
-                        string mark = Database.getTotalSummation2("Inventory", "Product = '" + primalproductcode + "' AND Branch='" + Login.assignedBranch + "' AND IsStock='1'  and Available > 0 ", "Available").ToString();
-                        XtraMessageBox.Show("Insuficient Stocks for this Product.. Your Available Quantity is " + mark);
-                    }
-                    else
-                    {
-                        add();
-                        displayForDelivery();
-                        //if(isFifo==false)
-                        //{
-                        //    searchLookUpEdit1.Text = "";
-                        //}
-                        if(barcodescanning.Checked==true)
-                        {
-                            txtbarcodescanning.Focus();
-                        }
-                        else
-                        {
-                            txtproduct.Focus();
-                        }
-                        txtweight.Text = "";
-                        txtproduct.Text = "";
-                        txtsku.Text = "";
-                    }
-                }
-            }
-            catch (SqlException ex)
-            {
-                XtraMessageBox.Show(ex.Message.ToString()+"123");
-            }
-            gridControl2.EndUpdate();
-        }
-
-       
         private void txtsku_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
@@ -395,18 +272,30 @@ namespace SalesInventorySystem
             SqlConnection con = Database.getConnection();
             con.Open();
             string query = "sp_CancelDelivery";
+            if (GlobalCache.CompanyName == "JFC")
+            {
+                query = "sp_CancelDeliveryFIFOJFC";
+            }
+            else
+            {
+                query = "sp_CancelDelivery";
+            }
             try
             {
+                string prodno = gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "ProductNo").ToString();
+                string qtydeliv = gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "QtyDelivered").ToString();
+                string seqno = gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "SeqNo").ToString();
+
                 SqlCommand com = new SqlCommand(query, con);
                 com.Parameters.AddWithValue("@parmdevno", txtdevno.Text);
                 com.Parameters.AddWithValue("@parmrefno", txtrefno.Text);
                 com.Parameters.AddWithValue("@parmpono", txtponum.Text);
-                com.Parameters.AddWithValue("@parmprodno", gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "ProductNo").ToString());
-                com.Parameters.AddWithValue("@parmqty", gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "QtyDelivered").ToString());
+                com.Parameters.AddWithValue("@parmprodno", prodno);
+                com.Parameters.AddWithValue("@parmqty", qtydeliv);
                 com.Parameters.AddWithValue("@parmbranchcode", txtbrcode.Text);
                 com.Parameters.AddWithValue("@parmorigin", Login.assignedBranch);
                 com.Parameters.AddWithValue("@preparedby", Login.isglobalUserID);
-                com.Parameters.AddWithValue("@parmdevseqno", Convert.ToInt32(gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "SeqNo").ToString()));
+                com.Parameters.AddWithValue("@parmdevseqno", Convert.ToInt32(seqno));
                 com.CommandType = CommandType.StoredProcedure;
                 com.CommandText = query;
                 com.ExecuteNonQuery();
@@ -417,33 +306,6 @@ namespace SalesInventorySystem
                 XtraMessageBox.Show(ex.Message);
             }
             con.Close();
-        }
-
-        private void simpleButton3_Click(object sender, EventArgs e)
-        {
-            returnOrder();
-            displayForDelivery();
-        }
-
-        String getProductCategoryCode()
-        {
-            string str;
-            if(isusedSearch==true)
-            {
-                str = productcategorycode;
-            }
-            else
-            {
-                str = Database.getSingleQuery("ProductCategory", "Description='" + txtprodcat.Text.Trim() + "'", "ProductCategoryID");
-            }
-            return str;
-        }
-
-        String getProductCode()
-        {
-            string str;
-            str = Database.getSingleQuery("Products", "Description='" + txtproduct.Text.Trim() + "' AND ProductCategoryCode='" + getProductCategoryCode() + "'", "ProductCode");
-            return str;
         }
 
         void displayweight()
@@ -480,7 +342,7 @@ namespace SalesInventorySystem
                     }
                     else
                     {
-                        productcode = getProductCode();
+                        productcode = pcode?.ToString() ?? "";
                         if (isBarcodeLong == true)
                         {
                             txtsku.Text = "33333" + productcode + strquantity.Replace(".", "") + Classes.Utilities.sequencePadding(ctr2.ToString());
@@ -518,7 +380,7 @@ namespace SalesInventorySystem
             serialPort1.DataReceived += new SerialDataReceivedEventHandler(serialPort1_DataReceived);
             serialPort1.RtsEnable = true;
             serialPort1.DtrEnable = true;
-            txtprodcat.Focus();
+            txtsearchlookupproduct.Focus();
         }
 
         void serialPort1_DataReceived(object sender, SerialDataReceivedEventArgs e)
@@ -558,88 +420,6 @@ namespace SalesInventorySystem
             }
         }
 
-        private void txtproduct_Click(object sender, EventArgs e)
-        {
-            isusedSearch = false;
-            if (txtprodcat.Text == "")
-            {
-                txtprodcat.Focus();
-            }
-            else
-            {
-                Database.displayComboBoxItems("SELECT * FROM Products WHERE BranchCode='888' AND ProductCategoryCode='" + getProductCategoryCode() + "' ORDER BY Description", "Description", txtproduct);
-            }
-        }
-
-       
-        private void txtprodcat_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            txtproduct.Text = "";
-            txtproduct.Focus();
-            Database.displayComboBoxItems("SELECT * FROM Products WHERE BranchCode='888'  AND ProductCategoryCode='" + getProductCategoryCode() + "' ORDER BY Description", "Description", txtproduct);
-        }
-
-        private void simpleButton4_Click(object sender, EventArgs e)
-        {
-            displayweight();
-            //if (checkBox1.Checked == true)
-            //{
-            //    displayweight();
-            //}
-            //else
-            //{
-            //    Random rand = new Random();
-            //    int ctr = rand.Next(0, 9);
-            //    txtsku.Text = getProductCategoryCode() + getProductCode() + txtweight.Text.Replace(".", "") + ctr.ToString();
-            //    simpleButton1.Focus();
-            //}
-        }
-
-        private void btnclear_Click(object sender, EventArgs e)
-        {
-            txtsku.Text = "";
-            txtweight.Text = "";
-            txtweight.Focus();
-        }
-
-        private void simpleButton5_Click(object sender, EventArgs e)
-        {
-            Barcode.BarcodePrinting bprint = new Barcode.BarcodePrinting();
-            bprint.lblmanufdate.Text = DateTime.Now.ToShortDateString();
-            bprint.lblprodtype.Text = txtproduct.Text;
-            bprint.lbltotalkilos.Text = txtweight.Text;
-            bprint.xrBarCode2.Text = txtsku.Text.Trim(); //productcategorycode + primalcode + txtweight.Text.Remove(2, 1);
-            ReportPrintTool report = new ReportPrintTool(bprint);
-            report.Print();
-        }
-
-        private void txtproduct_KeyDown(object sender, KeyEventArgs e)
-        {
-            //if (e.KeyCode == Keys.Enter)
-            //    txtsearch.PerformClick();
-        }
-
-        private void txtsearch_Click(object sender, EventArgs e)
-        {
-            //HOForms.SearchProducts searchProd = new HOForms.SearchProducts(getProductCategoryCode());
-            HOForms.SearchProducts searchProd = new HOForms.SearchProducts();
-            searchProd.ShowDialog(this);
-            Database.displayLocalGrid("SELECT * FROM view_CommissaryInventory ORDER BY Description ASC", searchProd.dataGridView1);
-            if (HOForms.SearchProducts.isdone == true)
-            {
-                productcategorycode = HOForms.SearchProducts.prodcode.Substring(0, 2);
-                string productcategorydesc = Database.getSingleQuery("ProductCategory", "ProductCategoryID='" + productcategorycode + "'", "Description");
-                txtprodcat.Text = productcategorydesc;
-                txtproduct.Text = HOForms.SearchProducts.prodname;
-                txtweight.Focus();
-                HOForms.SearchProducts.isdone = false;
-                isusedSearch = true;
-                searchProd.Dispose();
-            }
-           
-           
-        }
-
         private void searchLookUpEdit1_EditValueChanged(object sender, EventArgs e)
         {
             bool isFifo = Database.checkifExist("SELECT isFifo FROM InventorySettings WHERE isFifo=1");
@@ -658,40 +438,6 @@ namespace SalesInventorySystem
                 catch (Exception ex)
                 {
                     XtraMessageBox.Show(ex.Message.ToString() + "---");
-                }
-            }
-        }
-
-        private void txtproduct_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            bool isFifo = Database.checkifExist("SELECT isFifo FROM InventorySettings WHERE isFifo=1");
-            if (isFifo==false)
-            {
-                if(barcodescanning.Checked==false)
-                {
-                    Database.displaySearchlookupEdit("SELECT BranchCode,BranchName FROM Branches", searchLookUpEditBranch, "BranchCode", "BranchCode");
-                    searchLookUpEditBranch.Text = Login.assignedBranch;
-                    Database.displaySearchlookupEdit("SELECT SequenceNumber as SeqNo,DateReceived,Barcode,Quantity,Available FROM Inventory WHERE Branch='" + searchLookUpEditBranch.Text + "' and isStock=1 and Available > 0  and Product='" + getProductCode() + "'", searchLookUpEdit1, "Barcode", "Barcode");
-                    searchLookUpEdit1.Focus();
-                }
-                else
-                {
-                    txtbarcodescanning.Focus();
-                }
-            }else
-            {
-                if(barcodescanning.Checked == false)
-                {
-                    //OLD
-                    //Database.displaySearchlookupEdit("SELECT BranchCode,BranchName FROM Branches", searchLookUpEditBranch, "BranchCode", "BranchCode");
-                    //searchLookUpEditBranch.Text = Login.assignedBranch;
-                    //Database.displaySearchlookupEdit("SELECT SequenceNumber as SeqNo,DateReceived,Barcode,Quantity,Available FROM Inventory WHERE Branch='" + searchLookUpEditBranch.Text + "' and isStock=1 and Available > 0 and isWarehouse = 1 and Product='" + getProductCode() + "'", searchLookUpEdit1, "Barcode", "Barcode");
-                    //searchLookUpEdit1.Focus();
-                    txtweight.Focus();
-                }
-                else
-                {
-                    txtbarcodescanning.Focus();
                 }
             }
         }
@@ -724,19 +470,19 @@ namespace SalesInventorySystem
             if(barcodescanning.Checked==true)
             {
                 isFifo = false;
+                panel1.Visible = false;
                 panel2.Visible = true;
                 panel4.Visible = false;
-                panel3.Visible = false;
-                panel1.Visible = false;
                 txtbarcodescanning.Focus();
             }
             else
             {
                 Database.ExecuteQuery("UPDATE InventorySettings SET isFifo=1");
                 isFifo = true;
+                panel1.Visible = false;
                 panel2.Visible = false;
-                panel3.Visible = true;
-                panel1.Visible = true;
+                panel4.Visible = true;
+                txtsearchlookupproduct.Focus();
             }
         }
 
@@ -876,69 +622,9 @@ namespace SalesInventorySystem
 
         }
 
-        private void simpleButton7_Click(object sender, EventArgs e)
-        {
-            HOForms.ViewForDeliveryDetails viewdet = new HOForms.ViewForDeliveryDetails();
-            viewdet.Show();
-            Database.display("SELECT ProductName,BarcodeNo,QtyDelivered,FORMAT(SellingPrice, 'N','en-US')  AS Price,FORMAT((QtyDelivered*SellingPrice), 'N','en-US') AS Amount,QtyDelivered AS ActualQtyDelivered,ProductNo FROM view_DeliveryReciept WHERE PONumber = '" + txtponum.Text + "'", viewdet.gridControl4, viewdet.gridView4);
-            viewdet.gridView4.Columns["Amount"].Summary.Add(DevExpress.Data.SummaryItemType.Sum, "Amount", "{0:n2}");
-        }
-
-        private void simpleButton7_Click_1(object sender, EventArgs e)
-        {
-            bool confirm = HelperFunction.ConfirmDialog("Are you sure you want to print all barcodes?", "Print All Barcode");
-            if(confirm)
-            {
-                for (int i = 0; i <= gridView2.RowCount - 1; i++)
-                {
-                    //string qtydel = gridView2.GetRowCellValue(i, "QtyDelivered").ToString();
-                    Barcode.BarcodePrinting bprint = new Barcode.BarcodePrinting();
-                    bprint.lblmanufdate.Text = DateTime.Now.ToShortDateString();
-                    bprint.lblprodtype.Text = gridView2.GetRowCellValue(i, "ProductName").ToString();
-                    bprint.lbltotalkilos.Text = gridView2.GetRowCellValue(i, "QtyDelivered").ToString();
-                    bprint.xrBarCode2.Text = gridView2.GetRowCellValue(i, "BarcodeNo").ToString();
-                    bprint.lblxpirydate.Text = DateTime.Now.AddYears(1).ToShortDateString();
-                    ReportPrintTool report = new ReportPrintTool(bprint);
-                    //report.ShowRibbonPreviewDialog();
-                    report.Print();
-                }
-            }
-            else
-            {
-                return;
-            }
-            
-        }
-
-        private void simpleButton8_Click(object sender, EventArgs e)
-        {
-            Orders.OrderCheckerDevEx oread = new Orders.OrderCheckerDevEx();
-            
-            Database.display("SELECT ProductName,Qty FROM PurchaseOrderDetails WHERE PONumber='" + txtponum.Text + "'", oread.gridControlDelivByComm, oread.gridViewDelivByComm);
-            Database.display("SELECT ProductName,SUM(QtyDelivered) as TotalKilos,COUNT(distinct BarcodeNo) as TotalBox FROM DeliveryDetails WHERE PONumber='" + txtponum.Text + "' GROUP BY ProductName", oread.gridControlActualRcvd, oread.gridViewActualRcvd);
-            Database.display("SELECT ProductName,Qty FROM PurchaseOrderDetails WHERE ProductCode not in (Select ProductNo FROM DeliveryDetails WHERE PONumber='" + txtponum.Text + "') AND PONumber='" + txtponum.Text + "' ", oread.gridControlMyStsReq, oread.gridViewMyStsReq);
-
-            oread.ShowDialog(this);
-        }
-
         private void groupBox2_Enter(object sender, EventArgs e)
         {
 
-        }
-
-        private void simpleButton6_Click(object sender, EventArgs e)
-        {
-            if (gridView2.RowCount <= 0)
-            {
-                XtraMessageBox.Show("The System found out that there are no items to be pending!..");
-                this.Close();
-            }
-            else
-            {
-                ispending = true;
-                XtraMessageBox.Show("Transaction Save as Pending!");
-                this.Dispose();
-            }
         }
 
         private void btnadd_Click(object sender, EventArgs e)
@@ -956,14 +642,11 @@ namespace SalesInventorySystem
                     string qty = txtweight.Text;
                     if (barcodescanning.Checked == false)
                     {
-                        productcategorycode = Classes.Product.getProductCategoryCode(txtprodcat.Text);//Database.getSingleQuery("Products", "ProductCode='" + primalproductcode + "' AND BranchCode='" + Login.assignedBranch + "' ", "ProductCategoryCode");
-                        primalproductcode = globalproductcode;//Classes.Product.getProductCode(txtproduct.Text, productcategorycode);//Classes.BarcodeSettings.getBarcodePrimalProductCode(txtsku.Text);
+                        primalproductcode = pcode?.ToString() ?? "";
+                        productcategorycode = catcode?.ToString() ?? "";
                     }
                     else
                     {
-                        //old barcode scanning picking per barcode per plastic
-                        //primalproductcode = Database.getSingleQuery("Inventory", "Barcode='" + globaltxtbarcodescanning + "' and isWarehouse=1 and Available > 0 and Branch='888' and IsStock=1", "Product");
-                        //productcategorycode = primalproductcode.Substring(0, 2);
                         primalproductcode = globalproductcode;
                         productcategorycode = primalproductcode.Substring(0, 2);
                     }
@@ -994,12 +677,12 @@ namespace SalesInventorySystem
                         XtraMessageBox.Show("No Product Inventory");
                         txtsku.Text = "";
                     }
-                    else if (GlobalCache.CompanyName == "JFC" && Convert.ToDouble(txtweight.Text) > Database.getTotalSummation2("Inventory", "ShipmentNo='" + objshipmentno.ToString() + "' AND Branch='" + Login.assignedBranch + "' AND Product = '" + primalproductcode + "' and Available > 0 ", "Available")) //Database.getTotalSummation("Inventory", "Product", txtsku.Text.Substring(1, 6), "Quantity"))
-                    {
-                        BigAlert.Show("INSUFFICENT STOCKS","Insuficient Stocks for this Product.. Your Available Quantity is ",MessageBoxIcon.Warning);
-                    }
+                    //else if (GlobalCache.CompanyName == "JFC" && Convert.ToDouble(txtweight.Text) > Database.getTotalSummation2("Inventory", "ShipmentNo='" + (shipmentno?.ToString() ?? "") + "' AND Branch='" + Login.assignedBranch + "' AND Product = '" + primalproductcode + "' and Available > 0 ", "Available")) //Database.getTotalSummation("Inventory", "Product", txtsku.Text.Substring(1, 6), "Quantity"))
+                    //{
+                    //    BigAlert.Show("INSUFFICENT STOCKS", "Insuficient Stocks for this Product.. Your Available Quantity is ", MessageBoxIcon.Warning);
+                    //}
                     //kung imong gi encode na quantity is greater than sa total quantity sa imong Inventory sa commisary
-                    else if (Convert.ToDouble(txtweight.Text) > Database.getTotalSummation2("Inventory", "Product = '" + primalproductcode + "' AND Branch='" + Login.assignedBranch + "' AND isWarehouse='1' and Available > 0 ", "Available")) //Database.getTotalSummation("Inventory", "Product", txtsku.Text.Substring(1, 6), "Quantity"))
+                    else if (GlobalCache.CompanyName != "JFC" && Convert.ToDouble(txtweight.Text) > Database.getTotalSummation2("Inventory", "Product = '" + primalproductcode + "' AND Branch='" + Login.assignedBranch + "' AND isWarehouse='1' and Available > 0 ", "Available")) //Database.getTotalSummation("Inventory", "Product", txtsku.Text.Substring(1, 6), "Quantity"))
                     {
                         string mark = Database.getTotalSummation2("Inventory", "Product = '" + primalproductcode + "' AND Branch='" + Login.assignedBranch + "' AND isWarehouse='1'  and Available > 0 ", "Available").ToString();
                         XtraMessageBox.Show("Insuficient Stocks for this Product.. Your Available Quantity is " + mark);
@@ -1018,10 +701,10 @@ namespace SalesInventorySystem
                         }
                         else
                         {
-                            txtproduct.Focus();
+                            txtsearchlookupproduct.Focus();
                         }
                         txtweight.Text = "";
-                        txtproduct.Text = "";
+                        txtsearchlookupproduct.Text = "";
                         txtsku.Text = "";
                     }
                 }
@@ -1044,7 +727,7 @@ namespace SalesInventorySystem
         {
             Barcode.BarcodePrinting bprint = new Barcode.BarcodePrinting();
             bprint.lblmanufdate.Text = DateTime.Now.ToShortDateString();
-            bprint.lblprodtype.Text = txtproduct.Text;
+            bprint.lblprodtype.Text = txtsearchlookupproduct.Text;
             bprint.lbltotalkilos.Text = txtweight.Text;
             bprint.xrBarCode2.Text = txtsku.Text.Trim(); //productcategorycode + primalcode + txtweight.Text.Remove(2, 1);
             ReportPrintTool report = new ReportPrintTool(bprint);
@@ -1119,10 +802,14 @@ namespace SalesInventorySystem
 
         private void txtsearchlookupproduct_EditValueChanged(object sender, EventArgs e)
         {
-            objprodcode = SearchLookUpClass.getSingleValue(txtsearchlookupproduct, "ProductCode");
-            if (GlobalCache.CompanyName == "JFC") { objshipmentno = SearchLookUpClass.getSingleValue(txtsearchlookupproduct, "ShipmentNo"); }
-           
-            globalproductcode = objprodcode.ToString();
+            catcode = null;
+            pcode = null;
+            referencecode = null;
+            shipmentno = null;
+            catcode = SearchLookUpClass.getSingleValue(txtsearchlookupproduct, "CategoryCode");
+            pcode = SearchLookUpClass.getSingleValue(txtsearchlookupproduct, "ProductCode");
+            referencecode = SearchLookUpClass.getSingleValue(txtsearchlookupproduct, "ReferenceCode");
+            shipmentno = SearchLookUpClass.getSingleValue(txtsearchlookupproduct, "ShipmentNo");
             txtweight.Focus();
         }
 
@@ -1151,24 +838,5 @@ namespace SalesInventorySystem
             }
         }
 
-        private void simpleButton3_Click_1(object sender, EventArgs e)
-        {
-            //HOForms.SearchProducts searchProd = new HOForms.SearchProducts(getProductCategoryCode());
-            HOForms.SearchProducts searchProd = new HOForms.SearchProducts();
-            searchProd.ShowDialog(this);
-            Database.displayLocalGrid("SELECT * FROM view_CommissaryInventory ORDER BY Description ASC", searchProd.dataGridView1);
-            if (HOForms.SearchProducts.isdone == true)
-            {
-                productcategorycode = HOForms.SearchProducts.prodcatcode;
-                string productcategorydesc = Database.getSingleQuery("ProductCategory", "ProductCategoryID='" + productcategorycode + "'", "Description");
-                txtprodcat.Text = productcategorydesc;
-                txtproduct.Text = HOForms.SearchProducts.prodname;
-                txtweight.Focus();
-                HOForms.SearchProducts.isdone = false;
-                isusedSearch = true;
-                searchProd.Dispose();
-            }
-           
-        }
     }
 }

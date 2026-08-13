@@ -181,7 +181,7 @@ namespace SalesInventorySystem.POS
                 //devrcptfrm.xrcaption1.Text = caption1;
                 //devrcptfrm.xrcaption2.Text = caption2;
                 devrcptfrm.xrdeliveredby.Text = Login.Fullname;
-                devrcptfrm.PaperKind = System.Drawing.Printing.PaperKind.A4;
+                devrcptfrm.PaperKind = (DevExpress.Drawing.Printing.DXPaperKind)System.Drawing.Printing.PaperKind.A4;
 
                 gridView2.Columns["ID"].Visible = false;
                 gridView2.Columns["Branch"].Visible = false;

@@ -32,13 +32,15 @@
             this.panelControl1 = new DevExpress.XtraEditors.PanelControl();
             this.tabMain = new DevExpress.XtraTab.XtraTabControl();
             this.tabProducts = new DevExpress.XtraTab.XtraTabPage();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.groupControl1 = new DevExpress.XtraEditors.GroupControl();
             this.gridControl1 = new DevExpress.XtraGrid.GridControl();
             this.gridView1 = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.repoMetrics = new DevExpress.XtraEditors.Repository.RepositoryItemComboBox();
             this.panelControl2 = new DevExpress.XtraEditors.PanelControl();
+            this.txtgroup = new DevExpress.XtraEditors.ComboBoxEdit();
+            this.ordertype = new DevExpress.XtraEditors.ComboBoxEdit();
+            this.txteffectivedate = new DevExpress.XtraEditors.DateEdit();
             this.btnadd = new DevExpress.XtraEditors.SimpleButton();
-            this.txtgroup = new System.Windows.Forms.ComboBox();
             this.labelControl12 = new DevExpress.XtraEditors.LabelControl();
             this.radothers = new System.Windows.Forms.RadioButton();
             this.panelControl3 = new DevExpress.XtraEditors.PanelControl();
@@ -55,21 +57,24 @@
             this.labelControl4 = new DevExpress.XtraEditors.LabelControl();
             this.btnnew = new DevExpress.XtraEditors.SimpleButton();
             this.txtrefno = new DevExpress.XtraEditors.TextEdit();
-            this.ordertype = new System.Windows.Forms.ComboBox();
             this.labelControl11 = new DevExpress.XtraEditors.LabelControl();
             this.labelControl8 = new DevExpress.XtraEditors.LabelControl();
-            this.txteffectivedate = new System.Windows.Forms.DateTimePicker();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).BeginInit();
             this.panelControl1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tabMain)).BeginInit();
             this.tabMain.SuspendLayout();
             this.tabProducts.SuspendLayout();
-            this.groupBox2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.groupControl1)).BeginInit();
+            this.groupControl1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.repoMetrics)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl2)).BeginInit();
             this.panelControl2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.txtgroup.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ordertype.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txteffectivedate.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txteffectivedate.Properties.CalendarTimeProperties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl3)).BeginInit();
             this.panelControl3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtbranch.Properties)).BeginInit();
@@ -104,34 +109,32 @@
             // 
             // tabProducts
             // 
-            this.tabProducts.Controls.Add(this.groupBox2);
+            this.tabProducts.Controls.Add(this.groupControl1);
             this.tabProducts.Controls.Add(this.panelControl2);
             this.tabProducts.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("tabProducts.ImageOptions.Image")));
             this.tabProducts.Name = "tabProducts";
             this.tabProducts.Size = new System.Drawing.Size(1126, 623);
             this.tabProducts.Text = "STS Products";
             // 
-            // groupBox2
+            // groupControl1
             // 
-            this.groupBox2.BackColor = System.Drawing.Color.White;
-            this.groupBox2.Controls.Add(this.gridControl1);
-            this.groupBox2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox2.Location = new System.Drawing.Point(0, 157);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(1126, 466);
-            this.groupBox2.TabIndex = 11;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "List of Orders";
+            this.groupControl1.Controls.Add(this.gridControl1);
+            this.groupControl1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.groupControl1.Location = new System.Drawing.Point(0, 161);
+            this.groupControl1.Name = "groupControl1";
+            this.groupControl1.Size = new System.Drawing.Size(1126, 462);
+            this.groupControl1.TabIndex = 12;
+            this.groupControl1.Text = "List of Orders";
             // 
             // gridControl1
             // 
             this.gridControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControl1.Location = new System.Drawing.Point(3, 19);
+            this.gridControl1.Location = new System.Drawing.Point(2, 28);
             this.gridControl1.MainView = this.gridView1;
             this.gridControl1.Name = "gridControl1";
             this.gridControl1.RepositoryItems.AddRange(new DevExpress.XtraEditors.Repository.RepositoryItem[] {
             this.repoMetrics});
-            this.gridControl1.Size = new System.Drawing.Size(1120, 444);
+            this.gridControl1.Size = new System.Drawing.Size(1122, 432);
             this.gridControl1.TabIndex = 2;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1});
@@ -170,8 +173,10 @@
             // 
             // panelControl2
             // 
-            this.panelControl2.Controls.Add(this.btnadd);
             this.panelControl2.Controls.Add(this.txtgroup);
+            this.panelControl2.Controls.Add(this.ordertype);
+            this.panelControl2.Controls.Add(this.txteffectivedate);
+            this.panelControl2.Controls.Add(this.btnadd);
             this.panelControl2.Controls.Add(this.labelControl12);
             this.panelControl2.Controls.Add(this.radothers);
             this.panelControl2.Controls.Add(this.panelControl3);
@@ -185,52 +190,73 @@
             this.panelControl2.Controls.Add(this.labelControl4);
             this.panelControl2.Controls.Add(this.btnnew);
             this.panelControl2.Controls.Add(this.txtrefno);
-            this.panelControl2.Controls.Add(this.ordertype);
             this.panelControl2.Controls.Add(this.labelControl11);
             this.panelControl2.Controls.Add(this.labelControl8);
-            this.panelControl2.Controls.Add(this.txteffectivedate);
             this.panelControl2.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelControl2.Location = new System.Drawing.Point(0, 0);
             this.panelControl2.Name = "panelControl2";
-            this.panelControl2.Size = new System.Drawing.Size(1126, 157);
+            this.panelControl2.Size = new System.Drawing.Size(1126, 161);
             this.panelControl2.TabIndex = 0;
+            // 
+            // txtgroup
+            // 
+            this.txtgroup.Location = new System.Drawing.Point(416, 22);
+            this.txtgroup.Name = "txtgroup";
+            this.txtgroup.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.txtgroup.Size = new System.Drawing.Size(147, 22);
+            this.txtgroup.TabIndex = 80;
+            // 
+            // ordertype
+            // 
+            this.ordertype.Location = new System.Drawing.Point(416, 58);
+            this.ordertype.Name = "ordertype";
+            this.ordertype.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.ordertype.Properties.Items.AddRange(new object[] {
+            "MAIN",
+            "ADD-ONS"});
+            this.ordertype.Size = new System.Drawing.Size(147, 22);
+            this.ordertype.TabIndex = 79;
+            // 
+            // txteffectivedate
+            // 
+            this.txteffectivedate.EditValue = null;
+            this.txteffectivedate.Location = new System.Drawing.Point(164, 57);
+            this.txteffectivedate.Name = "txteffectivedate";
+            this.txteffectivedate.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.txteffectivedate.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.txteffectivedate.Size = new System.Drawing.Size(148, 22);
+            this.txteffectivedate.TabIndex = 78;
             // 
             // btnadd
             // 
             this.btnadd.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.Add_16x16__2_;
-            this.btnadd.Location = new System.Drawing.Point(252, 107);
+            this.btnadd.Location = new System.Drawing.Point(252, 103);
             this.btnadd.Name = "btnadd";
-            this.btnadd.Size = new System.Drawing.Size(112, 32);
+            this.btnadd.Size = new System.Drawing.Size(112, 43);
             this.btnadd.TabIndex = 77;
             this.btnadd.Text = "Add (Enter)";
             this.btnadd.Click += new System.EventHandler(this.btnadd_Click);
             // 
-            // txtgroup
-            // 
-            this.txtgroup.Enabled = false;
-            this.txtgroup.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtgroup.FormattingEnabled = true;
-            this.txtgroup.Location = new System.Drawing.Point(416, 15);
-            this.txtgroup.Name = "txtgroup";
-            this.txtgroup.Size = new System.Drawing.Size(147, 27);
-            this.txtgroup.TabIndex = 76;
-            // 
             // labelControl12
             // 
-            this.labelControl12.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F, System.Drawing.FontStyle.Bold);
+            this.labelControl12.Appearance.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
             this.labelControl12.Appearance.Options.UseFont = true;
-            this.labelControl12.Location = new System.Drawing.Point(324, 19);
+            this.labelControl12.Location = new System.Drawing.Point(324, 24);
             this.labelControl12.Name = "labelControl12";
-            this.labelControl12.Size = new System.Drawing.Size(50, 18);
+            this.labelControl12.Size = new System.Drawing.Size(48, 17);
             this.labelControl12.TabIndex = 75;
             this.labelControl12.Text = "Group:";
             // 
             // radothers
             // 
             this.radothers.AutoSize = true;
-            this.radothers.Location = new System.Drawing.Point(850, 19);
+            this.radothers.Location = new System.Drawing.Point(827, 20);
             this.radothers.Name = "radothers";
-            this.radothers.Size = new System.Drawing.Size(111, 21);
+            this.radothers.Size = new System.Drawing.Size(103, 20);
             this.radothers.TabIndex = 28;
             this.radothers.Text = "Other Branch";
             this.radothers.UseVisualStyleBackColor = true;
@@ -240,22 +266,22 @@
             // 
             this.panelControl3.Controls.Add(this.txtbranch);
             this.panelControl3.Controls.Add(this.labelControl6);
-            this.panelControl3.Location = new System.Drawing.Point(573, 45);
+            this.panelControl3.Location = new System.Drawing.Point(569, 52);
             this.panelControl3.Name = "panelControl3";
-            this.panelControl3.Size = new System.Drawing.Size(412, 53);
+            this.panelControl3.Size = new System.Drawing.Size(412, 45);
             this.panelControl3.TabIndex = 74;
             // 
             // txtbranch
             // 
             this.txtbranch.Location = new System.Drawing.Point(136, 8);
             this.txtbranch.Name = "txtbranch";
-            this.txtbranch.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F);
+            this.txtbranch.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 7.25F);
             this.txtbranch.Properties.Appearance.Options.UseFont = true;
             this.txtbranch.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.txtbranch.Properties.NullText = "";
             this.txtbranch.Properties.PopupView = this.searchLookUpEdit1View;
-            this.txtbranch.Size = new System.Drawing.Size(260, 24);
+            this.txtbranch.Size = new System.Drawing.Size(260, 22);
             this.txtbranch.TabIndex = 28;
             this.txtbranch.EditValueChanged += new System.EventHandler(this.txtbranch_EditValueChanged);
             // 
@@ -277,11 +303,11 @@
             // 
             // labelControl6
             // 
-            this.labelControl6.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F, System.Drawing.FontStyle.Bold);
+            this.labelControl6.Appearance.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
             this.labelControl6.Appearance.Options.UseFont = true;
-            this.labelControl6.Location = new System.Drawing.Point(7, 11);
+            this.labelControl6.Location = new System.Drawing.Point(5, 10);
             this.labelControl6.Name = "labelControl6";
-            this.labelControl6.Size = new System.Drawing.Size(108, 18);
+            this.labelControl6.Size = new System.Drawing.Size(99, 17);
             this.labelControl6.TabIndex = 27;
             this.labelControl6.Text = "Select Branch:";
             // 
@@ -289,9 +315,9 @@
             // 
             this.radho.AutoSize = true;
             this.radho.Checked = true;
-            this.radho.Location = new System.Drawing.Point(733, 19);
+            this.radho.Location = new System.Drawing.Point(706, 20);
             this.radho.Name = "radho";
-            this.radho.Size = new System.Drawing.Size(98, 21);
+            this.radho.Size = new System.Drawing.Size(94, 20);
             this.radho.TabIndex = 27;
             this.radho.TabStop = true;
             this.radho.Text = "Head Office";
@@ -300,30 +326,30 @@
             // 
             // labelControl5
             // 
-            this.labelControl5.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F, System.Drawing.FontStyle.Bold);
+            this.labelControl5.Appearance.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
             this.labelControl5.Appearance.Options.UseFont = true;
-            this.labelControl5.Location = new System.Drawing.Point(580, 19);
+            this.labelControl5.Location = new System.Drawing.Point(579, 23);
             this.labelControl5.Name = "labelControl5";
-            this.labelControl5.Size = new System.Drawing.Size(88, 18);
+            this.labelControl5.Size = new System.Drawing.Size(84, 17);
             this.labelControl5.TabIndex = 26;
             this.labelControl5.Text = "Request To:";
             // 
             // labelControl3
             // 
-            this.labelControl3.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F, System.Drawing.FontStyle.Bold);
+            this.labelControl3.Appearance.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
             this.labelControl3.Appearance.Options.UseFont = true;
-            this.labelControl3.Location = new System.Drawing.Point(21, 19);
+            this.labelControl3.Location = new System.Drawing.Point(21, 23);
             this.labelControl3.Name = "labelControl3";
-            this.labelControl3.Size = new System.Drawing.Size(65, 18);
+            this.labelControl3.Size = new System.Drawing.Size(60, 17);
             this.labelControl3.TabIndex = 8;
             this.labelControl3.Text = "Order #:";
             // 
             // btnclose
             // 
             this.btnclose.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnclose.ImageOptions.Image")));
-            this.btnclose.Location = new System.Drawing.Point(640, 107);
+            this.btnclose.Location = new System.Drawing.Point(640, 103);
             this.btnclose.Name = "btnclose";
-            this.btnclose.Size = new System.Drawing.Size(108, 32);
+            this.btnclose.Size = new System.Drawing.Size(108, 43);
             this.btnclose.TabIndex = 72;
             this.btnclose.Text = "Close (Esc)";
             this.btnclose.Click += new System.EventHandler(this.btnclose_Click);
@@ -331,29 +357,29 @@
             // btncancel
             // 
             this.btncancel.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btncancel.ImageOptions.Image")));
-            this.btncancel.Location = new System.Drawing.Point(477, 107);
+            this.btncancel.Location = new System.Drawing.Point(477, 103);
             this.btncancel.Name = "btncancel";
-            this.btncancel.Size = new System.Drawing.Size(155, 32);
+            this.btncancel.Size = new System.Drawing.Size(155, 43);
             this.btncancel.TabIndex = 71;
             this.btncancel.Text = "Cancel Line (Del)";
             this.btncancel.Click += new System.EventHandler(this.btncancel_Click);
             // 
             // textEdit1
             // 
-            this.textEdit1.Location = new System.Drawing.Point(164, 15);
+            this.textEdit1.Location = new System.Drawing.Point(164, 19);
             this.textEdit1.Name = "textEdit1";
-            this.textEdit1.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textEdit1.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 7.75F);
             this.textEdit1.Properties.Appearance.Options.UseFont = true;
             this.textEdit1.Properties.ReadOnly = true;
-            this.textEdit1.Size = new System.Drawing.Size(148, 26);
+            this.textEdit1.Size = new System.Drawing.Size(148, 22);
             this.textEdit1.TabIndex = 9;
             // 
             // btnsave
             // 
             this.btnsave.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.Save_16x16__5_;
-            this.btnsave.Location = new System.Drawing.Point(372, 107);
+            this.btnsave.Location = new System.Drawing.Point(372, 103);
             this.btnsave.Name = "btnsave";
-            this.btnsave.Size = new System.Drawing.Size(97, 32);
+            this.btnsave.Size = new System.Drawing.Size(97, 43);
             this.btnsave.TabIndex = 70;
             this.btnsave.Text = "Save (F5)";
             this.btnsave.Click += new System.EventHandler(this.btnsave_Click_1);
@@ -372,9 +398,9 @@
             // btnnew
             // 
             this.btnnew.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.New_16x16__5_;
-            this.btnnew.Location = new System.Drawing.Point(164, 107);
+            this.btnnew.Location = new System.Drawing.Point(164, 103);
             this.btnnew.Name = "btnnew";
-            this.btnnew.Size = new System.Drawing.Size(80, 32);
+            this.btnnew.Size = new System.Drawing.Size(80, 43);
             this.btnnew.TabIndex = 68;
             this.btnnew.Text = "New";
             this.btnnew.Click += new System.EventHandler(this.btnnew_Click);
@@ -390,46 +416,25 @@
             this.txtrefno.TabIndex = 14;
             this.txtrefno.Visible = false;
             // 
-            // ordertype
-            // 
-            this.ordertype.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ordertype.FormattingEnabled = true;
-            this.ordertype.Items.AddRange(new object[] {
-            "MAIN",
-            "ADD-ONS"});
-            this.ordertype.Location = new System.Drawing.Point(416, 49);
-            this.ordertype.Name = "ordertype";
-            this.ordertype.Size = new System.Drawing.Size(147, 27);
-            this.ordertype.TabIndex = 35;
-            // 
             // labelControl11
             // 
-            this.labelControl11.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F, System.Drawing.FontStyle.Bold);
+            this.labelControl11.Appearance.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
             this.labelControl11.Appearance.Options.UseFont = true;
-            this.labelControl11.Location = new System.Drawing.Point(320, 53);
+            this.labelControl11.Location = new System.Drawing.Point(324, 60);
             this.labelControl11.Name = "labelControl11";
-            this.labelControl11.Size = new System.Drawing.Size(89, 18);
+            this.labelControl11.Size = new System.Drawing.Size(83, 17);
             this.labelControl11.TabIndex = 34;
             this.labelControl11.Text = "Order Type:";
             // 
             // labelControl8
             // 
-            this.labelControl8.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F, System.Drawing.FontStyle.Bold);
+            this.labelControl8.Appearance.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
             this.labelControl8.Appearance.Options.UseFont = true;
-            this.labelControl8.Location = new System.Drawing.Point(21, 53);
+            this.labelControl8.Location = new System.Drawing.Point(21, 60);
             this.labelControl8.Name = "labelControl8";
-            this.labelControl8.Size = new System.Drawing.Size(122, 18);
+            this.labelControl8.Size = new System.Drawing.Size(109, 17);
             this.labelControl8.TabIndex = 25;
             this.labelControl8.Text = "Effectivity Date:";
-            // 
-            // txteffectivedate
-            // 
-            this.txteffectivedate.Font = new System.Drawing.Font("Tahoma", 10.25F);
-            this.txteffectivedate.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.txteffectivedate.Location = new System.Drawing.Point(164, 49);
-            this.txteffectivedate.Name = "txteffectivedate";
-            this.txteffectivedate.Size = new System.Drawing.Size(147, 28);
-            this.txteffectivedate.TabIndex = 26;
             // 
             // AddOrderSTSBatchMode
             // 
@@ -447,13 +452,18 @@
             ((System.ComponentModel.ISupportInitialize)(this.tabMain)).EndInit();
             this.tabMain.ResumeLayout(false);
             this.tabProducts.ResumeLayout(false);
-            this.groupBox2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.groupControl1)).EndInit();
+            this.groupControl1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.repoMetrics)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl2)).EndInit();
             this.panelControl2.ResumeLayout(false);
             this.panelControl2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.txtgroup.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ordertype.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txteffectivedate.Properties.CalendarTimeProperties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txteffectivedate.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl3)).EndInit();
             this.panelControl3.ResumeLayout(false);
             this.panelControl3.PerformLayout();
@@ -469,11 +479,9 @@
         private DevExpress.XtraEditors.PanelControl panelControl1;
         private DevExpress.XtraTab.XtraTabControl tabMain;
         private DevExpress.XtraTab.XtraTabPage tabProducts;
-        private System.Windows.Forms.GroupBox groupBox2;
         public DevExpress.XtraGrid.GridControl gridControl1;
         public DevExpress.XtraGrid.Views.Grid.GridView gridView1;
         private DevExpress.XtraEditors.PanelControl panelControl2;
-        private System.Windows.Forms.ComboBox txtgroup;
         private DevExpress.XtraEditors.LabelControl labelControl12;
         private System.Windows.Forms.RadioButton radothers;
         private DevExpress.XtraEditors.PanelControl panelControl3;
@@ -490,11 +498,13 @@
         private DevExpress.XtraEditors.LabelControl labelControl4;
         private DevExpress.XtraEditors.SimpleButton btnnew;
         private DevExpress.XtraEditors.TextEdit txtrefno;
-        private System.Windows.Forms.ComboBox ordertype;
         private DevExpress.XtraEditors.LabelControl labelControl11;
         private DevExpress.XtraEditors.LabelControl labelControl8;
-        private System.Windows.Forms.DateTimePicker txteffectivedate;
         private DevExpress.XtraEditors.Repository.RepositoryItemComboBox repoMetrics;
         private DevExpress.XtraEditors.SimpleButton btnadd;
+        private DevExpress.XtraEditors.GroupControl groupControl1;
+        private DevExpress.XtraEditors.ComboBoxEdit txtgroup;
+        private DevExpress.XtraEditors.ComboBoxEdit ordertype;
+        private DevExpress.XtraEditors.DateEdit txteffectivedate;
     }
 }

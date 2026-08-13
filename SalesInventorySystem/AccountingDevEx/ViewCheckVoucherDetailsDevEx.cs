@@ -75,7 +75,7 @@ namespace SalesInventorySystem.AccountingDevEx
                 xct.xrcaption1.Text = caption1;
                 xct.xrcaption2.Text = caption2;
 
-                xct.PaperKind = System.Drawing.Printing.PaperKind.A4;
+                xct.PaperKind = (DevExpress.Drawing.Printing.DXPaperKind)System.Drawing.Printing.PaperKind.A4;
                 xct.xrcheckno.Text = AccountingDevEx.ViewCheckVoucherDevEx.checkno;
                 xct.xrcheckdate.Text = Convert.ToDateTime(AccountingDevEx.ViewCheckVoucherDevEx.checkdate).ToShortDateString();
                 xct.xrpaidto.Text = AccountingDevEx.ViewCheckVoucherDevEx.paidto;

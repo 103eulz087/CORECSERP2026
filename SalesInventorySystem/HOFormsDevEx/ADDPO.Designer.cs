@@ -250,7 +250,7 @@
             this.isProd.Checked = true;
             this.isProd.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.isProd.Location = new System.Drawing.Point(147, 105);
-            this.isProd.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.isProd.Margin = new System.Windows.Forms.Padding(2);
             this.isProd.Name = "isProd";
             this.isProd.Size = new System.Drawing.Size(85, 22);
             this.isProd.TabIndex = 56;
@@ -264,7 +264,7 @@
             this.isServices.AutoSize = true;
             this.isServices.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.isServices.Location = new System.Drawing.Point(240, 105);
-            this.isServices.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.isServices.Margin = new System.Windows.Forms.Padding(2);
             this.isServices.Name = "isServices";
             this.isServices.Size = new System.Drawing.Size(82, 22);
             this.isServices.TabIndex = 57;
@@ -279,9 +279,9 @@
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Top;
             this.groupBox1.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox1.Location = new System.Drawing.Point(0, 0);
-            this.groupBox1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.groupBox1.Margin = new System.Windows.Forms.Padding(2);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.groupBox1.Padding = new System.Windows.Forms.Padding(2);
             this.groupBox1.Size = new System.Drawing.Size(1132, 340);
             this.groupBox1.TabIndex = 63;
             this.groupBox1.TabStop = false;
@@ -368,7 +368,7 @@
             // txtremakrs
             // 
             this.txtremakrs.Location = new System.Drawing.Point(148, 102);
-            this.txtremakrs.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.txtremakrs.Margin = new System.Windows.Forms.Padding(2);
             this.txtremakrs.Name = "txtremakrs";
             this.txtremakrs.Size = new System.Drawing.Size(425, 135);
             this.txtremakrs.TabIndex = 74;
@@ -466,7 +466,7 @@
             0,
             0});
             this.txtinvoiceamount.Location = new System.Drawing.Point(147, 219);
-            this.txtinvoiceamount.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.txtinvoiceamount.Margin = new System.Windows.Forms.Padding(2);
             this.txtinvoiceamount.Name = "txtinvoiceamount";
             this.txtinvoiceamount.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
@@ -514,7 +514,7 @@
             0,
             0});
             this.txtqty.Location = new System.Drawing.Point(147, 160);
-            this.txtqty.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.txtqty.Margin = new System.Windows.Forms.Padding(2);
             this.txtqty.Name = "txtqty";
             this.txtqty.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
@@ -530,7 +530,7 @@
             0,
             0});
             this.txtcost.Location = new System.Drawing.Point(147, 191);
-            this.txtcost.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.txtcost.Margin = new System.Windows.Forms.Padding(2);
             this.txtcost.Name = "txtcost";
             this.txtcost.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
@@ -592,9 +592,9 @@
             this.groupBox2.Controls.Add(this.gridControl1);
             this.groupBox2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBox2.Location = new System.Drawing.Point(0, 340);
-            this.groupBox2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.groupBox2.Margin = new System.Windows.Forms.Padding(2);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.groupBox2.Padding = new System.Windows.Forms.Padding(2);
             this.groupBox2.Size = new System.Drawing.Size(1132, 340);
             this.groupBox2.TabIndex = 64;
             this.groupBox2.TabStop = false;
@@ -667,7 +667,7 @@
             this.ClientSize = new System.Drawing.Size(1132, 680);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "ADDPO";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "ADDPO";

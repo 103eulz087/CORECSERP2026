@@ -567,6 +567,7 @@
             this.searchLookUpEdit1.Properties.ValueMember = "SupplierName";
             this.searchLookUpEdit1.Size = new System.Drawing.Size(286, 24);
             this.searchLookUpEdit1.TabIndex = 440;
+            this.searchLookUpEdit1.Visible = false;
             this.searchLookUpEdit1.EditValueChanged += new System.EventHandler(this.searchLookUpEdit1_EditValueChanged);
             // 
             // gridview
@@ -585,6 +586,7 @@
             this.Label1.Size = new System.Drawing.Size(90, 18);
             this.Label1.TabIndex = 415;
             this.Label1.Text = "Select Client:";
+            this.Label1.Visible = false;
             // 
             // label6
             // 

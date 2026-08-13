@@ -32,7 +32,7 @@ namespace SalesInventorySystem.Orders
         {
             textEdit1.Text = IDGenerator.getIDNumberSP("sp_GetPurchaseOrderNumber", "PONumber"); //IDGenerator.getPONumber();
             txtgroup.Enabled = true;
-            Database.displayComboBoxItems("Select CategoryName FROM GroupCategory", "CategoryName", txtgroup);
+            Database.displayDevComboBoxItems("Select CategoryName FROM GroupCategory", "CategoryName", txtgroup);
 
             btnnew.Enabled = false;
             btnadd.Enabled = true;
@@ -147,7 +147,7 @@ namespace SalesInventorySystem.Orders
             else
             {
                 panelControl2.Visible = true;
-                Database.displaySearchlookupEdit("SELECT BranchCode,BranchName FROM Branches WHERE (BranchCode <> '888' OR BranchCode <> '" + Login.assignedBranch + "') ORDER BY BranchCode", txtbranch, "BranchCode", "BranchCode");
+                Database.displaySearchlookupEdit("SELECT BranchCode,BranchName FROM Branches WHERE BranchCode NOT IN ('888', '" + Login.assignedBranch + "') ORDER BY BranchCode", txtbranch, "BranchCode", "BranchCode");
             }
         }
         private void radho_CheckedChanged(object sender, EventArgs e)

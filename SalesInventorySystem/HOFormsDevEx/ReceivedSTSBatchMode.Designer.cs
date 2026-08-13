@@ -59,20 +59,20 @@
             this.groupControl2.Controls.Add(this.gridControlRcvd);
             this.groupControl2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupControl2.Location = new System.Drawing.Point(0, 81);
-            this.groupControl2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.groupControl2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.groupControl2.Name = "groupControl2";
-            this.groupControl2.Size = new System.Drawing.Size(1405, 599);
+            this.groupControl2.Size = new System.Drawing.Size(1204, 599);
             this.groupControl2.TabIndex = 28;
             // 
             // gridControlRcvd
             // 
             this.gridControlRcvd.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControlRcvd.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.gridControlRcvd.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.gridControlRcvd.Location = new System.Drawing.Point(2, 28);
             this.gridControlRcvd.MainView = this.gridViewRcvd;
-            this.gridControlRcvd.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.gridControlRcvd.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.gridControlRcvd.Name = "gridControlRcvd";
-            this.gridControlRcvd.Size = new System.Drawing.Size(1401, 569);
+            this.gridControlRcvd.Size = new System.Drawing.Size(1200, 569);
             this.gridControlRcvd.TabIndex = 4;
             this.gridControlRcvd.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewRcvd});
@@ -95,12 +95,12 @@
             // 
             // gridControl1
             // 
-            this.gridControl1.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.gridControl1.Location = new System.Drawing.Point(444, 38);
+            this.gridControl1.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.gridControl1.Location = new System.Drawing.Point(380, 38);
             this.gridControl1.MainView = this.gridView1;
-            this.gridControl1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.gridControl1.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.gridControl1.Name = "gridControl1";
-            this.gridControl1.Size = new System.Drawing.Size(1402, 778);
+            this.gridControl1.Size = new System.Drawing.Size(1201, 778);
             this.gridControl1.TabIndex = 5;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1});
@@ -125,22 +125,22 @@
             // 
             // txtshipmentno
             // 
-            this.txtshipmentno.Location = new System.Drawing.Point(86, 37);
-            this.txtshipmentno.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.txtshipmentno.Location = new System.Drawing.Point(81, 38);
+            this.txtshipmentno.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.txtshipmentno.Name = "txtshipmentno";
             this.txtshipmentno.Properties.Appearance.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
             this.txtshipmentno.Properties.Appearance.Options.UseFont = true;
             this.txtshipmentno.Properties.MaxLength = 13;
             this.txtshipmentno.Properties.ReadOnly = true;
-            this.txtshipmentno.Size = new System.Drawing.Size(87, 26);
+            this.txtshipmentno.Size = new System.Drawing.Size(74, 26);
             this.txtshipmentno.TabIndex = 19;
             // 
             // labelControl1
             // 
             this.labelControl1.Appearance.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelControl1.Appearance.Options.UseFont = true;
-            this.labelControl1.Location = new System.Drawing.Point(15, 41);
-            this.labelControl1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.labelControl1.Location = new System.Drawing.Point(12, 41);
+            this.labelControl1.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.labelControl1.Name = "labelControl1";
             this.labelControl1.Size = new System.Drawing.Size(65, 18);
             this.labelControl1.TabIndex = 18;
@@ -149,24 +149,24 @@
             // simpleButton2
             // 
             this.simpleButton2.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.Save_16x16__5_;
-            this.simpleButton2.Location = new System.Drawing.Point(180, 37);
-            this.simpleButton2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.simpleButton2.Location = new System.Drawing.Point(159, 37);
+            this.simpleButton2.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.simpleButton2.Name = "simpleButton2";
-            this.simpleButton2.Size = new System.Drawing.Size(100, 26);
+            this.simpleButton2.Size = new System.Drawing.Size(85, 26);
             this.simpleButton2.TabIndex = 91;
             this.simpleButton2.Text = "Save";
             this.simpleButton2.Click += new System.EventHandler(this.simpleButton2_Click);
             // 
             // txtrefno
             // 
-            this.txtrefno.Location = new System.Drawing.Point(306, 34);
-            this.txtrefno.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.txtrefno.Location = new System.Drawing.Point(248, 33);
+            this.txtrefno.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.txtrefno.Name = "txtrefno";
             this.txtrefno.Properties.Appearance.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
             this.txtrefno.Properties.Appearance.Options.UseFont = true;
             this.txtrefno.Properties.MaxLength = 13;
             this.txtrefno.Properties.ReadOnly = true;
-            this.txtrefno.Size = new System.Drawing.Size(78, 32);
+            this.txtrefno.Size = new System.Drawing.Size(76, 32);
             this.txtrefno.TabIndex = 102;
             this.txtrefno.Visible = false;
             // 
@@ -179,9 +179,9 @@
             this.groupControl1.Controls.Add(this.txtshipmentno);
             this.groupControl1.Dock = System.Windows.Forms.DockStyle.Top;
             this.groupControl1.Location = new System.Drawing.Point(0, 0);
-            this.groupControl1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.groupControl1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.groupControl1.Name = "groupControl1";
-            this.groupControl1.Size = new System.Drawing.Size(1405, 81);
+            this.groupControl1.Size = new System.Drawing.Size(1204, 81);
             this.groupControl1.TabIndex = 27;
             this.groupControl1.Text = "Receive PO/Inventory";
             // 
@@ -202,11 +202,12 @@
             // 
             // ReceivedSTSBatchMode
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1405, 680);
+            this.ClientSize = new System.Drawing.Size(1204, 680);
             this.Controls.Add(this.groupControl2);
             this.Controls.Add(this.groupControl1);
+            this.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.Name = "ReceivedSTSBatchMode";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "ReceivedSTSBatchMode";

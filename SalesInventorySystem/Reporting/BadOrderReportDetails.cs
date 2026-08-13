@@ -59,7 +59,7 @@ namespace SalesInventorySystem.Reporting
             xct.xrLabel1.Text = reportype+ " REPORT";
 
             xct.Landscape = false;
-            xct.PaperKind = System.Drawing.Printing.PaperKind.A4;
+            xct.PaperKind = (DevExpress.Drawing.Printing.DXPaperKind)System.Drawing.Printing.PaperKind.A4;
             xct.Margins = new System.Drawing.Printing.Margins(100, 100, 100, 100);
 
             string remarks = Database.getSingleQuery($"SELECT TOP(1) Remarks FROM dbo.StockoutSummary WHERE BatchID='{batchid}' ", "Remarks");

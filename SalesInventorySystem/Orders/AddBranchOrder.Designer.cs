@@ -37,17 +37,11 @@
             this.advBandedGridView1 = new DevExpress.XtraGrid.Views.BandedGrid.AdvBandedGridView();
             this.gridBand1 = new DevExpress.XtraGrid.Views.BandedGrid.GridBand();
             this.groupControl2 = new DevExpress.XtraEditors.GroupControl();
-            this.gridControl2 = new DevExpress.XtraGrid.GridControl();
-            this.gridView2 = new DevExpress.XtraGrid.Views.Grid.GridView();
-            this.bandedGridView2 = new DevExpress.XtraGrid.Views.BandedGrid.BandedGridView();
-            this.advBandedGridView2 = new DevExpress.XtraGrid.Views.BandedGrid.AdvBandedGridView();
-            this.gridBand2 = new DevExpress.XtraGrid.Views.BandedGrid.GridBand();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.panel4 = new System.Windows.Forms.Panel();
             this.labelControl15 = new DevExpress.XtraEditors.LabelControl();
             this.txtsearchlookupproduct = new DevExpress.XtraEditors.SearchLookUpEdit();
             this.searchLookUpEdit2View = new DevExpress.XtraGrid.Views.Grid.GridView();
-            this.simpleButton3 = new DevExpress.XtraEditors.SimpleButton();
             this.simpleButton2 = new DevExpress.XtraEditors.SimpleButton();
             this.simpleButton1 = new DevExpress.XtraEditors.SimpleButton();
             this.btnsaveasdraft = new DevExpress.XtraEditors.SimpleButton();
@@ -66,11 +60,7 @@
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.txtweight = new System.Windows.Forms.TextBox();
             this.labelControl9 = new DevExpress.XtraEditors.LabelControl();
-            this.txtproduct = new System.Windows.Forms.ComboBox();
-            this.txtprodcat = new System.Windows.Forms.ComboBox();
             this.txtcomport = new System.Windows.Forms.ComboBox();
-            this.labelControl8 = new DevExpress.XtraEditors.LabelControl();
-            this.labelControl7 = new DevExpress.XtraEditors.LabelControl();
             this.labelControl6 = new DevExpress.XtraEditors.LabelControl();
             this.txtrefno = new DevExpress.XtraEditors.TextEdit();
             this.labelControl5 = new DevExpress.XtraEditors.LabelControl();
@@ -91,10 +81,17 @@
             this.searchLookUpEdit1 = new DevExpress.XtraEditors.SearchLookUpEdit();
             this.searchLookUpEdit1View = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.labelControl11 = new DevExpress.XtraEditors.LabelControl();
-            this.panel3 = new System.Windows.Forms.Panel();
+            this.gridControl2 = new DevExpress.XtraGrid.GridControl();
+            this.gridView2 = new DevExpress.XtraGrid.Views.Grid.GridView();
+            this.bandedGridView2 = new DevExpress.XtraGrid.Views.BandedGrid.BandedGridView();
+            this.advBandedGridView2 = new DevExpress.XtraGrid.Views.BandedGrid.AdvBandedGridView();
+            this.gridBand2 = new DevExpress.XtraGrid.Views.BandedGrid.GridBand();
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.printBarcodeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.tablePanel1 = new DevExpress.Utils.Layout.TablePanel();
+            this.panelControl1 = new DevExpress.XtraEditors.PanelControl();
+            this.panelControl2 = new DevExpress.XtraEditors.PanelControl();
             ((System.ComponentModel.ISupportInitialize)(this.groupControl1)).BeginInit();
             this.groupControl1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).BeginInit();
@@ -103,10 +100,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.advBandedGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.groupControl2)).BeginInit();
             this.groupControl2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.gridControl2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.gridView2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.bandedGridView2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.advBandedGridView2)).BeginInit();
             this.groupBox2.SuspendLayout();
             this.panel4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtsearchlookupproduct.Properties)).BeginInit();
@@ -125,16 +118,28 @@
             ((System.ComponentModel.ISupportInitialize)(this.txtseqno.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.searchLookUpEdit1.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.searchLookUpEdit1View)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridControl2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridView2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.bandedGridView2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.advBandedGridView2)).BeginInit();
             this.contextMenuStrip1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.tablePanel1)).BeginInit();
+            this.tablePanel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).BeginInit();
+            this.panelControl1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.panelControl2)).BeginInit();
+            this.panelControl2.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupControl1
             // 
+            this.tablePanel1.SetColumn(this.groupControl1, 1);
             this.groupControl1.Controls.Add(this.gridControl1);
-            this.groupControl1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.groupControl1.Location = new System.Drawing.Point(0, 0);
+            this.groupControl1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.groupControl1.Location = new System.Drawing.Point(727, 3);
             this.groupControl1.Name = "groupControl1";
-            this.groupControl1.Size = new System.Drawing.Size(1132, 403);
+            this.tablePanel1.SetRow(this.groupControl1, 0);
+            this.groupControl1.Size = new System.Drawing.Size(652, 494);
             this.groupControl1.TabIndex = 3;
             this.groupControl1.Text = "Order Details";
             // 
@@ -144,7 +149,7 @@
             this.gridControl1.Location = new System.Drawing.Point(2, 28);
             this.gridControl1.MainView = this.gridView1;
             this.gridControl1.Name = "gridControl1";
-            this.gridControl1.Size = new System.Drawing.Size(1128, 373);
+            this.gridControl1.Size = new System.Drawing.Size(648, 464);
             this.gridControl1.TabIndex = 2;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1,
@@ -221,104 +226,17 @@
             // 
             // groupControl2
             // 
-            this.groupControl2.Controls.Add(this.gridControl2);
             this.groupControl2.Controls.Add(this.groupBox2);
             this.groupControl2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupControl2.Location = new System.Drawing.Point(0, 403);
+            this.groupControl2.Location = new System.Drawing.Point(2, 2);
             this.groupControl2.Name = "groupControl2";
-            this.groupControl2.Size = new System.Drawing.Size(1132, 277);
+            this.groupControl2.Size = new System.Drawing.Size(1382, 172);
             this.groupControl2.TabIndex = 4;
             this.groupControl2.Text = "Add Order";
-            // 
-            // gridControl2
-            // 
-            this.gridControl2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControl2.Location = new System.Drawing.Point(2, 173);
-            this.gridControl2.MainView = this.gridView2;
-            this.gridControl2.Name = "gridControl2";
-            this.gridControl2.Size = new System.Drawing.Size(1128, 102);
-            this.gridControl2.TabIndex = 3;
-            this.gridControl2.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
-            this.gridView2,
-            this.bandedGridView2,
-            this.advBandedGridView2});
-            this.gridControl2.MouseUp += new System.Windows.Forms.MouseEventHandler(this.gridControl2_MouseUp);
-            // 
-            // gridView2
-            // 
-            this.gridView2.Appearance.HeaderPanel.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.gridView2.Appearance.HeaderPanel.Options.UseFont = true;
-            this.gridView2.Appearance.Row.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.gridView2.Appearance.Row.Options.UseFont = true;
-            this.gridView2.AppearancePrint.HeaderPanel.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.gridView2.AppearancePrint.HeaderPanel.Options.UseFont = true;
-            this.gridView2.AppearancePrint.Row.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.gridView2.AppearancePrint.Row.Options.UseFont = true;
-            this.gridView2.AppearancePrint.Row.Options.UseTextOptions = true;
-            this.gridView2.AppearancePrint.Row.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center;
-            this.gridView2.ColumnPanelRowHeight = 0;
-            this.gridView2.DetailHeight = 431;
-            this.gridView2.FixedLineWidth = 3;
-            this.gridView2.FooterPanelHeight = 0;
-            this.gridView2.GridControl = this.gridControl2;
-            this.gridView2.GroupRowHeight = 0;
-            this.gridView2.LevelIndent = 0;
-            this.gridView2.Name = "gridView2";
-            this.gridView2.OptionsBehavior.Editable = false;
-            this.gridView2.OptionsBehavior.ReadOnly = true;
-            this.gridView2.OptionsView.ColumnAutoWidth = false;
-            this.gridView2.OptionsView.RowAutoHeight = true;
-            this.gridView2.OptionsView.ShowFooter = true;
-            this.gridView2.OptionsView.ShowGroupPanel = false;
-            this.gridView2.OptionsView.ShowIndicator = false;
-            this.gridView2.PreviewIndent = 0;
-            this.gridView2.RowHeight = 0;
-            this.gridView2.ViewCaptionHeight = 0;
-            // 
-            // bandedGridView2
-            // 
-            this.bandedGridView2.BandPanelRowHeight = 0;
-            this.bandedGridView2.ColumnPanelRowHeight = 0;
-            this.bandedGridView2.DetailHeight = 431;
-            this.bandedGridView2.FixedLineWidth = 3;
-            this.bandedGridView2.FooterPanelHeight = 0;
-            this.bandedGridView2.GridControl = this.gridControl2;
-            this.bandedGridView2.GroupRowHeight = 0;
-            this.bandedGridView2.LevelIndent = 0;
-            this.bandedGridView2.Name = "bandedGridView2";
-            this.bandedGridView2.PreviewIndent = 0;
-            this.bandedGridView2.RowHeight = 0;
-            this.bandedGridView2.ViewCaptionHeight = 0;
-            // 
-            // advBandedGridView2
-            // 
-            this.advBandedGridView2.BandPanelRowHeight = 0;
-            this.advBandedGridView2.Bands.AddRange(new DevExpress.XtraGrid.Views.BandedGrid.GridBand[] {
-            this.gridBand2});
-            this.advBandedGridView2.ColumnPanelRowHeight = 0;
-            this.advBandedGridView2.DetailHeight = 431;
-            this.advBandedGridView2.FixedLineWidth = 3;
-            this.advBandedGridView2.FooterPanelHeight = 0;
-            this.advBandedGridView2.GridControl = this.gridControl2;
-            this.advBandedGridView2.GroupRowHeight = 0;
-            this.advBandedGridView2.LevelIndent = 0;
-            this.advBandedGridView2.Name = "advBandedGridView2";
-            this.advBandedGridView2.PreviewIndent = 0;
-            this.advBandedGridView2.RowHeight = 0;
-            this.advBandedGridView2.ViewCaptionHeight = 0;
-            // 
-            // gridBand2
-            // 
-            this.gridBand2.Caption = "gridBand1";
-            this.gridBand2.MinWidth = 12;
-            this.gridBand2.Name = "gridBand2";
-            this.gridBand2.VisibleIndex = 0;
-            this.gridBand2.Width = 82;
             // 
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.panel4);
-            this.groupBox2.Controls.Add(this.simpleButton3);
             this.groupBox2.Controls.Add(this.simpleButton2);
             this.groupBox2.Controls.Add(this.simpleButton1);
             this.groupBox2.Controls.Add(this.btnsaveasdraft);
@@ -335,11 +253,7 @@
             this.groupBox2.Controls.Add(this.checkBox1);
             this.groupBox2.Controls.Add(this.txtweight);
             this.groupBox2.Controls.Add(this.labelControl9);
-            this.groupBox2.Controls.Add(this.txtproduct);
-            this.groupBox2.Controls.Add(this.txtprodcat);
             this.groupBox2.Controls.Add(this.txtcomport);
-            this.groupBox2.Controls.Add(this.labelControl8);
-            this.groupBox2.Controls.Add(this.labelControl7);
             this.groupBox2.Controls.Add(this.labelControl6);
             this.groupBox2.Controls.Add(this.txtrefno);
             this.groupBox2.Controls.Add(this.labelControl5);
@@ -352,11 +266,10 @@
             this.groupBox2.Controls.Add(this.txtsku);
             this.groupBox2.Controls.Add(this.labelControl2);
             this.groupBox2.Controls.Add(this.panel1);
-            this.groupBox2.Controls.Add(this.panel3);
             this.groupBox2.Dock = System.Windows.Forms.DockStyle.Top;
             this.groupBox2.Location = new System.Drawing.Point(2, 28);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(1128, 145);
+            this.groupBox2.Size = new System.Drawing.Size(1378, 145);
             this.groupBox2.TabIndex = 0;
             this.groupBox2.TabStop = false;
             this.groupBox2.Enter += new System.EventHandler(this.groupBox2_Enter);
@@ -365,7 +278,7 @@
             // 
             this.panel4.Controls.Add(this.labelControl15);
             this.panel4.Controls.Add(this.txtsearchlookupproduct);
-            this.panel4.Location = new System.Drawing.Point(2, 11);
+            this.panel4.Location = new System.Drawing.Point(8, 12);
             this.panel4.Name = "panel4";
             this.panel4.Size = new System.Drawing.Size(444, 77);
             this.panel4.TabIndex = 90;
@@ -408,17 +321,7 @@
             this.searchLookUpEdit2View.PreviewIndent = 0;
             this.searchLookUpEdit2View.RowHeight = 0;
             this.searchLookUpEdit2View.ViewCaptionHeight = 0;
-            // 
-            // simpleButton3
-            // 
-            this.simpleButton3.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("simpleButton3.ImageOptions.Image")));
-            this.simpleButton3.Location = new System.Drawing.Point(454, 56);
-            this.simpleButton3.Name = "simpleButton3";
-            this.simpleButton3.Size = new System.Drawing.Size(82, 32);
-            this.simpleButton3.TabIndex = 82;
-            this.simpleButton3.Text = "Find (F1)";
-            this.simpleButton3.Click += new System.EventHandler(this.simpleButton3_Click_1);
-            // 
+            //
             // simpleButton2
             // 
             this.simpleButton2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("simpleButton2.ImageOptions.Image")));
@@ -461,7 +364,7 @@
             // 
             // simpleButton11
             // 
-            this.simpleButton11.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.Save_16x16__5_;
+            this.simpleButton11.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("simpleButton11.ImageOptions.Image")));
             this.simpleButton11.Location = new System.Drawing.Point(665, 99);
             this.simpleButton11.Name = "simpleButton11";
             this.simpleButton11.Size = new System.Drawing.Size(104, 32);
@@ -491,7 +394,7 @@
             // 
             // btncancel
             // 
-            this.btncancel.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.Cancel_16x16__2_;
+            this.btncancel.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btncancel.ImageOptions.Image")));
             this.btncancel.Location = new System.Drawing.Point(530, 99);
             this.btncancel.Name = "btncancel";
             this.btncancel.Size = new System.Drawing.Size(128, 32);
@@ -501,7 +404,7 @@
             // 
             // btnadd
             // 
-            this.btnadd.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.Add_16x16__2_;
+            this.btnadd.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnadd.ImageOptions.Image")));
             this.btnadd.Location = new System.Drawing.Point(178, 99);
             this.btnadd.Name = "btnadd";
             this.btnadd.Size = new System.Drawing.Size(104, 32);
@@ -513,7 +416,7 @@
             // 
             this.panel2.Controls.Add(this.txtbarcodescanning);
             this.panel2.Controls.Add(this.labelControl14);
-            this.panel2.Location = new System.Drawing.Point(2, 13);
+            this.panel2.Location = new System.Drawing.Point(8, 12);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(444, 75);
             this.panel2.TabIndex = 65;
@@ -546,7 +449,7 @@
             this.barcodescanning.AutoSize = true;
             this.barcodescanning.Location = new System.Drawing.Point(5, 99);
             this.barcodescanning.Name = "barcodescanning";
-            this.barcodescanning.Size = new System.Drawing.Size(173, 21);
+            this.barcodescanning.Size = new System.Drawing.Size(162, 20);
             this.barcodescanning.TabIndex = 66;
             this.barcodescanning.Text = "Use Barcode Scanning?";
             this.barcodescanning.UseVisualStyleBackColor = true;
@@ -580,7 +483,7 @@
             this.checkBox1.AutoSize = true;
             this.checkBox1.Location = new System.Drawing.Point(939, 31);
             this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(128, 21);
+            this.checkBox1.Size = new System.Drawing.Size(118, 20);
             this.checkBox1.TabIndex = 60;
             this.checkBox1.Text = "Auto GetWeight";
             this.checkBox1.UseVisualStyleBackColor = true;
@@ -605,28 +508,6 @@
             this.labelControl9.TabIndex = 45;
             this.labelControl9.Text = "Quantity:";
             // 
-            // txtproduct
-            // 
-            this.txtproduct.Font = new System.Drawing.Font("Tahoma", 8.25F);
-            this.txtproduct.FormattingEnabled = true;
-            this.txtproduct.Location = new System.Drawing.Point(171, 58);
-            this.txtproduct.Name = "txtproduct";
-            this.txtproduct.Size = new System.Drawing.Size(266, 25);
-            this.txtproduct.TabIndex = 23;
-            this.txtproduct.SelectedIndexChanged += new System.EventHandler(this.txtproduct_SelectedIndexChanged);
-            this.txtproduct.Click += new System.EventHandler(this.txtproduct_Click);
-            this.txtproduct.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtproduct_KeyDown);
-            // 
-            // txtprodcat
-            // 
-            this.txtprodcat.Font = new System.Drawing.Font("Tahoma", 9.25F);
-            this.txtprodcat.FormattingEnabled = true;
-            this.txtprodcat.Location = new System.Drawing.Point(171, 24);
-            this.txtprodcat.Name = "txtprodcat";
-            this.txtprodcat.Size = new System.Drawing.Size(266, 26);
-            this.txtprodcat.TabIndex = 22;
-            this.txtprodcat.SelectedIndexChanged += new System.EventHandler(this.txtprodcat_SelectedIndexChanged);
-            // 
             // txtcomport
             // 
             this.txtcomport.Font = new System.Drawing.Font("Tahoma", 10.25F);
@@ -637,26 +518,6 @@
             this.txtcomport.TabIndex = 21;
             this.txtcomport.Text = "COM1";
             this.txtcomport.SelectedIndexChanged += new System.EventHandler(this.txtcomport_SelectedIndexChanged);
-            // 
-            // labelControl8
-            // 
-            this.labelControl8.Appearance.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
-            this.labelControl8.Appearance.Options.UseFont = true;
-            this.labelControl8.Location = new System.Drawing.Point(8, 59);
-            this.labelControl8.Name = "labelControl8";
-            this.labelControl8.Size = new System.Drawing.Size(153, 19);
-            this.labelControl8.TabIndex = 20;
-            this.labelControl8.Text = "SELECT PRODUCT:";
-            // 
-            // labelControl7
-            // 
-            this.labelControl7.Appearance.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
-            this.labelControl7.Appearance.Options.UseFont = true;
-            this.labelControl7.Location = new System.Drawing.Point(8, 29);
-            this.labelControl7.Name = "labelControl7";
-            this.labelControl7.Size = new System.Drawing.Size(183, 19);
-            this.labelControl7.TabIndex = 19;
-            this.labelControl7.Text = "PRODUCT CATEGORY:";
             // 
             // labelControl6
             // 
@@ -888,12 +749,92 @@
             this.labelControl11.TabIndex = 21;
             this.labelControl11.Text = "Srce Prod Inventory:";
             // 
-            // panel3
+            // gridControl2
             // 
-            this.panel3.Location = new System.Drawing.Point(2, 13);
-            this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(444, 77);
-            this.panel3.TabIndex = 70;
+            this.tablePanel1.SetColumn(this.gridControl2, 0);
+            this.gridControl2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.gridControl2.Location = new System.Drawing.Point(3, 3);
+            this.gridControl2.MainView = this.gridView2;
+            this.gridControl2.Name = "gridControl2";
+            this.tablePanel1.SetRow(this.gridControl2, 0);
+            this.gridControl2.Size = new System.Drawing.Size(718, 494);
+            this.gridControl2.TabIndex = 3;
+            this.gridControl2.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
+            this.gridView2,
+            this.bandedGridView2,
+            this.advBandedGridView2});
+            this.gridControl2.MouseUp += new System.Windows.Forms.MouseEventHandler(this.gridControl2_MouseUp);
+            // 
+            // gridView2
+            // 
+            this.gridView2.Appearance.HeaderPanel.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.gridView2.Appearance.HeaderPanel.Options.UseFont = true;
+            this.gridView2.Appearance.Row.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.gridView2.Appearance.Row.Options.UseFont = true;
+            this.gridView2.AppearancePrint.HeaderPanel.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.gridView2.AppearancePrint.HeaderPanel.Options.UseFont = true;
+            this.gridView2.AppearancePrint.Row.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.gridView2.AppearancePrint.Row.Options.UseFont = true;
+            this.gridView2.AppearancePrint.Row.Options.UseTextOptions = true;
+            this.gridView2.AppearancePrint.Row.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center;
+            this.gridView2.ColumnPanelRowHeight = 0;
+            this.gridView2.DetailHeight = 431;
+            this.gridView2.FixedLineWidth = 3;
+            this.gridView2.FooterPanelHeight = 0;
+            this.gridView2.GridControl = this.gridControl2;
+            this.gridView2.GroupRowHeight = 0;
+            this.gridView2.LevelIndent = 0;
+            this.gridView2.Name = "gridView2";
+            this.gridView2.OptionsBehavior.Editable = false;
+            this.gridView2.OptionsBehavior.ReadOnly = true;
+            this.gridView2.OptionsView.ColumnAutoWidth = false;
+            this.gridView2.OptionsView.RowAutoHeight = true;
+            this.gridView2.OptionsView.ShowFooter = true;
+            this.gridView2.OptionsView.ShowGroupPanel = false;
+            this.gridView2.OptionsView.ShowIndicator = false;
+            this.gridView2.PreviewIndent = 0;
+            this.gridView2.RowHeight = 0;
+            this.gridView2.ViewCaptionHeight = 0;
+            // 
+            // bandedGridView2
+            // 
+            this.bandedGridView2.BandPanelRowHeight = 0;
+            this.bandedGridView2.ColumnPanelRowHeight = 0;
+            this.bandedGridView2.DetailHeight = 431;
+            this.bandedGridView2.FixedLineWidth = 3;
+            this.bandedGridView2.FooterPanelHeight = 0;
+            this.bandedGridView2.GridControl = this.gridControl2;
+            this.bandedGridView2.GroupRowHeight = 0;
+            this.bandedGridView2.LevelIndent = 0;
+            this.bandedGridView2.Name = "bandedGridView2";
+            this.bandedGridView2.PreviewIndent = 0;
+            this.bandedGridView2.RowHeight = 0;
+            this.bandedGridView2.ViewCaptionHeight = 0;
+            // 
+            // advBandedGridView2
+            // 
+            this.advBandedGridView2.BandPanelRowHeight = 0;
+            this.advBandedGridView2.Bands.AddRange(new DevExpress.XtraGrid.Views.BandedGrid.GridBand[] {
+            this.gridBand2});
+            this.advBandedGridView2.ColumnPanelRowHeight = 0;
+            this.advBandedGridView2.DetailHeight = 431;
+            this.advBandedGridView2.FixedLineWidth = 3;
+            this.advBandedGridView2.FooterPanelHeight = 0;
+            this.advBandedGridView2.GridControl = this.gridControl2;
+            this.advBandedGridView2.GroupRowHeight = 0;
+            this.advBandedGridView2.LevelIndent = 0;
+            this.advBandedGridView2.Name = "advBandedGridView2";
+            this.advBandedGridView2.PreviewIndent = 0;
+            this.advBandedGridView2.RowHeight = 0;
+            this.advBandedGridView2.ViewCaptionHeight = 0;
+            // 
+            // gridBand2
+            // 
+            this.gridBand2.Caption = "gridBand1";
+            this.gridBand2.MinWidth = 12;
+            this.gridBand2.Name = "gridBand2";
+            this.gridBand2.VisibleIndex = 0;
+            this.gridBand2.Width = 82;
             // 
             // contextMenuStrip1
             // 
@@ -910,13 +851,46 @@
             this.printBarcodeToolStripMenuItem.Text = "Print Barcode";
             this.printBarcodeToolStripMenuItem.Click += new System.EventHandler(this.printBarcodeToolStripMenuItem_Click);
             // 
+            // tablePanel1
+            // 
+            this.tablePanel1.Columns.AddRange(new DevExpress.Utils.Layout.TablePanelColumn[] {
+            new DevExpress.Utils.Layout.TablePanelColumn(DevExpress.Utils.Layout.TablePanelEntityStyle.Relative, 55F),
+            new DevExpress.Utils.Layout.TablePanelColumn(DevExpress.Utils.Layout.TablePanelEntityStyle.Relative, 50F)});
+            this.tablePanel1.Controls.Add(this.gridControl2);
+            this.tablePanel1.Controls.Add(this.groupControl1);
+            this.tablePanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tablePanel1.Location = new System.Drawing.Point(2, 2);
+            this.tablePanel1.Name = "tablePanel1";
+            this.tablePanel1.Rows.AddRange(new DevExpress.Utils.Layout.TablePanelRow[] {
+            new DevExpress.Utils.Layout.TablePanelRow(DevExpress.Utils.Layout.TablePanelEntityStyle.Absolute, 26F)});
+            this.tablePanel1.Size = new System.Drawing.Size(1382, 500);
+            this.tablePanel1.TabIndex = 5;
+            // 
+            // panelControl1
+            // 
+            this.panelControl1.Controls.Add(this.groupControl2);
+            this.panelControl1.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panelControl1.Location = new System.Drawing.Point(0, 0);
+            this.panelControl1.Name = "panelControl1";
+            this.panelControl1.Size = new System.Drawing.Size(1386, 176);
+            this.panelControl1.TabIndex = 6;
+            // 
+            // panelControl2
+            // 
+            this.panelControl2.Controls.Add(this.tablePanel1);
+            this.panelControl2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panelControl2.Location = new System.Drawing.Point(0, 176);
+            this.panelControl2.Name = "panelControl2";
+            this.panelControl2.Size = new System.Drawing.Size(1386, 504);
+            this.panelControl2.TabIndex = 7;
+            // 
             // AddBranchOrder
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1132, 680);
-            this.Controls.Add(this.groupControl2);
-            this.Controls.Add(this.groupControl1);
+            this.ClientSize = new System.Drawing.Size(1386, 680);
+            this.Controls.Add(this.panelControl2);
+            this.Controls.Add(this.panelControl1);
             this.IconOptions.Icon = ((System.Drawing.Icon)(resources.GetObject("AddBranchOrder.IconOptions.Icon")));
             this.Name = "AddBranchOrder";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -931,10 +905,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.advBandedGridView1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.groupControl2)).EndInit();
             this.groupControl2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.gridControl2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.gridView2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.bandedGridView2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.advBandedGridView2)).EndInit();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.panel4.ResumeLayout(false);
@@ -957,7 +927,17 @@
             ((System.ComponentModel.ISupportInitialize)(this.txtseqno.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.searchLookUpEdit1.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.searchLookUpEdit1View)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridControl2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridView2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.bandedGridView2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.advBandedGridView2)).EndInit();
             this.contextMenuStrip1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.tablePanel1)).EndInit();
+            this.tablePanel1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).EndInit();
+            this.panelControl1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.panelControl2)).EndInit();
+            this.panelControl2.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -984,10 +964,6 @@
         public DevExpress.XtraEditors.TextEdit txtponum;
         public DevExpress.XtraEditors.TextEdit txtrefno;
         private DevExpress.XtraEditors.LabelControl labelControl6;
-        private DevExpress.XtraEditors.LabelControl labelControl8;
-        private DevExpress.XtraEditors.LabelControl labelControl7;
-        private System.Windows.Forms.ComboBox txtproduct;
-        private System.Windows.Forms.ComboBox txtprodcat;
         private System.Windows.Forms.ComboBox txtcomport;
         private System.IO.Ports.SerialPort serialPort1;
         private DevExpress.XtraEditors.LabelControl labelControl9;
@@ -1014,7 +990,6 @@
         public DevExpress.XtraGrid.Views.Grid.GridView gridView2;
         public DevExpress.XtraGrid.GridControl gridControl1;
         public DevExpress.XtraGrid.Views.Grid.GridView gridView1;
-        private System.Windows.Forms.Panel panel3;
         private DevExpress.XtraEditors.SimpleButton btnadd;
         private DevExpress.XtraEditors.SimpleButton simpleButton10;
         private DevExpress.XtraEditors.SimpleButton simpleButton9;
@@ -1024,10 +999,12 @@
         private DevExpress.XtraEditors.SimpleButton btnsaveasdraft;
         private DevExpress.XtraEditors.SimpleButton simpleButton1;
         private DevExpress.XtraEditors.SimpleButton simpleButton2;
-        private DevExpress.XtraEditors.SimpleButton simpleButton3;
         private System.Windows.Forms.Panel panel4;
         private DevExpress.XtraEditors.LabelControl labelControl15;
         public DevExpress.XtraEditors.SearchLookUpEdit txtsearchlookupproduct;
         private DevExpress.XtraGrid.Views.Grid.GridView searchLookUpEdit2View;
+        private DevExpress.Utils.Layout.TablePanel tablePanel1;
+        private DevExpress.XtraEditors.PanelControl panelControl1;
+        private DevExpress.XtraEditors.PanelControl panelControl2;
     }
 }

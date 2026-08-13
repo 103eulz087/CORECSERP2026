@@ -46,23 +46,31 @@
             this.gridControl1 = new DevExpress.XtraGrid.GridControl();
             this.gridView1 = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.txtdateto = new DevExpress.XtraEditors.DateEdit();
+            this.txtdatefrom = new DevExpress.XtraEditors.DateEdit();
             this.btnPendingGenerate = new DevExpress.XtraEditors.SimpleButton();
-            this.datetoapproved = new System.Windows.Forms.DateTimePicker();
-            this.datefromapproved = new System.Windows.Forms.DateTimePicker();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.xtraTabPageCancelled = new DevExpress.XtraTab.XtraTabPage();
-            this.gridControl3 = new DevExpress.XtraGrid.GridControl();
-            this.gridView3 = new DevExpress.XtraGrid.Views.Grid.GridView();
+            this.groupControl3 = new DevExpress.XtraEditors.GroupControl();
+            this.panel5 = new System.Windows.Forms.Panel();
+            this.gridControlCancelled = new DevExpress.XtraGrid.GridControl();
+            this.gridViewCancelled = new DevExpress.XtraGrid.Views.Grid.GridView();
+            this.panel6 = new System.Windows.Forms.Panel();
+            this.dateToCancelled = new DevExpress.XtraEditors.DateEdit();
+            this.dateFromCancelled = new DevExpress.XtraEditors.DateEdit();
+            this.btnGenerateCancelled = new DevExpress.XtraEditors.SimpleButton();
+            this.label7 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
             this.xtraTabPagePaid = new DevExpress.XtraTab.XtraTabPage();
             this.groupControl2 = new DevExpress.XtraEditors.GroupControl();
             this.panel3 = new System.Windows.Forms.Panel();
             this.gridControl4 = new DevExpress.XtraGrid.GridControl();
             this.gridView4 = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.panel4 = new System.Windows.Forms.Panel();
+            this.dateToPaid = new DevExpress.XtraEditors.DateEdit();
+            this.dateFromPaid = new DevExpress.XtraEditors.DateEdit();
             this.btngeneratePaid = new DevExpress.XtraEditors.SimpleButton();
-            this.dateToPaid = new System.Windows.Forms.DateTimePicker();
-            this.dateFromPaid = new System.Windows.Forms.DateTimePicker();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.contextMenuStripForApproval = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -76,6 +84,7 @@
             this.contextMenuStripPaid = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+            this.editDetailsToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.xtraTabControl1)).BeginInit();
             this.xtraTabControl1.SuspendLayout();
             this.xtraTabPageForApproval.SuspendLayout();
@@ -89,9 +98,21 @@
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView1)).BeginInit();
             this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.txtdateto.Properties.CalendarTimeProperties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtdateto.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtdatefrom.Properties.CalendarTimeProperties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtdatefrom.Properties)).BeginInit();
             this.xtraTabPageCancelled.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.gridControl3)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.gridView3)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.groupControl3)).BeginInit();
+            this.groupControl3.SuspendLayout();
+            this.panel5.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.gridControlCancelled)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridViewCancelled)).BeginInit();
+            this.panel6.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dateToCancelled.Properties.CalendarTimeProperties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dateToCancelled.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dateFromCancelled.Properties.CalendarTimeProperties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dateFromCancelled.Properties)).BeginInit();
             this.xtraTabPagePaid.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.groupControl2)).BeginInit();
             this.groupControl2.SuspendLayout();
@@ -99,6 +120,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.gridControl4)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView4)).BeginInit();
             this.panel4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dateToPaid.Properties.CalendarTimeProperties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dateToPaid.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dateFromPaid.Properties.CalendarTimeProperties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dateFromPaid.Properties)).BeginInit();
             this.contextMenuStripForApproval.SuspendLayout();
             this.contextMenuStripApproved.SuspendLayout();
             this.contextMenuStripCancelled.SuspendLayout();
@@ -113,10 +138,10 @@
             this.xtraTabControl1.AppearancePage.Header.Options.UseImage = true;
             this.xtraTabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.xtraTabControl1.Location = new System.Drawing.Point(0, 0);
-            this.xtraTabControl1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.xtraTabControl1.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.xtraTabControl1.Name = "xtraTabControl1";
             this.xtraTabControl1.SelectedTabPage = this.xtraTabPageForApproval;
-            this.xtraTabControl1.Size = new System.Drawing.Size(1694, 680);
+            this.xtraTabControl1.Size = new System.Drawing.Size(1451, 680);
             this.xtraTabControl1.TabIndex = 3;
             this.xtraTabControl1.TabPages.AddRange(new DevExpress.XtraTab.XtraTabPage[] {
             this.xtraTabPageForApproval,
@@ -129,20 +154,20 @@
             // 
             this.xtraTabPageForApproval.Controls.Add(this.gridControl2);
             this.xtraTabPageForApproval.Controls.Add(this.groupBox3);
-            this.xtraTabPageForApproval.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.xtraTabPageForApproval.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.xtraTabPageForApproval.Name = "xtraTabPageForApproval";
-            this.xtraTabPageForApproval.Size = new System.Drawing.Size(1692, 648);
+            this.xtraTabPageForApproval.Size = new System.Drawing.Size(1449, 648);
             this.xtraTabPageForApproval.Text = "FOR APPROVAL";
             // 
             // gridControl2
             // 
             this.gridControl2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControl2.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.gridControl2.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.gridControl2.Location = new System.Drawing.Point(0, 61);
             this.gridControl2.MainView = this.gridView2;
-            this.gridControl2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.gridControl2.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.gridControl2.Name = "gridControl2";
-            this.gridControl2.Size = new System.Drawing.Size(1692, 587);
+            this.gridControl2.Size = new System.Drawing.Size(1449, 587);
             this.gridControl2.TabIndex = 6;
             this.gridControl2.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView2});
@@ -177,10 +202,10 @@
             this.groupBox3.Dock = System.Windows.Forms.DockStyle.Top;
             this.groupBox3.Font = new System.Drawing.Font("Tahoma", 7.75F);
             this.groupBox3.Location = new System.Drawing.Point(0, 0);
-            this.groupBox3.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.groupBox3.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.groupBox3.Size = new System.Drawing.Size(1692, 61);
+            this.groupBox3.Padding = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.groupBox3.Size = new System.Drawing.Size(1449, 61);
             this.groupBox3.TabIndex = 7;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Filter Date";
@@ -189,10 +214,10 @@
             // 
             this.btnforapproval.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnforapproval.ImageOptions.Image")));
             this.btnforapproval.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btnforapproval.Location = new System.Drawing.Point(395, 21);
-            this.btnforapproval.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnforapproval.Location = new System.Drawing.Point(338, 21);
+            this.btnforapproval.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.btnforapproval.Name = "btnforapproval";
-            this.btnforapproval.Size = new System.Drawing.Size(100, 28);
+            this.btnforapproval.Size = new System.Drawing.Size(85, 28);
             this.btnforapproval.TabIndex = 7;
             this.btnforapproval.Text = "Generate";
             this.btnforapproval.Click += new System.EventHandler(this.btnforapproval_Click);
@@ -201,27 +226,28 @@
             // 
             this.txtdatetoforapproval.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
             this.txtdatetoforapproval.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.txtdatetoforapproval.Location = new System.Drawing.Point(252, 21);
-            this.txtdatetoforapproval.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.txtdatetoforapproval.Location = new System.Drawing.Point(215, 21);
+            this.txtdatetoforapproval.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.txtdatetoforapproval.Name = "txtdatetoforapproval";
-            this.txtdatetoforapproval.Size = new System.Drawing.Size(137, 27);
+            this.txtdatetoforapproval.Size = new System.Drawing.Size(117, 27);
             this.txtdatetoforapproval.TabIndex = 3;
             // 
             // txtdatefromforapproval
             // 
             this.txtdatefromforapproval.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
             this.txtdatefromforapproval.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.txtdatefromforapproval.Location = new System.Drawing.Point(68, 21);
-            this.txtdatefromforapproval.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.txtdatefromforapproval.Location = new System.Drawing.Point(58, 21);
+            this.txtdatefromforapproval.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.txtdatefromforapproval.Name = "txtdatefromforapproval";
-            this.txtdatefromforapproval.Size = new System.Drawing.Size(137, 27);
+            this.txtdatefromforapproval.Size = new System.Drawing.Size(117, 27);
             this.txtdatefromforapproval.TabIndex = 2;
             // 
             // label5
             // 
             this.label5.AutoSize = true;
             this.label5.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
-            this.label5.Location = new System.Drawing.Point(212, 27);
+            this.label5.Location = new System.Drawing.Point(181, 27);
+            this.label5.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(37, 21);
             this.label5.TabIndex = 1;
@@ -231,7 +257,8 @@
             // 
             this.label6.AutoSize = true;
             this.label6.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
-            this.label6.Location = new System.Drawing.Point(9, 27);
+            this.label6.Location = new System.Drawing.Point(7, 27);
+            this.label6.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(60, 21);
             this.label6.TabIndex = 0;
@@ -240,9 +267,9 @@
             // xtraTabPageApproved
             // 
             this.xtraTabPageApproved.Controls.Add(this.groupControl1);
-            this.xtraTabPageApproved.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.xtraTabPageApproved.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.xtraTabPageApproved.Name = "xtraTabPageApproved";
-            this.xtraTabPageApproved.Size = new System.Drawing.Size(1692, 648);
+            this.xtraTabPageApproved.Size = new System.Drawing.Size(1449, 648);
             this.xtraTabPageApproved.Text = "APPROVED";
             // 
             // groupControl1
@@ -251,9 +278,9 @@
             this.groupControl1.Controls.Add(this.panel1);
             this.groupControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupControl1.Location = new System.Drawing.Point(0, 0);
-            this.groupControl1.Margin = new System.Windows.Forms.Padding(2);
+            this.groupControl1.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.groupControl1.Name = "groupControl1";
-            this.groupControl1.Size = new System.Drawing.Size(1692, 648);
+            this.groupControl1.Size = new System.Drawing.Size(1449, 648);
             this.groupControl1.TabIndex = 7;
             // 
             // panel2
@@ -261,20 +288,20 @@
             this.panel2.Controls.Add(this.gridControl1);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel2.Location = new System.Drawing.Point(2, 86);
-            this.panel2.Margin = new System.Windows.Forms.Padding(2);
+            this.panel2.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(1688, 560);
+            this.panel2.Size = new System.Drawing.Size(1445, 560);
             this.panel2.TabIndex = 1;
             // 
             // gridControl1
             // 
             this.gridControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControl1.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.gridControl1.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.gridControl1.Location = new System.Drawing.Point(0, 0);
             this.gridControl1.MainView = this.gridView1;
-            this.gridControl1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.gridControl1.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.gridControl1.Name = "gridControl1";
-            this.gridControl1.Size = new System.Drawing.Size(1688, 560);
+            this.gridControl1.Size = new System.Drawing.Size(1445, 560);
             this.gridControl1.TabIndex = 6;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1});
@@ -301,55 +328,62 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.txtdateto);
+            this.panel1.Controls.Add(this.txtdatefrom);
             this.panel1.Controls.Add(this.btnPendingGenerate);
-            this.panel1.Controls.Add(this.datetoapproved);
-            this.panel1.Controls.Add(this.datefromapproved);
             this.panel1.Controls.Add(this.label2);
             this.panel1.Controls.Add(this.label1);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(2, 28);
-            this.panel1.Margin = new System.Windows.Forms.Padding(2);
+            this.panel1.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(1688, 58);
+            this.panel1.Size = new System.Drawing.Size(1445, 58);
             this.panel1.TabIndex = 0;
+            // 
+            // txtdateto
+            // 
+            this.txtdateto.EditValue = null;
+            this.txtdateto.Location = new System.Drawing.Point(220, 20);
+            this.txtdateto.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.txtdateto.Name = "txtdateto";
+            this.txtdateto.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.txtdateto.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.txtdateto.Size = new System.Drawing.Size(125, 22);
+            this.txtdateto.TabIndex = 13;
+            // 
+            // txtdatefrom
+            // 
+            this.txtdatefrom.EditValue = null;
+            this.txtdatefrom.Location = new System.Drawing.Point(56, 20);
+            this.txtdatefrom.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.txtdatefrom.Name = "txtdatefrom";
+            this.txtdatefrom.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.txtdatefrom.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.txtdatefrom.Size = new System.Drawing.Size(125, 22);
+            this.txtdatefrom.TabIndex = 12;
             // 
             // btnPendingGenerate
             // 
             this.btnPendingGenerate.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnPendingGenerate.ImageOptions.Image")));
             this.btnPendingGenerate.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btnPendingGenerate.Location = new System.Drawing.Point(386, 17);
-            this.btnPendingGenerate.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnPendingGenerate.Location = new System.Drawing.Point(350, 19);
+            this.btnPendingGenerate.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.btnPendingGenerate.Name = "btnPendingGenerate";
-            this.btnPendingGenerate.Size = new System.Drawing.Size(100, 24);
+            this.btnPendingGenerate.Size = new System.Drawing.Size(85, 24);
             this.btnPendingGenerate.TabIndex = 11;
             this.btnPendingGenerate.Text = "Generate";
             this.btnPendingGenerate.Click += new System.EventHandler(this.btnPendingGenerate_Click);
-            // 
-            // datetoapproved
-            // 
-            this.datetoapproved.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
-            this.datetoapproved.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.datetoapproved.Location = new System.Drawing.Point(243, 17);
-            this.datetoapproved.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.datetoapproved.Name = "datetoapproved";
-            this.datetoapproved.Size = new System.Drawing.Size(137, 27);
-            this.datetoapproved.TabIndex = 10;
-            // 
-            // datefromapproved
-            // 
-            this.datefromapproved.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
-            this.datefromapproved.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.datefromapproved.Location = new System.Drawing.Point(66, 17);
-            this.datefromapproved.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.datefromapproved.Name = "datefromapproved";
-            this.datefromapproved.Size = new System.Drawing.Size(137, 27);
-            this.datefromapproved.TabIndex = 9;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
-            this.label2.Location = new System.Drawing.Point(209, 20);
+            this.label2.Location = new System.Drawing.Point(186, 20);
+            this.label2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(37, 21);
             this.label2.TabIndex = 8;
@@ -359,7 +393,8 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
-            this.label1.Location = new System.Drawing.Point(13, 20);
+            this.label1.Location = new System.Drawing.Point(2, 20);
+            this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(60, 21);
             this.label1.TabIndex = 7;
@@ -367,51 +402,145 @@
             // 
             // xtraTabPageCancelled
             // 
-            this.xtraTabPageCancelled.Controls.Add(this.gridControl3);
-            this.xtraTabPageCancelled.Margin = new System.Windows.Forms.Padding(2);
+            this.xtraTabPageCancelled.Controls.Add(this.groupControl3);
+            this.xtraTabPageCancelled.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.xtraTabPageCancelled.Name = "xtraTabPageCancelled";
-            this.xtraTabPageCancelled.Size = new System.Drawing.Size(1692, 648);
+            this.xtraTabPageCancelled.Size = new System.Drawing.Size(1449, 648);
             this.xtraTabPageCancelled.Text = "CANCELLED";
             // 
-            // gridControl3
+            // groupControl3
             // 
-            this.gridControl3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControl3.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.gridControl3.Location = new System.Drawing.Point(0, 0);
-            this.gridControl3.MainView = this.gridView3;
-            this.gridControl3.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.gridControl3.Name = "gridControl3";
-            this.gridControl3.Size = new System.Drawing.Size(1692, 648);
-            this.gridControl3.TabIndex = 7;
-            this.gridControl3.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
-            this.gridView3});
-            this.gridControl3.MouseUp += new System.Windows.Forms.MouseEventHandler(this.gridControl3_MouseUp);
+            this.groupControl3.Controls.Add(this.panel5);
+            this.groupControl3.Controls.Add(this.panel6);
+            this.groupControl3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.groupControl3.Location = new System.Drawing.Point(0, 0);
+            this.groupControl3.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
+            this.groupControl3.Name = "groupControl3";
+            this.groupControl3.Size = new System.Drawing.Size(1449, 648);
+            this.groupControl3.TabIndex = 9;
             // 
-            // gridView3
+            // panel5
             // 
-            this.gridView3.Appearance.HeaderPanel.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.gridView3.Appearance.HeaderPanel.Options.UseFont = true;
-            this.gridView3.Appearance.Row.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.gridView3.Appearance.Row.Options.UseFont = true;
-            this.gridView3.DetailHeight = 224;
-            this.gridView3.FixedLineWidth = 1;
-            this.gridView3.GridControl = this.gridControl3;
-            this.gridView3.LevelIndent = 0;
-            this.gridView3.Name = "gridView3";
-            this.gridView3.OptionsBehavior.Editable = false;
-            this.gridView3.OptionsBehavior.ReadOnly = true;
-            this.gridView3.OptionsView.ColumnAutoWidth = false;
-            this.gridView3.OptionsView.RowAutoHeight = true;
-            this.gridView3.OptionsView.ShowGroupPanel = false;
-            this.gridView3.OptionsView.ShowIndicator = false;
-            this.gridView3.PreviewIndent = 0;
+            this.panel5.Controls.Add(this.gridControlCancelled);
+            this.panel5.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel5.Location = new System.Drawing.Point(2, 86);
+            this.panel5.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
+            this.panel5.Name = "panel5";
+            this.panel5.Size = new System.Drawing.Size(1445, 560);
+            this.panel5.TabIndex = 1;
+            // 
+            // gridControlCancelled
+            // 
+            this.gridControlCancelled.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.gridControlCancelled.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.gridControlCancelled.Location = new System.Drawing.Point(0, 0);
+            this.gridControlCancelled.MainView = this.gridViewCancelled;
+            this.gridControlCancelled.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.gridControlCancelled.Name = "gridControlCancelled";
+            this.gridControlCancelled.Size = new System.Drawing.Size(1445, 560);
+            this.gridControlCancelled.TabIndex = 6;
+            this.gridControlCancelled.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
+            this.gridViewCancelled});
+            // 
+            // gridViewCancelled
+            // 
+            this.gridViewCancelled.Appearance.HeaderPanel.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.gridViewCancelled.Appearance.HeaderPanel.Options.UseFont = true;
+            this.gridViewCancelled.Appearance.Row.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.gridViewCancelled.Appearance.Row.Options.UseFont = true;
+            this.gridViewCancelled.DetailHeight = 224;
+            this.gridViewCancelled.FixedLineWidth = 1;
+            this.gridViewCancelled.GridControl = this.gridControlCancelled;
+            this.gridViewCancelled.LevelIndent = 0;
+            this.gridViewCancelled.Name = "gridViewCancelled";
+            this.gridViewCancelled.OptionsBehavior.Editable = false;
+            this.gridViewCancelled.OptionsBehavior.ReadOnly = true;
+            this.gridViewCancelled.OptionsView.ColumnAutoWidth = false;
+            this.gridViewCancelled.OptionsView.RowAutoHeight = true;
+            this.gridViewCancelled.OptionsView.ShowFooter = true;
+            this.gridViewCancelled.OptionsView.ShowIndicator = false;
+            this.gridViewCancelled.PreviewIndent = 0;
+            // 
+            // panel6
+            // 
+            this.panel6.Controls.Add(this.dateToCancelled);
+            this.panel6.Controls.Add(this.dateFromCancelled);
+            this.panel6.Controls.Add(this.btnGenerateCancelled);
+            this.panel6.Controls.Add(this.label7);
+            this.panel6.Controls.Add(this.label8);
+            this.panel6.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel6.Location = new System.Drawing.Point(2, 28);
+            this.panel6.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
+            this.panel6.Name = "panel6";
+            this.panel6.Size = new System.Drawing.Size(1445, 58);
+            this.panel6.TabIndex = 0;
+            // 
+            // dateToCancelled
+            // 
+            this.dateToCancelled.EditValue = null;
+            this.dateToCancelled.Location = new System.Drawing.Point(231, 20);
+            this.dateToCancelled.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.dateToCancelled.Name = "dateToCancelled";
+            this.dateToCancelled.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.dateToCancelled.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.dateToCancelled.Size = new System.Drawing.Size(125, 22);
+            this.dateToCancelled.TabIndex = 15;
+            // 
+            // dateFromCancelled
+            // 
+            this.dateFromCancelled.EditValue = null;
+            this.dateFromCancelled.Location = new System.Drawing.Point(67, 20);
+            this.dateFromCancelled.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.dateFromCancelled.Name = "dateFromCancelled";
+            this.dateFromCancelled.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.dateFromCancelled.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.dateFromCancelled.Size = new System.Drawing.Size(125, 22);
+            this.dateFromCancelled.TabIndex = 14;
+            // 
+            // btnGenerateCancelled
+            // 
+            this.btnGenerateCancelled.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnGenerateCancelled.ImageOptions.Image")));
+            this.btnGenerateCancelled.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
+            this.btnGenerateCancelled.Location = new System.Drawing.Point(361, 20);
+            this.btnGenerateCancelled.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.btnGenerateCancelled.Name = "btnGenerateCancelled";
+            this.btnGenerateCancelled.Size = new System.Drawing.Size(85, 24);
+            this.btnGenerateCancelled.TabIndex = 11;
+            this.btnGenerateCancelled.Text = "Generate";
+            this.btnGenerateCancelled.Click += new System.EventHandler(this.btnGenerateCancelled_Click);
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
+            this.label7.Location = new System.Drawing.Point(194, 20);
+            this.label7.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(37, 21);
+            this.label7.TabIndex = 8;
+            this.label7.Text = "To:";
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
+            this.label8.Location = new System.Drawing.Point(11, 20);
+            this.label8.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(60, 21);
+            this.label8.TabIndex = 7;
+            this.label8.Text = "From:";
             // 
             // xtraTabPagePaid
             // 
             this.xtraTabPagePaid.Controls.Add(this.groupControl2);
-            this.xtraTabPagePaid.Margin = new System.Windows.Forms.Padding(2);
+            this.xtraTabPagePaid.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.xtraTabPagePaid.Name = "xtraTabPagePaid";
-            this.xtraTabPagePaid.Size = new System.Drawing.Size(1692, 648);
+            this.xtraTabPagePaid.Size = new System.Drawing.Size(1449, 648);
             this.xtraTabPagePaid.Text = "PAID";
             // 
             // groupControl2
@@ -420,9 +549,9 @@
             this.groupControl2.Controls.Add(this.panel4);
             this.groupControl2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupControl2.Location = new System.Drawing.Point(0, 0);
-            this.groupControl2.Margin = new System.Windows.Forms.Padding(2);
+            this.groupControl2.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.groupControl2.Name = "groupControl2";
-            this.groupControl2.Size = new System.Drawing.Size(1692, 648);
+            this.groupControl2.Size = new System.Drawing.Size(1449, 648);
             this.groupControl2.TabIndex = 8;
             // 
             // panel3
@@ -430,20 +559,20 @@
             this.panel3.Controls.Add(this.gridControl4);
             this.panel3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel3.Location = new System.Drawing.Point(2, 86);
-            this.panel3.Margin = new System.Windows.Forms.Padding(2);
+            this.panel3.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(1688, 560);
+            this.panel3.Size = new System.Drawing.Size(1445, 560);
             this.panel3.TabIndex = 1;
             // 
             // gridControl4
             // 
             this.gridControl4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControl4.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.gridControl4.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.gridControl4.Location = new System.Drawing.Point(0, 0);
             this.gridControl4.MainView = this.gridView4;
-            this.gridControl4.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.gridControl4.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.gridControl4.Name = "gridControl4";
-            this.gridControl4.Size = new System.Drawing.Size(1688, 560);
+            this.gridControl4.Size = new System.Drawing.Size(1445, 560);
             this.gridControl4.TabIndex = 6;
             this.gridControl4.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView4});
@@ -470,55 +599,62 @@
             // 
             // panel4
             // 
-            this.panel4.Controls.Add(this.btngeneratePaid);
             this.panel4.Controls.Add(this.dateToPaid);
             this.panel4.Controls.Add(this.dateFromPaid);
+            this.panel4.Controls.Add(this.btngeneratePaid);
             this.panel4.Controls.Add(this.label3);
             this.panel4.Controls.Add(this.label4);
             this.panel4.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel4.Location = new System.Drawing.Point(2, 28);
-            this.panel4.Margin = new System.Windows.Forms.Padding(2);
+            this.panel4.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(1688, 58);
+            this.panel4.Size = new System.Drawing.Size(1445, 58);
             this.panel4.TabIndex = 0;
+            // 
+            // dateToPaid
+            // 
+            this.dateToPaid.EditValue = null;
+            this.dateToPaid.Location = new System.Drawing.Point(231, 20);
+            this.dateToPaid.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.dateToPaid.Name = "dateToPaid";
+            this.dateToPaid.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.dateToPaid.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.dateToPaid.Size = new System.Drawing.Size(125, 22);
+            this.dateToPaid.TabIndex = 15;
+            // 
+            // dateFromPaid
+            // 
+            this.dateFromPaid.EditValue = null;
+            this.dateFromPaid.Location = new System.Drawing.Point(67, 20);
+            this.dateFromPaid.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.dateFromPaid.Name = "dateFromPaid";
+            this.dateFromPaid.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.dateFromPaid.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.dateFromPaid.Size = new System.Drawing.Size(125, 22);
+            this.dateFromPaid.TabIndex = 14;
             // 
             // btngeneratePaid
             // 
             this.btngeneratePaid.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btngeneratePaid.ImageOptions.Image")));
             this.btngeneratePaid.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btngeneratePaid.Location = new System.Drawing.Point(386, 17);
-            this.btngeneratePaid.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btngeneratePaid.Location = new System.Drawing.Point(361, 20);
+            this.btngeneratePaid.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.btngeneratePaid.Name = "btngeneratePaid";
-            this.btngeneratePaid.Size = new System.Drawing.Size(100, 24);
+            this.btngeneratePaid.Size = new System.Drawing.Size(85, 24);
             this.btngeneratePaid.TabIndex = 11;
             this.btngeneratePaid.Text = "Generate";
             this.btngeneratePaid.Click += new System.EventHandler(this.simpleButton1_Click);
-            // 
-            // dateToPaid
-            // 
-            this.dateToPaid.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
-            this.dateToPaid.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.dateToPaid.Location = new System.Drawing.Point(243, 17);
-            this.dateToPaid.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.dateToPaid.Name = "dateToPaid";
-            this.dateToPaid.Size = new System.Drawing.Size(137, 27);
-            this.dateToPaid.TabIndex = 10;
-            // 
-            // dateFromPaid
-            // 
-            this.dateFromPaid.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
-            this.dateFromPaid.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.dateFromPaid.Location = new System.Drawing.Point(66, 17);
-            this.dateFromPaid.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.dateFromPaid.Name = "dateFromPaid";
-            this.dateFromPaid.Size = new System.Drawing.Size(137, 27);
-            this.dateFromPaid.TabIndex = 9;
             // 
             // label3
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
-            this.label3.Location = new System.Drawing.Point(209, 20);
+            this.label3.Location = new System.Drawing.Point(194, 20);
+            this.label3.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(37, 21);
             this.label3.TabIndex = 8;
@@ -528,7 +664,8 @@
             // 
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
-            this.label4.Location = new System.Drawing.Point(13, 20);
+            this.label4.Location = new System.Drawing.Point(11, 20);
+            this.label4.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(60, 21);
             this.label4.TabIndex = 7;
@@ -562,21 +699,22 @@
             this.contextMenuStripApproved.ImageScalingSize = new System.Drawing.Size(28, 28);
             this.contextMenuStripApproved.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripMenuItem1,
-            this.errorCorrectToolStripMenuItem});
+            this.errorCorrectToolStripMenuItem,
+            this.editDetailsToolStripMenuItem1});
             this.contextMenuStripApproved.Name = "contextMenuStripForApproval";
-            this.contextMenuStripApproved.Size = new System.Drawing.Size(165, 52);
+            this.contextMenuStripApproved.Size = new System.Drawing.Size(211, 104);
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(164, 24);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(210, 24);
             this.toolStripMenuItem1.Text = "Show Details";
             this.toolStripMenuItem1.Click += new System.EventHandler(this.toolStripMenuItem1_Click);
             // 
             // errorCorrectToolStripMenuItem
             // 
             this.errorCorrectToolStripMenuItem.Name = "errorCorrectToolStripMenuItem";
-            this.errorCorrectToolStripMenuItem.Size = new System.Drawing.Size(164, 24);
+            this.errorCorrectToolStripMenuItem.Size = new System.Drawing.Size(210, 24);
             this.errorCorrectToolStripMenuItem.Text = "Error Correct";
             this.errorCorrectToolStripMenuItem.Click += new System.EventHandler(this.errorCorrectToolStripMenuItem_Click);
             // 
@@ -610,13 +748,20 @@
             this.toolStripMenuItem3.Text = "Show Details";
             this.toolStripMenuItem3.Click += new System.EventHandler(this.toolStripMenuItem3_Click);
             // 
+            // editDetailsToolStripMenuItem1
+            // 
+            this.editDetailsToolStripMenuItem1.Name = "editDetailsToolStripMenuItem1";
+            this.editDetailsToolStripMenuItem1.Size = new System.Drawing.Size(210, 24);
+            this.editDetailsToolStripMenuItem1.Text = "Edit Details";
+            this.editDetailsToolStripMenuItem1.Click += new System.EventHandler(this.editDetailsToolStripMenuItem1_Click);
+            // 
             // ViewExpenseDevEx
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1694, 680);
+            this.ClientSize = new System.Drawing.Size(1451, 680);
             this.Controls.Add(this.xtraTabControl1);
-            this.Margin = new System.Windows.Forms.Padding(2);
+            this.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.Name = "ViewExpenseDevEx";
             this.Text = "ViewExpenseDevEx";
             this.Load += new System.EventHandler(this.ViewExpenseDevEx_Load);
@@ -635,9 +780,22 @@
             ((System.ComponentModel.ISupportInitialize)(this.gridView1)).EndInit();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.txtdateto.Properties.CalendarTimeProperties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtdateto.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtdatefrom.Properties.CalendarTimeProperties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtdatefrom.Properties)).EndInit();
             this.xtraTabPageCancelled.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.gridControl3)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.gridView3)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.groupControl3)).EndInit();
+            this.groupControl3.ResumeLayout(false);
+            this.panel5.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.gridControlCancelled)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridViewCancelled)).EndInit();
+            this.panel6.ResumeLayout(false);
+            this.panel6.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dateToCancelled.Properties.CalendarTimeProperties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dateToCancelled.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dateFromCancelled.Properties.CalendarTimeProperties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dateFromCancelled.Properties)).EndInit();
             this.xtraTabPagePaid.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.groupControl2)).EndInit();
             this.groupControl2.ResumeLayout(false);
@@ -646,6 +804,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.gridView4)).EndInit();
             this.panel4.ResumeLayout(false);
             this.panel4.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dateToPaid.Properties.CalendarTimeProperties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dateToPaid.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dateFromPaid.Properties.CalendarTimeProperties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dateFromPaid.Properties)).EndInit();
             this.contextMenuStripForApproval.ResumeLayout(false);
             this.contextMenuStripApproved.ResumeLayout(false);
             this.contextMenuStripCancelled.ResumeLayout(false);
@@ -664,8 +826,6 @@
         private DevExpress.XtraGrid.GridControl gridControl1;
         private DevExpress.XtraGrid.Views.Grid.GridView gridView1;
         private DevExpress.XtraTab.XtraTabPage xtraTabPageCancelled;
-        private DevExpress.XtraGrid.GridControl gridControl3;
-        private DevExpress.XtraGrid.Views.Grid.GridView gridView3;
         private System.Windows.Forms.ContextMenuStrip contextMenuStripForApproval;
         private System.Windows.Forms.ToolStripMenuItem showDetailsToolStripMenuItem;
         private System.Windows.Forms.ContextMenuStrip contextMenuStripApproved;
@@ -676,8 +836,6 @@
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Panel panel1;
         private DevExpress.XtraEditors.SimpleButton btnPendingGenerate;
-        private System.Windows.Forms.DateTimePicker datetoapproved;
-        private System.Windows.Forms.DateTimePicker datefromapproved;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
         private DevExpress.XtraTab.XtraTabPage xtraTabPagePaid;
@@ -687,8 +845,6 @@
         private DevExpress.XtraGrid.Views.Grid.GridView gridView4;
         private System.Windows.Forms.Panel panel4;
         private DevExpress.XtraEditors.SimpleButton btngeneratePaid;
-        private System.Windows.Forms.DateTimePicker dateToPaid;
-        private System.Windows.Forms.DateTimePicker dateFromPaid;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.ContextMenuStrip contextMenuStripPaid;
@@ -702,5 +858,20 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label6;
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
+        private DevExpress.XtraEditors.DateEdit txtdateto;
+        private DevExpress.XtraEditors.DateEdit txtdatefrom;
+        private DevExpress.XtraEditors.DateEdit dateToPaid;
+        private DevExpress.XtraEditors.DateEdit dateFromPaid;
+        private DevExpress.XtraEditors.GroupControl groupControl3;
+        private System.Windows.Forms.Panel panel5;
+        private DevExpress.XtraGrid.GridControl gridControlCancelled;
+        private DevExpress.XtraGrid.Views.Grid.GridView gridViewCancelled;
+        private System.Windows.Forms.Panel panel6;
+        private DevExpress.XtraEditors.DateEdit dateToCancelled;
+        private DevExpress.XtraEditors.DateEdit dateFromCancelled;
+        private DevExpress.XtraEditors.SimpleButton btnGenerateCancelled;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.ToolStripMenuItem editDetailsToolStripMenuItem1;
     }
 }

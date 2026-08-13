@@ -54,7 +54,7 @@ namespace SalesInventorySystem.Reporting
             xct.xrcaption2.Text = caption2;
 
             xct.Landscape = false;
-            xct.PaperKind = System.Drawing.Printing.PaperKind.A4;
+            xct.PaperKind = (DevExpress.Drawing.Printing.DXPaperKind)System.Drawing.Printing.PaperKind.A4;
             
             suppliername = Database.getSingleQuery("Supplier", "SupplierID='" + suppkey + "'", "SupplierName");
 

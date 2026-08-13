@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SalesInventorySystem</RootNamespace>
     <AssemblyName>SalesInventorySystem</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
@@ -134,95 +134,100 @@
     <Reference Include="CrystalDecisions.Windows.Forms, Version=13.0.2000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
       <Private>True</Private>
     </Reference>
-    <Reference Include="DevExpress.BonusSkins.v19.2, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.BonusSkins.v26.1, Version=26.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <Private>True</Private>
     </Reference>
-    <Reference Include="DevExpress.Charts.v19.2.Core, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.Charts.v26.1.Core, Version=26.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <Private>True</Private>
     </Reference>
-    <Reference Include="DevExpress.Data.v19.2, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.Drawing.v26.1, Version=26.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <Private>True</Private>
     </Reference>
-    <Reference Include="DevExpress.DataAccess.v19.2, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
-    <Reference Include="DevExpress.ExpressApp.v19.2, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
-    <Reference Include="DevExpress.ExpressApp.Win.v19.2, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
-    <Reference Include="DevExpress.PivotGrid.v19.2.Core, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.Data.v26.1, Version=26.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <Private>True</Private>
     </Reference>
-    <Reference Include="DevExpress.Pdf.v19.2.Core, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
+    <Reference Include="DevExpress.DataAccess.v26.1, Version=26.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.PivotGrid.v26.1.Core, Version=26.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <Private>True</Private>
     </Reference>
-    <Reference Include="DevExpress.RichEdit.v19.2.Export, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
+    <Reference Include="DevExpress.Pdf.v26.1.Core, Version=26.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
       <Private>True</Private>
     </Reference>
-    <Reference Include="DevExpress.Printing.v19.2.Core, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
+    <Reference Include="DevExpress.RichEdit.v26.1.Export, Version=26.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
       <Private>True</Private>
     </Reference>
-    <Reference Include="DevExpress.Office.v19.2.Core, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.Printing.v26.1.Core, Version=26.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
       <Private>True</Private>
     </Reference>
-    <Reference Include="DevExpress.RichEdit.v19.2.Core, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.Office.v26.1.Core, Version=26.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <Private>True</Private>
     </Reference>
-    <Reference Include="DevExpress.Utils.v19.2, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.RichEdit.v26.1.Core, Version=26.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <Private>True</Private>
     </Reference>
-    <Reference Include="DevExpress.Xpo.v19.2, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
-    <Reference Include="DevExpress.XtraBars.v19.2, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.Data.Desktop.v26.1, Version=26.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <Private>True</Private>
     </Reference>
-    <Reference Include="DevExpress.XtraCharts.v19.2.Wizard, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.Utils.v26.1, Version=26.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <Private>True</Private>
     </Reference>
-    <Reference Include="DevExpress.XtraCharts.v19.2, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.Xpo.v26.1, Version=26.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.XtraBars.v26.1, Version=26.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <Private>True</Private>
     </Reference>
-    <Reference Include="DevExpress.XtraEditors.v19.2, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.XtraCharts.v26.1.Wizard, Version=26.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <Private>True</Private>
     </Reference>
-    <Reference Include="DevExpress.XtraGauges.v19.2.Core, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.XtraCharts.v26.1, Version=26.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <Private>True</Private>
     </Reference>
-    <Reference Include="DevExpress.XtraNavBar.v19.2, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
-    <Reference Include="DevExpress.XtraPrinting.v19.2, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.XtraEditors.v26.1, Version=26.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <Private>True</Private>
     </Reference>
-    <Reference Include="DevExpress.XtraGrid.v19.2, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.XtraGauges.v26.1.Core, Version=26.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <Private>True</Private>
     </Reference>
-    <Reference Include="DevExpress.XtraLayout.v19.2, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
+    <Reference Include="DevExpress.XtraNavBar.v26.1, Version=26.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraPrinting.v26.1, Version=26.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <Private>True</Private>
     </Reference>
-    <Reference Include="DevExpress.XtraPivotGrid.v19.2, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.XtraGrid.v26.1, Version=26.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <Private>True</Private>
     </Reference>
-    <Reference Include="DevExpress.Sparkline.v19.2.Core, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.XtraLayout.v26.1, Version=26.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
       <Private>True</Private>
     </Reference>
-    <Reference Include="DevExpress.Utils.v19.2.UI, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.XtraPivotGrid.v26.1, Version=26.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <Private>True</Private>
     </Reference>
-    <Reference Include="DevExpress.XtraReports.v19.2.Extensions, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.Sparkline.v26.1.Core, Version=26.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <Private>True</Private>
     </Reference>
-    <Reference Include="DevExpress.CodeParser.v19.2, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.Utils.v26.1.UI, Version=26.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <Private>True</Private>
     </Reference>
-    <Reference Include="DevExpress.XtraReports.v19.2, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.XtraReports.v26.1.Extensions, Version=26.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <Private>True</Private>
     </Reference>
-    <Reference Include="DevExpress.Images.v19.2, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.CodeParser.v26.1, Version=26.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <Private>True</Private>
     </Reference>
-    <Reference Include="DevExpress.XtraRichEdit.v19.2, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.XtraReports.v26.1, Version=26.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <Private>True</Private>
     </Reference>
-    <Reference Include="DevExpress.XtraScheduler.v19.2, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
-    <Reference Include="DevExpress.XtraScheduler.v19.2.Core, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
-    <Reference Include="DevExpress.XtraTreeList.v19.2, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.Images.v26.1, Version=26.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <Private>True</Private>
     </Reference>
-    <Reference Include="DevExpress.XtraVerticalGrid.v19.2, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.XtraRichEdit.v26.1, Version=26.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="DevExpress.XtraScheduler.v26.1, Version=26.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraScheduler.v26.1.Core.Desktop, Version=26.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.XtraScheduler.v26.1.Core, Version=26.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.XtraTreeList.v26.1, Version=26.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="DevExpress.XtraVerticalGrid.v26.1, Version=26.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <Private>True</Private>
     </Reference>
     <Reference Include="DocumentFormat.OpenXml">
@@ -243,14 +248,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\Debug\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="Npgsql, Version=4.0.11.0, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7, processorArchitecture=MSIL">
-      <HintPath>..\packages\Npgsql.4.0.11\lib\net451\Npgsql.dll</HintPath>
-    </Reference>
     <Reference Include="System">
       <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Buffers, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Buffers.4.4.0\lib\netstandard2.0\System.Buffers.dll</HintPath>
     </Reference>
     <Reference Include="System.ComponentModel.DataAnnotations, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Configuration">
@@ -266,23 +265,8 @@
     <Reference Include="System.Management">
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Memory.4.5.3\lib\netstandard2.0\System.Memory.dll</HintPath>
-    </Reference>
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Numerics" />
-    <Reference Include="System.Numerics.Vectors, Version=4.1.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Numerics.Vectors.4.4.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.2\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.2\lib\netstandard2.0\System.Threading.Tasks.Extensions.dll</HintPath>
-    </Reference>
-    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net461\System.ValueTuple.dll</HintPath>
-    </Reference>
     <Reference Include="System.Web">
       <Private>True</Private>
     </Reference>
@@ -319,6 +303,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AccountingDevEx\AccountingBoard.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AccountingDevEx\AccountingBoard.Designer.cs">
+      <DependentUpon>AccountingBoard.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AccountingDevEx\AddExpenseDevExFrm.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="AccountingDevEx\AddExpenseDevExFrm.Designer.cs">
+      <DependentUpon>AddExpenseDevExFrm.cs</DependentUpon>
+    </Compile>
     <Compile Include="AccountingDevEx\BalanceSheetAccountDetails.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -331,6 +327,12 @@
     <Compile Include="AccountingDevEx\BalanceSheetDevEx.Designer.cs">
       <DependentUpon>BalanceSheetDevEx.cs</DependentUpon>
     </Compile>
+    <Compile Include="AccountingDevEx\BankReconAutoDebitMatchForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AccountingDevEx\BankReconAutoDebitMatchForm.Designer.cs">
+      <DependentUpon>BankReconAutoDebitMatchForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="AccountingDevEx\BankReconFormV1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -338,7 +340,7 @@
       <DependentUpon>BankReconFormV1.cs</DependentUpon>
     </Compile>
     <Compile Include="AccountingDevEx\BankReconFormV2.cs">
-      <SubType>Form</SubType>
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="AccountingDevEx\BankReconFormV2.Designer.cs">
       <DependentUpon>BankReconFormV2.cs</DependentUpon>
@@ -348,6 +350,24 @@
     </Compile>
     <Compile Include="AccountingDevEx\BankReconItemForm.Designer.cs">
       <DependentUpon>BankReconItemForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AccountingDevEx\ClientPaymentsDevExAcctg.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="AccountingDevEx\ClientPaymentsDevExAcctg.Designer.cs">
+      <DependentUpon>ClientPaymentsDevExAcctg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AccountingDevEx\ExpenseManualMultiBranchFrm.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="AccountingDevEx\ExpenseManualMultiBranchFrm.Designer.cs">
+      <DependentUpon>ExpenseManualMultiBranchFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AccountingDevEx\FluentDesignForm1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AccountingDevEx\FluentDesignForm1.Designer.cs">
+      <DependentUpon>FluentDesignForm1.cs</DependentUpon>
     </Compile>
     <Compile Include="AccountingDevEx\ManualTicketFormV1.cs">
       <SubType>Form</SubType>
@@ -360,6 +380,24 @@
     </Compile>
     <Compile Include="AccountingDevEx\ManualTicketForm.Designer.cs">
       <DependentUpon>ManualTicketForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AccountingDevEx\SupplierPaymentDevEx.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="AccountingDevEx\SupplierPaymentDevEx.Designer.cs">
+      <DependentUpon>SupplierPaymentDevEx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AccountingDevEx\SupplierVoucherReversalFrm.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="AccountingDevEx\SupplierVoucherReversalFrm.Designer.cs">
+      <DependentUpon>SupplierVoucherReversalFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AccountingDevEx\TicketInquiryFrm.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="AccountingDevEx\TicketInquiryFrm.Designer.cs">
+      <DependentUpon>TicketInquiryFrm.cs</DependentUpon>
     </Compile>
     <Compile Include="AccountingDevEx\ViewCheckVoucherDetailsDevEx.cs">
       <SubType>Form</SubType>
@@ -374,10 +412,16 @@
       <DependentUpon>CancelledCheckVoucher.cs</DependentUpon>
     </Compile>
     <Compile Include="AccountingDevEx\ViewCheckVoucherDevEx.cs">
-      <SubType>Form</SubType>
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="AccountingDevEx\ViewCheckVoucherDevEx.Designer.cs">
       <DependentUpon>ViewCheckVoucherDevEx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AccountingDevEx\VoucheringManualFrm.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="AccountingDevEx\VoucheringManualFrm.Designer.cs">
+      <DependentUpon>VoucheringManualFrm.cs</DependentUpon>
     </Compile>
     <Compile Include="Accounting\AcctViewTicketDetails.cs">
       <SubType>Form</SubType>
@@ -451,10 +495,10 @@
     <Compile Include="Accounting\GLPostingDevEx.Designer.cs">
       <DependentUpon>GLPostingDevEx.cs</DependentUpon>
     </Compile>
-    <Compile Include="Accounting\GLSummary.cs">
+    <Compile Include="AccountingDevEx\GLSummary.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Accounting\GLSummary.Designer.cs">
+    <Compile Include="AccountingDevEx\GLSummary.Designer.cs">
       <DependentUpon>GLSummary.cs</DependentUpon>
     </Compile>
     <Compile Include="Accounting\IncomeStatement.cs">
@@ -672,6 +716,7 @@
     <Compile Include="Classes\GlobalVariables.cs" />
     <Compile Include="Classes\HelperFunction.cs" />
     <Compile Include="Classes\IDGenerator.cs" />
+    <Compile Include="Classes\Interface\IResettableForm.cs" />
     <Compile Include="Classes\Inventory.cs" />
     <Compile Include="Classes\ListItems.cs" />
     <Compile Include="Classes\Locations.cs" />
@@ -698,6 +743,10 @@
     <Compile Include="Classes\User.cs" />
     <Compile Include="Classes\Utilities.cs" />
     <Compile Include="Classes\WebSocketDashboardClient.cs" />
+    <Compile Include="Classes\ApprovalRelayMessages.cs" />
+    <Compile Include="Classes\ApprovalRelayServer.cs" />
+    <Compile Include="Classes\ApprovalRelayClient.cs" />
+    <Compile Include="Classes\ApprovalRelaySession.cs" />
     <Compile Include="Connection.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -817,6 +866,12 @@
     </Compile>
     <Compile Include="DevExReportTemplate\SabongBetReceipt.Designer.cs">
       <DependentUpon>SabongBetReceipt.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DevExReportTemplate\SalesInvoiceJFC.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="DevExReportTemplate\SalesInvoiceJFC.Designer.cs">
+      <DependentUpon>SalesInvoiceJFC.cs</DependentUpon>
     </Compile>
     <Compile Include="DevExReportTemplate\SalesInvoice.cs">
       <SubType>Component</SubType>
@@ -938,8 +993,14 @@
     <Compile Include="Forwarding\Reporting\ForwardingDeliveryFrm.Designer.cs">
       <DependentUpon>ForwardingDeliveryFrm.cs</DependentUpon>
     </Compile>
+    <Compile Include="HOFormsDevEx\AccountingReportsForm.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="HOFormsDevEx\AccountingReportsForm.Designer.cs">
+      <DependentUpon>AccountingReportsForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="HOFormsDevEx\AccountMasterListDevEx.cs">
-      <SubType>Form</SubType>
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="HOFormsDevEx\AccountMasterListDevEx.Designer.cs">
       <DependentUpon>AccountMasterListDevEx.cs</DependentUpon>
@@ -980,8 +1041,14 @@
     <Compile Include="HOFormsDevEx\AddCompanyDevFrm.Designer.cs">
       <DependentUpon>AddCompanyDevFrm.cs</DependentUpon>
     </Compile>
-    <Compile Include="HOFormsDevEx\AddExpenseDevExFrm.cs">
+    <Compile Include="HOFormsDevEx\AddExpenseDevExFrmTest.cs">
       <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HOFormsDevEx\AddExpenseDevExFrmTest.Designer.cs">
+      <DependentUpon>AddExpenseDevExFrmTest.cs</DependentUpon>
+    </Compile>
+    <Compile Include="HOFormsDevEx\AddExpenseDevExFrm.cs">
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="HOFormsDevEx\AddExpenseDevExFrm.Designer.cs">
       <DependentUpon>AddExpenseDevExFrm.cs</DependentUpon>
@@ -1088,6 +1155,12 @@
     <Compile Include="HOFormsDevEx\CarcassCostingDevEx.Designer.cs">
       <DependentUpon>CarcassCostingDevEx.cs</DependentUpon>
     </Compile>
+    <Compile Include="HOFormsDevEx\CashAdvanceVoucherFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HOFormsDevEx\CashAdvanceVoucherFrm.Designer.cs">
+      <DependentUpon>CashAdvanceVoucherFrm.cs</DependentUpon>
+    </Compile>
     <Compile Include="HOFormsDevEx\CheckInventoryTransferStatusDevEx.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -1105,6 +1178,12 @@
     </Compile>
     <Compile Include="HOFormsDevEx\ClientAddPaymentDevEx.Designer.cs">
       <DependentUpon>ClientAddPaymentDevEx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="HOFormsDevEx\ClientAdjustmentMemoFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HOFormsDevEx\ClientAdjustmentMemoFrm.Designer.cs">
+      <DependentUpon>ClientAdjustmentMemoFrm.cs</DependentUpon>
     </Compile>
     <Compile Include="HOFormsDevEx\ClientChargesDevEx.cs">
       <SubType>Form</SubType>
@@ -1153,6 +1232,12 @@
     </Compile>
     <Compile Include="HOFormsDevEx\ClientShowItemsDevEx.Designer.cs">
       <DependentUpon>ClientShowItemsDevEx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="HOFormsDevEx\CombinedSupplierVoucherFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HOFormsDevEx\CombinedSupplierVoucherFrm.Designer.cs">
+      <DependentUpon>CombinedSupplierVoucherFrm.cs</DependentUpon>
     </Compile>
     <Compile Include="HOFormsDevEx\ConfirmOrderDevEx.cs">
       <SubType>Form</SubType>
@@ -1412,6 +1497,18 @@
     <Compile Include="HOFormsDevEx\LockedUsers.Designer.cs">
       <DependentUpon>LockedUsers.cs</DependentUpon>
     </Compile>
+    <Compile Include="HOFormsDevEx\ManualJournalVoucherFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HOFormsDevEx\ManualJournalVoucherFrm.Designer.cs">
+      <DependentUpon>ManualJournalVoucherFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="HOFormsDevEx\ManualJournalVoucherMultiBranchFrm.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="HOFormsDevEx\ManualJournalVoucherMultiBranchFrm.Designer.cs">
+      <DependentUpon>ManualJournalVoucherMultiBranchFrm.cs</DependentUpon>
+    </Compile>
     <Compile Include="HOFormsDevEx\MerchantsDevEx.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -1431,10 +1528,16 @@
       <DependentUpon>POCheckerDevEx.cs</DependentUpon>
     </Compile>
     <Compile Include="HOFormsDevEx\PostExpenseDevExFrm.cs">
-      <SubType>Form</SubType>
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="HOFormsDevEx\PostExpenseDevExFrm.Designer.cs">
       <DependentUpon>PostExpenseDevExFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="HOFormsDevEx\PostSingleExpenseForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HOFormsDevEx\PostSingleExpenseForm.Designer.cs">
+      <DependentUpon>PostSingleExpenseForm.cs</DependentUpon>
     </Compile>
     <Compile Include="HOFormsDevEx\PrimalCutCosting.cs">
       <SubType>Form</SubType>
@@ -1531,6 +1634,12 @@
     </Compile>
     <Compile Include="HOFormsDevEx\SupplierAddPaymentDevEx.Designer.cs">
       <DependentUpon>SupplierAddPaymentDevEx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="HOFormsDevEx\SupplierAdjustmentMemoFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HOFormsDevEx\SupplierAdjustmentMemoFrm.Designer.cs">
+      <DependentUpon>SupplierAdjustmentMemoFrm.cs</DependentUpon>
     </Compile>
     <Compile Include="HOFormsDevEx\SupplierPaymentDevEx.cs">
       <SubType>Form</SubType>
@@ -2192,12 +2301,6 @@
     </Compile>
     <Compile Include="MainBranch.Designer.cs">
       <DependentUpon>MainBranch.cs</DependentUpon>
-    </Compile>
-    <Compile Include="MainRibbonForm1.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="MainRibbonForm1.Designer.cs">
-      <DependentUpon>MainRibbonForm1.cs</DependentUpon>
     </Compile>
     <Compile Include="MasterDetailGrid.cs">
       <SubType>Form</SubType>
@@ -3143,7 +3246,7 @@
       <DependentUpon>TransferInventoryHO.cs</DependentUpon>
     </Compile>
     <Compile Include="Reporting\ViewTicketDevExRep.cs">
-      <SubType>Form</SubType>
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Reporting\ViewTicketDevExRep.Designer.cs">
       <DependentUpon>ViewTicketDevExRep.cs</DependentUpon>
@@ -3223,12 +3326,6 @@
     </Compile>
     <Compile Include="Samples\SampleCashierTransactions.Designer.cs">
       <DependentUpon>SampleCashierTransactions.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Samples\SampleMainRibbonForm2.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Samples\SampleMainRibbonForm2.Designer.cs">
-      <DependentUpon>SampleMainRibbonForm2.cs</DependentUpon>
     </Compile>
     <Compile Include="Samples\SamplePlayers.cs">
       <SubType>Form</SubType>
@@ -3363,11 +3460,20 @@
     <Compile Include="zzzDemozzz\TicketSweepstakes.Designer.cs">
       <DependentUpon>TicketSweepstakes.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="AccountingDevEx\AccountingBoard.resx">
+      <DependentUpon>AccountingBoard.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AccountingDevEx\AddExpenseDevExFrm.resx">
+      <DependentUpon>AddExpenseDevExFrm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="AccountingDevEx\BalanceSheetAccountDetails.resx">
       <DependentUpon>BalanceSheetAccountDetails.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="AccountingDevEx\BalanceSheetDevEx.resx">
       <DependentUpon>BalanceSheetDevEx.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AccountingDevEx\BankReconAutoDebitMatchForm.resx">
+      <DependentUpon>BankReconAutoDebitMatchForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="AccountingDevEx\BankReconFormV1.resx">
       <DependentUpon>BankReconFormV1.cs</DependentUpon>
@@ -3375,8 +3481,23 @@
     <EmbeddedResource Include="AccountingDevEx\BankReconFormV2.resx">
       <DependentUpon>BankReconFormV2.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="AccountingDevEx\ClientPaymentsDevExAcctg.resx">
+      <DependentUpon>ClientPaymentsDevExAcctg.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AccountingDevEx\ExpenseManualMultiBranchFrm.resx">
+      <DependentUpon>ExpenseManualMultiBranchFrm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="AccountingDevEx\ManualTicketFormV1.resx">
       <DependentUpon>ManualTicketFormV1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AccountingDevEx\SupplierPaymentDevEx.resx">
+      <DependentUpon>SupplierPaymentDevEx.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AccountingDevEx\SupplierVoucherReversalFrm.resx">
+      <DependentUpon>SupplierVoucherReversalFrm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AccountingDevEx\TicketInquiryFrm.resx">
+      <DependentUpon>TicketInquiryFrm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="AccountingDevEx\ViewCheckVoucherDetailsDevEx.resx">
       <DependentUpon>ViewCheckVoucherDetailsDevEx.cs</DependentUpon>
@@ -3386,6 +3507,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="AccountingDevEx\ViewCheckVoucherDevEx.resx">
       <DependentUpon>ViewCheckVoucherDevEx.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AccountingDevEx\VoucheringManualFrm.resx">
+      <DependentUpon>VoucheringManualFrm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Accounting\AcctViewTicketDetails.resx">
       <DependentUpon>AcctViewTicketDetails.cs</DependentUpon>
@@ -3423,7 +3547,7 @@
     <EmbeddedResource Include="Accounting\GLPostingDevEx.resx">
       <DependentUpon>GLPostingDevEx.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Accounting\GLSummary.resx">
+    <EmbeddedResource Include="AccountingDevEx\GLSummary.resx">
       <DependentUpon>GLSummary.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Accounting\IncomeStatement.resx">
@@ -3583,6 +3707,9 @@
     <EmbeddedResource Include="DevExReportTemplate\SabongBetReceipt.resx">
       <DependentUpon>SabongBetReceipt.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="DevExReportTemplate\SalesInvoiceJFC.resx">
+      <DependentUpon>SalesInvoiceJFC.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="DevExReportTemplate\SalesInvoice.resx">
       <DependentUpon>SalesInvoice.cs</DependentUpon>
     </EmbeddedResource>
@@ -3643,6 +3770,9 @@
     <EmbeddedResource Include="Forwarding\Reporting\ForwardingDeliveryFrm.resx">
       <DependentUpon>ForwardingDeliveryFrm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="HOFormsDevEx\AccountingReportsForm.resx">
+      <DependentUpon>AccountingReportsForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="HOFormsDevEx\AccountMasterListDevEx.resx">
       <DependentUpon>AccountMasterListDevEx.cs</DependentUpon>
     </EmbeddedResource>
@@ -3664,6 +3794,9 @@
     <EmbeddedResource Include="HOFormsDevEx\AddCompanyDevFrm.resx">
       <DependentUpon>AddCompanyDevFrm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="HOFormsDevEx\AddExpenseDevExFrmTest.resx">
+      <DependentUpon>AddExpenseDevExFrmTest.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="HOFormsDevEx\AddExpenseDevExFrm.resx">
       <DependentUpon>AddExpenseDevExFrm.cs</DependentUpon>
     </EmbeddedResource>
@@ -3678,6 +3811,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="HOFormsDevEx\AddNonTradeOrdersDevEx.resx">
       <DependentUpon>AddNonTradeOrdersDevEx.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HOFormsDevEx\AddPODevEx.resx">
+      <DependentUpon>AddPODevEx.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="HOFormsDevEx\AddPrimalCutDevEx.resx">
       <DependentUpon>AddPrimalCutDevEx.cs</DependentUpon>
@@ -3715,6 +3851,9 @@
     <EmbeddedResource Include="HOFormsDevEx\CarcassCostingDevEx.resx">
       <DependentUpon>CarcassCostingDevEx.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="HOFormsDevEx\CashAdvanceVoucherFrm.resx">
+      <DependentUpon>CashAdvanceVoucherFrm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="HOFormsDevEx\CheckInventoryTransferStatusDevEx.resx">
       <DependentUpon>CheckInventoryTransferStatusDevEx.cs</DependentUpon>
     </EmbeddedResource>
@@ -3723,6 +3862,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="HOFormsDevEx\ClientAddPaymentDevEx.resx">
       <DependentUpon>ClientAddPaymentDevEx.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HOFormsDevEx\ClientAdjustmentMemoFrm.resx">
+      <DependentUpon>ClientAdjustmentMemoFrm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="HOFormsDevEx\ClientChargesDevEx.resx">
       <DependentUpon>ClientChargesDevEx.cs</DependentUpon>
@@ -3747,6 +3889,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="HOFormsDevEx\ClientShowItemsDevEx.resx">
       <DependentUpon>ClientShowItemsDevEx.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HOFormsDevEx\CombinedSupplierVoucherFrm.resx">
+      <DependentUpon>CombinedSupplierVoucherFrm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="HOFormsDevEx\ConfirmOrderDevEx.resx">
       <DependentUpon>ConfirmOrderDevEx.cs</DependentUpon>
@@ -3877,6 +4022,12 @@
     <EmbeddedResource Include="HOFormsDevEx\LockedUsers.resx">
       <DependentUpon>LockedUsers.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="HOFormsDevEx\ManualJournalVoucherFrm.resx">
+      <DependentUpon>ManualJournalVoucherFrm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HOFormsDevEx\ManualJournalVoucherMultiBranchFrm.resx">
+      <DependentUpon>ManualJournalVoucherMultiBranchFrm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="HOFormsDevEx\MerchantsDevEx.resx">
       <DependentUpon>MerchantsDevEx.cs</DependentUpon>
     </EmbeddedResource>
@@ -3936,6 +4087,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="HOFormsDevEx\SupplierAddPaymentDevEx.resx">
       <DependentUpon>SupplierAddPaymentDevEx.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HOFormsDevEx\SupplierAdjustmentMemoFrm.resx">
+      <DependentUpon>SupplierAdjustmentMemoFrm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="HOFormsDevEx\SupplierPaymentDevEx.resx">
       <DependentUpon>SupplierPaymentDevEx.cs</DependentUpon>
@@ -4275,9 +4429,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="MainBranch.resx">
       <DependentUpon>MainBranch.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="MainRibbonForm1.resx">
-      <DependentUpon>MainRibbonForm1.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MasterDetailGrid.resx">
       <DependentUpon>MasterDetailGrid.cs</DependentUpon>
@@ -4807,9 +4958,6 @@
     <EmbeddedResource Include="Samples\SampleCashierTransactions.resx">
       <DependentUpon>SampleCashierTransactions.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Samples\SampleMainRibbonForm2.resx">
-      <DependentUpon>SampleMainRibbonForm2.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Samples\SamplePlayers.resx">
       <DependentUpon>SamplePlayers.cs</DependentUpon>
     </EmbeddedResource>
@@ -4875,7 +5023,6 @@
     </None>
     <None Include="ClassDiagram1.cd" />
     <None Include="DevExReportTemplate\SeniorCitizenSalesReport.repx" />
-    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -4902,7 +5049,11 @@
     <Service Include="{967B4E0D-AD0C-4609-AB67-0FA40C0206D8}" />
     <Service Include="{C0C07587-41A7-46C8-8FBD-3F9C8EBE2DDC}" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <PackageReference Include="Npgsql">
+      <Version>4.0.11</Version>
+    </PackageReference>
+  </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
       <Visible>False</Visible>
@@ -4994,4 +5145,10 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup>
+    <PackageReference Include="DevExpress.ExpressApp.CodeAnalysis" Version="26.1.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
 </Project>

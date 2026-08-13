@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using DevExpress.XtraEditors;
 using System.Data.SqlClient;
 using DevExpress.XtraGrid;
+using DevExpress.XtraGrid.Views.Grid;
 
 namespace SalesInventorySystem.Accounting
 {
@@ -18,76 +19,113 @@ namespace SalesInventorySystem.Accounting
         public AgingReports()
         {
             InitializeComponent();
+            gridView1.OptionsBehavior.AutoExpandAllGroups = true;
+            gridView1.OptionsView.ShowGroupPanel = true;
+            gridView1.OptionsView.ShowFooter = true;
+            gridView1.OptionsBehavior.Editable = false;
+            gridView1.OptionsView.ColumnAutoWidth = false;
         }
-
-        void execute()
+        private void ExecuteReport()
         {
-            SqlConnection con = Database.getConnection();
-            con.Open();
-            string query = "sp_Aging";
-            SqlCommand com = new SqlCommand(query, con);
-            com.Parameters.AddWithValue("@parmdatefrom", datefrom.Text);
-            com.Parameters.AddWithValue("@parmdateto", dateto.Text);
-            com.Parameters.AddWithValue("@parmtype", txtagingtype.Text);
-            com.CommandType = CommandType.StoredProcedure;
-            com.CommandText = query;
-            com.ExecuteNonQuery();
-            SqlDataAdapter adapter = new SqlDataAdapter(com);
-            DataTable table = new DataTable();
-            gridView1.Columns.Clear();
-            gridControl1.DataSource = null;
-            adapter.Fill(table);
-            gridControl1.DataSource = table;
-            gridView1.BestFitColumns();
-            con.Close();
-        }
+            DataTable dt = new DataTable();
 
-     
+            using (SqlConnection con = Database.getConnection())
+            using (SqlCommand cmd = new SqlCommand("sp_Aging", con))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.Add("@parmdatefrom", SqlDbType.Date).Value = datefrom.DateTime.Date;
+                cmd.Parameters.Add("@parmdateto", SqlDbType.Date).Value = dateto.DateTime.Date;
+                cmd.Parameters.Add("@parmtype", SqlDbType.VarChar, 12).Value = txtagingtype.Text;
+
+                using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                {
+                    da.Fill(dt);
+                }
+            }
+
+            gridView1.Columns.Clear();
+
+            gridControl1.DataSource = null;
+            gridControl1.DataSource = dt;
+
+            gridView1.PopulateColumns();
+            gridView1.RefreshData();
+            gridControl1.Refresh();
+
+
+            gridView1.BestFitColumns();
+        }
+        public static void AddGroupSum(GridView view, string fieldName)
+        {
+            if (view.Columns[fieldName] == null)
+                return;
+
+            GridGroupSummaryItem item = new GridGroupSummaryItem()
+            {
+                FieldName = fieldName,
+                SummaryType = DevExpress.Data.SummaryItemType.Sum,
+                ShowInGroupColumnFooter = view.Columns[fieldName],
+                DisplayFormat = "{0:n2}"
+            };
+
+            view.GroupSummary.Add(item);
+
+            view.Columns[fieldName].Summary.Clear();
+            view.Columns[fieldName].Summary.Add(
+                DevExpress.Data.SummaryItemType.Sum,
+                fieldName,
+                "{0:n2}"
+            );
+        }
 
         private void btnextract_Click(object sender, EventArgs e)
         {
             try
             {
-                execute();
-                Classes.DevXGridViewSettings.ShowFooterCountTotal(gridView1, "InvoiceNo");
-                Classes.DevXGridViewSettings.ShowFooterTotal(gridView1, "0 to 30");
-                Classes.DevXGridViewSettings.ShowFooterTotal(gridView1, "31 to 60");
-                Classes.DevXGridViewSettings.ShowFooterTotal(gridView1, "61 to 90");
-                Classes.DevXGridViewSettings.ShowFooterTotal(gridView1, "91 to 120");
-                //GridGroupSummaryItem ite = new GridGroupSummaryItem();
-                //ite.FieldName = "0 to 30";
-                //ite.SummaryType = DevExpress.Data.SummaryItemType.Sum;
-                //ite.ShowInGroupColumnFooter = gridView1.Columns["0 to 30"];
-                //gridView1.GroupSummary.Add(ite);
+                ExecuteReport();
+              
+                gridView1.OptionsView.ShowFooter = true;
+                gridView1.GroupSummary.Clear();
+                 
+                AddGroupSum(gridView1, "0 to 30");
+                AddGroupSum(gridView1, "31 to 60");
+                AddGroupSum(gridView1, "61 to 90");
 
-                //GridGroupSummaryItem ite1 = new GridGroupSummaryItem();
-                //ite1.FieldName = "31 to 60";
-                //ite1.SummaryType = DevExpress.Data.SummaryItemType.Sum;
-                //ite1.ShowInGroupColumnFooter = gridView1.Columns["31 to 60"];
-                //gridView1.GroupSummary.Add(ite1);
+                if (gridView1.Columns["91 to 120"] != null)
+                    AddGroupSum(gridView1, "91 to 120");
 
-                //GridGroupSummaryItem ite11 = new GridGroupSummaryItem();
-                //ite11.FieldName = "61 to 90";
-                //ite11.SummaryType = DevExpress.Data.SummaryItemType.Sum;
-                //ite11.ShowInGroupColumnFooter = gridView1.Columns["61 to 90"];
-                //gridView1.GroupSummary.Add(ite11);
+                if (gridView1.Columns["Over 120"] != null)
+                    AddGroupSum(gridView1, "Over 120");
 
-                //GridGroupSummaryItem ite1111 = new GridGroupSummaryItem();
-                //ite1111.FieldName = "91 to 120";
-                //ite1111.SummaryType = DevExpress.Data.SummaryItemType.Sum;
-                //ite1111.ShowInGroupColumnFooter = gridView1.Columns["91 to 120"];
-                //gridView1.GroupSummary.Add(ite1111);
+                // Group by Customer
+                gridView1.BeginSort();
+                gridView1.ClearGrouping();
 
-                //gridView1.Columns["0 to 30"].Summary.Add(DevExpress.Data.SummaryItemType.Sum, "0 to 30", "{0:n2}");
-                //gridView1.Columns["31 to 60"].Summary.Add(DevExpress.Data.SummaryItemType.Sum, "31 to 60", "{0:n2}");
-                //gridView1.Columns["61 to 90"].Summary.Add(DevExpress.Data.SummaryItemType.Sum, "61 to 90", "{0:n2}");
-                //gridView1.Columns["91 to 120"].Summary.Add(DevExpress.Data.SummaryItemType.Sum, "91 to 120", "{0:n2}");
+                if (txtagingtype.Text == "AR")
+                {
+                    if (gridView1.Columns["CustomerName"] != null)
+                        gridView1.Columns["CustomerName"].GroupIndex = 0;
+                }
+                else
+                {
+                    if (gridView1.Columns["SupplierName"] != null)
+                        gridView1.Columns["SupplierName"].GroupIndex = 0;
+                }
+
+
+                gridView1.EndSort();
+                // Auto Expand
+                gridView1.ExpandAllGroups();
             }
             catch (Exception ex)
             {
-                XtraMessageBox.Show(ex.Message.ToString());
+                XtraMessageBox.Show(ex.Message, "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
             }
         }
+        
 
         private void simpleButton2_Click(object sender, EventArgs e)
         {

@@ -67,7 +67,7 @@
             // 
             // txtsrchprodcat
             // 
-            this.txtsrchprodcat.Location = new System.Drawing.Point(117, 38);
+            this.txtsrchprodcat.Location = new System.Drawing.Point(133, 41);
             this.txtsrchprodcat.Name = "txtsrchprodcat";
             this.txtsrchprodcat.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9.8F);
             this.txtsrchprodcat.Properties.Appearance.Options.UseFont = true;
@@ -90,7 +90,7 @@
             // 
             this.labelControl2.Appearance.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelControl2.Appearance.Options.UseFont = true;
-            this.labelControl2.Location = new System.Drawing.Point(9, 44);
+            this.labelControl2.Location = new System.Drawing.Point(5, 46);
             this.labelControl2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.labelControl2.Name = "labelControl2";
             this.labelControl2.Size = new System.Drawing.Size(107, 18);
@@ -99,7 +99,7 @@
             // 
             // txtpono
             // 
-            this.txtpono.Location = new System.Drawing.Point(9, 95);
+            this.txtpono.Location = new System.Drawing.Point(10, 135);
             this.txtpono.Name = "txtpono";
             this.txtpono.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9.8F);
             this.txtpono.Properties.Appearance.Options.UseFont = true;
@@ -109,16 +109,16 @@
             // 
             // btnsave
             // 
-            this.btnsave.Location = new System.Drawing.Point(337, 38);
+            this.btnsave.Location = new System.Drawing.Point(353, 41);
             this.btnsave.Name = "btnsave";
-            this.btnsave.Size = new System.Drawing.Size(79, 29);
+            this.btnsave.Size = new System.Drawing.Size(79, 26);
             this.btnsave.TabIndex = 4;
             this.btnsave.Text = "Save";
             this.btnsave.Click += new System.EventHandler(this.btnsave_Click);
             // 
             // txtsearchprod
             // 
-            this.txtsearchprod.Location = new System.Drawing.Point(132, 73);
+            this.txtsearchprod.Location = new System.Drawing.Point(133, 113);
             this.txtsearchprod.Name = "txtsearchprod";
             this.txtsearchprod.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9.8F);
             this.txtsearchprod.Properties.Appearance.Options.UseFont = true;
@@ -132,7 +132,7 @@
             // 
             this.labelControl1.Appearance.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelControl1.Appearance.Options.UseFont = true;
-            this.labelControl1.Location = new System.Drawing.Point(9, 76);
+            this.labelControl1.Location = new System.Drawing.Point(10, 116);
             this.labelControl1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.labelControl1.Name = "labelControl1";
             this.labelControl1.Size = new System.Drawing.Size(108, 21);

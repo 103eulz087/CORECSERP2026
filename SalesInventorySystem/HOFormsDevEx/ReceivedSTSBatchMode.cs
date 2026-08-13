@@ -23,25 +23,6 @@ namespace SalesInventorySystem.HOFormsDevEx
             InitializeComponent();
         }
 
-        void receiveSTS(string pono,string pcode,string qty,string barcode,string branchcode,string receiveby,string sprice,string isscan)
-        {
-            SqlConnection con = Database.getConnection();
-            con.Open();
-            string query = "sp_AddBranchInventory";
-            SqlCommand com = new SqlCommand(query, con);
-            com.Parameters.AddWithValue("@parmponumber", pono);
-            com.Parameters.AddWithValue("@parmproductcode", pcode);
-            com.Parameters.AddWithValue("@parmqty", qty);
-            com.Parameters.AddWithValue("@parmbarcode", barcode);
-            com.Parameters.AddWithValue("@parmbranchcode", branchcode);
-            com.Parameters.AddWithValue("@parmreceivedby", receiveby);
-            com.Parameters.AddWithValue("@parmsellingprice", sprice);
-            com.Parameters.AddWithValue("@parmisscan", isscan);
-            com.CommandType = CommandType.StoredProcedure;
-            com.CommandText = query;
-            com.ExecuteNonQuery();
-            con.Close();
-        }
         void ConfirmBranchReceivedOrder()
         {
             SqlConnection con = Database.getConnection();
@@ -49,7 +30,15 @@ namespace SalesInventorySystem.HOFormsDevEx
             try
             {
 
-                string query = "sp_ConfirmBranchRecievedOrder";
+                string query = "";
+                if(GlobalCache.CompanyName=="JFC")
+                {
+                    query = "sp_ConfirmBranchRecievedOrderJFC";
+                }
+                else
+                {
+                    query = "sp_ConfirmBranchRecievedOrder";
+                }
                 SqlCommand com = new SqlCommand(query, con);
                 com.Parameters.AddWithValue("@parmdevno", "");
                 com.Parameters.AddWithValue("@parmpono", txtshipmentno.Text);
@@ -69,40 +58,6 @@ namespace SalesInventorySystem.HOFormsDevEx
                 con.Close();
             }
         }
-        //void executeTransfer()
-        //{
-        //    try
-        //    {
-        //        GridView view = gridControl1.FocusedView as GridView;
-        //        view.SortInfo.Clear();
-
-        //        int[] selectedRows = gridView1.GetSelectedRows();
-
-        //        foreach (int rowHandle in selectedRows)
-        //        {
-
-        //            string productcode = gridView1.GetRowCellValue(rowHandle, "ProductNo").ToString();//dataGridView1.Rows[0].Cells["Product"].Value.ToString();
-        //            string description = gridView1.GetRowCellValue(rowHandle, "ProductName").ToString();// dataGridView1.Rows[0].Cells["Description"].Value.ToString(); 
-        //            string barcode = gridView1.GetRowCellValue(rowHandle, "BarcodeNo").ToString();// dataGridView1.Rows[0].Cells["Description"].Value.ToString(); 
-        //            string cost = gridView1.GetRowCellValue(rowHandle, "Cost").ToString();//dataGridView1.Rows[0].Cells["Quantity"].Value.ToString();
-        //            string quantity = gridView1.GetRowCellValue(rowHandle, "QtyDelivered").ToString();//dataGridView1.Rows[0].Cells["Quantity"].Value.ToString();
-        //            string actualqty = gridView1.GetRowCellValue(rowHandle, "ActualQty").ToString();//dataGridView1.Rows[0].Cells["Quantity"].Value.ToString();
-        //            totalreceive = rowHandle;
-
-        //            if (rowHandle >= 0)
-        //            {
-
-        //                receiveSTS(txtshipmentno.Text, productcode, actualqty, barcode,Login.assignedBranch,Login.isglobalUserID,"0","0");
-        //            }
-        //        }
-        //        totalreceive = gridView1.SelectedRowsCount;
-        //        isdone = true;
-        //    }
-        //    catch (SqlException ex)
-        //    {
-        //        XtraMessageBox.Show(ex.Message.ToString());
-        //    }
-        //}
         void executeTransfer()
         {
             try

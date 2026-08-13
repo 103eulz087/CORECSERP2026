@@ -137,16 +137,26 @@ namespace SalesInventorySystem.HOForms
             con.Open();
             try
             {
-                string query = "SP_UPLOADINVENTORY";
+                string query = "sp_FinalizeInventoryUpload";
                 SqlCommand com = new SqlCommand(query, con);
-                com.Parameters.AddWithValue("@parmshipmentno", shipmentno);
-                com.Parameters.AddWithValue("@parmbranch", branch);
-                com.Parameters.AddWithValue("@parmsupplierid", supplierid);
-                com.Parameters.AddWithValue("@parminvoiceno", txtinvoiceno.Text);
-                com.Parameters.AddWithValue("@parmuploadby", Login.Fullname);
+                com.Parameters.AddWithValue("@ShipmentNo", shipmentno);
+                com.Parameters.AddWithValue("@SupplierID", supplierid);
+                com.Parameters.AddWithValue("@BranchCode", branch);
+                com.Parameters.AddWithValue("@InvoiceNo", txtinvoiceno.Text);
+                com.Parameters.AddWithValue("@UploadedBy", Login.Fullname);
                 com.CommandType = CommandType.StoredProcedure;
                 com.CommandText = query;
                 com.ExecuteNonQuery();
+                //string query = "SP_UPLOADINVENTORY";
+                //SqlCommand com = new SqlCommand(query, con);
+                //com.Parameters.AddWithValue("@parmshipmentno", shipmentno);
+                //com.Parameters.AddWithValue("@parmbranch", branch);
+                //com.Parameters.AddWithValue("@parmsupplierid", supplierid);
+                //com.Parameters.AddWithValue("@parminvoiceno", txtinvoiceno.Text);
+                //com.Parameters.AddWithValue("@parmuploadby", Login.Fullname);
+                //com.CommandType = CommandType.StoredProcedure;
+                //com.CommandText = query;
+                //com.ExecuteNonQuery();
             }
             catch (SqlException ex)
             {

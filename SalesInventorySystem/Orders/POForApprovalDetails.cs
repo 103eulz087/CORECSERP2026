@@ -136,7 +136,7 @@ namespace SalesInventorySystem
 
             PurchaseOrderRep xct = new PurchaseOrderRep();
             xct.Landscape = false;
-            xct.PaperKind = System.Drawing.Printing.PaperKind.Letter;
+            xct.PaperKind = (DevExpress.Drawing.Printing.DXPaperKind)System.Drawing.Printing.PaperKind.Letter;
             xct.Margins = new System.Drawing.Printing.Margins(100, 100, 100, 100);
             xct.lbldate.Text = DateTime.Now.ToShortDateString();
             xct.lblorderno.Text = POForApproval.refno;
@@ -227,7 +227,7 @@ namespace SalesInventorySystem
 
             PurchaseOrderRep xct = new PurchaseOrderRep();
             xct.Landscape = false;
-            xct.PaperKind = System.Drawing.Printing.PaperKind.Letter;
+            xct.PaperKind = (DevExpress.Drawing.Printing.DXPaperKind)System.Drawing.Printing.PaperKind.Letter;
             xct.Margins = new System.Drawing.Printing.Margins(100, 100, 100, 100);
             xct.lbldate.Text = DateTime.Now.ToShortDateString();
             xct.lblorderno.Text = txtpono.Text;
@@ -305,7 +305,7 @@ namespace SalesInventorySystem
             xct.xrcaption2.Text = caption2;
 
             xct.Landscape = false;
-            xct.PaperKind = System.Drawing.Printing.PaperKind.A4;
+            xct.PaperKind = (DevExpress.Drawing.Printing.DXPaperKind)System.Drawing.Printing.PaperKind.A4;
            
             var rowPO = Database.getMultipleQuery("PurchaseOrderSummary", "PONumber='" + txtpono.Text + "' ", "RequestedBy,BranchCode,EffectivityDate");
             string requestedby = rowPO["RequestedBy"].ToString();
@@ -358,21 +358,36 @@ namespace SalesInventorySystem
 
         private void simpleButton9_Click(object sender, EventArgs e)
         {
-            if (richTextBox1.Text == "")
+            //if (richTextBox1.Text == "")
+            //{
+            //    XtraMessageBox.Show("Please Input Remarks");
+            //}
+            //else
+            //{
+            //    DateTime dt = DateTime.Now;
+            //    bool ok = HelperFunction.ConfirmDialog("Are you sure you want to Reject this Transaction?", "Rejected!!");
+            //    if (ok)
+            //    {
+            //        //refernceno = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "PONumber").ToString(); 
+            //        Database.ExecuteQuery("UPDATE PurchaseOrderSummary SET Status='REJECTED',Remarks='" + richTextBox1.Text.Trim() + "',ApprovedBy='" + Login.Fullname + "',DateApproved='" + String.Format("{0:MM/dd/yyyy}", dt) + "' WHERE PONumber='" + txtpono.Text + "'", "Success");
+            //        this.Close();
+            //    }
+            //}
+            bool isexist = Database.checkifExist("SELECT TOP(1) 1 FROM DeliveryDetails WHERE PONumber='" + gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "PONumber").ToString() + "' AND isReturned=0");
+            if (isexist)
             {
-                XtraMessageBox.Show("Please Input Remarks");
+                XtraMessageBox.Show("This PO is Already Processed in your Commissary..To Cancel this Order, Please Delete All Item/s Processed in this PO.");
+                return;
+            }
+            bool ok = HelperFunction.ConfirmDialog("Are you sure you want to Cancel this Order?..", "Cancel Purchase Order");
+            if (ok)
+            {
+                string actionlogs = "CANCEL REJECTED REQUEST with PONumber=" + gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "PONumber").ToString() + " ";
+                Database.ExecuteQuery("insert into HistoryLogs values('" + Login.Fullname + "','" + DateTime.Now.ToShortDateString() + "','" + actionlogs + "','" + Login.assignedBranch + "')");
+                Database.ExecuteQuery("Update PurchaseOrderSummary SET Status='REJECTED' Remarks='" + richTextBox1.Text.Trim() + "' WHERE PONumber='" + gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "PONumber").ToString() + "'", "Successfully Executed");
             }
             else
-            {
-                DateTime dt = DateTime.Now;
-                bool ok = HelperFunction.ConfirmDialog("Are you sure you want to Reject this Transaction?", "Rejected!!");
-                if (ok)
-                {
-                    //refernceno = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "PONumber").ToString(); 
-                    Database.ExecuteQuery("UPDATE PurchaseOrderSummary SET Status='REJECTED',Remarks='" + richTextBox1.Text.Trim() + "',ApprovedBy='" + Login.Fullname + "',DateApproved='" + String.Format("{0:MM/dd/yyyy}", dt) + "' WHERE PONumber='" + txtpono.Text + "'", "Success");
-                    this.Close();
-                }
-            }
+                return;
         }
 
         private void simpleButton10_Click(object sender, EventArgs e)
@@ -421,7 +436,7 @@ namespace SalesInventorySystem
             xct.xraddress2.Text = caption2;
 
             xct.Landscape = false;
-            xct.PaperKind = System.Drawing.Printing.PaperKind.A4;
+            xct.PaperKind = (DevExpress.Drawing.Printing.DXPaperKind)System.Drawing.Printing.PaperKind.A4;
             xct.Margins = new System.Drawing.Printing.Margins(100, 100, 100, 100);
             xct.lbldate.Text = DateTime.Now.ToShortDateString();
             xct.lblorderno.Text = txtpono.Text;

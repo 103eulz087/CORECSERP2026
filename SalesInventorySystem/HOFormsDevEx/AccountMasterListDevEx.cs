@@ -12,7 +12,7 @@ using System.Data.SqlClient;
 
 namespace SalesInventorySystem.HOFormsDevEx
 {
-    public partial class AccountMasterListDevEx : DevExpress.XtraEditors.XtraForm
+    public partial class AccountMasterListDevEx : DevExpress.XtraEditors.XtraUserControl
     {
         public AccountMasterListDevEx()
         {
@@ -141,10 +141,19 @@ namespace SalesInventorySystem.HOFormsDevEx
             Database.display("SELECT CustomerID,CAST(TransactionDate as date) as TransactionDate,OrderNo,FORMAT(Amount,'N', 'en-us') as Amount,FORMAT(AmountPaid,'N', 'en-us') as AmountPaid,FORMAT(Balance,'N', 'en-us') as Balance,PaymentStatus FROM view_TransactionChargeSales WHERE CustomerID='" + gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "AccountKey").ToString() + "'", acctdev.gridControl1, acctdev.gridView1);
 
         }
+        private bool _dataLoaded = false;
+        public void LoadData()
+        {
+            if (_dataLoaded)
+                return;
 
+            Database.displaySearchlookupEdit("SELECT SupplierKey,SupplierName FROM dbo.Supplier", txtapaccnt, "SupplierKey", "SupplierKey");
+            xtraTabControl1.TabPages[2].PageVisible = false;
+            _dataLoaded = true;
+        }
         private void AccountMasterListDevEx_Load(object sender, EventArgs e)
         {
-            Database.displaySearchlookupEdit("SELECT SupplierKey,SupplierName FROM dbo.Supplier", txtapaccnt, "SupplierKey", "SupplierKey");
+            //Database.displaySearchlookupEdit("SELECT SupplierKey,SupplierName FROM dbo.Supplier", txtapaccnt, "SupplierKey", "SupplierKey");
         }
 
         private void button3_Click(object sender, EventArgs e)
@@ -227,7 +236,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             suppacctdev.txtacctbalance.Text = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "AccountBalance").ToString();
             suppacctdev.txtacctstatus.Text = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "AccountStatus").ToString();
             suppacctdev.txtmvmtdate.Text = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "LastMovementDate").ToString();
-            suppacctdev.ShowDialog(this);
+            suppacctdev.Show();
         }
 
         private void gridView2_MouseUp(object sender, MouseEventArgs e)
@@ -253,7 +262,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             suppacctdev.txtacctbalance.Text = gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "AccountBalance").ToString();
             suppacctdev.txtacctstatus.Text = gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "AccountStatus").ToString();
             //suppacctdev.txtmvmtdate.Text = gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "LastMovementDate").ToString();
-            suppacctdev.ShowDialog(this);
+            suppacctdev.Show();
         }
     }
 }

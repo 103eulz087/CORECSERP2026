@@ -32,12 +32,12 @@
             this.gridControl1 = new DevExpress.XtraGrid.GridControl();
             this.gridView1 = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.groupControl1 = new DevExpress.XtraEditors.GroupControl();
+            this.btnforapprovalstsexcel = new DevExpress.XtraEditors.SimpleButton();
             this.simpleButton1 = new DevExpress.XtraEditors.SimpleButton();
             this.labelControl1 = new DevExpress.XtraEditors.LabelControl();
             this.dateTo = new DevExpress.XtraEditors.DateEdit();
             this.labelControl2 = new DevExpress.XtraEditors.LabelControl();
             this.dateFrom = new DevExpress.XtraEditors.DateEdit();
-            this.btnforapprovalstsexcel = new DevExpress.XtraEditors.SimpleButton();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView1)).BeginInit();
@@ -115,6 +115,18 @@
             this.groupControl1.Size = new System.Drawing.Size(1132, 111);
             this.groupControl1.TabIndex = 14;
             // 
+            // btnforapprovalstsexcel
+            // 
+            this.btnforapprovalstsexcel.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.ExportToExcel_16x16;
+            this.btnforapprovalstsexcel.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
+            this.btnforapprovalstsexcel.Location = new System.Drawing.Point(298, 35);
+            this.btnforapprovalstsexcel.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
+            this.btnforapprovalstsexcel.Name = "btnforapprovalstsexcel";
+            this.btnforapprovalstsexcel.Size = new System.Drawing.Size(114, 58);
+            this.btnforapprovalstsexcel.TabIndex = 14;
+            this.btnforapprovalstsexcel.Text = "Export to Excel";
+            this.btnforapprovalstsexcel.Click += new System.EventHandler(this.btnforapprovalstsexcel_Click);
+            // 
             // simpleButton1
             // 
             this.simpleButton1.Location = new System.Drawing.Point(195, 35);
@@ -172,18 +184,6 @@
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.dateFrom.Size = new System.Drawing.Size(125, 24);
             this.dateFrom.TabIndex = 3;
-            // 
-            // btnforapprovalstsexcel
-            // 
-            this.btnforapprovalstsexcel.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.ExportToExcel_16x16;
-            this.btnforapprovalstsexcel.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btnforapprovalstsexcel.Location = new System.Drawing.Point(298, 35);
-            this.btnforapprovalstsexcel.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
-            this.btnforapprovalstsexcel.Name = "btnforapprovalstsexcel";
-            this.btnforapprovalstsexcel.Size = new System.Drawing.Size(114, 58);
-            this.btnforapprovalstsexcel.TabIndex = 14;
-            this.btnforapprovalstsexcel.Text = "Export to Excel";
-            this.btnforapprovalstsexcel.Click += new System.EventHandler(this.btnforapprovalstsexcel_Click);
             // 
             // InventoryMonthEndReInventory
             // 

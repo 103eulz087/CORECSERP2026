@@ -15,10 +15,8 @@ namespace SalesInventorySystem.HOFormsDevEx
 {
     public partial class InventoryQtyAdjustmentDevEx : DevExpress.XtraEditors.XtraForm
     {
-        double newqty = 0.0, costkg = 0.0;
-        bool islinktosupplier = false;
-        object productcode,productcost;
-        string adjustmenttype = "", adjustmentmethod="";
+        object productcode;
+        string adjustmenttype = "";
         public InventoryQtyAdjustmentDevEx()
         {
             InitializeComponent();
@@ -32,6 +30,9 @@ namespace SalesInventorySystem.HOFormsDevEx
         void populate()
         {
             Database.displaySearchlookupEdit("SELECT BranchCode,BranchName FROM Branches", txtbranch, "BranchCode", "BranchCode");
+            // Product list is independent of the In Transit / Link to Supplier
+            // design (not used by this form) - load it directly.
+            Database.displaySearchlookupEdit("SELECT ProductCode,Description FROM Products WHERE BranchCode='888'", txtproduct, "Description", "Description");
         }
 
         private void txtbranch_EditValueChanged(object sender, EventArgs e)
@@ -46,60 +47,25 @@ namespace SalesInventorySystem.HOFormsDevEx
             
         }
 
+        // Supplier / Shipment / In Transit / Link to Supplier design is not
+        // used by this form - Supplier, ShipmentNo, Cost/kg, Orig Qty,
+        // Available Qty and New Qty fields have been removed from the flow.
+        // Only Branch, Product, Qty Adjustment and Add/Deduct drive the
+        // adjustment now; these handlers are intentionally left empty.
         private void radlinktosupplier_CheckedChanged(object sender, EventArgs e)
         {
-            if (radlinktosupplier.Checked==true)
-            {
-                adjustmentmethod = "LINKTOSUPPLIER";
-                Database.displaySearchlookupEdit("SELECT SupplierID,SupplierName FROM Supplier", txtsupplier, "SupplierID", "SupplierID");
-                txtsupplier.Enabled = true;
-                txtshipmentno.Enabled = true;
-            }
-            else
-            {
-                adjustmentmethod = "INTRANSIT";
-                Database.displaySearchlookupEdit("SELECT ProductCode,Description FROM Products WHERE BranchCode='888'", txtproduct, "Description", "Description");
-                txtcostkg.Enabled = true;
-                txtsupplier.Enabled = false;
-                txtshipmentno.Enabled = false;
-            }
-
         }
 
         private void txtsupplier_EditValueChanged(object sender, EventArgs e)
         {
-            Database.displaySearchlookupEdit("SELECT ShipmentNo,BranchCode,TargetDate FROM POSUMMARY", txtshipmentno, "ShipmentNo", "ShipmentNo");
-            //Database.displaySearchlookupEdit("SELECT ShipmentNo,Branch,OrderDate FROM ShipmentOrder", txtshipmentno, "ShipmentNo", "ShipmentNo");
-            islinktosupplier = true;
         }
 
         private void txtshipmentno_EditValueChanged(object sender, EventArgs e)
         {
-            if (islinktosupplier)
-            {
-                Database.displaySearchlookupEdit("SELECT distinct Product as ProductCode,Description,Cost FROM Inventory WHERE Branch='"+txtbranch.Text+"' and ShipmentNo='" + txtshipmentno.Text + "'", txtproduct, "Description", "Description");
-            }
-            else
-            {
-                Database.displaySearchlookupEdit("SELECT ProductCode,Description FROM Products WHERE BranchCode='888'", txtproduct, "Description", "Description");
-               
-            }
         }
 
         private void txtqtyadj_EditValueChanged(object sender, EventArgs e)
         {
-            if (radadd.Checked==true)
-            {
-                newqty = Convert.ToDouble(txtqty.Text) + Convert.ToDouble(txtqtyadj.Text);
-                costkg = Convert.ToDouble(txtcostkg.Text) * Convert.ToDouble(txtqtyadj.Text);
-                txtnewqty.Text = newqty.ToString();
-            }
-            else if (raddeduct.Checked==true)
-            {
-                newqty = Convert.ToDouble(txtqty.Text) - Convert.ToDouble(txtqtyadj.Text);
-                costkg = Convert.ToDouble(txtcostkg.Text) * Convert.ToDouble(txtqtyadj.Text);
-                txtnewqty.Text = newqty.ToString();
-            }
         }
 
         private void radadd_CheckedChanged(object sender, EventArgs e)
@@ -112,46 +78,34 @@ namespace SalesInventorySystem.HOFormsDevEx
 
         private void radintransit_CheckedChanged(object sender, EventArgs e)
         {
-            if (radintransit.Checked == true)
-            {
-                adjustmentmethod = "INTRANSIT";
-                Database.displaySearchlookupEdit("SELECT ProductCode,Description FROM Products WHERE BranchCode='888'", txtproduct, "Description", "Description");
-                txtcostkg.Enabled = true;
-                txtsupplier.Enabled = false;
-                txtshipmentno.Enabled = false;
-            }
-            else
-            {
-                adjustmentmethod = "LINKTOSUPPLIER";
-                txtsupplier.Enabled = true;
-                txtshipmentno.Enabled = true;
-            }
-               
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            double totalavailable = Database.getTotalSummation2("Inventory", "Product='" + productcode + "' and isStock=1 and Available > 0 and Branch='" + txtbranch.Text + "'", "Available");
-            if(raddeduct.Checked==true)
+            if (txtbranch.Text == "" || productcode == null || productcode.ToString() == "")
             {
-                if (totalavailable < Convert.ToDouble(txtqtyadj.Text))
+                XtraMessageBox.Show("Please select a Branch and Product.");
+                return;
+            }
+            if (!double.TryParse(txtqtyadj.Text, out double qtyToAdjust) || qtyToAdjust <= 0)
+            {
+                XtraMessageBox.Show("Please enter a valid Qty Adjustment greater than zero.");
+                return;
+            }
+
+            if (raddeduct.Checked == true)
+            {
+                double totalavailable = Database.getTotalSummation2("Inventory", "Product='" + productcode + "' and isStock=1 and Available > 0 and isWarehouse=1 and Branch='" + txtbranch.Text + "'", "Available");
+                if (totalavailable < qtyToAdjust)
                 {
                     XtraMessageBox.Show("Cant Deduct Inventory.. Available Quantity must not less than Qty Adjustment!");
                     return;
                 }
-                else
-                {
-                    save();
-                    XtraMessageBox.Show("Successfully Adjusted!");
-                    this.Dispose();
-                }
             }
-            else
-            {
-                save();
-                XtraMessageBox.Show("Successfully Adjusted!");
-                this.Dispose();
-            }
+
+            AdjustInventory();
+            XtraMessageBox.Show("Successfully Adjusted!");
+            this.Dispose();
         }
 
         private void raddeduct_CheckedChanged(object sender, EventArgs e)
@@ -164,20 +118,21 @@ namespace SalesInventorySystem.HOFormsDevEx
 
         private void txtproduct_EditValueChanged(object sender, EventArgs e)
         {
-            //GridView view = txtproduct.Properties.View;
-            //int rowHandle = view.FocusedRowHandle;
-            //productcode = view.GetRowCellValue(rowHandle, "ProductCode");
-            //productcost = view.GetRowCellValue(rowHandle, "Cost");
             productcode = SearchLookUpClass.getSingleValue(txtproduct, "ProductCode");
-            productcost = SearchLookUpClass.getSingleValue(txtproduct, "Cost");
-            txtcostkg.Text = productcost.ToString();
-            double totalorigqty = Database.getTotalSummation2("Inventory", "Product='" + productcode + "' and isWarehouse=1 and Branch='" + txtbranch.Text + "' and ShipmentNo='"+txtshipmentno.Text+"'", "Quantity");
-            double totalavailable = Database.getTotalSummation2("Inventory", "Product='"+productcode+"' and isStock=1 and Available > 0 and isWarehouse=1 and Branch='" + txtbranch.Text + "'  and ShipmentNo='" + txtshipmentno.Text + "'", "Available");
-            txtqty.Text = totalavailable.ToString();
-            txtorigqty.Text = totalorigqty.ToString();
         }
 
-        void save()
+        // Posts the branch inventory quantity adjustment.
+        //   ADD    -> sp_InvQtyAdjustment inserts a brand new Inventory row
+        //             for the adjusted quantity, using the product's
+        //             LandingCost as the row cost.
+        //   DEDUCT -> sp_InvQtyAdjustment consumes existing Inventory rows
+        //             for this Branch+Product oldest-first (FIFO) until the
+        //             adjustment quantity is fully accounted for, each row
+        //             carrying its own actual cost.
+        // Only Branch, Product, Qty Adjustment and Adjustment Type drive
+        // this now - available qty, cost and new qty are resolved inside
+        // the SP itself rather than round-tripped through UI fields.
+        void AdjustInventory()
         {
             SqlConnection con = Database.getConnection();
             con.Open();
@@ -188,15 +143,8 @@ namespace SalesInventorySystem.HOFormsDevEx
                 com.Parameters.AddWithValue("@parmbranchcode", txtbranch.Text);
                 com.Parameters.AddWithValue("@parmprodcode", productcode.ToString());
                 com.Parameters.AddWithValue("@parmdesc", txtproduct.Text);
-                com.Parameters.AddWithValue("@parmsupplierid", txtsupplier.Text);
-                com.Parameters.AddWithValue("@parmshipmentno", txtshipmentno.Text);
-                com.Parameters.AddWithValue("@parmqty", txtqty.Text);
-                com.Parameters.AddWithValue("@parmcost", txtcostkg.Text);
                 com.Parameters.AddWithValue("@parmqtyadj", txtqtyadj.Text);
-                com.Parameters.AddWithValue("@parmnewqty", txtnewqty.Text);
                 com.Parameters.AddWithValue("@parmadjustmenttype", adjustmenttype);
-                com.Parameters.AddWithValue("@parmadjustmentmethod", adjustmentmethod);
-                com.Parameters.AddWithValue("@parmamountadjusted", costkg);
                 com.Parameters.AddWithValue("@parmuser", Login.Fullname);
                 com.CommandType = CommandType.StoredProcedure;
                 com.CommandText = query;

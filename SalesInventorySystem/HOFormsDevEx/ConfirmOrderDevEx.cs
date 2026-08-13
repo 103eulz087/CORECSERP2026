@@ -83,20 +83,21 @@ namespace SalesInventorySystem.HOFormsDevEx
 
         private void gridControl2_MouseUp(object sender, MouseEventArgs e)
         {
-            //if (e.Button == MouseButtons.Right)
-            //    contextMenuStrip1.Show(gridControl2, e.Location);
+            if (e.Button == MouseButtons.Right)
+                contextMenuStrip1.Show(gridControl2, e.Location);
         }
 
         private void updateSellingPriceToolStripMenuItem_Click(object sender, EventArgs e)
         {
             HOFormsDevEx.ConfirmOrderUpdateSPriceDevEx aksd = new ConfirmOrderUpdateSPriceDevEx();
+            aksd.txtpono.Text = txtpono.Text;
             aksd.txtdesc.Text = gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "ProductName").ToString();
-            aksd.txtseqno.Text = gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "SequenceNo").ToString();
+            aksd.txtseqno.Text = gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "SeqNo").ToString();
             aksd.txtsprice.Text = gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "SellingPrice").ToString();
             aksd.ShowDialog(this);
             if(HOFormsDevEx.ConfirmOrderUpdateSPriceDevEx.isdone == true)
             {
-                display();
+                checkChanged();
                 HOFormsDevEx.ConfirmOrderUpdateSPriceDevEx.isdone = false;
                 aksd.Dispose();
             }

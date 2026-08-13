@@ -307,8 +307,8 @@ namespace SalesInventorySystem.HOFormsDevEx
                         //com.Parameters.AddWithValue("@parmtransdate", txtdate.Text);
                         //com.Parameters.AddWithValue("@parmbranchcode", txtbranch.Text);
                        
-                        com.Parameters.Add("@parmbranchcode", SqlDbType.Date).Value = (DateTime)txtdate.Value.Date;
-                        com.Parameters.Add("@parmtransdate", SqlDbType.VarChar).Value = txtbranch.Text;
+                        com.Parameters.Add("@parmtransdate", SqlDbType.Date).Value = (DateTime)txtdate.Value.Date;
+                        com.Parameters.Add("@parmbranchcode", SqlDbType.VarChar).Value = txtbranch.Text;
                         com.Parameters.Add("@parmprodcode", SqlDbType.VarChar).Value = "";
                         com.Parameters.Add("@parmqty", SqlDbType.VarChar).Value = "";
                         com.Parameters.Add("@parmoption", SqlDbType.VarChar).Value = "2";
