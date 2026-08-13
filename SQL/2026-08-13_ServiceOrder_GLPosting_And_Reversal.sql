@@ -250,7 +250,10 @@ GO
 -- =============================================
 -- Author:      Eulz Avancena (original); added 2026-08-13
 -- Description: Cancels an already-APPROVED Service Order -- the reversal
---              trap for sp_ApproveServiceOrder above. Modeled directly on
+--              trap for sp_ApproveServiceOrder above. Called from the "Error
+--              Correct / Cancelled" right-click menu on gridControlApprovedServices
+--              in Orders/POForApproval.cs (contextMenuStripCancelServices ->
+--              toolStripMenuItem3_Click_1). Modeled directly on
 --              sp_ReturnSalesOrder's DELIVERED-path reversal section
 --              (SQL/2026-08-05_ReturnSalesOrder_TVP_ReversalTicket_Rewrite.sql):
 --                - TransactionChargeSales is recomputed to zero in place
@@ -266,6 +269,14 @@ GO
 --                  or the Service row been deleted since approval; the ticket
 --                  already posted is the only correct source of truth for
 --                  what actually needs reversing.
+--                - Final status is 'REJECTED', not a separate 'CANCELLED'
+--                  value -- reuses POForApproval.cs's existing Rejected tab
+--                  (loadRejectedServices()) instead of needing a new one.
+--                  RejectedBy/DateRejected/RejectReason are populated for that
+--                  view; CancelledBy/DateCancelled/CancelReason are ALSO
+--                  populated alongside them purely so this path stays
+--                  distinguishable from a genuine pre-approval
+--                  sp_RejectServiceOrder rejection (CancelledBy IS NULL there).
 --              Payment-touched guard (CLAUDE.md Known Bug Pattern #4): if the
 --              service invoice already has AmountPaid > 0, this SP refuses --
 --              a paid invoice needs a different manual path, not a silent
@@ -300,7 +311,7 @@ BEGIN
         BEGIN TRAN;
 
         IF NOT EXISTS (SELECT 1 FROM dbo.ServiceOrderSummary WHERE SVCNumber = @SVCNumber AND Status = 'APPROVED')
-            THROW 58141, 'This Service Order is not in APPROVED status (already cancelled, or was never approved).', 1;
+            THROW 58141, 'This Service Order is not in APPROVED status (already error-corrected/rejected, or was never approved).', 1;
 
         SELECT @custkey = CustomerKey, @branchcode = BranchCode, @invoiceno = InvoiceNo
         FROM dbo.ServiceOrderSummary
@@ -402,8 +413,20 @@ BEGIN
 
         DROP TABLE IF EXISTS #SvcGLRev;
 
+        -- Status lands on 'REJECTED' (not a separate 'CANCELLED' value) so this
+        -- reuses the existing Rejected tab/view_ServiceOrderSummary filtering in
+        -- POForApproval.cs (loadRejectedServices() filters on DateRejected) --
+        -- no new tab needed. RejectedBy/DateRejected/RejectReason are populated
+        -- so it displays correctly there. CancelledBy/DateCancelled/CancelReason
+        -- are ALSO populated (in addition to the Rejected* columns) purely so a
+        -- post-approval error-correction can still be told apart from a genuine
+        -- pre-approval rejection later if ever needed -- CancelledBy IS NULL for
+        -- a true sp_RejectServiceOrder rejection, NOT NULL for this path.
         UPDATE dbo.ServiceOrderSummary
-        SET Status = 'CANCELLED',
+        SET Status = 'REJECTED',
+            RejectedBy = @CancelledBy,
+            DateRejected = GETDATE(),
+            RejectReason = @Reason,
             CancelledBy = @CancelledBy,
             DateCancelled = GETDATE(),
             CancelReason = @Reason,

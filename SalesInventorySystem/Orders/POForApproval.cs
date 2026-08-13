@@ -1136,6 +1136,71 @@ namespace SalesInventorySystem
             showItemsReturned(gridViewReturned);
         }
 
+        private void gridControlApprovedServices_MouseUp(object sender, MouseEventArgs e)
+        {
+            if(e.Button == MouseButtons.Right)
+                contextMenuStripCancelServices.Show(gridControlApprovedServices,e.Location);
+        }
+
+        private void toolStripMenuItem3_Click_1(object sender, EventArgs e)
+        {
+            if (gridViewApprovedServices.FocusedRowHandle < 0)
+                return;
+
+            if (Convert.ToBoolean(Login.isglobalApprover) != true)
+            {
+                XtraMessageBox.Show("You are not authorized to error correct/cancel Service Orders.");
+                return;
+            }
+
+            string svcNumber = gridViewApprovedServices.GetRowCellValue(gridViewApprovedServices.FocusedRowHandle, "SVCNumber").ToString();
+            string custName = gridViewApprovedServices.GetRowCellValue(gridViewApprovedServices.FocusedRowHandle, "Customer").ToString();
+            decimal totalAmount = Convert.ToDecimal(gridViewApprovedServices.GetRowCellValue(gridViewApprovedServices.FocusedRowHandle, "TotalAmount"));
+
+            StringBuilder detail = new StringBuilder();
+            detail.AppendLine("Service Order: " + svcNumber);
+            detail.AppendLine("Customer: " + custName);
+            detail.AppendLine();
+            DataTable lines = Database.GetDataTable("SELECT ServiceName, Qty, SellingPrice, Amount FROM funcview_ServiceOrderDetails('" + svcNumber + "')");
+            foreach (DataRow r in lines.Rows)
+            {
+                detail.AppendLine("  " + r["ServiceName"] + "  x" + r["Qty"] + "  @ " + Convert.ToDecimal(r["SellingPrice"]).ToString("n2") + " = " + Convert.ToDecimal(r["Amount"]).ToString("n2"));
+            }
+            detail.AppendLine();
+            detail.AppendLine("Total: " + totalAmount.ToString("n2"));
+            detail.AppendLine();
+            detail.AppendLine("Error Correct this approved Service Order? This reverses its GL posting and AR charge, and moves it to Rejected.");
+
+            DialogResult result = XtraMessageBox.Show(detail.ToString(), "Error Correct / Cancel Service Order", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            if (result != DialogResult.Yes)
+                return;
+
+            string reason = XtraInputBox.Show("Enter error-correction reason:", "Error Correct Service Order", "");
+            if (string.IsNullOrWhiteSpace(reason))
+                return;
+
+            try
+            {
+                using (SqlConnection con = Database.getConnection())
+                {
+                    con.Open();
+                    SqlCommand com = new SqlCommand("sp_CancelApprovedServiceOrder", con);
+                    com.CommandType = CommandType.StoredProcedure;
+                    com.Parameters.AddWithValue("@SVCNumber", svcNumber);
+                    com.Parameters.AddWithValue("@CancelledBy", Login.Fullname);
+                    com.Parameters.AddWithValue("@Reason", reason);
+                    com.ExecuteNonQuery();
+                }
+                XtraMessageBox.Show("Service Order error-corrected and moved to Rejected.");
+                loadApprovedServices();
+                loadRejectedServices();
+            }
+            catch (SqlException ex)
+            {
+                XtraMessageBox.Show(ex.Message.ToString());
+            }
+        }
+
         private void toolStripMenuItem13_Click(object sender, EventArgs e)
         {
             devno = gridView5.GetRowCellValue(gridView5.FocusedRowHandle, "DeliveryNo").ToString();
