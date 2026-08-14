@@ -2417,7 +2417,36 @@ namespace SalesInventorySystem
             }
             finally
             {
-               
+
+                con.Close();
+            }
+        }
+        public static void displayComboBoxItems(string query, string col, DevExpress.XtraEditors.ComboBoxEdit box)
+        {
+            box.Properties.Items.Clear();
+            SqlConnection con = getConnection();
+            con.Open();
+            SqlCommand com = new SqlCommand(query, con);
+
+            SqlDataReader reader = com.ExecuteReader();
+            try
+            {
+                if (reader != null)
+                {
+                    while (reader.Read())
+                    {
+                        box.Properties.Items.Add(reader[col].ToString().Trim());
+                    }
+                    reader.Close();
+                }
+            }
+            catch (SqlException sex)
+            {
+                XtraMessageBox.Show(sex.StackTrace.ToString());
+            }
+            finally
+            {
+
                 con.Close();
             }
         }

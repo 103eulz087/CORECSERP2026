@@ -306,6 +306,7 @@
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.txtsearchlookupproduct.Properties.NullText = "";
             this.txtsearchlookupproduct.Properties.PopupView = this.searchLookUpEdit2View;
+            this.txtsearchlookupproduct.Properties.ReadOnly = true;
             this.txtsearchlookupproduct.Size = new System.Drawing.Size(257, 22);
             this.txtsearchlookupproduct.TabIndex = 88;
             this.txtsearchlookupproduct.EditValueChanged += new System.EventHandler(this.txtsearchlookupproduct_EditValueChanged);

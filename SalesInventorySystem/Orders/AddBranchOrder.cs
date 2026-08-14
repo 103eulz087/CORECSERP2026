@@ -696,6 +696,10 @@ namespace SalesInventorySystem
                         //    searchLookUpEdit1.Text = "";
                         //}
                         txtweight.Text = "";
+                        // EditValue = null re-fires txtsearchlookupproduct_EditValueChanged, which
+                        // re-sets pcode/catcode/referencecode/shipmentno from the popup grid's
+                        // (possibly stale) focused row -- the explicit nulls below must stay AFTER
+                        // this line so they're the last write and actually win.
                         txtsearchlookupproduct.EditValue = null;
                         txtsku.Text = "";
                         pcode = null;
@@ -810,11 +814,18 @@ namespace SalesInventorySystem
             pcode = null;
             referencecode = null;
             shipmentno = null;
-            catcode = SearchLookUpClass.getSingleValue(txtsearchlookupproduct, "CategoryCode");
-            pcode = SearchLookUpClass.getSingleValue(txtsearchlookupproduct, "ProductCode");
-            referencecode = SearchLookUpClass.getSingleValue(txtsearchlookupproduct, "ReferenceCode");
-            shipmentno = SearchLookUpClass.getSingleValue(txtsearchlookupproduct, "ShipmentNo");
-            txtweight.Focus();
+            try
+            {
+                catcode = SearchLookUpClass.getSingleValue(txtsearchlookupproduct, "CategoryCode");
+                pcode = SearchLookUpClass.getSingleValue(txtsearchlookupproduct, "ProductCode");
+                referencecode = SearchLookUpClass.getSingleValue(txtsearchlookupproduct, "ReferenceCode");
+                shipmentno = SearchLookUpClass.getSingleValue(txtsearchlookupproduct, "ShipmentNo");
+                txtweight.Focus();
+            }
+            catch (Exception ex)
+            {
+                XtraMessageBox.Show(ex.Message.ToString() + "---");
+            }
         }
 
         private void simpleButton2_Click_1(object sender, EventArgs e)
