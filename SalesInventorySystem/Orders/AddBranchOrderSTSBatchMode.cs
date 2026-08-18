@@ -28,47 +28,23 @@ namespace SalesInventorySystem.Orders
 
         }
 
-        void processSTS(string pono, string devno, string refno, string brcode, string pcatcode, string pcode, string qty, string barcode)
+        // transferredCount = rows actually processed. skippedItems = human-readable reasons,
+        // covering both rows filtered out here (requested > available) and any the SP itself
+        // skipped (sp_AddBranchOrderBatch isolates each row and reports failures instead of
+        // aborting the whole batch -- covers the race-condition case where inventory changed
+        // between grid-load and Save-click).
+        private bool executeTransfer(out int transferredCount, out List<string> skippedItems)
         {
-            SqlConnection con = Database.getConnection();
-            con.Open();
-            string query = "sp_AddBranchOrder";
-            try
-            {
-                SqlCommand com = new SqlCommand(query, con);
-                com.Parameters.AddWithValue("@parmdevno", devno);
-                com.Parameters.AddWithValue("@parmrefno", refno);
-                com.Parameters.AddWithValue("@parmpono", pono);
-                com.Parameters.AddWithValue("@parmprodcatcode", pcatcode);
-                com.Parameters.AddWithValue("@parmprodcode", pcode);
-                com.Parameters.AddWithValue("@parmqty", qty);
-                com.Parameters.AddWithValue("@parmbarcode", barcode);
-
-                com.Parameters.AddWithValue("@parmbranchcode", txtbrcode.Text); //initiating branhc
-                com.Parameters.AddWithValue("@parmorigin", Login.assignedBranch);
-                com.Parameters.AddWithValue("@preparedby", Login.Fullname);
-                //com.Parameters.AddWithValue("@parmeffectivitydate", txteffectivedate.Text);
-                com.Parameters.AddWithValue("@parmsourceseqno", "");
-                com.Parameters.AddWithValue("@parmbarcodescanning", 0);
-                com.CommandType = CommandType.StoredProcedure;
-                com.CommandText = query;
-                com.ExecuteNonQuery();
-            }
-            catch (SqlException ex)
-            {
-                XtraMessageBox.Show(ex.Message.ToString());
-            }
-        }
-        
-        private bool executeTransfer()
-        {
+            transferredCount = 0;
+            skippedItems = new List<string>();
             try
             {
                 DataTable dtTransfer = new DataTable();
                 dtTransfer.Columns.Add("ProductCategoryCode", typeof(string));
                 dtTransfer.Columns.Add("ProductCode", typeof(string));
+                dtTransfer.Columns.Add("ProductName", typeof(string));
+                dtTransfer.Columns.Add("QtyRequested", typeof(decimal));
                 dtTransfer.Columns.Add("Qty", typeof(decimal));
-                dtTransfer.Columns.Add("Barcode", typeof(string));
 
                 int[] selectedRows = gridView1.GetSelectedRows();
                 if (selectedRows == null || selectedRows.Length == 0)
@@ -81,25 +57,33 @@ namespace SalesInventorySystem.Orders
                 {
                     if (rowHandle < 0) continue;
 
+                    double available = Convert.ToDouble(gridView1.GetRowCellValue(rowHandle, "AvailableInv"));
+                    double requested = Convert.ToDouble(gridView1.GetRowCellValue(rowHandle, "QtyRequested"));
+                    string productName = Convert.ToString(gridView1.GetRowCellValue(rowHandle, "ProductName"));
+
+                    // Don't send rows that exceed available inventory at all -- skip, don't deduct.
+                    if (requested > available)
+                    {
+                        skippedItems.Add(productName + ": requested " + requested + ", only " + available + " available");
+                        continue;
+                    }
+
                     DataRow dr = dtTransfer.NewRow();
                     dr["ProductCategoryCode"] =
                         Classes.Product.getProductCategoryCode(
                             Convert.ToString(gridView1.GetRowCellValue(rowHandle, "Category")));
 
                     dr["ProductCode"] = Convert.ToString(gridView1.GetRowCellValue(rowHandle, "ProductCode"));
+                    dr["ProductName"] = productName;
+                    dr["QtyRequested"] = Convert.ToDecimal(requested);
                     dr["Qty"] = Convert.ToDecimal(gridView1.GetRowCellValue(rowHandle, "Qty"));
-
-                    object barcodeObj = gridView1.GetRowCellValue(rowHandle, "Barcode");
-                    dr["Barcode"] = (barcodeObj == null || barcodeObj == DBNull.Value)
-                        ? (object)DBNull.Value
-                        : barcodeObj.ToString();
 
                     dtTransfer.Rows.Add(dr);
                 }
 
                 if (dtTransfer.Rows.Count == 0)
                 {
-                    XtraMessageBox.Show("No valid rows selected.");
+                    XtraMessageBox.Show("No valid rows to transfer (all selected items exceed available inventory).");
                     return false;
                 }
 
@@ -120,7 +104,16 @@ namespace SalesInventorySystem.Orders
                     cmd.Parameters.Add("@PreparedBy", SqlDbType.VarChar, 60).Value = Login.Fullname;
 
                     conn.Open();
-                    cmd.ExecuteNonQuery();
+                    var serverSkipped = new List<string>();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            serverSkipped.Add(reader["ProductName"].ToString() + ": " + reader["Reason"].ToString());
+                        }
+                    }
+                    skippedItems.AddRange(serverSkipped);
+                    transferredCount = dtTransfer.Rows.Count - serverSkipped.Count;
                 }
 
                 return true; // ✅ success
@@ -168,17 +161,17 @@ namespace SalesInventorySystem.Orders
         {
 
             int totalorders = Database.getCountData(
-                    "SELECT COUNT(ProductNo) as Counter FROM DeliveryDetails WHERE PONumber=" + txtponum.Text,
+                    "SELECT COUNT(ProductNo) as Counter FROM DeliveryDetails WHERE PONumber=" + txtponum.Text + " AND isReturned=0 AND isCancelled=0",
                     "Counter");
 
             if (!HelperFunction.ConfirmDialog("Are you sure you want to save this Inventory?", "Confirm Inventory Entry"))
                 return;
 
-            // ✅ NEW: check for negative inventory BEFORE transfer
+            // ✅ check for negative inventory BEFORE transfer
             if (HasNegativeInventorySelected())
             {
                 bool confirmNegative = HelperFunction.ConfirmDialog(
-                    "Some items exceed available inventory (NEGATIVE INVENTORY).\n\nDo you want to continue processing?",
+                    "Some selected items exceed available inventory and will be SKIPPED (not deducted).\n\nDo you want to continue processing the remaining valid items?",
                     "Negative Inventory Warning");
 
                 if (!confirmNegative)
@@ -186,8 +179,10 @@ namespace SalesInventorySystem.Orders
             }
 
             // ✅ Stop if executeTransfer fails
-            if (!executeTransfer())
+            if (!executeTransfer(out int transferredCount, out List<string> skippedItems))
                 return;
+
+            totalreceive = transferredCount;
 
             // discrepancy prompt
             if (totalorders != totalreceive)
@@ -203,37 +198,14 @@ namespace SalesInventorySystem.Orders
                 return;
 
             isdone = true;
-            BigAlert.Show("SUCCESS", "Successfully Added!", MessageBoxIcon.Information);
+
+            string summary = transferredCount + " item(s) transferred successfully.";
+            if (skippedItems.Count > 0)
+            {
+                summary += "\n\n" + skippedItems.Count + " item(s) skipped:\n" + string.Join("\n", skippedItems);
+            }
+            BigAlert.Show("SUCCESS", summary, MessageBoxIcon.Information);
             this.Close();
-
-            //int totalorders = Database.getCountData(
-            //        "SELECT COUNT(ProductNo) as Counter FROM DeliveryDetails WHERE PONumber=" + txtponum.Text,
-            //        "Counter");
-
-            //if (!HelperFunction.ConfirmDialog("Are you sure you want to save this Inventory?", "Confirm Inventory Entry"))
-            //    return;
-
-            //// ✅ Stop if executeTransfer fails
-            //if (!executeTransfer())
-            //    return;
-
-            //// discrepancy prompt
-            //if (totalorders != totalreceive)
-            //{
-            //    if (!HelperFunction.ConfirmDialog(
-            //        "The System found out that there are remaining items in OrderDetails that you do not receive.. Are you sure you want to Continue",
-            //        "Discrepancy"))
-            //        return;
-            //}
-
-            //// ✅ Stop if confirm fails
-            //if (!ConfirmBranchOrder())
-            //    return;
-
-            //isdone = true;
-            //BigAlert.Show("SUCCESS","Successfully Added!",MessageBoxIcon.Information);
-            //this.Close();
-
         }
 
         private void gridView1_RowCellStyle(object sender, RowCellStyleEventArgs e)
