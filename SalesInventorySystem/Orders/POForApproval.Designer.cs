@@ -547,19 +547,19 @@
             this.toolStripMenuItem1,
             this.cancelThisOrderToolStripMenuItem});
             this.contextMenuApprovedG2.Name = "contextMenuStrip1";
-            this.contextMenuApprovedG2.Size = new System.Drawing.Size(207, 52);
+            this.contextMenuApprovedG2.Size = new System.Drawing.Size(211, 80);
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(206, 24);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(210, 24);
             this.toolStripMenuItem1.Text = "Show Order Details";
             this.toolStripMenuItem1.Click += new System.EventHandler(this.toolStripMenuItem1_Click);
             // 
             // cancelThisOrderToolStripMenuItem
             // 
             this.cancelThisOrderToolStripMenuItem.Name = "cancelThisOrderToolStripMenuItem";
-            this.cancelThisOrderToolStripMenuItem.Size = new System.Drawing.Size(206, 24);
+            this.cancelThisOrderToolStripMenuItem.Size = new System.Drawing.Size(210, 24);
             this.cancelThisOrderToolStripMenuItem.Text = "Cancel this Order";
             this.cancelThisOrderToolStripMenuItem.Click += new System.EventHandler(this.cancelThisOrderToolStripMenuItem_Click);
             // 
@@ -802,11 +802,11 @@
             // 
             this.gridControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gridControl1.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.gridControl1.Location = new System.Drawing.Point(0, 54);
+            this.gridControl1.Location = new System.Drawing.Point(0, 43);
             this.gridControl1.MainView = this.gridView1;
             this.gridControl1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.gridControl1.Name = "gridControl1";
-            this.gridControl1.Size = new System.Drawing.Size(1410, 715);
+            this.gridControl1.Size = new System.Drawing.Size(1128, 572);
             this.gridControl1.TabIndex = 0;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1});
@@ -868,18 +868,18 @@
             this.forApprovalServicesSalesOrder.Controls.Add(this.gridControlForApprovalServices);
             this.forApprovalServicesSalesOrder.Controls.Add(this.panelControl6);
             this.forApprovalServicesSalesOrder.Name = "forApprovalServicesSalesOrder";
-            this.forApprovalServicesSalesOrder.Size = new System.Drawing.Size(1410, 769);
+            this.forApprovalServicesSalesOrder.Size = new System.Drawing.Size(1128, 615);
             this.forApprovalServicesSalesOrder.Text = "Services Sales Order";
             // 
             // gridControlForApprovalServices
             // 
             this.gridControlForApprovalServices.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gridControlForApprovalServices.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.gridControlForApprovalServices.Location = new System.Drawing.Point(0, 54);
+            this.gridControlForApprovalServices.Location = new System.Drawing.Point(0, 43);
             this.gridControlForApprovalServices.MainView = this.gridViewForApprovalServices;
             this.gridControlForApprovalServices.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.gridControlForApprovalServices.Name = "gridControlForApprovalServices";
-            this.gridControlForApprovalServices.Size = new System.Drawing.Size(1763, 908);
+            this.gridControlForApprovalServices.Size = new System.Drawing.Size(1128, 572);
             this.gridControlForApprovalServices.TabIndex = 0;
             this.gridControlForApprovalServices.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewForApprovalServices});
@@ -919,7 +919,7 @@
             this.panelControl6.Location = new System.Drawing.Point(0, 0);
             this.panelControl6.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.panelControl6.Name = "panelControl6";
-            this.panelControl6.Size = new System.Drawing.Size(1763, 43);
+            this.panelControl6.Size = new System.Drawing.Size(1128, 43);
             this.panelControl6.TabIndex = 4;
             // 
             // simpleButton4
@@ -1023,11 +1023,11 @@
             // 
             this.gridControl2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gridControl2.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.gridControl2.Location = new System.Drawing.Point(0, 54);
+            this.gridControl2.Location = new System.Drawing.Point(0, 43);
             this.gridControl2.MainView = this.gridView2;
             this.gridControl2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.gridControl2.Name = "gridControl2";
-            this.gridControl2.Size = new System.Drawing.Size(1410, 716);
+            this.gridControl2.Size = new System.Drawing.Size(1128, 573);
             this.gridControl2.TabIndex = 2;
             this.gridControl2.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView2});
@@ -1083,18 +1083,18 @@
             this.approvedServicesSalesOrder.Controls.Add(this.gridControlApprovedServices);
             this.approvedServicesSalesOrder.Controls.Add(this.panelControl8);
             this.approvedServicesSalesOrder.Name = "approvedServicesSalesOrder";
-            this.approvedServicesSalesOrder.Size = new System.Drawing.Size(1410, 770);
+            this.approvedServicesSalesOrder.Size = new System.Drawing.Size(1128, 616);
             this.approvedServicesSalesOrder.Text = "Services Sales Order";
             // 
             // gridControlApprovedServices
             // 
             this.gridControlApprovedServices.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gridControlApprovedServices.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.gridControlApprovedServices.Location = new System.Drawing.Point(0, 54);
+            this.gridControlApprovedServices.Location = new System.Drawing.Point(0, 43);
             this.gridControlApprovedServices.MainView = this.gridViewApprovedServices;
             this.gridControlApprovedServices.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.gridControlApprovedServices.Name = "gridControlApprovedServices";
-            this.gridControlApprovedServices.Size = new System.Drawing.Size(1763, 909);
+            this.gridControlApprovedServices.Size = new System.Drawing.Size(1128, 573);
             this.gridControlApprovedServices.TabIndex = 2;
             this.gridControlApprovedServices.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewApprovedServices});
@@ -1129,7 +1129,7 @@
             this.panelControl8.Location = new System.Drawing.Point(0, 0);
             this.panelControl8.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.panelControl8.Name = "panelControl8";
-            this.panelControl8.Size = new System.Drawing.Size(1763, 43);
+            this.panelControl8.Size = new System.Drawing.Size(1128, 43);
             this.panelControl8.TabIndex = 3;
             // 
             // simpleButton5
@@ -1233,11 +1233,11 @@
             // 
             this.gridControl3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gridControl3.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.gridControl3.Location = new System.Drawing.Point(0, 54);
+            this.gridControl3.Location = new System.Drawing.Point(0, 43);
             this.gridControl3.MainView = this.gridView3;
             this.gridControl3.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.gridControl3.Name = "gridControl3";
-            this.gridControl3.Size = new System.Drawing.Size(1410, 716);
+            this.gridControl3.Size = new System.Drawing.Size(1128, 573);
             this.gridControl3.TabIndex = 3;
             this.gridControl3.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView3});
@@ -1291,18 +1291,18 @@
             this.rejectedServicesSalesOrder.Controls.Add(this.gridControl6);
             this.rejectedServicesSalesOrder.Controls.Add(this.panelControl10);
             this.rejectedServicesSalesOrder.Name = "rejectedServicesSalesOrder";
-            this.rejectedServicesSalesOrder.Size = new System.Drawing.Size(1410, 770);
+            this.rejectedServicesSalesOrder.Size = new System.Drawing.Size(1128, 616);
             this.rejectedServicesSalesOrder.Text = "Services Sales Order";
             // 
             // gridControl6
             // 
             this.gridControl6.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gridControl6.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.gridControl6.Location = new System.Drawing.Point(0, 54);
+            this.gridControl6.Location = new System.Drawing.Point(0, 43);
             this.gridControl6.MainView = this.gridView6;
             this.gridControl6.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.gridControl6.Name = "gridControl6";
-            this.gridControl6.Size = new System.Drawing.Size(1763, 909);
+            this.gridControl6.Size = new System.Drawing.Size(1128, 573);
             this.gridControl6.TabIndex = 3;
             this.gridControl6.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView6});
@@ -1336,7 +1336,7 @@
             this.panelControl10.Location = new System.Drawing.Point(0, 0);
             this.panelControl10.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.panelControl10.Name = "panelControl10";
-            this.panelControl10.Size = new System.Drawing.Size(1763, 43);
+            this.panelControl10.Size = new System.Drawing.Size(1128, 43);
             this.panelControl10.TabIndex = 3;
             // 
             // simpleButton6
@@ -1950,7 +1950,7 @@
             this.contextMenuStripCancelServices.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripMenuItem3});
             this.contextMenuStripCancelServices.Name = "contextMenuStrip1";
-            this.contextMenuStripCancelServices.Size = new System.Drawing.Size(242, 56);
+            this.contextMenuStripCancelServices.Size = new System.Drawing.Size(242, 28);
             // 
             // toolStripMenuItem3
             // 

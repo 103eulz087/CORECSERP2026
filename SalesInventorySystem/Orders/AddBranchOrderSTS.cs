@@ -968,6 +968,18 @@ namespace SalesInventorySystem.Orders
                 return;
             }
 
+            // gridView2 only shows Status='PENDING' rows -- mirror sp_ConfirmBranchOrderSTS's
+            // own isReturned/isCancelled check directly against the DB here too, so a desync
+            // between what's displayed and what's actually confirmable (e.g. everything already
+            // returned/cancelled since the grid was last loaded) is caught with a clear message
+            // instead of falling through to the SP's NULL-aggregate guard.
+            bool hasConfirmableLines = Database.checkifExist(
+                "SELECT TOP(1) 1 FROM DeliveryDetails WHERE DeliveryNo='" + txtdevno.Text + "' AND PONumber='" + txtponum.Text + "' AND isReturned=0 AND isCancelled=0");
+            if (!hasConfirmableLines)
+            {
+                XtraMessageBox.Show("Cant Save: No valid line items found for this delivery. Please add at least one product.");
+                return;
+            }
 
             bool confirm = HelperFunction.ConfirmDialog("Are you sure all order has been Processed?", "Save Transaction");
             if (!confirm)

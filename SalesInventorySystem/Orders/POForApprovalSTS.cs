@@ -462,7 +462,9 @@ namespace SalesInventorySystem.Orders
             string pono = gridViewapprvdsts.GetRowCellValue(gridViewapprvdsts.FocusedRowHandle, "PONumber").ToString();
             if (XtraMessageBox.Show("Are you sure you want to cancel this STS Request?", "Cancel STS Request", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
-                bool checkifexistsindelivery = Database.checkifExist("SELECT TOP(1) 1 FROM DeliverySummary WHERE PONumber='" + pono + "'");
+                //bool checkifexistsindelivery = Database.checkifExist("SELECT TOP(1) 1 FROM DeliverySummary WHERE PONumber='" + pono + "' AND ");
+                bool checkifexistsindelivery = Database.checkifExist("SELECT TOP(1) 1 FROM DeliveryDetails WHERE PONumber='" + pono + "' AND (isReturned=0 AND isCancelled=0) ");
+
                 if (checkifexistsindelivery)
                 {
                     XtraMessageBox.Show("This STS Request is already in delivery. " +

@@ -12,7 +12,7 @@ using System.Windows.Forms;
 
 namespace SalesInventorySystem.Orders
 {
-    public partial class AddOrderSTS : Form
+    public partial class AddOrderSTS : XtraForm
     {
         DataTable table; 
         string company = Database.getSingleQuery("CompanyProfile", "CompanyName <> ''", "CompanyName");

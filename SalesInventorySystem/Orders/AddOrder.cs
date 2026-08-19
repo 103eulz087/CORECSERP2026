@@ -7,10 +7,6 @@ using System.Text;
 using System.Windows.Forms;
 using DevExpress.XtraEditors;
 using System.Data.SqlClient;
-using System.Net.Sockets;
-using System.Threading;
-using System.Net;
-using System.Web;
 using DevExpress.XtraGrid.Views.Grid;
 using SalesInventorySystem.Classes;
 //using Excel = Microsoft.Office.Interop.Excel;
@@ -21,20 +17,15 @@ namespace SalesInventorySystem
     { 
         
         object objprodcode = null;
-        object objprodcatname = null;
-        private const int portNum = 8888;
-        delegate void SetTextCallback(string text);
         object objcustkey = null;
         object objcreditmlimit = null;
         object objbalance = null;
         object objremaininglimit = null;
         object srvcid = null,srvccustid=null;
-        private const string hostName = "192.168.99.143";
         DataTable table;
         DataTable serviceTable;
         //string itemno,desc,unitprice,sellingprice,prodname;
         //string number;
-        public static string text_to_send="";
         public static string Isconnected = "";
         string company = Database.getSingleQuery("CompanyProfile", "CompanyName <> ''", "CompanyName");
         decimal tot = 0m;
@@ -63,66 +54,6 @@ namespace SalesInventorySystem
             return functionReturnValue;
         }
 
-
-        private void simpleButton1_Click(object sender, EventArgs e)
-        {
-            
-            if (panel1.Visible == true && txtcustomer.Text=="")
-            {
-                XtraMessageBox.Show("Customer Name Must Not Empty");
-                return;
-            }
-
-            if (txtqty.Text == "" || txtpname.Text.Trim()=="" || comboBox1.Text=="")
-            {
-                XtraMessageBox.Show("Fields must not Empty");
-            }
-            //else if (Convert.ToDouble(spinEdit1.Text) < 1)
-            //{
-            //    XtraMessageBox.Show("Quantity must Non Negative Value!");
-            //}
-            else
-            {
-                int count = 0;
-                bool checkifexists = Database.checkifExist("SELECT TOP(1) PONumber FROM PurchaseOrderDetails WHERE PONumber='" + textEdit1.Text + "' AND ProductName='" + txtpname.Text.Trim() + "'");
-                
-                for(int i=0;i<=gridView1.RowCount-1;i++)
-                {
-                    if (gridView1.GetRowCellValue(i, "ProductName").ToString() == txtpname.Text.Trim())
-                    {
-                        //gridView1.SetRowCellValue(gridView1.FocusedRowHandle, "Qty", Convert.ToDouble(gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "Qty").ToString()) + Convert.ToDouble(spinEdit1.Text));
-                        count = 1;
-                    }
-                    else
-                    {
-                        count += 0;
-                    }
-                }
-                if(count > 0)
-                {
-                    XtraMessageBox.Show("Product Already Exist");
-                    return;
-                }
-                if (checkifexists)
-                {
-                    bool ok = HelperFunction.ConfirmDialog("Product is Already Exist!. Are you Sure you want to Continue?", "Product Exists");
-                    if (ok)
-                    {
-                        add2();
-                       // display();
-                    }
-                }
-              
-                else
-                {
-                    add2();
-                   // display();
-                }
-            }
-            txteffectivedate.Enabled = false;
-            gridView1.MoveLast();
-            //MydataGridView1.CurrentCell = MydataGridView1.Rows[MydataGridView1.Rows.Count - 1].Cells[0];
-        }
 
         // Shared by the credit-limit trap and the invoice-lapsing trap: try the branch's remote
         // approval relay first (Classes/ApprovalRelaySession.cs), falling back to the local
@@ -255,8 +186,6 @@ namespace SalesInventorySystem
             {
                 //var row = Database.getMultipleQuery("Customers", "CustomerName='" + txtcustomer.Text + "'", "CustomerID,isActive,CustomerCreditLimit");
                 string custid =  objcustkey.ToString();
-                string creditlimit = objcreditmlimit.ToString();
-                string balance = objbalance.ToString();
                 string remaininglimit = objremaininglimit.ToString();
 
                 //string custid = row["CustomerID"].ToString();
@@ -280,10 +209,6 @@ namespace SalesInventorySystem
                  {
                      reamrks = Database.getSingleQuery("CustomerProductSetting", "ProductCode = '" + itemcode + "' AND CustID='" + custid + "' ", "Remarks");
                  }
-                 //check if item exist in customer table
-                 // bool prodexist = Database.checkifExist("SELECT * FROM Customers WHERE ItemCode = '" + itemcode + "' AND CustomerID='" + custid + "' ");// Database.getSingleQuery("Customers","ItemCode = '"+Classes.Product.getProductCode(txtprodname.Text,prodcatcode)+"',"sdd");
-                 bool prodexist = Database.checkifExist("SELECT 1 FROM view_custprodsettings WHERE ProductCode = '" + itemcode + "' AND CustID='" + custid + "' ");// Database.getSingleQuery("Customers","ItemCode = '"+Classes.Product.getProductCode(txtprodname.Text,prodcatcode)+"',"sdd");
-
                  //reamrks = Database.getSingleQuery("Customers", "ItemCode = '" + itemcode + "' AND CustomerID='" + custid + "' ", "Remarks");
                  //specialprice = Database.getSingleQuery("Customers", "ItemCode = '" + itemcode + "' AND CustomerID='" + custid + "' ", "SpecialPriceAmount");
                  if (chckspecialprice.Checked == true)
@@ -442,26 +367,41 @@ namespace SalesInventorySystem
             }
         }
 
-        private void display()
-        {
-            Database.display("SELECT * FROM PurchaseOrderDetails WHERE PONumber='" + textEdit1.Text + "'", gridControl1, gridView1);
-            gridView1.Columns[8].Visible = false;
-        }
-
-       
         private void AddOrder_Load(object sender, EventArgs e)
         {
-            //this.ActiveControl = txtprodcat;
             comboBox1.Text = "Kg";
             panel1.Visible = true;
             checkBox1.Visible = true;
             chckspecialprice.Visible = true;
-            //if (Login.assignedBranch == "888")
-            //{
 
-            //}
-           
+            // Guarded fallback -- table is only non-null once LoadData() has actually run.
+            if (table == null)
+            {
+                LoadData();
+            }
+        }
 
+        // Real init entry point for the Products tab: fresh line-item table, new PO#, and the
+        // customer/product/metric lookups populated. Called on first Load and again every time
+        // "New" is clicked to start a fresh order.
+        void LoadData()
+        {
+            table = new DataTable();
+            table.Columns.Add("ProductCode");
+            table.Columns.Add("ProductName"); //UnitPrice
+            table.Columns.Add("Qty"); //Total UnitPrice * weight
+            table.Columns.Add("Units");
+            table.Columns.Add("SellingPrice");
+            table.Columns.Add("Remarks");
+            gridControl1.DataSource = table;
+            gridView1.BestFitColumns();
+
+            textEdit1.Text = IDGenerator.getIDNumberSP("sp_GetPurchaseOrderNumber", "PONumber"); //IDGenerator.getPONumber();
+
+            txtpname.Enabled = true;
+            Database.displaySearchlookupEdit("SELECT ProductCategory,ProductCode,Description FROM view_Products WHERE BranchCode='" + Login.assignedBranch + "' ", txtpname, "Description", "Description");
+            populateCustomer(txtcustomer);
+            loadMetrics();
         }
 
 
@@ -477,31 +417,6 @@ namespace SalesInventorySystem
             Database.displaySearchlookupEdit("Select * FROM view_CustomerWithCreditLimit", edit, "CustomerName", "CustomerName");
         }
         
-        private void simpleButton2_Click(object sender, EventArgs e)
-        {
-            string creditlimit = Database.getSingleQuery("Customers", "CustomerName='" + txtcustomer.Text + "'", "CustomerCreditLimit");
-            string accountbalance = Database.getSingleQuery("ClientAccounts", "AccountID='" + Customers.getCustAccountID(txtcustomer.Text) + "'", "AccountBalance");
-            if(Convert.ToDouble(accountbalance) > Convert.ToDouble(creditlimit))
-            {
-                XtraMessageBox.Show("Credit Limit Exceeded!...");
-                return;
-            }
-            if(ordertype.Text=="" || ordertype == null)
-            {
-                XtraMessageBox.Show("Please Select Order Type!");
-                return;
-            }
-            if (gridView1.RowCount <= 0)
-            {
-                XtraMessageBox.Show("Please Input Product Details!");
-                return;
-            }
-            else
-            {
-                saveAll();
-            }
-        }
-
         void saveAll()
         {
             try
@@ -657,25 +572,6 @@ namespace SalesInventorySystem
         }
 
 
-        private void clear()
-        {
-            txtqty.Text = "";
-            txtpname.Text = "";
-        }
-
-        private void simpleButton3_Click(object sender, EventArgs e)
-        {
-            if (gridView1.RowCount ==0)
-            {
-                XtraMessageBox.Show("No Such Line to cancel!");
-            }
-            else
-            {
-               
-                gridView1.DeleteSelectedRows();
-            }
-        }
-
         private void gridView1_KeyDown(object sender, KeyEventArgs e)
         {
          
@@ -705,128 +601,6 @@ namespace SalesInventorySystem
             ///this.Close();
         }
 
-        private void simpleButton4_Click(object sender, EventArgs e)
-        {
-            if (gridView1.RowCount == 0)
-            {
-                this.Dispose();
-                this.Close();
-            }
-            else
-            {
-                bool ok = HelperFunction.ConfirmDialog("Are you sure you want to Force Close the form? \n Note: All Transactions will be cancelled", "Force Close");
-                if (ok)
-                {
-                   this.Dispose();
-                    this.Close();
-                }
-                
-            }
-        }
-
-        private void txtprodcat_Click(object sender, EventArgs e)
-        {
-            //Database.displayComboBoxItems("SELECT Description FROM ProductCategory", "Description", txtprodcat);
-        }
-
-       
-        private void txtprodname_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            txtqty.Focus();
-        }
-
-        
-       
-        private void simpleButton6_Click(object sender, EventArgs e)
-        {
-       
-            FolderBrowserDialog folder = new FolderBrowserDialog();
-            try
-            {
-                if (folder.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                {
-                
-                    Main main = new Main();
-                    main.notifyIcon1.BalloonTipIcon = ToolTipIcon.Info;
-                    main.notifyIcon1.BalloonTipTitle = "Successfully Exported";
-                    main.notifyIcon1.BalloonTipText = "Your file successfully exported at " + folder.SelectedPath + "\\" +this.Text+ ".xls";
-                    main.notifyIcon1.ShowBalloonTip(1000);
-                }
-            }
-            catch (Exception ex)
-            {
-                XtraMessageBox.Show(ex.Message.ToString());
-            }
-        }
-
-      
-   
-        private void btnitemcancel_Click(object sender, EventArgs e)
-        {
-            if (gridViewitem.RowCount == 0)
-            {
-                XtraMessageBox.Show("No Such Line to cancel!");
-            }
-            else
-            {
-                gridViewitem.DeleteSelectedRows();
-            }
-        }
-
-        
-
-        private void btnitemclose_Click(object sender, EventArgs e)
-        {
-            if (gridViewitem.RowCount == 0)
-            {
-                this.Dispose();
-                this.Close();
-            }
-            else
-            {
-                bool ok = HelperFunction.ConfirmDialog("Are you sure you want to Force Close the form? \n Note: All Transactions will be cancelled", "Force Close");
-                if (ok)
-                {
-                    this.Dispose();
-                    this.Close();
-                }
-
-            }
-        }
-
-        private void btnitemexport_Click(object sender, EventArgs e)
-        {
-            FolderBrowserDialog folder = new FolderBrowserDialog();
-            try
-            {
-                if (folder.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                {
-                    Main main = new Main();
-                    main.notifyIcon1.BalloonTipIcon = ToolTipIcon.Info;
-                    main.notifyIcon1.BalloonTipTitle = "Successfully Exported";
-                    main.notifyIcon1.BalloonTipText = "Your file successfully exported at " + folder.SelectedPath + "\\" + this.Text + ".xls";
-                    main.notifyIcon1.ShowBalloonTip(1000);
-                }
-            }
-            catch (Exception ex)
-            {
-                XtraMessageBox.Show(ex.Message.ToString());
-            }
-        }
-
-       
-        private void simpleButton8_Click(object sender, EventArgs e)
-        {
-            textEdit1.Text = IDGenerator.getIDNumberSP("sp_GetPurchaseOrderNumber", "PONumber"); //IDGenerator.getPONumber();
-            
-            txtpname.Enabled = true;
-            
-
-            populateCustomer(txtcustomer);
-            loadMetrics();
-
-        }
-
         private void txtqty_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
@@ -841,29 +615,12 @@ namespace SalesInventorySystem
         private void txtpname_EditValueChanged(object sender, EventArgs e)
         {
             objprodcode = SearchLookUpClass.getSingleValue(txtpname, "ProductCode");
-            objprodcatname = SearchLookUpClass.getSingleValue(txtpname, "ProductCategory");
             txtqty.Focus();
         }
 
         private void btnnew_Click(object sender, EventArgs e)
         {
-            
-            table = new DataTable();
-            table.Columns.Add("ProductCode");
-            table.Columns.Add("ProductName"); //UnitPrice
-            table.Columns.Add("Qty"); //Total UnitPrice * weight
-            table.Columns.Add("Units");
-            table.Columns.Add("SellingPrice");
-            table.Columns.Add("Remarks");
-            gridControl1.DataSource = table;
-            gridView1.BestFitColumns();
-
-            textEdit1.Text = IDGenerator.getIDNumberSP("sp_GetPurchaseOrderNumber", "PONumber"); //IDGenerator.getPONumber();
-           
-            txtpname.Enabled = true;
-            Database.displaySearchlookupEdit("SELECT ProductCategory,ProductCode,Description FROM view_Products WHERE BranchCode='" + Login.assignedBranch + "' ", txtpname, "Description", "Description");
-            populateCustomer(txtcustomer);
-            loadMetrics();
+            LoadData();
         }
 
         private void btnadd_Click(object sender, EventArgs e)
@@ -930,14 +687,14 @@ namespace SalesInventorySystem
             string accountbalance = Database.getSingleQuery("ClientAccounts", "AccountKey='" + objcustkey.ToString() + "'", "AccountBalance");
             string enableCreditLimit = Database.getSingleQuery("SalesSettings", "EnableCreditLimit is not null", "EnableCreditLimit"); //temporary 0 no effect
 
-            if (Convert.ToBoolean(enableCreditLimit) == true)
-            {
-                if (Convert.ToDouble(accountbalance) > Convert.ToDouble(creditlimit))
-                {
-                    XtraMessageBox.Show("Credit Limit Exceeded!...");
-                    return;
-                }
-            }
+            //if (Convert.ToBoolean(enableCreditLimit) == true)
+            //{
+            //    if (Convert.ToDouble(accountbalance) > Convert.ToDouble(creditlimit))
+            //    {
+            //        XtraMessageBox.Show("Credit Limit Exceeded!...");
+            //        return;
+            //    }
+            //}
             if (String.IsNullOrEmpty(ordertype.Text))
             {
                 XtraMessageBox.Show("Please Select Order Type!");

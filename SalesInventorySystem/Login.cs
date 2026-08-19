@@ -170,6 +170,7 @@ namespace SalesInventorySystem
                 MessageBox.Show(ex.Message.ToString());
             }
         }
+
         //private async void tryCheckUpdateV1()
         //{
         //    try

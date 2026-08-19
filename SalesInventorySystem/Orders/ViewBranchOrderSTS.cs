@@ -489,21 +489,16 @@ namespace SalesInventorySystem.Orders
                 addbrorder.txtrefno.Text = id;//IDGenerator.getReferenceNumber();
                 addbrorder.txteffectivedate.Text = effectivedate;
 
-                //Database.display("SELECT * FROM view_TransferOrderDetails WHERE PONumber='" + addbrorder.txtponum.Text + "'", addbrorder.gridControl1, addbrorder.gridView1);//
                 Database.display($"SELECT * FROM funcview_TransferOrderDetailsSTS('{Login.assignedBranch}','{addbrorder.txtponum.Text}') ", addbrorder.gridControl1, addbrorder.gridView1);//
-                Database.display("SELECT SeqNo,ProductNo,ProductName,BarcodeNo,QtyDelivered,Status,ProcessedBy FROM DeliveryDetails WHERE DeliveryNo='" + addbrorder.txtdevno.Text + "' AND PONumber='" + addbrorder.txtponum.Text + "' and Status = 'PENDING'", addbrorder.gridControl2, addbrorder.gridView2);
-                //addbrorder.gridView2.Columns["SequenceNo"].Visible = false;
+                Database.display("SELECT SeqNo,ProductNo,ProductName,BarcodeNo,QtyDelivered,Status,ProcessedBy FROM DeliveryDetails " +
+                    "WHERE DeliveryNo='" + addbrorder.txtdevno.Text + "' " +
+                    "AND PONumber='" + addbrorder.txtponum.Text + "' " +
+                    "AND Status = 'PENDING' AND isReturned=0 AND isCancelled=0 ", addbrorder.gridControl2, addbrorder.gridView2);
                 addbrorder.gridView1.Columns["PONumber"].Visible = false;
                 addbrorder.gridView1.ExpandAllGroups();
 
-                //addbrorder.gridView1.Columns["SeqNo"].Summary.Add(DevExpress.Data.SummaryItemType.Count, "SeqNo", "{0:n2}");
-                addbrorder.gridView2.Columns["ProductNo"].Summary.Add(DevExpress.Data.SummaryItemType.Count, "ProductNo", "{0:n2}");
+                  addbrorder.gridView2.Columns["ProductNo"].Summary.Add(DevExpress.Data.SummaryItemType.Count, "ProductNo", "{0:n2}");
 
-                //Database.displaySearchlookupEdit("SELECT ProductCode,Barcode,Description FROM Products WHERE BranchCode='888' " +
-                // "AND ProductCode in (SELECT ProductCode FROM TransferOrderDetails WHERE PONumber='" + ponumber + "' )", addbrorder.txtsearchlookupproduct, "Description", "Description");
-
-                //Database.displaySearchlookupEdit($"SELECT * FROM dbo.funcview_populateProducts('{Login.assignedBranch}') " +
-                //  $"WHERE ProductCode in (Select distinct ProductCode FROM TransferOrderDetails WHERE PONumber='{ponumber}')", addbrorder.txtsearchlookupproduct, "Description", "Description");
                 if(GlobalCache.CompanyName=="JFC")
                 {
                     Database.displaySearchlookupEdit($"SELECT * FROM dbo.funcview_populateProductsInPOJFC('{Login.assignedBranch}','{ponumber}','{addbrorder.txteffectivedate.Text}')", addbrorder.txtsearchlookupproduct, "Description", "Description");

@@ -48,6 +48,13 @@ Check against this list:
 
 11. **Gridview Display** Should be best fit columns for readable.
 
+12. **Numeric fields** Should be spin edit like Qty, Cost and Selling Price field.
+
+13. **Unnecessary fields display in the gridview** flag this display if there are some fields like ProductCategory Code, BranchCode it should be the Description or Concatenated code-name.  
+
+14. **Unnecessary Variables** Those assigned and redundant variables that need to remove.
+15. **Unused and Redundant methods** Those unnecessary or redundant methods that need to be removed.
+
 
 For each form reviewed, report pass/fail per relevant check, exact
 file/line for anything flagged, and a one-line suggested fix. Skip checks

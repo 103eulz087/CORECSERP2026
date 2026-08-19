@@ -125,7 +125,7 @@
             this.groupControl1.Location = new System.Drawing.Point(0, 0);
             this.groupControl1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.groupControl1.Name = "groupControl1";
-            this.groupControl1.Size = new System.Drawing.Size(1577, 311);
+            this.groupControl1.Size = new System.Drawing.Size(1577, 486);
             this.groupControl1.TabIndex = 39;
             this.groupControl1.Text = "Process To Primal Cuts";
             this.groupControl1.Paint += new System.Windows.Forms.PaintEventHandler(this.groupControl1_Paint);
@@ -541,7 +541,7 @@
             this.label7.ForeColor = System.Drawing.Color.Maroon;
             this.label7.Location = new System.Drawing.Point(260, 30);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(506, 52);
+            this.label7.Size = new System.Drawing.Size(505, 52);
             this.label7.TabIndex = 40;
             this.label7.Text = "ENZO\'S MEAT MARKET";
             // 
@@ -563,10 +563,10 @@
             // 
             this.groupControl2.Controls.Add(this.gridControl1);
             this.groupControl2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupControl2.Location = new System.Drawing.Point(0, 311);
+            this.groupControl2.Location = new System.Drawing.Point(0, 486);
             this.groupControl2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.groupControl2.Name = "groupControl2";
-            this.groupControl2.Size = new System.Drawing.Size(1577, 364);
+            this.groupControl2.Size = new System.Drawing.Size(1577, 189);
             this.groupControl2.TabIndex = 40;
             this.groupControl2.Text = "Primal Cut Items";
             // 
@@ -578,7 +578,7 @@
             this.gridControl1.MainView = this.gridView1;
             this.gridControl1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.gridControl1.Name = "gridControl1";
-            this.gridControl1.Size = new System.Drawing.Size(1573, 334);
+            this.gridControl1.Size = new System.Drawing.Size(1573, 159);
             this.gridControl1.TabIndex = 97;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1});

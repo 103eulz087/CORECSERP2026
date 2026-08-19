@@ -61,7 +61,7 @@ namespace SalesInventorySystem.HOFormsDevEx
                 com.Parameters.AddWithValue("@parmtransdate", txtdatein.Text);
                 com.Parameters.AddWithValue("@parmbranchcode", _currentItem.BranchCode);
                 com.Parameters.AddWithValue("@parmprodcode", "");
-                com.Parameters.AddWithValue("@parmqty", txtqty.Value);
+                com.Parameters.AddWithValue("@parmqty", txtqty.Text);
                 com.Parameters.AddWithValue("@parmoption", "2");
                 com.Parameters.AddWithValue("@parmsellingprice", "0");
                 com.Parameters.AddWithValue("@parmcost", "0");

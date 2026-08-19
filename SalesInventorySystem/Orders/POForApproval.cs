@@ -508,7 +508,7 @@ namespace SalesInventorySystem
 
         private void cancelThisOrderToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            bool isexist = Database.checkifExist("SELECT TOP(1) 1 FROM DeliveryDetails WHERE PONumber='" + gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "PONumber").ToString() + "' AND isReturned=0");
+            bool isexist = Database.checkifExist("SELECT TOP(1) 1 FROM DeliveryDetails WHERE PONumber='" + gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "PONumber").ToString() + "' AND (isReturned=0 AND isCancelled=0)");
             if(isexist)
             {
                 XtraMessageBox.Show("This PO is Already Processed in your Commissary..To Cancel this Order, Please Delete All Item/s Processed in this PO.");

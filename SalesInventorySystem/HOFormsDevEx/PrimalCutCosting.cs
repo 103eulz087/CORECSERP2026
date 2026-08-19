@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using DevExpress.XtraEditors;
 using DevExpress.XtraGrid.Views.Grid;
+using DevExpress.XtraEditors.Repository;
+using System.Data.SqlClient;
 
 namespace SalesInventorySystem.HOFormsDevEx
 {
@@ -31,57 +33,127 @@ namespace SalesInventorySystem.HOFormsDevEx
 
         private void searchLookUpEdit_EditValueChanged(object sender, EventArgs e)
         {
-            bool isExists = false;
-            isExists = Database.checkifExist($"SELECT 1 FROM dbo.TempCosting WHERE ShipmentNo='{txtshipmentno.Text}'");
-            if(isExists)
-            {
-                Database.display($"SELECT ItemCode as ProductCode,Parts as Description,CostPerKg as Cost FROM dbo.TempCosting WHERE ShipmentNo='{txtshipmentno.Text}'", gridControl1, gridView1);
-            }
-            else
-            {
+            bool isExists = Database.checkifExist($"SELECT 1 FROM dbo.TempCosting WHERE ShipmentNo='{txtshipmentno.Text}'");
+            if (!isExists)
                 XtraMessageBox.Show("This Shipment Number has not been defined for costing yet.");
+
+            refreshGrid(isExists);
+        }
+
+        // Reloads gridView1 for the currently selected shipment, then reapplies the Cost
+        // column's numeric editor -- Database.display() clears and rebinds columns on every
+        // call, so any ColumnEdit assigned before a reload is wiped and must be reapplied
+        // after. Also called after a successful save so already-transferred/held items are
+        // reflected instead of the grid showing stale pre-save state.
+        void refreshGrid(bool costingAlreadyDefined)
+        {
+            if (costingAlreadyDefined)
+                Database.display($"SELECT ItemCode as ProductCode,Parts as Description,CostPerKg as Cost FROM dbo.TempCosting WHERE ShipmentNo='{txtshipmentno.Text}'", gridControl1, gridView1);
+            else
                 Database.display($"SELECT * FROM dbo.view_PrimalCutPartsForCosting", gridControl1, gridView1);
-            }
+
+            applyCostSpinEditor();
+        }
+
+        void applyCostSpinEditor()
+        {
+            if (gridView1.Columns["Cost"] == null) return;
+
+            RepositoryItemSpinEdit spinCost = new RepositoryItemSpinEdit();
+            spinCost.MinValue = 0;
+            spinCost.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+            spinCost.DisplayFormat.FormatString = "n2";
+            spinCost.EditFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+            spinCost.EditFormat.FormatString = "n2";
+            gridControl1.RepositoryItems.Add(spinCost);
+            gridView1.Columns["Cost"].ColumnEdit = spinCost;
         }
 
         private void btnsave_Click(object sender, EventArgs e)
         {
-            bool isExists = false;
-            isExists = Database.checkifExist($"SELECT 1 FROM dbo.TempCosting WHERE ShipmentNo='{txtshipmentno.Text}'");
-            if(isExists)
+            if (string.IsNullOrWhiteSpace(txtshipmentno.Text))
             {
-                if(gridView1.RowCount > 0)
-                {
-                    for (int i = 0; i <= gridView1.RowCount - 1; i++)
-                    {
-                        string costperkg = gridView1.GetRowCellValue(i, "Cost").ToString();
-                        string productcode = gridView1.GetRowCellValue(i, "ProductCode").ToString();
-                       
-                        Database.ExecuteQuery($"UPDATE dbo.TempCosting SET CostPerKg='{costperkg}' WHERE ShipmentNo='{txtshipmentno.Text}' and ItemCode='{productcode}'");
-                    }
-                    XtraMessageBox.Show("Successfully Updated.");
-                }
+                XtraMessageBox.Show("Please select a Shipment Number.");
+                return;
             }
-            else
+
+            if (gridView1.RowCount == 0)
             {
-                if (gridView1.RowCount > 0)
-                {
-                    for (int i = 0; i <= gridView1.RowCount - 1; i++)
-                    {
-                        string costperkg = gridView1.GetRowCellValue(i, "Cost").ToString();
-                        string productcode = gridView1.GetRowCellValue(i, "ProductCode").ToString();
-                        string desc = gridView1.GetRowCellValue(i, "Description").ToString();
-                        Database.ExecuteQuery($"INSERT INTO dbo.TempCosting(ShipmentNo,ItemCode,Parts,CostPerKg) VALUES ('{txtshipmentno.Text}','{productcode}','{desc}','{costperkg}')  ");
-                    }
-                    XtraMessageBox.Show("Successfully inserted.");
-                }
+                XtraMessageBox.Show("No items to save.");
+                return;
             }
-            Database.ExecuteQuery("UPDATE a SET a.Cost=b.CostperKg " +
-                "FROM dbo.Inventory a " +
-                "INNER JOIN dbo.TempCosting b " +
-                "On a.Product = b.ItemCode " +
-                "and a.ShipmentNo = b.ShipmentNo " +
-                $"WHERE a.Branch = '{Login.assignedBranch}' and a.isWarehouse = 0 ", "All Items of this ShipmentNo are Successfully Executed.");
+
+            try
+            {
+                DataTable dtLines = new DataTable();
+                dtLines.Columns.Add("ProductCode", typeof(string));
+                dtLines.Columns.Add("Description", typeof(string));
+                dtLines.Columns.Add("Cost", typeof(decimal));
+
+                for (int i = 0; i <= gridView1.RowCount - 1; i++)
+                {
+                    // GetRowCellValue can be DBNull (row loaded from view_PrimalCutPartsForCosting
+                    // before a cost was ever typed in) -- Convert.ToDecimal on that throws
+                    // InvalidCastException, which used to happen outside any try/catch and would
+                    // crash mid-loop, losing every other row's entered cost. Default to 0 instead,
+                    // which correctly falls into the SP's "held, cost not set" path.
+                    object rawCost = gridView1.GetRowCellValue(i, "Cost");
+                    decimal cost = (rawCost == null || rawCost == DBNull.Value) ? 0m : Convert.ToDecimal(rawCost);
+
+                    DataRow dr = dtLines.NewRow();
+                    dr["ProductCode"] = gridView1.GetRowCellValue(i, "ProductCode").ToString();
+                    dr["Description"] = gridView1.GetRowCellValue(i, "Description").ToString();
+                    dr["Cost"] = cost;
+                    dtLines.Rows.Add(dr);
+                }
+
+                using (SqlConnection con = Database.getConnection())
+                using (SqlCommand com = new SqlCommand("dbo.spu_UpdatePrimalCutCosting", con))
+                {
+                    com.CommandType = CommandType.StoredProcedure;
+
+                    var p = com.Parameters.Add("@Lines", SqlDbType.Structured);
+                    p.TypeName = "dbo.tt_PrimalCutCostingLines";
+                    p.Value = dtLines;
+
+                    com.Parameters.Add("@ShipmentNo", SqlDbType.VarChar, 10).Value = txtshipmentno.Text.Trim();
+                    com.Parameters.Add("@Branch", SqlDbType.VarChar, 5).Value = Login.assignedBranch;
+                    com.Parameters.Add("@PreparedBy", SqlDbType.VarChar, 50).Value = Login.Fullname;
+
+                    con.Open();
+                    int transferredCount = 0;
+                    var heldItems = new List<string>();
+                    using (SqlDataReader reader = com.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            bool transferred = Convert.ToBoolean(reader["Transferred"]);
+                            if (transferred)
+                                transferredCount++;
+                            else
+                                heldItems.Add(reader["Description"].ToString() + " (" + reader["ProductCode"].ToString() + ")");
+                        }
+                    }
+
+                    string summary = transferredCount + " item(s) transferred to Commissary.";
+                    if (heldItems.Count > 0)
+                        summary += "\n\n" + heldItems.Count + " item(s) held in BigBlue (zero cost), not transferred:\n" + string.Join("\n", heldItems);
+
+                    XtraMessageBox.Show(summary, "Primal Cut Costing Saved");
+                }
+
+                // Refresh so already-transferred/held rows reflect the outcome instead of the
+                // grid still showing stale pre-save state (Known Bug Pattern #6).
+                refreshGrid(true);
+            }
+            catch (SqlException ex)
+            {
+                XtraMessageBox.Show(ex.Message, "Save Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (Exception ex)
+            {
+                XtraMessageBox.Show(ex.Message, "Save Failed -- check entered values", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void gridView1_RowCellStyle(object sender, DevExpress.XtraGrid.Views.Grid.RowCellStyleEventArgs e)
@@ -101,7 +173,6 @@ namespace SalesInventorySystem.HOFormsDevEx
 
         private void gridView1_RowCellStyle_1(object sender, RowCellStyleEventArgs e)
         {
-            GridView view = sender as GridView;
             if (e.Column.FieldName == "Cost")
             {
                 e.Appearance.BackColor = Color.Salmon;

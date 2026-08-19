@@ -18,6 +18,19 @@ namespace SalesInventorySystem.Orders
     {
         int totalreceive = 0;
         public static bool isdone = false;
+
+        // Each sp_AddBranchOrder call inside sp_AddBranchOrderBatch is its own independent,
+        // already-committed transaction -- executeTransfer() durably deducts inventory the
+        // moment it runs, regardless of what happens afterward (e.g. the user declining the
+        // later discrepancy prompt). Declining that prompt does NOT undo the transfer; it only
+        // skips ConfirmBranchOrder(). Since this form stays open for the user to fix an
+        // insufficient item's Qty and hit Submit again, track which lines were already durably
+        // transferred this session so a retry doesn't resend (and double-deduct) them. Keyed on
+        // SeqNo (TransferOrderDetails' real per-line grain), NOT ProductCode -- the same product
+        // can legitimately appear on more than one line with a different quantity, and
+        // ProductCode alone can't tell those lines apart.
+        private readonly HashSet<decimal> _transferredSeqNos = new HashSet<decimal>();
+
         public AddBranchOrderSTSBatchMode()
         {
             InitializeComponent();
@@ -45,6 +58,7 @@ namespace SalesInventorySystem.Orders
                 dtTransfer.Columns.Add("ProductName", typeof(string));
                 dtTransfer.Columns.Add("QtyRequested", typeof(decimal));
                 dtTransfer.Columns.Add("Qty", typeof(decimal));
+                dtTransfer.Columns.Add("SeqNo", typeof(decimal));
 
                 int[] selectedRows = gridView1.GetSelectedRows();
                 if (selectedRows == null || selectedRows.Length == 0)
@@ -57,14 +71,33 @@ namespace SalesInventorySystem.Orders
                 {
                     if (rowHandle < 0) continue;
 
+                    string productCode = Convert.ToString(gridView1.GetRowCellValue(rowHandle, "ProductCode"));
+                    string productName = Convert.ToString(gridView1.GetRowCellValue(rowHandle, "ProductName"));
+                    decimal seqNo = Convert.ToDecimal(gridView1.GetRowCellValue(rowHandle, "SeqNo"));
+
+                    // Already durably committed in an earlier Submit attempt this session (e.g.
+                    // the user declined the discrepancy prompt after a partial transfer, fixed
+                    // the other item's Qty, and hit Submit again) -- don't resend/double-deduct.
+                    // Keyed on SeqNo, not ProductCode -- see class-level comment on
+                    // _transferredSeqNos for why.
+                    if (_transferredSeqNos.Contains(seqNo))
+                    {
+                        skippedItems.Add(productName + ": already transferred in a previous attempt this session, not resent");
+                        continue;
+                    }
+
                     double available = Convert.ToDouble(gridView1.GetRowCellValue(rowHandle, "AvailableInv"));
                     double requested = Convert.ToDouble(gridView1.GetRowCellValue(rowHandle, "QtyRequested"));
-                    string productName = Convert.ToString(gridView1.GetRowCellValue(rowHandle, "ProductName"));
+                    double qtyToSend = Convert.ToDouble(gridView1.GetRowCellValue(rowHandle, "Qty"));
 
-                    // Don't send rows that exceed available inventory at all -- skip, don't deduct.
-                    if (requested > available)
+                    // Skip based on Qty (the editable amount actually being sent -- defaults to
+                    // QtyRequested but the user can lower it into range via the in-grid editor),
+                    // not the fixed original QtyRequested. Comparing against QtyRequested here
+                    // meant lowering Qty on an insufficient-stock row never actually let it
+                    // through, since the original ask never changes.
+                    if (qtyToSend > available)
                     {
-                        skippedItems.Add(productName + ": requested " + requested + ", only " + available + " available");
+                        skippedItems.Add(productName + ": requested to send " + qtyToSend + ", only " + available + " available");
                         continue;
                     }
 
@@ -73,17 +106,21 @@ namespace SalesInventorySystem.Orders
                         Classes.Product.getProductCategoryCode(
                             Convert.ToString(gridView1.GetRowCellValue(rowHandle, "Category")));
 
-                    dr["ProductCode"] = Convert.ToString(gridView1.GetRowCellValue(rowHandle, "ProductCode"));
+                    dr["ProductCode"] = productCode;
                     dr["ProductName"] = productName;
                     dr["QtyRequested"] = Convert.ToDecimal(requested);
-                    dr["Qty"] = Convert.ToDecimal(gridView1.GetRowCellValue(rowHandle, "Qty"));
+                    dr["Qty"] = Convert.ToDecimal(qtyToSend);
+                    dr["SeqNo"] = seqNo;
 
                     dtTransfer.Rows.Add(dr);
                 }
 
                 if (dtTransfer.Rows.Count == 0)
                 {
-                    XtraMessageBox.Show("No valid rows to transfer (all selected items exceed available inventory).");
+                    if (skippedItems.Count == 0)
+                        XtraMessageBox.Show("No items selected.");
+                    else
+                        XtraMessageBox.Show("No new items to transfer -- everything selected was either already transferred or exceeds available inventory.");
                     return false;
                 }
 
@@ -104,16 +141,34 @@ namespace SalesInventorySystem.Orders
                     cmd.Parameters.Add("@PreparedBy", SqlDbType.VarChar, 60).Value = Login.Fullname;
 
                     conn.Open();
-                    var serverSkipped = new List<string>();
+                    // Keyed on SeqNo, not ProductCode -- two dtTransfer rows can share a
+                    // ProductCode (see class-level comment on _transferredSeqNos), so matching
+                    // the SP's skip results back to specific rows has to use the same per-line
+                    // key or a skip on one line could get misattributed to a sibling line that
+                    // actually succeeded.
+                    var serverSkippedSeqNos = new HashSet<decimal>();
+                    var serverSkippedMessages = new List<string>();
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            serverSkipped.Add(reader["ProductName"].ToString() + ": " + reader["Reason"].ToString());
+                            serverSkippedSeqNos.Add(Convert.ToDecimal(reader["SeqNo"]));
+                            serverSkippedMessages.Add(reader["ProductName"].ToString() + ": " + reader["Reason"].ToString());
                         }
                     }
-                    skippedItems.AddRange(serverSkipped);
-                    transferredCount = dtTransfer.Rows.Count - serverSkipped.Count;
+                    skippedItems.AddRange(serverSkippedMessages);
+
+                    // Only rows the server actually accepted (not in its skip list) were really
+                    // committed -- that's what gets remembered against future resend attempts.
+                    foreach (DataRow dr in dtTransfer.Rows)
+                    {
+                        decimal sentSeqNo = Convert.ToDecimal(dr["SeqNo"]);
+                        if (!serverSkippedSeqNos.Contains(sentSeqNo))
+                        {
+                            _transferredSeqNos.Add(sentSeqNo);
+                            transferredCount++;
+                        }
+                    }
                 }
 
                 return true; // ✅ success
@@ -235,7 +290,7 @@ namespace SalesInventorySystem.Orders
                     e.Appearance.BackColor = Color.LightGray;
                     e.Appearance.ForeColor = Color.DarkGray;
                 }
-                else if (Convert.ToDouble(gridView1.GetRowCellValue(e.RowHandle, "QtyRequested")) > available)
+                else if (Convert.ToDouble(gridView1.GetRowCellValue(e.RowHandle, "Qty")) > available)
                 {
                     // ⚠ NEGATIVE INVENTORY (visual only, not disabled)
                     e.Appearance.BackColor = Color.Khaki;
@@ -304,10 +359,12 @@ namespace SalesInventorySystem.Orders
                 if (rowHandle < 0) continue;
 
                 double available = Convert.ToDouble(gridView1.GetRowCellValue(rowHandle, "AvailableInv"));
-                double requested = Convert.ToDouble(gridView1.GetRowCellValue(rowHandle, "QtyRequested"));
+                double qtyToSend = Convert.ToDouble(gridView1.GetRowCellValue(rowHandle, "Qty"));
 
-                // ✅ Negative inventory condition
-                if (available > 0 && requested > available)
+                // ✅ Negative inventory condition -- compare the actual amount to be sent
+                // (editable), not the fixed original QtyRequested, so lowering Qty into range
+                // correctly clears the warning instead of always tripping it.
+                if (available > 0 && qtyToSend > available)
                 {
                     return true;
                 }

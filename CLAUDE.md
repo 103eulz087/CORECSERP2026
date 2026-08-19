@@ -53,7 +53,7 @@ SP Backup Renaming: add suffix timestamp in sp name for backup before creating n
 - Connection strings are **not** primarily read from `app.config` (that file only holds a few stale/legacy entries with placeholder credentials — never trust it as the source of truth, and never hardcode real credentials into source in this repo). The real connection strings are stored per-machine in the **Windows Registry** under `HKCU\...` keys such as `AAITCRE\ConnSettingsMain` (main SalesAndInventory DB), plus other keys for accounting/HRM/Postgres/cloud-upload targets. See `Classes/Database.cs` (`getConnection()`, `getConnection(string regkeyname)`, `getConnectionString(string regkeypath)`, `getPgConnection()`) and `Connection.cs` (the UI that writes these registry keys via `btnsave_Click`).
 - `GlobalCache.InitializeCompanyData()` is called first thing in `Program.Main` and opens a DB connection immediately at startup to load company info — DB connectivity (registry key configured) is a hard prerequisite for the app to even start.
 - `Classes/GlobalVariables.cs` holds static, process-wide mutable state (current user, session flags, shared `SqlConnection`/`OleDbConnection`/`DataSet` instances) that most forms read/write directly instead of passing state explicitly. Many other classes (e.g. `Database`) inherit from `GlobalVariables` to get this state in scope.
-- SQL Server databases are involved: `CORECSERP_002_DEV` (sales/inventory/POS/Accounting).
+- SQL Server databases are involved: `CORECSERP_002_DEV` (sales/inventory/POS/Accounting), if there are changes has been made in `CORECSERP_002_DEV` should also apply in `CORECSJFC2026_STAGING` database but ask confirmation first.
 
 ## Module / folder structure
 
