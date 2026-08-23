@@ -26,7 +26,7 @@ Ask (or confirm from context) if not already clear:
 
 **Form/UserControl:**
 - Two tabs: **New Entry** and **Posted**
-- Posted tab: grid with View Details, Copy, and Edit actions
+- Posted tab: grid with View Details, Copy, and Edit actions. Copy and Edit function is for Accounting Module only.
 - `LoadData()` as the real initialization entry point; `Load` event handler
   only as a guarded fallback that calls `LoadData()` if not already run
 - All grid columns bound to a LookUpEdit MUST set
@@ -45,12 +45,12 @@ Ask (or confirm from context) if not already clear:
 - If multi-branch: fetch the shared TicketNumber ONCE outside the per-branch
   loop
 - Include a duplicate-post guard
-- Edit procedure:
-  - If shape can change: implement as delete-and-repost under the same
-    ReferenceNo (single transaction: validate → delete → repost), gated so it
-    refuses to run if the record has been touched by payment/other downstream
-    activity (fall back to a reversal SP instead)
-  - If shape is always fixed: a straightforward in-place UPDATE is fine
+# - Edit procedure:
+  # - If shape can change: implement as delete-and-repost under the same
+    # ReferenceNo (single transaction: validate → delete → repost), gated so it
+    # refuses to run if the record has been touched by payment/other downstream
+    # activity (fall back to a reversal SP instead)
+  # - If shape is always fixed: a straightforward in-place UPDATE is fine
 - Copy action on the Posted tab should carry over the fields that make sense
   to reuse (branch, supplier/party, remarks) but not the reference/ticket
   identity

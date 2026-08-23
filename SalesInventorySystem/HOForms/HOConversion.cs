@@ -783,12 +783,24 @@ namespace SalesInventorySystem
         private void txtsrchprodcat_EditValueChanged(object sender, EventArgs e)
         {
             objprod = SearchLookUpClass.getSingleValue(txtsrchprodcat, "ProductCategoryID");
-            Database.display("SELECT Product,Description,SUM(Available) as Available " +
-             "FROM Inventory with(nolock)" +
-             "WHERE Branch='" + Login.assignedBranch + "' " +
-             "and Available > 0 " +
-             "and Product in (Select ProductCode FROM Products with(nolock) WHERE BranchCode='" + Login.assignedBranch + "' AND ProductCategoryCode='" + objprod + "') " +
-             "GROUP BY Product,Description", gridControl1, gridView1);
+            if(GlobalCache.CompanyName == "JFC")
+            {
+                Database.display("SELECT ShipmentNo,ReferenceCode,Product,Description,SUM(Available) as Available " +
+              "FROM Inventory with(nolock)" +
+              "WHERE Branch='" + Login.assignedBranch + "' " +
+              "and Available > 0 " +
+              "GROUP BY ShipmentNo,ReferenceCode,Product,Description", gridControl1, gridView1);
+            }
+            else
+            {
+                Database.display("SELECT Product,Description,SUM(Available) as Available " +
+                "FROM Inventory with(nolock)" +
+                "WHERE Branch='" + Login.assignedBranch + "' " +
+                "and Available > 0 " +
+                "and Product in (Select ProductCode FROM Products with(nolock) WHERE BranchCode='" + Login.assignedBranch + "' AND ProductCategoryCode='" + objprod + "') " +
+                "GROUP BY Product,Description", gridControl1, gridView1);
+            }
+               
         }
 
         private void repositoryItemSearchLookUpEditConversionItems_EditValueChanged(object sender, EventArgs e)
@@ -1177,6 +1189,11 @@ namespace SalesInventorySystem
         private DataTable BuildOneToManyLinesFromGrid()
         {
             var dt = new DataTable();
+            if(GlobalCache.CompanyName == "JFC")
+            {
+                dt.Columns.Add("ShipmentNo", typeof(string));
+                dt.Columns.Add("ReferenceCode", typeof(string));
+            }
             dt.Columns.Add("ProductCode", typeof(string));
             dt.Columns.Add("Description", typeof(string));
             dt.Columns.Add("ActualQty", typeof(decimal));
@@ -1192,7 +1209,12 @@ namespace SalesInventorySystem
                 decimal.TryParse(Convert.ToString(aqObj), out actualQty);
 
                 if (actualQty <= 0m) continue;
-
+                string shipno=""; string refcode="";
+                if (GlobalCache.CompanyName == "JFC")
+                {
+                    shipno = Convert.ToString(gridView3.GetRowCellValue(rh, "ShipmentNo"));
+                    refcode = Convert.ToString(gridView3.GetRowCellValue(rh, "ReferenceCode"));
+                }
                 string prod = Convert.ToString(gridView3.GetRowCellValue(rh, "ProductCode"));
                 string desc = Convert.ToString(gridView3.GetRowCellValue(rh, "Description"));
 
@@ -1200,6 +1222,11 @@ namespace SalesInventorySystem
                     continue;
 
                 var r = dt.NewRow();
+                if (GlobalCache.CompanyName == "JFC")
+                {
+                    r["ShipmentNo"] = shipno.Trim();
+                    r["ReferenceCode"] = refcode.Trim();
+                }
                 r["ProductCode"] = prod.Trim();
                 r["Description"] = desc.Trim();
                 r["ActualQty"] = actualQty;
@@ -1295,12 +1322,22 @@ namespace SalesInventorySystem
                 }
 
                 // Source fields for OneToMany
+
+
+
+                string srcShipmentNo = null;
+                string srcReferenceCode = null;
                 string srcProdCode = null;
                 string srcDesc = null;
                 decimal srcQty = 0m;
 
                 if (isOneToMany)
                 {
+                    if(GlobalCache.CompanyName=="JFC")
+                    {
+                        srcShipmentNo = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "ShipmentNo")?.ToString();
+                        srcReferenceCode = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "ReferenceCode")?.ToString();
+                    }
                     srcProdCode = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "Product")?.ToString();
                     srcDesc = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "Description")?.ToString();
 
@@ -1335,8 +1372,17 @@ namespace SalesInventorySystem
                 }
 
                 // Call ONE stored procedure
+                string procname = "dbo.sp_SubmitConversionRaw";
+                if (GlobalCache.CompanyName == "JFC")
+                {
+                    procname = "dbo.sp_SubmitConversionRaw_JFC";
+                }
+                else
+                {
+                    procname = "dbo.sp_SubmitConversionRaw";
+                }
                 using (SqlConnection conn = Database.getConnection())
-                using (SqlCommand cmd = new SqlCommand("dbo.sp_SubmitConversionRaw", conn))
+                using (SqlCommand cmd = new SqlCommand(procname, conn))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.CommandTimeout = 180;
@@ -1348,7 +1394,11 @@ namespace SalesInventorySystem
                     cmd.Parameters.AddWithValue("@DateConverted", DateTime.Now);
                     cmd.Parameters.AddWithValue("@IsErrorCorrect", false);
                     cmd.Parameters.AddWithValue("@IsConfirm", false);
-
+                    if (GlobalCache.CompanyName == "JFC")
+                    {
+                        cmd.Parameters.AddWithValue("@CuttingFee", txtcharge.Text);
+                    }
+                    
                     // OneToMany params
                     cmd.Parameters.AddWithValue("@SourceProductCode", (object)srcProdCode ?? DBNull.Value);
                     cmd.Parameters.AddWithValue("@SourceDescription", (object)srcDesc ?? DBNull.Value);
@@ -1363,7 +1413,15 @@ namespace SalesInventorySystem
                     // TVPs
                     var p1 = cmd.Parameters.AddWithValue("@OneToManyLines", dtOneToMany);
                     p1.SqlDbType = SqlDbType.Structured;
-                    p1.TypeName = "dbo.TVP_Conversion_OneToManyLines";
+                    if (GlobalCache.CompanyName == "JFC")
+                    {
+                        p1.TypeName = "dbo.TVP_Conversion_OneToManyLines_JFC";
+                    }
+                    else
+                    {
+                        p1.TypeName = "dbo.TVP_Conversion_OneToManyLines";
+                    }
+                
 
                     var p2 = cmd.Parameters.AddWithValue("@ManyToOneLines", dtManyToOne);
                     p2.SqlDbType = SqlDbType.Structured;

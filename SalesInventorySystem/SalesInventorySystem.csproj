@@ -1257,6 +1257,18 @@
     <Compile Include="HOFormsDevEx\ConversionDevEx.Designer.cs">
       <DependentUpon>ConversionDevEx.cs</DependentUpon>
     </Compile>
+    <Compile Include="HOFormsDevEx\ConversionPerBarcode.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HOFormsDevEx\ConversionPerBarcode.Designer.cs">
+      <DependentUpon>ConversionPerBarcode.cs</DependentUpon>
+    </Compile>
+    <Compile Include="HOFormsDevEx\ConversionPerBarcodeDetails.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HOFormsDevEx\ConversionPerBarcodeDetails.Designer.cs">
+      <DependentUpon>ConversionPerBarcodeDetails.cs</DependentUpon>
+    </Compile>
     <Compile Include="HOFormsDevEx\CostAdjustmentDevEx.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -3901,6 +3913,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="HOFormsDevEx\ConversionDevEx.resx">
       <DependentUpon>ConversionDevEx.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HOFormsDevEx\ConversionPerBarcode.resx">
+      <DependentUpon>ConversionPerBarcode.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HOFormsDevEx\ConversionPerBarcodeDetails.resx">
+      <DependentUpon>ConversionPerBarcodeDetails.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="HOFormsDevEx\CostAdjustmentDevEx.resx">
       <DependentUpon>CostAdjustmentDevEx.cs</DependentUpon>

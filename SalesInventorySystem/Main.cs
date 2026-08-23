@@ -3117,6 +3117,20 @@ namespace SalesInventorySystem
             //ads.Show();
         }
 
+        private void btnConversionPerBarcode_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            foreach (Form form in Application.OpenForms)
+            {
+                if (form.GetType() == typeof(HOFormsDevEx.ConversionPerBarcode))
+                {
+                    form.Activate();
+                    return;
+                }
+            }
+            HOFormsDevEx.ConversionPerBarcode convperbarcode = new HOFormsDevEx.ConversionPerBarcode();
+            convperbarcode.Show();
+        }
+
         private void barButtonItem24_ItemClick_1(object sender, ItemClickEventArgs e)
         {
 
