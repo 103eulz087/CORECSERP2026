@@ -359,7 +359,7 @@
             this.Commissary.Location = new System.Drawing.Point(82, 5);
             this.Commissary.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.Commissary.Name = "Commissary";
-            this.Commissary.Size = new System.Drawing.Size(104, 21);
+            this.Commissary.Size = new System.Drawing.Size(98, 20);
             this.Commissary.TabIndex = 1;
             this.Commissary.TabStop = true;
             this.Commissary.Text = "Commissary";
@@ -372,7 +372,7 @@
             this.bigblue.Location = new System.Drawing.Point(3, 5);
             this.bigblue.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.bigblue.Name = "bigblue";
-            this.bigblue.Size = new System.Drawing.Size(72, 21);
+            this.bigblue.Size = new System.Drawing.Size(69, 20);
             this.bigblue.TabIndex = 0;
             this.bigblue.Text = "BigBlue";
             this.bigblue.UseVisualStyleBackColor = true;
@@ -620,7 +620,7 @@
             this.panelControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelControl1.Location = new System.Drawing.Point(0, 0);
             this.panelControl1.Name = "panelControl1";
-            this.panelControl1.Size = new System.Drawing.Size(1485, 650);
+            this.panelControl1.Size = new System.Drawing.Size(1856, 813);
             this.panelControl1.TabIndex = 0;
             // 
             // xtraTabPage2
@@ -637,7 +637,7 @@
             this.panelControl2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelControl2.Location = new System.Drawing.Point(0, 0);
             this.panelControl2.Name = "panelControl2";
-            this.panelControl2.Size = new System.Drawing.Size(1485, 650);
+            this.panelControl2.Size = new System.Drawing.Size(1856, 813);
             this.panelControl2.TabIndex = 1;
             // 
             // groupBox4
@@ -645,11 +645,11 @@
             this.groupBox4.BackColor = System.Drawing.Color.White;
             this.groupBox4.Controls.Add(this.gridControltab2);
             this.groupBox4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox4.Location = new System.Drawing.Point(2, 176);
+            this.groupBox4.Location = new System.Drawing.Point(2, 220);
             this.groupBox4.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Padding = new System.Windows.Forms.Padding(3, 5, 3, 5);
-            this.groupBox4.Size = new System.Drawing.Size(1481, 472);
+            this.groupBox4.Size = new System.Drawing.Size(1852, 591);
             this.groupBox4.TabIndex = 120;
             this.groupBox4.TabStop = false;
             // 
@@ -661,7 +661,7 @@
             this.gridControltab2.MainView = this.gridView4;
             this.gridControltab2.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.gridControltab2.Name = "gridControltab2";
-            this.gridControltab2.Size = new System.Drawing.Size(1475, 446);
+            this.gridControltab2.Size = new System.Drawing.Size(1846, 565);
             this.gridControltab2.TabIndex = 18;
             this.gridControltab2.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView4});
@@ -707,7 +707,7 @@
             this.groupBox3.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Padding = new System.Windows.Forms.Padding(3, 5, 3, 5);
-            this.groupBox3.Size = new System.Drawing.Size(1481, 174);
+            this.groupBox3.Size = new System.Drawing.Size(1852, 218);
             this.groupBox3.TabIndex = 119;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "     ";
@@ -823,7 +823,7 @@
             this.tab2radcomm.Location = new System.Drawing.Point(82, 5);
             this.tab2radcomm.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.tab2radcomm.Name = "tab2radcomm";
-            this.tab2radcomm.Size = new System.Drawing.Size(104, 21);
+            this.tab2radcomm.Size = new System.Drawing.Size(98, 20);
             this.tab2radcomm.TabIndex = 1;
             this.tab2radcomm.TabStop = true;
             this.tab2radcomm.Text = "Commissary";
@@ -835,7 +835,7 @@
             this.tab2radbigblue.Location = new System.Drawing.Point(3, 5);
             this.tab2radbigblue.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.tab2radbigblue.Name = "tab2radbigblue";
-            this.tab2radbigblue.Size = new System.Drawing.Size(72, 21);
+            this.tab2radbigblue.Size = new System.Drawing.Size(69, 20);
             this.tab2radbigblue.TabIndex = 0;
             this.tab2radbigblue.Text = "BigBlue";
             this.tab2radbigblue.UseVisualStyleBackColor = true;

@@ -25,6 +25,9 @@ namespace SalesInventorySystem.AccountingDevEx
         private AccordionControlElement menuVoucherPostingTelegraphic;
         private AccordionControlElement menuPaymentList;
 
+        private AccordionControlElement groupAccountReceivable;
+        private AccordionControlElement menuPostClientPayment;
+
         private AccordionControlElement groupExpense;
         private AccordionControlElement menuExpenseSingle;
         private AccordionControlElement menuExpenseBatch;
@@ -53,6 +56,8 @@ namespace SalesInventorySystem.AccountingDevEx
             this.menuVoucherPostingCashCheck = new DevExpress.XtraBars.Navigation.AccordionControlElement();
             this.menuVoucherPostingTelegraphic = new DevExpress.XtraBars.Navigation.AccordionControlElement();
             this.menuPaymentList = new DevExpress.XtraBars.Navigation.AccordionControlElement();
+            this.groupAccountReceivable = new DevExpress.XtraBars.Navigation.AccordionControlElement();
+            this.menuPostClientPayment = new DevExpress.XtraBars.Navigation.AccordionControlElement();
             this.groupExpense = new DevExpress.XtraBars.Navigation.AccordionControlElement();
             this.menuExpenseSingle = new DevExpress.XtraBars.Navigation.AccordionControlElement();
             this.menuExpenseBatch = new DevExpress.XtraBars.Navigation.AccordionControlElement();
@@ -87,6 +92,7 @@ namespace SalesInventorySystem.AccountingDevEx
             this.accordionControl1.Elements.AddRange(new DevExpress.XtraBars.Navigation.AccordionControlElement[] {
             this.menuMasterList,
             this.groupVouchering,
+            this.groupAccountReceivable,
             this.groupExpense,
             this.menuManualTicket,
             this.menuBankRecon,
@@ -136,6 +142,21 @@ namespace SalesInventorySystem.AccountingDevEx
             this.menuPaymentList.Tag = "navVoucherPaymentList";
             this.menuPaymentList.Text = "Payment List";
             this.menuPaymentList.Click += new System.EventHandler(this.menuPaymentList_Click);
+            // 
+            // groupAccountReceivable
+            // 
+            this.groupAccountReceivable.Elements.AddRange(new DevExpress.XtraBars.Navigation.AccordionControlElement[] {
+            this.menuPostClientPayment});
+            this.groupAccountReceivable.Expanded = true;
+            this.groupAccountReceivable.Name = "groupAccountReceivable";
+            this.groupAccountReceivable.Text = "Account Receivable";
+            // 
+            // menuPostClientPayment
+            // 
+            this.menuPostClientPayment.Name = "menuPostClientPayment";
+            this.menuPostClientPayment.Style = DevExpress.XtraBars.Navigation.ElementStyle.Item;
+            this.menuPostClientPayment.Tag = "navPostClientPayment";
+            this.menuPostClientPayment.Text = "Post Client Payment";
             // 
             // groupExpense
             // 

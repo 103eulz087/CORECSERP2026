@@ -636,10 +636,10 @@
             this.tablePanel3.SetColumn(this.panelControl2, 0);
             this.panelControl2.Controls.Add(this.tablePanel4);
             this.panelControl2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelControl2.Location = new System.Drawing.Point(3, 3);
+            this.panelControl2.Location = new System.Drawing.Point(4, 4);
             this.panelControl2.Name = "panelControl2";
             this.tablePanel3.SetRow(this.panelControl2, 0);
-            this.panelControl2.Size = new System.Drawing.Size(1113, 1140);
+            this.panelControl2.Size = new System.Drawing.Size(1391, 1425);
             this.panelControl2.TabIndex = 0;
             // 
             // tablePanel4
@@ -654,7 +654,7 @@
             this.tablePanel4.Rows.AddRange(new DevExpress.Utils.Layout.TablePanelRow[] {
             new DevExpress.Utils.Layout.TablePanelRow(DevExpress.Utils.Layout.TablePanelEntityStyle.Absolute, 341.9999F),
             new DevExpress.Utils.Layout.TablePanelRow(DevExpress.Utils.Layout.TablePanelEntityStyle.Absolute, 26F)});
-            this.tablePanel4.Size = new System.Drawing.Size(1109, 1136);
+            this.tablePanel4.Size = new System.Drawing.Size(1387, 1421);
             this.tablePanel4.TabIndex = 0;
             // 
             // panelControl13
@@ -662,10 +662,10 @@
             this.tablePanel4.SetColumn(this.panelControl13, 0);
             this.panelControl13.Controls.Add(this.panelControl8);
             this.panelControl13.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelControl13.Location = new System.Drawing.Point(3, 3);
+            this.panelControl13.Location = new System.Drawing.Point(4, 4);
             this.panelControl13.Name = "panelControl13";
             this.tablePanel4.SetRow(this.panelControl13, 0);
-            this.panelControl13.Size = new System.Drawing.Size(1103, 336);
+            this.panelControl13.Size = new System.Drawing.Size(1726, 420);
             this.panelControl13.TabIndex = 1;
             // 
             // panelControl12
@@ -673,10 +673,10 @@
             this.tablePanel4.SetColumn(this.panelControl12, 0);
             this.panelControl12.Controls.Add(this.xtraTabControl1);
             this.panelControl12.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelControl12.Location = new System.Drawing.Point(3, 345);
+            this.panelControl12.Location = new System.Drawing.Point(4, 431);
             this.panelControl12.Name = "panelControl12";
             this.tablePanel4.SetRow(this.panelControl12, 1);
-            this.panelControl12.Size = new System.Drawing.Size(1103, 788);
+            this.panelControl12.Size = new System.Drawing.Size(1726, 1341);
             this.panelControl12.TabIndex = 0;
             // 
             // xtraTabControl1
@@ -687,7 +687,7 @@
             this.xtraTabControl1.Location = new System.Drawing.Point(2, 2);
             this.xtraTabControl1.Name = "xtraTabControl1";
             this.xtraTabControl1.SelectedTabPage = this.xtraTabPage1;
-            this.xtraTabControl1.Size = new System.Drawing.Size(1099, 784);
+            this.xtraTabControl1.Size = new System.Drawing.Size(1722, 1337);
             this.xtraTabControl1.TabIndex = 0;
             this.xtraTabControl1.TabPages.AddRange(new DevExpress.XtraTab.XtraTabPage[] {
             this.xtraTabPage1,
@@ -698,16 +698,16 @@
             this.xtraTabPage1.Controls.Add(this.panelControl5);
             this.xtraTabPage1.Controls.Add(this.panelControl10);
             this.xtraTabPage1.Name = "xtraTabPage1";
-            this.xtraTabPage1.Size = new System.Drawing.Size(1097, 751);
+            this.xtraTabPage1.Size = new System.Drawing.Size(1720, 1304);
             this.xtraTabPage1.Text = "INVOICES";
             // 
             // panelControl5
             // 
             this.panelControl5.Controls.Add(this.gridControlMaster);
             this.panelControl5.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelControl5.Location = new System.Drawing.Point(0, 46);
+            this.panelControl5.Location = new System.Drawing.Point(0, 58);
             this.panelControl5.Name = "panelControl5";
-            this.panelControl5.Size = new System.Drawing.Size(1097, 705);
+            this.panelControl5.Size = new System.Drawing.Size(2150, 1573);
             this.panelControl5.TabIndex = 0;
             // 
             // gridControlMaster
@@ -728,7 +728,7 @@
             this.repositoryItemSearchLookUpEditdiscountglcode,
             this.repDiscountAccount,
             this.repositoryItemSearchLookUpEditoffsetCreditGLCode});
-            this.gridControlMaster.Size = new System.Drawing.Size(1093, 701);
+            this.gridControlMaster.Size = new System.Drawing.Size(2146, 1569);
             this.gridControlMaster.TabIndex = 8;
             this.gridControlMaster.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewMaster});
@@ -881,7 +881,7 @@
             this.panelControl10.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelControl10.Location = new System.Drawing.Point(0, 0);
             this.panelControl10.Name = "panelControl10";
-            this.panelControl10.Size = new System.Drawing.Size(1097, 46);
+            this.panelControl10.Size = new System.Drawing.Size(2150, 46);
             this.panelControl10.TabIndex = 3;
             // 
             // xtraTabPage2
@@ -896,9 +896,9 @@
             // 
             this.panelControl6.Controls.Add(this.gridControlLines);
             this.panelControl6.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelControl6.Location = new System.Drawing.Point(0, 46);
+            this.panelControl6.Location = new System.Drawing.Point(0, 58);
             this.panelControl6.Name = "panelControl6";
-            this.panelControl6.Size = new System.Drawing.Size(1097, 705);
+            this.panelControl6.Size = new System.Drawing.Size(1371, 881);
             this.panelControl6.TabIndex = 1;
             // 
             // gridControlLines
@@ -913,7 +913,7 @@
             this.repAmount,
             this.repParticulars,
             this.repBranchLine});
-            this.gridControlLines.Size = new System.Drawing.Size(1093, 701);
+            this.gridControlLines.Size = new System.Drawing.Size(1367, 877);
             this.gridControlLines.TabIndex = 1;
             this.gridControlLines.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewLines});
@@ -1044,7 +1044,7 @@
             this.panelControl7.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelControl7.Location = new System.Drawing.Point(0, 0);
             this.panelControl7.Name = "panelControl7";
-            this.panelControl7.Size = new System.Drawing.Size(1097, 46);
+            this.panelControl7.Size = new System.Drawing.Size(1371, 46);
             this.panelControl7.TabIndex = 2;
             // 
             // lblTotalCaption
@@ -1175,8 +1175,7 @@
             // 
             // SupplierPaymentDevEx
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
             this.Controls.Add(this.panelControl3);
             this.Margin = new System.Windows.Forms.Padding(2, 5, 2, 5);
             this.Name = "SupplierPaymentDevEx";
