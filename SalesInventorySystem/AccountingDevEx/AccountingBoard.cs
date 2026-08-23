@@ -29,6 +29,7 @@ namespace SalesInventorySystem.AccountingDevEx
         private const string PageVoucherPosting = "navVoucherPosting";
         private const string PageVoucherPostingManual = "navVoucherPostingManual";
         private const string PageVoucherPaymentList = "navVoucherPaymentList";
+        private const string PagePostClientPayment = "navPostClientPayment";
         private const string PageExpenseSingle = "navExpenseSingle";
         private const string PageExpenseBatch = "navExpenseBatch";
         private const string PageManualTicket = "navManualTicket";
@@ -67,6 +68,11 @@ namespace SalesInventorySystem.AccountingDevEx
                 //_paymentList = new ViewCheckVoucherDevEx();
                 _paymentList = new SupplierVoucherReversalFrm();
                 return _paymentList;
+            },
+            [PagePostClientPayment] = () =>
+            {
+                _clientPayment = new ClientPaymentsDevExAcctg();
+                return _clientPayment;
             },
             [PageExpenseSingle] = () =>
             {
@@ -266,6 +272,7 @@ namespace SalesInventorySystem.AccountingDevEx
         private VoucheringManualFrm _voucheringManual;
         //private ViewCheckVoucherDevEx _paymentList;
         private SupplierVoucherReversalFrm _paymentList;
+        private ClientPaymentsDevExAcctg _clientPayment;
         private HOFormsDevEx.AccountMasterListDevEx _accountMasterList;
         private HOFormsDevEx.ManualJournalVoucherMultiBranchFrm _manualVoucherMultiBranch;
         private HOFormsDevEx.AccountingReportsForm _accountingReports;

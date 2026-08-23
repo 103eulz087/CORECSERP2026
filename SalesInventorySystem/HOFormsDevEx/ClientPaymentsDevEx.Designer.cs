@@ -196,25 +196,25 @@
             ((System.ComponentModel.ISupportInitialize)(this.txtcreditglcode.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView3)).BeginInit();
             this.panelOnline.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.txtdatedeponline.Properties.CalendarTimeProperties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtdatedeponline.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtdatedeponline.Properties.CalendarTimeProperties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtdebitglcode.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridview)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.txtdate.Properties.CalendarTimeProperties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtdate.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtdate.Properties.CalendarTimeProperties)).BeginInit();
             this.groupCheque.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.txtcheckdate.Properties.CalendarTimeProperties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtcheckdate.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtcheckdate.Properties.CalendarTimeProperties)).BeginInit();
             this.xtraTabPage2.SuspendLayout();
             this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.groupControl2)).BeginInit();
             this.groupControl2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.groupControl1)).BeginInit();
             this.groupControl1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.txtdateto.Properties.CalendarTimeProperties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtdateto.Properties)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.txtdatefrom.Properties.CalendarTimeProperties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtdateto.Properties.CalendarTimeProperties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtdatefrom.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtdatefrom.Properties.CalendarTimeProperties)).BeginInit();
             this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -535,7 +535,7 @@
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Margin = new System.Windows.Forms.Padding(2);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(1737, 648);
+            this.panel1.Size = new System.Drawing.Size(2171, 810);
             this.panel1.TabIndex = 0;
             // 
             // groupBox2
@@ -543,11 +543,11 @@
             this.groupBox2.BackColor = System.Drawing.Color.White;
             this.groupBox2.Controls.Add(this.gridControl2);
             this.groupBox2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox2.Location = new System.Drawing.Point(0, 369);
+            this.groupBox2.Location = new System.Drawing.Point(0, 461);
             this.groupBox2.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Padding = new System.Windows.Forms.Padding(2, 4, 2, 4);
-            this.groupBox2.Size = new System.Drawing.Size(1737, 279);
+            this.groupBox2.Size = new System.Drawing.Size(2171, 349);
             this.groupBox2.TabIndex = 20;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Transaction with Balances";
@@ -594,7 +594,7 @@
             this.groupBox1.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(2, 4, 2, 4);
-            this.groupBox1.Size = new System.Drawing.Size(1737, 369);
+            this.groupBox1.Size = new System.Drawing.Size(2171, 461);
             this.groupBox1.TabIndex = 19;
             this.groupBox1.TabStop = false;
             // 
@@ -945,7 +945,7 @@
             this.label16.Location = new System.Drawing.Point(28, 298);
             this.label16.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(465, 16);
+            this.label16.Size = new System.Drawing.Size(464, 16);
             this.label16.TabIndex = 448;
             this.label16.Text = "Note: If Credit GL Code is Empty Value this Transaction is default to AR-Trade";
             this.label16.Visible = false;
@@ -1406,17 +1406,17 @@
             this.panel2.Location = new System.Drawing.Point(0, 0);
             this.panel2.Margin = new System.Windows.Forms.Padding(2);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(1737, 648);
+            this.panel2.Size = new System.Drawing.Size(2171, 810);
             this.panel2.TabIndex = 1;
             // 
             // groupControl2
             // 
             this.groupControl2.Controls.Add(this.gridControl1);
             this.groupControl2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupControl2.Location = new System.Drawing.Point(0, 101);
+            this.groupControl2.Location = new System.Drawing.Point(0, 126);
             this.groupControl2.Margin = new System.Windows.Forms.Padding(2);
             this.groupControl2.Name = "groupControl2";
-            this.groupControl2.Size = new System.Drawing.Size(1737, 547);
+            this.groupControl2.Size = new System.Drawing.Size(2171, 684);
             this.groupControl2.TabIndex = 1;
             // 
             // groupControl1
@@ -1431,7 +1431,7 @@
             this.groupControl1.Location = new System.Drawing.Point(0, 0);
             this.groupControl1.Margin = new System.Windows.Forms.Padding(2);
             this.groupControl1.Name = "groupControl1";
-            this.groupControl1.Size = new System.Drawing.Size(1737, 101);
+            this.groupControl1.Size = new System.Drawing.Size(2171, 126);
             this.groupControl1.TabIndex = 0;
             // 
             // simpleButton5

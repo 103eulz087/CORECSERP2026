@@ -204,9 +204,9 @@
             this.panelControl1.Controls.Add(this.lblTotalDebit);
             this.panelControl1.Controls.Add(this.lblTotalCreditCaption);
             this.panelControl1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panelControl1.Location = new System.Drawing.Point(0, 759);
+            this.panelControl1.Location = new System.Drawing.Point(0, 769);
             this.panelControl1.Name = "panelControl1";
-            this.panelControl1.Size = new System.Drawing.Size(1076, 100);
+            this.panelControl1.Size = new System.Drawing.Size(1345, 244);
             this.panelControl1.TabIndex = 5;
             // 
             // btnAddLine
@@ -289,9 +289,9 @@
             this.panelControl2.Controls.Add(this.btnPost);
             this.panelControl2.Controls.Add(this.btnClose);
             this.panelControl2.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panelControl2.Location = new System.Drawing.Point(0, 859);
+            this.panelControl2.Location = new System.Drawing.Point(0, 1038);
             this.panelControl2.Name = "panelControl2";
-            this.panelControl2.Size = new System.Drawing.Size(1076, 50);
+            this.panelControl2.Size = new System.Drawing.Size(1345, 99);
             this.panelControl2.TabIndex = 6;
             // 
             // btnPost
@@ -318,9 +318,9 @@
             // 
             this.grpLines.Controls.Add(this.gridControlLines);
             this.grpLines.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.grpLines.Location = new System.Drawing.Point(0, 147);
+            this.grpLines.Location = new System.Drawing.Point(0, 185);
             this.grpLines.Name = "grpLines";
-            this.grpLines.Size = new System.Drawing.Size(1076, 762);
+            this.grpLines.Size = new System.Drawing.Size(1345, 951);
             this.grpLines.TabIndex = 1;
             this.grpLines.Text = "Journal Entry Lines";
             // 
@@ -336,7 +336,7 @@
             this.repParticulars,
             this.repDebit,
             this.repCredit});
-            this.gridControlLines.Size = new System.Drawing.Size(1072, 732);
+            this.gridControlLines.Size = new System.Drawing.Size(1341, 921);
             this.gridControlLines.TabIndex = 0;
             this.gridControlLines.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewLines});
@@ -447,9 +447,9 @@
             this.lblEditNotice.Appearance.Options.UseFont = true;
             this.lblEditNotice.Appearance.Options.UseForeColor = true;
             this.lblEditNotice.AutoSizeMode = DevExpress.XtraEditors.LabelAutoSizeMode.None;
-            this.lblEditNotice.Location = new System.Drawing.Point(14, 690);
+            this.lblEditNotice.Location = new System.Drawing.Point(11, 552);
             this.lblEditNotice.Name = "lblEditNotice";
-            this.lblEditNotice.Size = new System.Drawing.Size(840, 18);
+            this.lblEditNotice.Size = new System.Drawing.Size(672, 14);
             this.lblEditNotice.TabIndex = 4;
             this.lblEditNotice.Visible = false;
             // 
@@ -468,7 +468,7 @@
             this.grpHeader.Dock = System.Windows.Forms.DockStyle.Top;
             this.grpHeader.Location = new System.Drawing.Point(0, 0);
             this.grpHeader.Name = "grpHeader";
-            this.grpHeader.Size = new System.Drawing.Size(1076, 147);
+            this.grpHeader.Size = new System.Drawing.Size(1345, 148);
             this.grpHeader.TabIndex = 0;
             this.grpHeader.Text = "Journal Voucher Header";
             // 
@@ -564,10 +564,10 @@
             // gridControlPostedDetails
             // 
             this.gridControlPostedDetails.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControlPostedDetails.Location = new System.Drawing.Point(0, 490);
+            this.gridControlPostedDetails.Location = new System.Drawing.Point(0, 766);
             this.gridControlPostedDetails.MainView = this.gridViewPostedDetails;
             this.gridControlPostedDetails.Name = "gridControlPostedDetails";
-            this.gridControlPostedDetails.Size = new System.Drawing.Size(1076, 419);
+            this.gridControlPostedDetails.Size = new System.Drawing.Size(1345, 370);
             this.gridControlPostedDetails.TabIndex = 0;
             this.gridControlPostedDetails.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewPostedDetails});
@@ -586,9 +586,9 @@
             this.pnlPostedButtons.Controls.Add(this.btnCopyToNew);
             this.pnlPostedButtons.Controls.Add(this.btnEditVoucher);
             this.pnlPostedButtons.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pnlPostedButtons.Location = new System.Drawing.Point(0, 445);
+            this.pnlPostedButtons.Location = new System.Drawing.Point(0, 679);
             this.pnlPostedButtons.Name = "pnlPostedButtons";
-            this.pnlPostedButtons.Size = new System.Drawing.Size(1076, 45);
+            this.pnlPostedButtons.Size = new System.Drawing.Size(1345, 70);
             this.pnlPostedButtons.TabIndex = 1;
             // 
             // btnViewDetails
@@ -628,10 +628,10 @@
             // gridControlPosted
             // 
             this.gridControlPosted.Dock = System.Windows.Forms.DockStyle.Top;
-            this.gridControlPosted.Location = new System.Drawing.Point(0, 58);
+            this.gridControlPosted.Location = new System.Drawing.Point(0, 73);
             this.gridControlPosted.MainView = this.gridViewPosted;
             this.gridControlPosted.Name = "gridControlPosted";
-            this.gridControlPosted.Size = new System.Drawing.Size(1076, 387);
+            this.gridControlPosted.Size = new System.Drawing.Size(1345, 485);
             this.gridControlPosted.TabIndex = 2;
             this.gridControlPosted.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewPosted});
@@ -656,7 +656,7 @@
             this.pnlPostedFilter.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlPostedFilter.Location = new System.Drawing.Point(0, 0);
             this.pnlPostedFilter.Name = "pnlPostedFilter";
-            this.pnlPostedFilter.Size = new System.Drawing.Size(1076, 58);
+            this.pnlPostedFilter.Size = new System.Drawing.Size(1345, 58);
             this.pnlPostedFilter.TabIndex = 3;
             // 
             // lblDateFrom
@@ -706,8 +706,7 @@
             // 
             // ManualJournalVoucherMultiBranchFrm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
             this.Controls.Add(this.tabMain);
             this.Name = "ManualJournalVoucherMultiBranchFrm";
             this.Size = new System.Drawing.Size(1078, 939);

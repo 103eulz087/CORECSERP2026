@@ -805,8 +805,7 @@
             // 
             // VoucheringManualFrm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
             this.Controls.Add(this.tabMain);
             this.Name = "VoucheringManualFrm";
             this.Size = new System.Drawing.Size(998, 851);

@@ -82,15 +82,15 @@
             this.label9 = new System.Windows.Forms.Label();
             this.xtraTabControl1 = new DevExpress.XtraTab.XtraTabControl();
             this.xtraTabPage1 = new DevExpress.XtraTab.XtraTabPage();
-            this.xtraTabPage2 = new DevExpress.XtraTab.XtraTabPage();
             this.panelControl1 = new DevExpress.XtraEditors.PanelControl();
-            this.panelControl2 = new DevExpress.XtraEditors.PanelControl();
             this.xtraTabPage3 = new DevExpress.XtraTab.XtraTabPage();
             this.panelControl3 = new DevExpress.XtraEditors.PanelControl();
-            this.panelControl4 = new DevExpress.XtraEditors.PanelControl();
             this.panelControl5 = new DevExpress.XtraEditors.PanelControl();
-            this.panelControl6 = new DevExpress.XtraEditors.PanelControl();
+            this.panelControl4 = new DevExpress.XtraEditors.PanelControl();
+            this.xtraTabPage2 = new DevExpress.XtraTab.XtraTabPage();
+            this.panelControl2 = new DevExpress.XtraEditors.PanelControl();
             this.panelControl7 = new DevExpress.XtraEditors.PanelControl();
+            this.panelControl6 = new DevExpress.XtraEditors.PanelControl();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView4)).BeginInit();
@@ -114,22 +114,22 @@
             ((System.ComponentModel.ISupportInitialize)(this.xtraTabControl1)).BeginInit();
             this.xtraTabControl1.SuspendLayout();
             this.xtraTabPage1.SuspendLayout();
-            this.xtraTabPage2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).BeginInit();
             this.panelControl1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.panelControl2)).BeginInit();
-            this.panelControl2.SuspendLayout();
             this.xtraTabPage3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl3)).BeginInit();
             this.panelControl3.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.panelControl4)).BeginInit();
-            this.panelControl4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl5)).BeginInit();
             this.panelControl5.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.panelControl6)).BeginInit();
-            this.panelControl6.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.panelControl4)).BeginInit();
+            this.panelControl4.SuspendLayout();
+            this.xtraTabPage2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.panelControl2)).BeginInit();
+            this.panelControl2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl7)).BeginInit();
             this.panelControl7.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.panelControl6)).BeginInit();
+            this.panelControl6.SuspendLayout();
             this.SuspendLayout();
             // 
             // gridControl2
@@ -387,11 +387,11 @@
             this.txtavg.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
             this.tablePanel1.SetColumn(this.txtavg, 3);
             this.txtavg.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txtavg.Location = new System.Drawing.Point(850, 70);
+            this.txtavg.Location = new System.Drawing.Point(1063, 88);
             this.txtavg.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.txtavg.Name = "txtavg";
             this.tablePanel1.SetRow(this.txtavg, 1);
-            this.txtavg.Size = new System.Drawing.Size(272, 77);
+            this.txtavg.Size = new System.Drawing.Size(340, 96);
             this.txtavg.TabIndex = 17;
             this.txtavg.Text = "labelControl4";
             // 
@@ -408,11 +408,11 @@
             this.labelControl2.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
             this.tablePanel1.SetColumn(this.labelControl2, 1);
             this.labelControl2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.labelControl2.Location = new System.Drawing.Point(303, 3);
+            this.labelControl2.Location = new System.Drawing.Point(379, 4);
             this.labelControl2.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.labelControl2.Name = "labelControl2";
             this.tablePanel1.SetRow(this.labelControl2, 0);
-            this.labelControl2.Size = new System.Drawing.Size(272, 63);
+            this.labelControl2.Size = new System.Drawing.Size(340, 79);
             this.labelControl2.TabIndex = 17;
             this.labelControl2.Text = "TOTAL GROSS";
             // 
@@ -429,11 +429,11 @@
             this.txttotasalesb4tax.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
             this.tablePanel1.SetColumn(this.txttotasalesb4tax, 2);
             this.txttotasalesb4tax.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txttotasalesb4tax.Location = new System.Drawing.Point(577, 70);
+            this.txttotasalesb4tax.Location = new System.Drawing.Point(721, 88);
             this.txttotasalesb4tax.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.txttotasalesb4tax.Name = "txttotasalesb4tax";
             this.tablePanel1.SetRow(this.txttotasalesb4tax, 1);
-            this.txttotasalesb4tax.Size = new System.Drawing.Size(272, 77);
+            this.txttotasalesb4tax.Size = new System.Drawing.Size(340, 96);
             this.txttotasalesb4tax.TabIndex = 17;
             this.txttotasalesb4tax.Text = "labelControl3";
             // 
@@ -450,11 +450,11 @@
             this.labelControl3.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
             this.tablePanel1.SetColumn(this.labelControl3, 2);
             this.labelControl3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.labelControl3.Location = new System.Drawing.Point(577, 3);
+            this.labelControl3.Location = new System.Drawing.Point(721, 4);
             this.labelControl3.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.labelControl3.Name = "labelControl3";
             this.tablePanel1.SetRow(this.labelControl3, 0);
-            this.labelControl3.Size = new System.Drawing.Size(272, 63);
+            this.labelControl3.Size = new System.Drawing.Size(340, 79);
             this.labelControl3.TabIndex = 18;
             this.labelControl3.Text = "TOTAL NET";
             // 
@@ -471,11 +471,11 @@
             this.txttotsalesnet.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
             this.tablePanel1.SetColumn(this.txttotsalesnet, 1);
             this.txttotsalesnet.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txttotsalesnet.Location = new System.Drawing.Point(303, 70);
+            this.txttotsalesnet.Location = new System.Drawing.Point(379, 88);
             this.txttotsalesnet.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.txttotsalesnet.Name = "txttotsalesnet";
             this.tablePanel1.SetRow(this.txttotsalesnet, 1);
-            this.txttotsalesnet.Size = new System.Drawing.Size(272, 77);
+            this.txttotsalesnet.Size = new System.Drawing.Size(340, 96);
             this.txttotsalesnet.TabIndex = 16;
             this.txttotsalesnet.Text = "labelControl2";
             // 
@@ -492,11 +492,11 @@
             this.labelControl4.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
             this.tablePanel1.SetColumn(this.labelControl4, 3);
             this.labelControl4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.labelControl4.Location = new System.Drawing.Point(850, 3);
+            this.labelControl4.Location = new System.Drawing.Point(1063, 4);
             this.labelControl4.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.labelControl4.Name = "labelControl4";
             this.tablePanel1.SetRow(this.labelControl4, 0);
-            this.labelControl4.Size = new System.Drawing.Size(272, 63);
+            this.labelControl4.Size = new System.Drawing.Size(340, 79);
             this.labelControl4.TabIndex = 19;
             this.labelControl4.Text = "AVERAGE";
             // 
@@ -513,11 +513,11 @@
             this.txttotinvoice.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
             this.tablePanel1.SetColumn(this.txttotinvoice, 0);
             this.txttotinvoice.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txttotinvoice.Location = new System.Drawing.Point(2, 70);
+            this.txttotinvoice.Location = new System.Drawing.Point(3, 88);
             this.txttotinvoice.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.txttotinvoice.Name = "txttotinvoice";
             this.tablePanel1.SetRow(this.txttotinvoice, 1);
-            this.txttotinvoice.Size = new System.Drawing.Size(299, 77);
+            this.txttotinvoice.Size = new System.Drawing.Size(374, 96);
             this.txttotinvoice.TabIndex = 15;
             this.txttotinvoice.Text = "labelControl1";
             // 
@@ -534,11 +534,11 @@
             this.labelControl1.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
             this.tablePanel1.SetColumn(this.labelControl1, 0);
             this.labelControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.labelControl1.Location = new System.Drawing.Point(2, 3);
+            this.labelControl1.Location = new System.Drawing.Point(3, 4);
             this.labelControl1.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.labelControl1.Name = "labelControl1";
             this.tablePanel1.SetRow(this.labelControl1, 0);
-            this.labelControl1.Size = new System.Drawing.Size(299, 63);
+            this.labelControl1.Size = new System.Drawing.Size(374, 79);
             this.labelControl1.TabIndex = 16;
             this.labelControl1.Text = "TOTAL INVOICE";
             // 
@@ -840,13 +840,6 @@
             this.xtraTabPage1.Size = new System.Drawing.Size(1130, 650);
             this.xtraTabPage1.Text = "Customer Sales Report";
             // 
-            // xtraTabPage2
-            // 
-            this.xtraTabPage2.Controls.Add(this.panelControl2);
-            this.xtraTabPage2.Name = "xtraTabPage2";
-            this.xtraTabPage2.Size = new System.Drawing.Size(1130, 650);
-            this.xtraTabPage2.Text = "Cash Receipt Book / Sales Journal";
-            // 
             // panelControl1
             // 
             this.panelControl1.Controls.Add(this.gridControl3);
@@ -855,18 +848,8 @@
             this.panelControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelControl1.Location = new System.Drawing.Point(0, 0);
             this.panelControl1.Name = "panelControl1";
-            this.panelControl1.Size = new System.Drawing.Size(1130, 650);
+            this.panelControl1.Size = new System.Drawing.Size(1413, 813);
             this.panelControl1.TabIndex = 0;
-            // 
-            // panelControl2
-            // 
-            this.panelControl2.Controls.Add(this.panelControl7);
-            this.panelControl2.Controls.Add(this.panelControl6);
-            this.panelControl2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelControl2.Location = new System.Drawing.Point(0, 0);
-            this.panelControl2.Name = "panelControl2";
-            this.panelControl2.Size = new System.Drawing.Size(1130, 650);
-            this.panelControl2.TabIndex = 0;
             // 
             // xtraTabPage3
             // 
@@ -882,8 +865,17 @@
             this.panelControl3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelControl3.Location = new System.Drawing.Point(0, 0);
             this.panelControl3.Name = "panelControl3";
-            this.panelControl3.Size = new System.Drawing.Size(1130, 650);
+            this.panelControl3.Size = new System.Drawing.Size(1413, 813);
             this.panelControl3.TabIndex = 0;
+            // 
+            // panelControl5
+            // 
+            this.panelControl5.Controls.Add(this.gridControl2);
+            this.panelControl5.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panelControl5.Location = new System.Drawing.Point(2, 151);
+            this.panelControl5.Name = "panelControl5";
+            this.panelControl5.Size = new System.Drawing.Size(1409, 660);
+            this.panelControl5.TabIndex = 1;
             // 
             // panelControl4
             // 
@@ -901,17 +893,34 @@
             this.panelControl4.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelControl4.Location = new System.Drawing.Point(2, 2);
             this.panelControl4.Name = "panelControl4";
-            this.panelControl4.Size = new System.Drawing.Size(1126, 119);
+            this.panelControl4.Size = new System.Drawing.Size(1409, 149);
             this.panelControl4.TabIndex = 0;
             // 
-            // panelControl5
+            // xtraTabPage2
             // 
-            this.panelControl5.Controls.Add(this.gridControl2);
-            this.panelControl5.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelControl5.Location = new System.Drawing.Point(2, 121);
-            this.panelControl5.Name = "panelControl5";
-            this.panelControl5.Size = new System.Drawing.Size(1126, 527);
-            this.panelControl5.TabIndex = 1;
+            this.xtraTabPage2.Controls.Add(this.panelControl2);
+            this.xtraTabPage2.Name = "xtraTabPage2";
+            this.xtraTabPage2.Size = new System.Drawing.Size(1130, 650);
+            this.xtraTabPage2.Text = "Cash Receipt Book / Sales Journal";
+            // 
+            // panelControl2
+            // 
+            this.panelControl2.Controls.Add(this.panelControl7);
+            this.panelControl2.Controls.Add(this.panelControl6);
+            this.panelControl2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panelControl2.Location = new System.Drawing.Point(0, 0);
+            this.panelControl2.Name = "panelControl2";
+            this.panelControl2.Size = new System.Drawing.Size(1413, 813);
+            this.panelControl2.TabIndex = 0;
+            // 
+            // panelControl7
+            // 
+            this.panelControl7.Controls.Add(this.gridControl1);
+            this.panelControl7.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panelControl7.Location = new System.Drawing.Point(2, 115);
+            this.panelControl7.Name = "panelControl7";
+            this.panelControl7.Size = new System.Drawing.Size(1409, 696);
+            this.panelControl7.TabIndex = 1;
             // 
             // panelControl6
             // 
@@ -926,17 +935,8 @@
             this.panelControl6.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelControl6.Location = new System.Drawing.Point(2, 2);
             this.panelControl6.Name = "panelControl6";
-            this.panelControl6.Size = new System.Drawing.Size(1126, 90);
+            this.panelControl6.Size = new System.Drawing.Size(1409, 113);
             this.panelControl6.TabIndex = 0;
-            // 
-            // panelControl7
-            // 
-            this.panelControl7.Controls.Add(this.gridControl1);
-            this.panelControl7.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelControl7.Location = new System.Drawing.Point(2, 92);
-            this.panelControl7.Name = "panelControl7";
-            this.panelControl7.Size = new System.Drawing.Size(1126, 556);
-            this.panelControl7.TabIndex = 1;
             // 
             // POSSalesReportDevEx
             // 
@@ -975,24 +975,24 @@
             ((System.ComponentModel.ISupportInitialize)(this.xtraTabControl1)).EndInit();
             this.xtraTabControl1.ResumeLayout(false);
             this.xtraTabPage1.ResumeLayout(false);
-            this.xtraTabPage2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).EndInit();
             this.panelControl1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.panelControl2)).EndInit();
-            this.panelControl2.ResumeLayout(false);
             this.xtraTabPage3.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.panelControl3)).EndInit();
             this.panelControl3.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.panelControl5)).EndInit();
+            this.panelControl5.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.panelControl4)).EndInit();
             this.panelControl4.ResumeLayout(false);
             this.panelControl4.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.panelControl5)).EndInit();
-            this.panelControl5.ResumeLayout(false);
+            this.xtraTabPage2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.panelControl2)).EndInit();
+            this.panelControl2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.panelControl7)).EndInit();
+            this.panelControl7.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.panelControl6)).EndInit();
             this.panelControl6.ResumeLayout(false);
             this.panelControl6.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.panelControl7)).EndInit();
-            this.panelControl7.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }

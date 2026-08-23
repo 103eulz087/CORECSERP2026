@@ -143,7 +143,7 @@
             this.tabForApprovalSub.Margin = new System.Windows.Forms.Padding(4);
             this.tabForApprovalSub.Name = "tabForApprovalSub";
             this.tabForApprovalSub.SelectedTabPage = this.forApprovalSTS;
-            this.tabForApprovalSub.Size = new System.Drawing.Size(1397, 671);
+            this.tabForApprovalSub.Size = new System.Drawing.Size(1746, 839);
             this.tabForApprovalSub.TabIndex = 7;
             this.tabForApprovalSub.TabPages.AddRange(new DevExpress.XtraTab.XtraTabPage[] {
             this.forApprovalSTS});
@@ -155,18 +155,18 @@
             this.forApprovalSTS.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.Transit_16x16;
             this.forApprovalSTS.Margin = new System.Windows.Forms.Padding(4);
             this.forApprovalSTS.Name = "forApprovalSTS";
-            this.forApprovalSTS.Size = new System.Drawing.Size(1395, 639);
+            this.forApprovalSTS.Size = new System.Drawing.Size(1744, 807);
             this.forApprovalSTS.Text = "Stock Out Transfer";
             // 
             // groupBox10
             // 
             this.groupBox10.Controls.Add(this.gridControlSTS);
             this.groupBox10.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox10.Location = new System.Drawing.Point(0, 42);
+            this.groupBox10.Location = new System.Drawing.Point(0, 54);
             this.groupBox10.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox10.Name = "groupBox10";
             this.groupBox10.Padding = new System.Windows.Forms.Padding(4);
-            this.groupBox10.Size = new System.Drawing.Size(1395, 597);
+            this.groupBox10.Size = new System.Drawing.Size(2180, 955);
             this.groupBox10.TabIndex = 5;
             this.groupBox10.TabStop = false;
             // 
@@ -178,7 +178,7 @@
             this.gridControlSTS.MainView = this.gridViewSTS;
             this.gridControlSTS.Margin = new System.Windows.Forms.Padding(4);
             this.gridControlSTS.Name = "gridControlSTS";
-            this.gridControlSTS.Size = new System.Drawing.Size(1387, 573);
+            this.gridControlSTS.Size = new System.Drawing.Size(2172, 931);
             this.gridControlSTS.TabIndex = 0;
             this.gridControlSTS.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewSTS});
@@ -215,7 +215,7 @@
             this.panelControl2.Location = new System.Drawing.Point(0, 0);
             this.panelControl2.Margin = new System.Windows.Forms.Padding(4);
             this.panelControl2.Name = "panelControl2";
-            this.panelControl2.Size = new System.Drawing.Size(1395, 42);
+            this.panelControl2.Size = new System.Drawing.Size(2180, 43);
             this.panelControl2.TabIndex = 0;
             // 
             // btnforapprovalstsexcel
@@ -301,7 +301,7 @@
             this.tabApprovedSub.Margin = new System.Windows.Forms.Padding(4);
             this.tabApprovedSub.Name = "tabApprovedSub";
             this.tabApprovedSub.SelectedTabPage = this.approvedSTS;
-            this.tabApprovedSub.Size = new System.Drawing.Size(1397, 671);
+            this.tabApprovedSub.Size = new System.Drawing.Size(1746, 839);
             this.tabApprovedSub.TabIndex = 8;
             this.tabApprovedSub.TabPages.AddRange(new DevExpress.XtraTab.XtraTabPage[] {
             this.approvedSTS});
@@ -313,18 +313,18 @@
             this.approvedSTS.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.Transit_16x16;
             this.approvedSTS.Margin = new System.Windows.Forms.Padding(4);
             this.approvedSTS.Name = "approvedSTS";
-            this.approvedSTS.Size = new System.Drawing.Size(1395, 640);
+            this.approvedSTS.Size = new System.Drawing.Size(1744, 808);
             this.approvedSTS.Text = "StockOut Transfer";
             // 
             // groupBox26
             // 
             this.groupBox26.Controls.Add(this.gridControlapprvdsts);
             this.groupBox26.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox26.Location = new System.Drawing.Point(0, 42);
+            this.groupBox26.Location = new System.Drawing.Point(0, 54);
             this.groupBox26.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox26.Name = "groupBox26";
             this.groupBox26.Padding = new System.Windows.Forms.Padding(4);
-            this.groupBox26.Size = new System.Drawing.Size(1395, 598);
+            this.groupBox26.Size = new System.Drawing.Size(2180, 956);
             this.groupBox26.TabIndex = 2;
             this.groupBox26.TabStop = false;
             // 
@@ -336,7 +336,7 @@
             this.gridControlapprvdsts.MainView = this.gridViewapprvdsts;
             this.gridControlapprvdsts.Margin = new System.Windows.Forms.Padding(4);
             this.gridControlapprvdsts.Name = "gridControlapprvdsts";
-            this.gridControlapprvdsts.Size = new System.Drawing.Size(1387, 574);
+            this.gridControlapprvdsts.Size = new System.Drawing.Size(2172, 932);
             this.gridControlapprvdsts.TabIndex = 2;
             this.gridControlapprvdsts.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewapprvdsts});
@@ -368,7 +368,7 @@
             this.panelControl4.Location = new System.Drawing.Point(0, 0);
             this.panelControl4.Margin = new System.Windows.Forms.Padding(4);
             this.panelControl4.Name = "panelControl4";
-            this.panelControl4.Size = new System.Drawing.Size(1395, 42);
+            this.panelControl4.Size = new System.Drawing.Size(2180, 43);
             this.panelControl4.TabIndex = 1;
             // 
             // btnapprovedreqstsexcel
@@ -454,7 +454,7 @@
             this.tabRejectedSub.Margin = new System.Windows.Forms.Padding(4);
             this.tabRejectedSub.Name = "tabRejectedSub";
             this.tabRejectedSub.SelectedTabPage = this.rejectedSTS;
-            this.tabRejectedSub.Size = new System.Drawing.Size(1397, 671);
+            this.tabRejectedSub.Size = new System.Drawing.Size(1746, 839);
             this.tabRejectedSub.TabIndex = 8;
             this.tabRejectedSub.TabPages.AddRange(new DevExpress.XtraTab.XtraTabPage[] {
             this.rejectedSTS});
@@ -466,18 +466,18 @@
             this.rejectedSTS.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.Transit_16x16;
             this.rejectedSTS.Margin = new System.Windows.Forms.Padding(4);
             this.rejectedSTS.Name = "rejectedSTS";
-            this.rejectedSTS.Size = new System.Drawing.Size(1395, 640);
+            this.rejectedSTS.Size = new System.Drawing.Size(1744, 808);
             this.rejectedSTS.Text = "StockOut Transfer";
             // 
             // groupBox28
             // 
             this.groupBox28.Controls.Add(this.gridControlrjctdsts);
             this.groupBox28.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox28.Location = new System.Drawing.Point(0, 42);
+            this.groupBox28.Location = new System.Drawing.Point(0, 54);
             this.groupBox28.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox28.Name = "groupBox28";
             this.groupBox28.Padding = new System.Windows.Forms.Padding(4);
-            this.groupBox28.Size = new System.Drawing.Size(1395, 598);
+            this.groupBox28.Size = new System.Drawing.Size(2180, 956);
             this.groupBox28.TabIndex = 2;
             this.groupBox28.TabStop = false;
             // 
@@ -489,7 +489,7 @@
             this.gridControlrjctdsts.MainView = this.gridViewrjctdsts;
             this.gridControlrjctdsts.Margin = new System.Windows.Forms.Padding(4);
             this.gridControlrjctdsts.Name = "gridControlrjctdsts";
-            this.gridControlrjctdsts.Size = new System.Drawing.Size(1387, 574);
+            this.gridControlrjctdsts.Size = new System.Drawing.Size(2172, 932);
             this.gridControlrjctdsts.TabIndex = 3;
             this.gridControlrjctdsts.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewrjctdsts});
@@ -521,7 +521,7 @@
             this.panelControl6.Location = new System.Drawing.Point(0, 0);
             this.panelControl6.Margin = new System.Windows.Forms.Padding(4);
             this.panelControl6.Name = "panelControl6";
-            this.panelControl6.Size = new System.Drawing.Size(1395, 42);
+            this.panelControl6.Size = new System.Drawing.Size(2180, 43);
             this.panelControl6.TabIndex = 1;
             // 
             // btnrejectedstsexcel

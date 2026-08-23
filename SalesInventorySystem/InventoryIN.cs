@@ -217,7 +217,7 @@ namespace SalesInventorySystem
                 simpleButton1.Focus();
             }
         }
-
+         
         private void simpleButton2_Click(object sender, EventArgs e)
         {
             SqlConnection con = Database.getConnection();

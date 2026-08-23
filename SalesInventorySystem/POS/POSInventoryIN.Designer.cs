@@ -64,10 +64,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.txtproduct.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtcost.Properties)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.txtexpirydate.Properties.CalendarTimeProperties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtexpirydate.Properties)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.txtdatein.Properties.CalendarTimeProperties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtexpirydate.Properties.CalendarTimeProperties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtdatein.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtdatein.Properties.CalendarTimeProperties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtbatchid.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.groupControl1)).BeginInit();
             this.groupControl1.SuspendLayout();
@@ -261,7 +261,7 @@
             this.groupControl1.Dock = System.Windows.Forms.DockStyle.Top;
             this.groupControl1.Location = new System.Drawing.Point(0, 0);
             this.groupControl1.Name = "groupControl1";
-            this.groupControl1.Size = new System.Drawing.Size(1132, 271);
+            this.groupControl1.Size = new System.Drawing.Size(1132, 424);
             this.groupControl1.TabIndex = 12;
             // 
             // btnprint
@@ -361,9 +361,9 @@
             // 
             this.groupControl2.Controls.Add(this.gridControl1);
             this.groupControl2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupControl2.Location = new System.Drawing.Point(0, 271);
+            this.groupControl2.Location = new System.Drawing.Point(0, 424);
             this.groupControl2.Name = "groupControl2";
-            this.groupControl2.Size = new System.Drawing.Size(1132, 409);
+            this.groupControl2.Size = new System.Drawing.Size(1132, 256);
             this.groupControl2.TabIndex = 13;
             // 
             // gridControl1
@@ -374,7 +374,7 @@
             this.gridControl1.MainView = this.gridView2;
             this.gridControl1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.gridControl1.Name = "gridControl1";
-            this.gridControl1.Size = new System.Drawing.Size(1128, 379);
+            this.gridControl1.Size = new System.Drawing.Size(1128, 226);
             this.gridControl1.TabIndex = 5;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView2,

@@ -30,6 +30,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             new KeyValuePair<string, string>("navVoucherPosting", "Vouchering - Posting Cash/Check"),
             new KeyValuePair<string, string>("navVoucherPostingManual", "Vouchering - Posting Telegraphic"),
             new KeyValuePair<string, string>("navVoucherPaymentList", "Vouchering - Payment List"),
+            new KeyValuePair<string, string>("navPostClientPayment", "Account Receivable - Post Client Payment"),
             new KeyValuePair<string, string>("navExpenseSingle", "Post Expense - Single Mode"),
             new KeyValuePair<string, string>("navExpenseBatch", "Post Expense - Batch Mode"),
             new KeyValuePair<string, string>("navManualTicket", "Manual Ticket"),

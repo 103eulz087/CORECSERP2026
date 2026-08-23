@@ -29,8 +29,8 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            DevExpress.XtraGrid.GridLevelNode gridLevelNode1 = new DevExpress.XtraGrid.GridLevelNode();
             DevExpress.XtraGrid.GridLevelNode gridLevelNode2 = new DevExpress.XtraGrid.GridLevelNode();
+            DevExpress.XtraGrid.GridLevelNode gridLevelNode3 = new DevExpress.XtraGrid.GridLevelNode();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ClientPaymentsDevExAcctg));
             this.gridView5 = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.gridControl2 = new DevExpress.XtraGrid.GridControl();
@@ -62,6 +62,8 @@
             this.gridView13 = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.repositoryItemSearchLookUpEdit5 = new DevExpress.XtraEditors.Repository.RepositoryItemSearchLookUpEdit();
             this.gridView14 = new DevExpress.XtraGrid.Views.Grid.GridView();
+            this.gridControlPaymentDetails = new DevExpress.XtraGrid.GridControl();
+            this.gridViewPaymentDetails = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.xtraTabControl1 = new DevExpress.XtraTab.XtraTabControl();
             this.xtraTabPage1 = new DevExpress.XtraTab.XtraTabPage();
             this.panel1 = new System.Windows.Forms.Panel();
@@ -93,7 +95,6 @@
             this.groupBoxadvancepayment = new System.Windows.Forms.GroupBox();
             this.txtacctbalance = new System.Windows.Forms.TextBox();
             this.label23 = new System.Windows.Forms.Label();
-            this.radioButton4 = new System.Windows.Forms.RadioButton();
             this.simpleButton4 = new DevExpress.XtraEditors.SimpleButton();
             this.label20 = new System.Windows.Forms.Label();
             this.label19 = new System.Windows.Forms.Label();
@@ -142,6 +143,8 @@
             this.groupControl1 = new DevExpress.XtraEditors.GroupControl();
             this.simpleButton5 = new DevExpress.XtraEditors.SimpleButton();
             this.simpleButton1 = new DevExpress.XtraEditors.SimpleButton();
+            this.btnViewDetails = new DevExpress.XtraEditors.SimpleButton();
+            this.btnEditDetails = new DevExpress.XtraEditors.SimpleButton();
             this.txtdateto = new DevExpress.XtraEditors.DateEdit();
             this.txtdatefrom = new DevExpress.XtraEditors.DateEdit();
             this.labelControl2 = new DevExpress.XtraEditors.LabelControl();
@@ -181,6 +184,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.gridView13)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.repositoryItemSearchLookUpEdit5)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView14)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridControlPaymentDetails)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridViewPaymentDetails)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.xtraTabControl1)).BeginInit();
             this.xtraTabControl1.SuspendLayout();
             this.xtraTabPage1.SuspendLayout();
@@ -232,10 +237,10 @@
             // 
             this.gridControl2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gridControl2.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
-            gridLevelNode1.LevelTemplate = this.gridView5;
-            gridLevelNode1.RelationName = "Level1";
+            gridLevelNode2.LevelTemplate = this.gridView5;
+            gridLevelNode2.RelationName = "Level1";
             this.gridControl2.LevelTree.Nodes.AddRange(new DevExpress.XtraGrid.GridLevelNode[] {
-            gridLevelNode1});
+            gridLevelNode2});
             this.gridControl2.Location = new System.Drawing.Point(2, 20);
             this.gridControl2.MainView = this.gridView2;
             this.gridControl2.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
@@ -248,7 +253,7 @@
             this.repositoryItemSearchLookUpEditEWTDebitGLCode,
             this.repositoryItemSearchLookUpEditEWTCreditGLCode,
             this.repositoryItemCheckEditPayCharge});
-            this.gridControl2.Size = new System.Drawing.Size(1981, 369);
+            this.gridControl2.Size = new System.Drawing.Size(1980, 579);
             this.gridControl2.TabIndex = 6;
             this.gridControl2.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView2,
@@ -382,12 +387,12 @@
             // 
             // gridControl1
             // 
-            this.gridControl1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.gridControl1.Dock = System.Windows.Forms.DockStyle.Top;
             this.gridControl1.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
-            gridLevelNode2.LevelTemplate = this.gridView8;
-            gridLevelNode2.RelationName = "Level1";
+            gridLevelNode3.LevelTemplate = this.gridView8;
+            gridLevelNode3.RelationName = "Level1";
             this.gridControl1.LevelTree.Nodes.AddRange(new DevExpress.XtraGrid.GridLevelNode[] {
-            gridLevelNode2});
+            gridLevelNode3});
             this.gridControl1.Location = new System.Drawing.Point(2, 28);
             this.gridControl1.MainView = this.gridView9;
             this.gridControl1.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
@@ -400,7 +405,7 @@
             this.repositoryItemSearchLookUpEdit3,
             this.repositoryItemSearchLookUpEdit4,
             this.repositoryItemSearchLookUpEdit5});
-            this.gridControl1.Size = new System.Drawing.Size(1981, 631);
+            this.gridControl1.Size = new System.Drawing.Size(1980, 450);
             this.gridControl1.TabIndex = 7;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView9,
@@ -519,6 +524,26 @@
             this.gridView14.OptionsSelection.EnableAppearanceFocusedCell = false;
             this.gridView14.OptionsView.ShowGroupPanel = false;
             // 
+            // gridControlPaymentDetails
+            // 
+            this.gridControlPaymentDetails.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.gridControlPaymentDetails.Location = new System.Drawing.Point(2, 478);
+            this.gridControlPaymentDetails.MainView = this.gridViewPaymentDetails;
+            this.gridControlPaymentDetails.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.gridControlPaymentDetails.Name = "gridControlPaymentDetails";
+            this.gridControlPaymentDetails.Size = new System.Drawing.Size(1980, 351);
+            this.gridControlPaymentDetails.TabIndex = 8;
+            this.gridControlPaymentDetails.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
+            this.gridViewPaymentDetails});
+            // 
+            // gridViewPaymentDetails
+            // 
+            this.gridViewPaymentDetails.GridControl = this.gridControlPaymentDetails;
+            this.gridViewPaymentDetails.Name = "gridViewPaymentDetails";
+            this.gridViewPaymentDetails.OptionsBehavior.Editable = false;
+            this.gridViewPaymentDetails.OptionsView.ShowFooter = true;
+            this.gridViewPaymentDetails.OptionsView.ShowGroupPanel = false;
+            // 
             // xtraTabControl1
             // 
             this.xtraTabControl1.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F);
@@ -530,7 +555,7 @@
             this.xtraTabControl1.Margin = new System.Windows.Forms.Padding(2);
             this.xtraTabControl1.Name = "xtraTabControl1";
             this.xtraTabControl1.SelectedTabPage = this.xtraTabPage1;
-            this.xtraTabControl1.Size = new System.Drawing.Size(1987, 794);
+            this.xtraTabControl1.Size = new System.Drawing.Size(1987, 993);
             this.xtraTabControl1.TabIndex = 0;
             this.xtraTabControl1.TabPages.AddRange(new DevExpress.XtraTab.XtraTabPage[] {
             this.xtraTabPage1,
@@ -541,7 +566,7 @@
             this.xtraTabPage1.Controls.Add(this.panel1);
             this.xtraTabPage1.Margin = new System.Windows.Forms.Padding(2);
             this.xtraTabPage1.Name = "xtraTabPage1";
-            this.xtraTabPage1.Size = new System.Drawing.Size(1985, 762);
+            this.xtraTabPage1.Size = new System.Drawing.Size(1985, 961);
             this.xtraTabPage1.Text = "Invoice w/Balances";
             // 
             // panel1
@@ -552,7 +577,7 @@
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Margin = new System.Windows.Forms.Padding(2);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(1985, 762);
+            this.panel1.Size = new System.Drawing.Size(1985, 961);
             this.panel1.TabIndex = 0;
             // 
             // groupBox2
@@ -560,11 +585,11 @@
             this.groupBox2.BackColor = System.Drawing.Color.White;
             this.groupBox2.Controls.Add(this.gridControl2);
             this.groupBox2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox2.Location = new System.Drawing.Point(0, 369);
+            this.groupBox2.Location = new System.Drawing.Point(0, 357);
             this.groupBox2.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Padding = new System.Windows.Forms.Padding(2, 4, 2, 4);
-            this.groupBox2.Size = new System.Drawing.Size(1985, 393);
+            this.groupBox2.Size = new System.Drawing.Size(1984, 603);
             this.groupBox2.TabIndex = 20;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Transaction with Balances";
@@ -581,7 +606,6 @@
             this.groupBox1.Controls.Add(this.txtcrno);
             this.groupBox1.Controls.Add(this.txtcontrolno);
             this.groupBox1.Controls.Add(this.groupBoxadvancepayment);
-            this.groupBox1.Controls.Add(this.radioButton4);
             this.groupBox1.Controls.Add(this.simpleButton4);
             this.groupBox1.Controls.Add(this.label20);
             this.groupBox1.Controls.Add(this.label19);
@@ -611,9 +635,10 @@
             this.groupBox1.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(2, 4, 2, 4);
-            this.groupBox1.Size = new System.Drawing.Size(1985, 369);
+            this.groupBox1.Size = new System.Drawing.Size(1984, 357);
             this.groupBox1.TabIndex = 19;
             this.groupBox1.TabStop = false;
+            this.groupBox1.Enter += new System.EventHandler(this.groupBox1_Enter);
             // 
             // txtcustname
             // 
@@ -899,21 +924,6 @@
             this.label23.Size = new System.Drawing.Size(112, 21);
             this.label23.TabIndex = 0;
             this.label23.Text = "Acct Balance:";
-            // 
-            // radioButton4
-            // 
-            this.radioButton4.AutoSize = true;
-            this.radioButton4.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.radioButton4.Location = new System.Drawing.Point(1539, 141);
-            this.radioButton4.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
-            this.radioButton4.Name = "radioButton4";
-            this.radioButton4.Size = new System.Drawing.Size(181, 22);
-            this.radioButton4.TabIndex = 461;
-            this.radioButton4.TabStop = true;
-            this.radioButton4.Text = "Advance Payment (F4)";
-            this.radioButton4.UseVisualStyleBackColor = true;
-            this.radioButton4.Visible = false;
-            this.radioButton4.CheckedChanged += new System.EventHandler(this.radioButton4_CheckedChanged);
             // 
             // simpleButton4
             // 
@@ -1421,7 +1431,7 @@
             this.xtraTabPage2.Controls.Add(this.panel2);
             this.xtraTabPage2.Margin = new System.Windows.Forms.Padding(2);
             this.xtraTabPage2.Name = "xtraTabPage2";
-            this.xtraTabPage2.Size = new System.Drawing.Size(1985, 762);
+            this.xtraTabPage2.Size = new System.Drawing.Size(1985, 961);
             this.xtraTabPage2.Text = "FullyPaid Invoice";
             // 
             // panel2
@@ -1432,23 +1442,26 @@
             this.panel2.Location = new System.Drawing.Point(0, 0);
             this.panel2.Margin = new System.Windows.Forms.Padding(2);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(1985, 762);
+            this.panel2.Size = new System.Drawing.Size(1985, 961);
             this.panel2.TabIndex = 1;
             // 
             // groupControl2
             // 
+            this.groupControl2.Controls.Add(this.gridControlPaymentDetails);
             this.groupControl2.Controls.Add(this.gridControl1);
             this.groupControl2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupControl2.Location = new System.Drawing.Point(0, 101);
+            this.groupControl2.Location = new System.Drawing.Point(0, 129);
             this.groupControl2.Margin = new System.Windows.Forms.Padding(2);
             this.groupControl2.Name = "groupControl2";
-            this.groupControl2.Size = new System.Drawing.Size(1985, 661);
+            this.groupControl2.Size = new System.Drawing.Size(1984, 831);
             this.groupControl2.TabIndex = 1;
             // 
             // groupControl1
             // 
             this.groupControl1.Controls.Add(this.simpleButton5);
             this.groupControl1.Controls.Add(this.simpleButton1);
+            this.groupControl1.Controls.Add(this.btnViewDetails);
+            this.groupControl1.Controls.Add(this.btnEditDetails);
             this.groupControl1.Controls.Add(this.txtdateto);
             this.groupControl1.Controls.Add(this.txtdatefrom);
             this.groupControl1.Controls.Add(this.labelControl2);
@@ -1457,7 +1470,7 @@
             this.groupControl1.Location = new System.Drawing.Point(0, 0);
             this.groupControl1.Margin = new System.Windows.Forms.Padding(2);
             this.groupControl1.Name = "groupControl1";
-            this.groupControl1.Size = new System.Drawing.Size(1985, 101);
+            this.groupControl1.Size = new System.Drawing.Size(1984, 129);
             this.groupControl1.TabIndex = 0;
             // 
             // simpleButton5
@@ -1465,10 +1478,10 @@
             this.simpleButton5.Appearance.Font = new System.Drawing.Font("Tahoma", 8.5F);
             this.simpleButton5.Appearance.Options.UseFont = true;
             this.simpleButton5.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.Print_32x32__2_;
-            this.simpleButton5.Location = new System.Drawing.Point(482, 37);
+            this.simpleButton5.Location = new System.Drawing.Point(482, 46);
             this.simpleButton5.Margin = new System.Windows.Forms.Padding(2);
             this.simpleButton5.Name = "simpleButton5";
-            this.simpleButton5.Size = new System.Drawing.Size(174, 52);
+            this.simpleButton5.Size = new System.Drawing.Size(174, 64);
             this.simpleButton5.TabIndex = 462;
             this.simpleButton5.Text = "Print";
             this.simpleButton5.Click += new System.EventHandler(this.simpleButton5_Click);
@@ -1478,18 +1491,42 @@
             this.simpleButton1.Appearance.Font = new System.Drawing.Font("Tahoma", 8.5F);
             this.simpleButton1.Appearance.Options.UseFont = true;
             this.simpleButton1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("simpleButton1.ImageOptions.Image")));
-            this.simpleButton1.Location = new System.Drawing.Point(303, 37);
+            this.simpleButton1.Location = new System.Drawing.Point(303, 46);
             this.simpleButton1.Margin = new System.Windows.Forms.Padding(2);
             this.simpleButton1.Name = "simpleButton1";
-            this.simpleButton1.Size = new System.Drawing.Size(174, 52);
+            this.simpleButton1.Size = new System.Drawing.Size(174, 64);
             this.simpleButton1.TabIndex = 461;
             this.simpleButton1.Text = "Submit";
             this.simpleButton1.Click += new System.EventHandler(this.simpleButton1_Click_1);
             // 
+            // btnViewDetails
+            // 
+            this.btnViewDetails.Appearance.Font = new System.Drawing.Font("Tahoma", 8.5F);
+            this.btnViewDetails.Appearance.Options.UseFont = true;
+            this.btnViewDetails.Location = new System.Drawing.Point(661, 46);
+            this.btnViewDetails.Margin = new System.Windows.Forms.Padding(2);
+            this.btnViewDetails.Name = "btnViewDetails";
+            this.btnViewDetails.Size = new System.Drawing.Size(174, 64);
+            this.btnViewDetails.TabIndex = 463;
+            this.btnViewDetails.Text = "View Details";
+            this.btnViewDetails.Click += new System.EventHandler(this.BtnViewDetails_Click);
+            // 
+            // btnEditDetails
+            // 
+            this.btnEditDetails.Appearance.Font = new System.Drawing.Font("Tahoma", 8.5F);
+            this.btnEditDetails.Appearance.Options.UseFont = true;
+            this.btnEditDetails.Location = new System.Drawing.Point(840, 46);
+            this.btnEditDetails.Margin = new System.Windows.Forms.Padding(2);
+            this.btnEditDetails.Name = "btnEditDetails";
+            this.btnEditDetails.Size = new System.Drawing.Size(174, 64);
+            this.btnEditDetails.TabIndex = 464;
+            this.btnEditDetails.Text = "Edit Details";
+            this.btnEditDetails.Click += new System.EventHandler(this.BtnEditDetails_Click);
+            // 
             // txtdateto
             // 
             this.txtdateto.EditValue = null;
-            this.txtdateto.Location = new System.Drawing.Point(122, 65);
+            this.txtdateto.Location = new System.Drawing.Point(122, 86);
             this.txtdateto.Margin = new System.Windows.Forms.Padding(2);
             this.txtdateto.Name = "txtdateto";
             this.txtdateto.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F);
@@ -1504,7 +1541,7 @@
             // txtdatefrom
             // 
             this.txtdatefrom.EditValue = null;
-            this.txtdatefrom.Location = new System.Drawing.Point(122, 37);
+            this.txtdatefrom.Location = new System.Drawing.Point(122, 46);
             this.txtdatefrom.Margin = new System.Windows.Forms.Padding(2);
             this.txtdatefrom.Name = "txtdatefrom";
             this.txtdatefrom.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F);
@@ -1520,7 +1557,7 @@
             // 
             this.labelControl2.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F);
             this.labelControl2.Appearance.Options.UseFont = true;
-            this.labelControl2.Location = new System.Drawing.Point(16, 68);
+            this.labelControl2.Location = new System.Drawing.Point(16, 89);
             this.labelControl2.Margin = new System.Windows.Forms.Padding(2);
             this.labelControl2.Name = "labelControl2";
             this.labelControl2.Size = new System.Drawing.Size(59, 18);
@@ -1531,7 +1568,7 @@
             // 
             this.labelControl1.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F);
             this.labelControl1.Appearance.Options.UseFont = true;
-            this.labelControl1.Location = new System.Drawing.Point(16, 40);
+            this.labelControl1.Location = new System.Drawing.Point(16, 49);
             this.labelControl1.Margin = new System.Windows.Forms.Padding(2);
             this.labelControl1.Name = "labelControl1";
             this.labelControl1.Size = new System.Drawing.Size(75, 18);
@@ -1586,7 +1623,7 @@
             this.Controls.Add(this.xtraTabControl1);
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "ClientPaymentsDevExAcctg";
-            this.Size = new System.Drawing.Size(1987, 794);
+            this.Size = new System.Drawing.Size(1987, 993);
             this.Load += new System.EventHandler(this.ClientPaymentsDevExAcctg_Load);
             ((System.ComponentModel.ISupportInitialize)(this.gridView5)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl2)).EndInit();
@@ -1618,6 +1655,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.gridView13)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.repositoryItemSearchLookUpEdit5)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView14)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridControlPaymentDetails)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridViewPaymentDetails)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.xtraTabControl1)).EndInit();
             this.xtraTabControl1.ResumeLayout(false);
             this.xtraTabPage1.ResumeLayout(false);
@@ -1730,6 +1769,8 @@
         public DevExpress.XtraGrid.GridControl gridControl1;
         private DevExpress.XtraGrid.Views.Grid.GridView gridView8;
         public DevExpress.XtraGrid.Views.Grid.GridView gridView9;
+        private DevExpress.XtraGrid.GridControl gridControlPaymentDetails;
+        private DevExpress.XtraGrid.Views.Grid.GridView gridViewPaymentDetails;
         private DevExpress.XtraEditors.Repository.RepositoryItemComboBox repositoryItemComboBox2;
         private DevExpress.XtraEditors.Repository.RepositoryItemSearchLookUpEdit repositoryItemSearchLookUpEdit1;
         private DevExpress.XtraGrid.Views.Grid.GridView gridView11;
@@ -1759,8 +1800,9 @@
         private DevExpress.XtraEditors.SimpleButton simpleButton4;
         private DevExpress.XtraEditors.SimpleButton simpleButton1;
         private DevExpress.XtraEditors.SimpleButton simpleButton5;
+        private DevExpress.XtraEditors.SimpleButton btnViewDetails;
+        private DevExpress.XtraEditors.SimpleButton btnEditDetails;
         private DevExpress.XtraEditors.Repository.RepositoryItemCheckEdit repositoryItemCheckEditPayCharge;
-        private System.Windows.Forms.RadioButton radioButton4;
         public System.Windows.Forms.GroupBox groupBoxadvancepayment;
         private System.Windows.Forms.TextBox txtacctbalance;
         private System.Windows.Forms.Label label23;
