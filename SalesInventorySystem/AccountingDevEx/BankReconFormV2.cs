@@ -464,6 +464,28 @@ namespace SalesInventorySystem.AccountingDevEx
             catch (SqlException ex) { SetStatus(ex.Message, err: true); }
         }
 
+        private void MarkAsUncleared(int reconID)
+        {
+            if (reconID <= 0) return;
+            if (XtraMessageBox.Show("Mark this item as uncleared by the bank?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
+            try
+            {
+                using (var con = Database.getConnection())
+                using (var cmd = new SqlCommand("sp_BankRecon_ResolveItem", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add("@ReconID", SqlDbType.Int).Value = reconID;
+                    cmd.Parameters.Add("@IsResolved", SqlDbType.Bit).Value = false;
+                    cmd.Parameters.Add("@ResolvedBy", SqlDbType.VarChar, 50).Value = Login.Fullname;
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                }
+                LoadPeriod(); RefreshSummary();
+                SetStatus("Item marked as uncleared.");
+            }
+            catch (SqlException ex) { SetStatus(ex.Message, err: true); }
+        }
+
         private void BtnDelete_Click(int reconID)
         {
             if (reconID <= 0) return;
@@ -723,6 +745,21 @@ namespace SalesInventorySystem.AccountingDevEx
         private void simpleButton1_Click(object sender, EventArgs e) => BtnAdd_Click("DIT");
 
         private void btnDeleteOC_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void markAsUnclearedToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            MarkAsUncleared(_selOcID);
+        }
+
+        private void markAsUnclearedToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MarkAsUncleared(_selDitID);
+        }
+
+        private void btnPrint_Click_1(object sender, EventArgs e)
         {
 
         }

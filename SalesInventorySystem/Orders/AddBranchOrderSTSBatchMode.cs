@@ -31,6 +31,26 @@ namespace SalesInventorySystem.Orders
         // ProductCode alone can't tell those lines apart.
         private readonly HashSet<decimal> _transferredSeqNos = new HashSet<decimal>();
 
+        // Local Pork/Chicken/Beef -- this batch-mode screen has no barcode-scan/FIFO
+        // setup for these categories, so their rows must never be selectable/editable
+        // here (matches the existing "no inventory" disable pattern below, just keyed
+        // on category instead of AvailableInv).
+        
+        private static readonly HashSet<string> _restrictedCategoryCodes;
+
+        static AddBranchOrderSTSBatchMode()
+        {
+            // Only enable these restricted categories for ENZO (ENZODEV).
+            if (string.Equals(GlobalCache.CompanyName, "ENZO", System.StringComparison.OrdinalIgnoreCase))
+            {
+                _restrictedCategoryCodes = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "10", "11", "12" };
+            }
+            else
+            {
+                _restrictedCategoryCodes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            }
+        }
+
         public AddBranchOrderSTSBatchMode()
         {
             InitializeComponent();
@@ -38,7 +58,23 @@ namespace SalesInventorySystem.Orders
 
         private void AddBranchOrderSTSBatchMode_Load(object sender, EventArgs e)
         {
+            // ProductCategoryCode is only needed for the IsRestrictedCategory() check --
+            // the human-readable category name is already shown via the "Category" column.
+            if (gridView1.Columns["ProductCategoryCode"] != null)
+                gridView1.Columns["ProductCategoryCode"].Visible = false;
+        }
 
+        bool IsRestrictedCategory(int rowHandle)
+        {
+            // Degrade to "not restricted" rather than throw if the grid's data source
+            // predates the funcview_TransferOrderDetailsSTS ProductCategoryCode column
+            // (e.g. this build running against an environment the SQL hasn't been
+            // deployed to yet) -- matches AddBranchOrderSTSBatchMode_Load's own guard.
+            if (gridView1.Columns["ProductCategoryCode"] == null)
+                return false;
+
+            string categoryCode = Convert.ToString(gridView1.GetRowCellValue(rowHandle, "ProductCategoryCode")).Trim();
+            return _restrictedCategoryCodes.Contains(categoryCode);
         }
 
         // transferredCount = rows actually processed. skippedItems = human-readable reasons,
@@ -74,6 +110,16 @@ namespace SalesInventorySystem.Orders
                     string productCode = Convert.ToString(gridView1.GetRowCellValue(rowHandle, "ProductCode"));
                     string productName = Convert.ToString(gridView1.GetRowCellValue(rowHandle, "ProductName"));
                     decimal seqNo = Convert.ToDecimal(gridView1.GetRowCellValue(rowHandle, "SeqNo"));
+
+                    // gridView1_SelectionChanged already unselects Local Pork/Chicken/Beef rows
+                    // the moment they're clicked -- this is a defensive re-check in case a row's
+                    // selection state changed some other way (e.g. keyboard multi-select) between
+                    // click and Submit.
+                    if (IsRestrictedCategory(rowHandle))
+                    {
+                        skippedItems.Add(productName + ": Local Pork/Chicken/Beef items are not processed on this screen");
+                        continue;
+                    }
 
                     // Already durably committed in an earlier Submit attempt this session (e.g.
                     // the user declined the discrepancy prompt after a partial transfer, fixed
@@ -284,9 +330,9 @@ namespace SalesInventorySystem.Orders
             {
                 double available = Convert.ToDouble(gridView1.GetRowCellValue(e.RowHandle, "AvailableInv"));
 
-                if (available <= 0)
+                if (available <= 0 || IsRestrictedCategory(e.RowHandle))
                 {
-                    // ❌ Disable only when NO inventory
+                    // ❌ Disable when NO inventory OR the item is Local Pork/Chicken/Beef
                     e.Appearance.BackColor = Color.LightGray;
                     e.Appearance.ForeColor = Color.DarkGray;
                 }
@@ -303,6 +349,15 @@ namespace SalesInventorySystem.Orders
         {
             GridView view = sender as GridView;
             if (view.FocusedColumn.FieldName != "Qty")
+            {
+                e.Cancel = true;
+                return;
+            }
+
+            // Block editing Qty on Local Pork/Chicken/Beef rows too -- a row can be
+            // keyboard-focused without being selected, which the SelectionChanged-based
+            // unselect below doesn't cover.
+            if (view.FocusedRowHandle >= 0 && IsRestrictedCategory(view.FocusedRowHandle))
                 e.Cancel = true;
         }
 
@@ -323,9 +378,9 @@ namespace SalesInventorySystem.Orders
                 //}
 
                 double available = Convert.ToDouble(gridView1.GetRowCellValue(rowHandle, "AvailableInv"));
-                if (available <= 0)
+                if (available <= 0 || IsRestrictedCategory(rowHandle))
                 {
-                    // only block if NO inventory
+                    // block if NO inventory OR the item is Local Pork/Chicken/Beef
                     gridView1.UnselectRow(rowHandle);
                 }
 
@@ -342,7 +397,7 @@ namespace SalesInventorySystem.Orders
 
                     double available = Convert.ToDouble(gridView1.GetRowCellValue(i, "AvailableInv"));
 
-                    if (available <= 0)
+                    if (available <= 0 || IsRestrictedCategory(i))
                     {
                         gridView1.UnselectRow(i);
                     }

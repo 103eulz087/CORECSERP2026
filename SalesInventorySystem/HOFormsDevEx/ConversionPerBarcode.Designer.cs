@@ -48,6 +48,8 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.btnAddScan = new DevExpress.XtraEditors.SimpleButton();
             this.txtScanBarcode = new DevExpress.XtraEditors.TextEdit();
             this.labelControl7 = new DevExpress.XtraEditors.LabelControl();
+            this.radioGroupFifoType = new DevExpress.XtraEditors.RadioGroup();
+            this.labelControlFifoType = new DevExpress.XtraEditors.LabelControl();
             this.btnAddFifo = new DevExpress.XtraEditors.SimpleButton();
             this.txtFifoQty = new DevExpress.XtraEditors.SpinEdit();
             this.labelControlFifoQty = new DevExpress.XtraEditors.LabelControl();
@@ -64,8 +66,8 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.chkDriploss = new DevExpress.XtraEditors.CheckEdit();
             this.txtOutputQty = new DevExpress.XtraEditors.SpinEdit();
             this.labelControl9 = new DevExpress.XtraEditors.LabelControl();
-            this.btnSearchProduct = new DevExpress.XtraEditors.SimpleButton();
-            this.txtOutputProductDesc = new DevExpress.XtraEditors.TextEdit();
+            this.txtOutputProductDesc = new DevExpress.XtraEditors.SearchLookUpEdit();
+            this.gridViewOutputProductPopup = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.txtOutputProductCode = new DevExpress.XtraEditors.TextEdit();
             this.labelControl8 = new DevExpress.XtraEditors.LabelControl();
             this.labelControlOutput = new DevExpress.XtraEditors.LabelControl();
@@ -105,6 +107,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             ((System.ComponentModel.ISupportInitialize)(this.panelScan)).BeginInit();
             this.panelScan.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtScanBarcode.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.radioGroupFifoType.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtFifoQty.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.slueFifoProduct.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridViewFifoProductPopup)).BeginInit();
@@ -116,6 +119,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             ((System.ComponentModel.ISupportInitialize)(this.chkDriploss.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtOutputQty.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtOutputProductDesc.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridViewOutputProductPopup)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtOutputProductCode.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridControlOutput)).BeginInit();
             this.contextMenuStripOutput.SuspendLayout();
@@ -339,6 +343,8 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.panelScan.Controls.Add(this.btnAddScan);
             this.panelScan.Controls.Add(this.txtScanBarcode);
             this.panelScan.Controls.Add(this.labelControl7);
+            this.panelScan.Controls.Add(this.radioGroupFifoType);
+            this.panelScan.Controls.Add(this.labelControlFifoType);
             this.panelScan.Controls.Add(this.btnAddFifo);
             this.panelScan.Controls.Add(this.txtFifoQty);
             this.panelScan.Controls.Add(this.labelControlFifoQty);
@@ -380,7 +386,33 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.labelControl7.Size = new System.Drawing.Size(69, 13);
             this.labelControl7.TabIndex = 0;
             this.labelControl7.Text = "Scan Barcode:";
-            // 
+            //
+            // labelControlFifoType
+            //
+            this.labelControlFifoType.Location = new System.Drawing.Point(625, 18);
+            this.labelControlFifoType.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.labelControlFifoType.Name = "labelControlFifoType";
+            this.labelControlFifoType.Size = new System.Drawing.Size(53, 13);
+            this.labelControlFifoType.TabIndex = 6;
+            this.labelControlFifoType.Text = "FIFO Type:";
+            this.labelControlFifoType.Visible = false;
+            //
+            // radioGroupFifoType
+            //
+            this.radioGroupFifoType.EditValue = "Auto";
+            this.radioGroupFifoType.Location = new System.Drawing.Point(686, 12);
+            this.radioGroupFifoType.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.radioGroupFifoType.Name = "radioGroupFifoType";
+            this.radioGroupFifoType.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 8.8F);
+            this.radioGroupFifoType.Properties.Appearance.Options.UseFont = true;
+            this.radioGroupFifoType.Properties.Items.AddRange(new DevExpress.XtraEditors.Controls.RadioGroupItem[] {
+            new DevExpress.XtraEditors.Controls.RadioGroupItem("Auto", "Auto (By Sequence)"),
+            new DevExpress.XtraEditors.Controls.RadioGroupItem("Manual", "Manual (By Shipment)")});
+            this.radioGroupFifoType.Size = new System.Drawing.Size(320, 24);
+            this.radioGroupFifoType.TabIndex = 7;
+            this.radioGroupFifoType.Visible = false;
+            this.radioGroupFifoType.EditValueChanged += new System.EventHandler(this.radioGroupFifoType_EditValueChanged);
+            //
             // btnAddFifo
             // 
             this.btnAddFifo.Location = new System.Drawing.Point(523, 14);
@@ -516,7 +548,6 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.panelOutputEntry.Controls.Add(this.chkDriploss);
             this.panelOutputEntry.Controls.Add(this.txtOutputQty);
             this.panelOutputEntry.Controls.Add(this.labelControl9);
-            this.panelOutputEntry.Controls.Add(this.btnSearchProduct);
             this.panelOutputEntry.Controls.Add(this.txtOutputProductDesc);
             this.panelOutputEntry.Controls.Add(this.txtOutputProductCode);
             this.panelOutputEntry.Controls.Add(this.labelControl8);
@@ -580,27 +611,28 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.labelControl9.TabIndex = 4;
             this.labelControl9.Text = "Qty:";
             // 
-            // btnSearchProduct
-            // 
-            this.btnSearchProduct.Location = new System.Drawing.Point(347, 13);
-            this.btnSearchProduct.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.btnSearchProduct.Name = "btnSearchProduct";
-            this.btnSearchProduct.Size = new System.Drawing.Size(43, 21);
-            this.btnSearchProduct.TabIndex = 3;
-            this.btnSearchProduct.Text = "...";
-            this.btnSearchProduct.Click += new System.EventHandler(this.btnSearchProduct_Click);
-            // 
             // txtOutputProductDesc
-            // 
+            //
             this.txtOutputProductDesc.Location = new System.Drawing.Point(150, 13);
             this.txtOutputProductDesc.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.txtOutputProductDesc.Name = "txtOutputProductDesc";
             this.txtOutputProductDesc.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9.8F);
             this.txtOutputProductDesc.Properties.Appearance.Options.UseFont = true;
-            this.txtOutputProductDesc.Properties.ReadOnly = true;
-            this.txtOutputProductDesc.Size = new System.Drawing.Size(189, 22);
+            this.txtOutputProductDesc.Properties.NullText = "";
+            this.txtOutputProductDesc.Properties.PopupView = this.gridViewOutputProductPopup;
+            this.txtOutputProductDesc.Size = new System.Drawing.Size(239, 22);
             this.txtOutputProductDesc.TabIndex = 2;
-            // 
+            this.txtOutputProductDesc.EditValueChanged += new System.EventHandler(this.txtOutputProductDesc_EditValueChanged);
+            //
+            // gridViewOutputProductPopup
+            //
+            this.gridViewOutputProductPopup.FocusRectStyle = DevExpress.XtraGrid.Views.Grid.DrawFocusRectStyle.RowFocus;
+            this.gridViewOutputProductPopup.Name = "gridViewOutputProductPopup";
+            this.gridViewOutputProductPopup.OptionsBehavior.Editable = false;
+            this.gridViewOutputProductPopup.OptionsBehavior.ReadOnly = true;
+            this.gridViewOutputProductPopup.OptionsSelection.EnableAppearanceFocusedCell = false;
+            this.gridViewOutputProductPopup.OptionsView.ShowGroupPanel = false;
+            //
             // txtOutputProductCode
             // 
             this.txtOutputProductCode.Location = new System.Drawing.Point(69, 13);
@@ -882,6 +914,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.panelScan.ResumeLayout(false);
             this.panelScan.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtScanBarcode.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.radioGroupFifoType.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtFifoQty.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.slueFifoProduct.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridViewFifoProductPopup)).EndInit();
@@ -894,6 +927,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             ((System.ComponentModel.ISupportInitialize)(this.chkDriploss.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtOutputQty.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtOutputProductDesc.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridViewOutputProductPopup)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtOutputProductCode.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridControlOutput)).EndInit();
             this.contextMenuStripOutput.ResumeLayout(false);
@@ -935,6 +969,8 @@ namespace SalesInventorySystem.HOFormsDevEx
         private DevExpress.XtraEditors.SimpleButton btnAddScan;
         private DevExpress.XtraEditors.TextEdit txtScanBarcode;
         private DevExpress.XtraEditors.LabelControl labelControl7;
+        private DevExpress.XtraEditors.RadioGroup radioGroupFifoType;
+        private DevExpress.XtraEditors.LabelControl labelControlFifoType;
         private DevExpress.XtraEditors.SimpleButton btnAddFifo;
         private DevExpress.XtraEditors.SpinEdit txtFifoQty;
         private DevExpress.XtraEditors.LabelControl labelControlFifoQty;
@@ -951,8 +987,8 @@ namespace SalesInventorySystem.HOFormsDevEx
         private DevExpress.XtraEditors.CheckEdit chkDriploss;
         private DevExpress.XtraEditors.SpinEdit txtOutputQty;
         private DevExpress.XtraEditors.LabelControl labelControl9;
-        private DevExpress.XtraEditors.SimpleButton btnSearchProduct;
-        private DevExpress.XtraEditors.TextEdit txtOutputProductDesc;
+        private DevExpress.XtraEditors.SearchLookUpEdit txtOutputProductDesc;
+        private DevExpress.XtraGrid.Views.Grid.GridView gridViewOutputProductPopup;
         private DevExpress.XtraEditors.TextEdit txtOutputProductCode;
         private DevExpress.XtraEditors.LabelControl labelControl8;
         private DevExpress.XtraEditors.LabelControl labelControlOutput;

@@ -534,7 +534,7 @@ namespace SalesInventorySystem.Orders
             addbrorder.txtdevno.Text = IDGenerator.getIDNumberSP("sp_GetDeliveryNumber", "DeliveryNumber");
             addbrorder.txtrefno.Text = id;//IDGenerator.getReferenceNumber();
             //Database.display("SELECT * FROM view_TransferOrderDetailsSTS WHERE PONumber='" + addbrorder.txtponum.Text + "'", addbrorder.gridControl1, addbrorder.gridView1);//
-            Database.display($"SELECT * FROM dbo.funcview_TransferOrderDetailsSTS('{Login.assignedBranch}','{addbrorder.txtponum.Text}') ", addbrorder.gridControl1, addbrorder.gridView1);//
+            Database.display($"SELECT * FROM dbo.funcview_TransferOrderDetailsSTSBatchMode('{Login.assignedBranch}','{addbrorder.txtponum.Text}') ", addbrorder.gridControl1, addbrorder.gridView1);//
             addbrorder.gridView1.Columns["PONumber"].Visible = false;
             addbrorder.gridView1.ExpandAllGroups();
             //addbrorder.gridView1.Columns["SeqNo"].Summary.Add(DevExpress.Data.SummaryItemType.Count, "SeqNo", "{0:n2}");

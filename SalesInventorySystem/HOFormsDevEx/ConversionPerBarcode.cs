@@ -13,13 +13,16 @@ namespace SalesInventorySystem.HOFormsDevEx
     {
         private DataTable tableSource;
         private DataTable tableOutput;
+        private DataTable tableOutputProductLookup;
         private bool _dataLoaded;
         private bool _suppressRadioChanged;
         private string _lastConversionType = "OneToMany";
         private bool _suppressSourceMethodChanged;
+        private bool _suppressFifoTypeChanged;
 
         bool IsOneToMany => Convert.ToString(radioGroupType.EditValue) == "OneToMany";
         bool IsBarcodeMethod => Convert.ToString(radioGroupSourceMethod.EditValue) == "Barcode";
+        bool IsManualFifo => Convert.ToString(radioGroupFifoType.EditValue) == "Manual";
 
         public ConversionPerBarcode()
         {
@@ -42,6 +45,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             BuildOutputGridShape();
             FetchNewReferenceNumber();
             LoadFifoProductDropdown();
+            LoadOutputProductDropdown();
             UpdateSourceMethodVisibility();
             LoadPostedGrid();
 
@@ -49,6 +53,14 @@ namespace SalesInventorySystem.HOFormsDevEx
         }
 
         void LoadFifoProductDropdown()
+        {
+            if (IsManualFifo)
+                LoadFifoProductDropdownManual();
+            else
+                LoadFifoProductDropdownAuto();
+        }
+
+        void LoadFifoProductDropdownAuto()
         {
             using (var con = Database.getConnection())
             using (var cmd = new SqlCommand("dbo.sp_GetInventoryForConversionDropdown", con))
@@ -72,6 +84,73 @@ namespace SalesInventorySystem.HOFormsDevEx
             }
         }
 
+        void LoadFifoProductDropdownManual()
+        {
+            using (var con = Database.getConnection())
+            using (var cmd = new SqlCommand("dbo.sp_GetInventoryForConversionManualDropdown", con))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add("@BranchCode", SqlDbType.VarChar, 50).Value = Login.assignedBranch;
+
+                var dt = new DataTable();
+                con.Open();
+                using (var da = new SqlDataAdapter(cmd))
+                    da.Fill(dt);
+
+                // ProductCode alone is NOT unique per row here -- one product can have
+                // several batches in stock at once, so ValueMember has to be the
+                // composite LookupKey ("Product||ShipmentNo||ReferenceCode") the SP
+                // builds, or picking a row would resolve to "the first row with this
+                // ProductCode" instead of the exact batch the user clicked.
+                slueFifoProduct.Properties.View.Columns.Clear();
+                slueFifoProduct.Properties.DataSource = null;
+                slueFifoProduct.Properties.DataSource = dt;
+                slueFifoProduct.Properties.DisplayMember = "DisplayText";
+                slueFifoProduct.Properties.ValueMember = "LookupKey";
+            }
+        }
+
+        void LoadOutputProductDropdown()
+        {
+            using (var con = Database.getConnection())
+            using (var cmd = new SqlCommand("dbo.sp_GetProductsForConversionOutputDropdown", con))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                var dt = new DataTable();
+                con.Open();
+                using (var da = new SqlDataAdapter(cmd))
+                    da.Fill(dt);
+
+                tableOutputProductLookup = dt;
+
+                txtOutputProductDesc.Properties.View.Columns.Clear();
+                txtOutputProductDesc.Properties.DataSource = null;
+                txtOutputProductDesc.Properties.DataSource = dt;
+                txtOutputProductDesc.Properties.DisplayMember = "DisplayText";
+                txtOutputProductDesc.Properties.ValueMember = "ProductCode";
+            }
+        }
+
+        string GetOutputProductDescription(string productCode)
+        {
+            if (tableOutputProductLookup == null) return "";
+            DataRow[] rows = tableOutputProductLookup.Select($"ProductCode = '{productCode.Replace("'", "''")}'");
+            return rows.Length > 0 ? rows[0]["Description"].ToString() : "";
+        }
+
+        private void txtOutputProductDesc_EditValueChanged(object sender, EventArgs e)
+        {
+            if (txtOutputProductDesc.EditValue == null || string.IsNullOrEmpty(txtOutputProductDesc.EditValue.ToString()))
+            {
+                txtOutputProductCode.Text = "";
+                return;
+            }
+
+            txtOutputProductCode.Text = txtOutputProductDesc.EditValue.ToString();
+            txtOutputQty.Focus();
+        }
+
         void UpdateSourceMethodVisibility()
         {
             bool barcode = IsBarcodeMethod;
@@ -80,6 +159,8 @@ namespace SalesInventorySystem.HOFormsDevEx
             txtScanBarcode.Visible = barcode;
             btnAddScan.Visible = barcode;
 
+            labelControlFifoType.Visible = !barcode;
+            radioGroupFifoType.Visible = !barcode;
             labelControlFifoProduct.Visible = !barcode;
             slueFifoProduct.Visible = !barcode;
             labelControlFifoQty.Visible = !barcode;
@@ -92,6 +173,15 @@ namespace SalesInventorySystem.HOFormsDevEx
             if (_suppressSourceMethodChanged) return;
             UpdateSourceMethodVisibility();
             if (IsBarcodeMethod) txtScanBarcode.Focus(); else slueFifoProduct.Focus();
+        }
+
+        private void radioGroupFifoType_EditValueChanged(object sender, EventArgs e)
+        {
+            if (_suppressFifoTypeChanged) return;
+            slueFifoProduct.EditValue = null;
+            txtFifoQty.Value = 0;
+            LoadFifoProductDropdown();
+            slueFifoProduct.Focus();
         }
 
         public async Task ResetUIAsync()
@@ -119,7 +209,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             tableOutput.Rows.Clear();
             txtCharge.Value = 0;
             txtOutputProductCode.Text = "";
-            txtOutputProductDesc.Text = "";
+            txtOutputProductDesc.EditValue = null;
             txtOutputQty.Value = 0;
             chkDriploss.Checked = false;
             slueFifoProduct.EditValue = null;
@@ -135,6 +225,12 @@ namespace SalesInventorySystem.HOFormsDevEx
                 _suppressSourceMethodChanged = true;
                 radioGroupSourceMethod.EditValue = "Barcode";
                 _suppressSourceMethodChanged = false;
+
+                _suppressFifoTypeChanged = true;
+                radioGroupFifoType.EditValue = "Auto";
+                _suppressFifoTypeChanged = false;
+                LoadFifoProductDropdown();
+
                 UpdateSourceMethodVisibility();
             }
 
@@ -321,7 +417,32 @@ namespace SalesInventorySystem.HOFormsDevEx
                 BigAlert.Show("NO PRODUCT", "Please select a product first.", MessageBoxIcon.Warning);
                 return;
             }
-            string productCode = slueFifoProduct.EditValue.ToString();
+
+            string productCode;
+            string shipmentNo = null;
+            string referenceCode = null;
+
+            if (IsManualFifo)
+            {
+                // ValueMember is the composite LookupKey ("Product||ShipmentNo||ReferenceCode")
+                // set up in LoadFifoProductDropdownManual() -- ProductCode+ShipmentNo alone
+                // isn't enough to identify the batch: Conversion-output lots all share the
+                // literal ShipmentNo "CONVERSION", so ReferenceCode (the per-run ConversionRefNo)
+                // is what actually separates one conversion run's output from another's.
+                string[] parts = slueFifoProduct.EditValue.ToString().Split(new[] { "||" }, StringSplitOptions.None);
+                if (parts.Length != 3)
+                {
+                    BigAlert.Show("SELECTION ERROR", "Could not resolve the selected product/shipment. Please reselect.", MessageBoxIcon.Warning);
+                    return;
+                }
+                productCode = parts[0];
+                shipmentNo = parts[1];
+                referenceCode = parts[2];
+            }
+            else
+            {
+                productCode = slueFifoProduct.EditValue.ToString();
+            }
 
             decimal qty = txtFifoQty.Value;
             if (qty <= 0)
@@ -340,14 +461,16 @@ namespace SalesInventorySystem.HOFormsDevEx
                 return;
             }
 
-            DataTable breakdown = GetFifoBreakdown(productCode, qty);
+            DataTable breakdown = IsManualFifo
+                ? GetFifoBreakdownByShipment(productCode, shipmentNo, referenceCode, qty)
+                : GetFifoBreakdown(productCode, qty);
             decimal totalReturned = breakdown.Rows.Count == 0 ? 0m : breakdown.AsEnumerable().Sum(r => Convert.ToDecimal(r["Qty"]));
 
             if (totalReturned < qty)
             {
                 BigAlert.Show(
                     "INSUFFICIENT STOCK",
-                    $"Only {totalReturned:N3} available for this product (requested {qty:N3}).",
+                    $"Only {totalReturned:N3} available for this product{(IsManualFifo ? " in the selected shipment" : "")} (requested {qty:N3}).",
                     MessageBoxIcon.Warning);
                 return;
             }
@@ -417,6 +540,33 @@ namespace SalesInventorySystem.HOFormsDevEx
             }
         }
 
+        DataTable GetFifoBreakdownByShipment(string productCode, string shipmentNo, string referenceCode, decimal requestedQty)
+        {
+            using (var con = Database.getConnection())
+            using (var cmd = new SqlCommand("dbo.sp_GetInventoryFIFOBreakdownByShipment", con))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add("@ProductCode", SqlDbType.VarChar, 50).Value = productCode;
+                cmd.Parameters.Add("@BranchCode", SqlDbType.VarChar, 50).Value = Login.assignedBranch;
+                cmd.Parameters.Add("@ShipmentNo", SqlDbType.VarChar, 10).Value = shipmentNo;
+                cmd.Parameters.Add("@ReferenceCode", SqlDbType.VarChar, 50).Value = string.IsNullOrEmpty(referenceCode) ? (object)DBNull.Value : referenceCode;
+                cmd.Parameters.Add("@RequestedQty", SqlDbType.Decimal).Value = requestedQty;
+                cmd.Parameters["@RequestedQty"].Precision = 18;
+                cmd.Parameters["@RequestedQty"].Scale = 3;
+
+                var pStaged = cmd.Parameters.AddWithValue("@AlreadyStaged", BuildStagedLotsTVP());
+                pStaged.SqlDbType = SqlDbType.Structured;
+                pStaged.TypeName = "dbo.tt_ConversionStagedLots";
+
+                var dt = new DataTable();
+                con.Open();
+                using (var da = new SqlDataAdapter(cmd))
+                    da.Fill(dt);
+
+                return dt;
+            }
+        }
+
         DataTable BuildStagedLotsTVP()
         {
             var dt = new DataTable();
@@ -433,31 +583,16 @@ namespace SalesInventorySystem.HOFormsDevEx
         // ------------------------------------------------------------------
         // Destination / output items
         // ------------------------------------------------------------------
-        private void btnSearchProduct_Click(object sender, EventArgs e)
-        {
-            HOForms.SearchProducts.isdone = false;
-            HOForms.SearchProducts searchProd = new HOForms.SearchProducts();
-            searchProd.FormClosed += SearchProd_FormClosed;
-            searchProd.Show();
-        }
-
-        void SearchProd_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            if (!HOForms.SearchProducts.isdone)
-                return;
-
-            txtOutputProductCode.Text = HOForms.SearchProducts.prodcode;
-            txtOutputProductDesc.Text = HOForms.SearchProducts.prodname;
-            txtOutputQty.Focus();
-        }
-
         private void btnAddOutput_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(txtOutputProductCode.Text))
+            if (txtOutputProductDesc.EditValue == null || string.IsNullOrEmpty(txtOutputProductDesc.EditValue.ToString()))
             {
                 BigAlert.Show("NO PRODUCT", "Please select a destination product first.", MessageBoxIcon.Warning);
                 return;
             }
+
+            string outputProductCode = txtOutputProductDesc.EditValue.ToString();
+            string outputProductDescription = GetOutputProductDescription(outputProductCode);
 
             decimal qty = txtOutputQty.Value;
             if (qty <= 0)
@@ -479,7 +614,7 @@ namespace SalesInventorySystem.HOFormsDevEx
                 return;
             }
 
-            if (tableOutput.Select($"ProductCode = '{txtOutputProductCode.Text.Replace("'", "''")}' AND IsDriploss = {(isDriploss ? "true" : "false")}").Length > 0)
+            if (tableOutput.Select($"ProductCode = '{outputProductCode.Replace("'", "''")}' AND IsDriploss = {(isDriploss ? "true" : "false")}").Length > 0)
             {
                 BigAlert.Show("ALREADY ADDED", "This product/driploss line is already in the Destination list.", MessageBoxIcon.Warning);
                 return;
@@ -487,8 +622,8 @@ namespace SalesInventorySystem.HOFormsDevEx
 
             DataRow row = tableOutput.NewRow();
             row["SeqNo"] = tableOutput.Rows.Count + 1;
-            row["ProductCode"] = txtOutputProductCode.Text;
-            row["Description"] = txtOutputProductDesc.Text;
+            row["ProductCode"] = outputProductCode;
+            row["Description"] = outputProductDescription;
             row["Qty"] = qty;
             row["IsDriploss"] = isDriploss;
             tableOutput.Rows.Add(row);
@@ -496,7 +631,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             RecalculateTotals();
 
             txtOutputProductCode.Text = "";
-            txtOutputProductDesc.Text = "";
+            txtOutputProductDesc.EditValue = null;
             txtOutputQty.Value = 0;
             chkDriploss.Checked = false;
             txtScanBarcode.Focus();

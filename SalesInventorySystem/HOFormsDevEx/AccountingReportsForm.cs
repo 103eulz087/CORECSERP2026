@@ -433,6 +433,32 @@ namespace SalesInventorySystem.HOFormsDevEx
 
         private void RunSingleBranchReport(ReportConfig cfg)
         {
+            // cboBranchCode.Visible is exactly "this report needs one specific branch chosen"
+            // (ApplyParamModeForSelection/chkAllBranches_CheckedChanged hide it for consolidated
+            // reports and whenever All Branches is checked) -- an unselected EditValue here used
+            // to fall through to cboBranchCode.Text producing an empty string (an obviously-empty
+            // report). Now that the params below correctly read EditValue, an unselected control
+            // would instead pass DBNull.Value -- the SAME sentinel used for "All Branches" -- which
+            // would silently generate a full consolidated report instead of an obviously-empty one.
+            // Block that case explicitly rather than let it through.
+            if (cboBranchCode.Visible && cboBranchCode.EditValue == null)
+            {
+                XtraMessageBox.Show("Select a Branch Code.", "Missing Parameter", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Bank Reconciliation (BranchAccountAsOfDate) has no "All Accounts" option --
+            // unlike BranchAccountDateRange's @AccountCode, an unselected txtAccountCode here
+            // used to send "" (obviously wrong for a report whose own description says "for a
+            // specific bank account"); now that the param below reads EditValue it would send
+            // NULL instead, which an optional-filter SP could silently read as "all accounts".
+            // Block it explicitly, same as the branch guard above.
+            if (cfg.Mode == ParamMode.BranchAccountAsOfDate && txtAccountCode.EditValue == null)
+            {
+                XtraMessageBox.Show("Select an Account Code.", "Missing Parameter", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             try
             {
                 lblStatus.Text = "Generating...";
@@ -444,13 +470,11 @@ namespace SalesInventorySystem.HOFormsDevEx
                     switch (cfg.Mode)
                     {
                         case ParamMode.BranchAccountDateRange:
-                            //cmd.Parameters.Add("@BranchCode", SqlDbType.VarChar, 5).Value =
-                            //    (cfg.AllowAllBranches && chkAllBranches.Checked) ? (object)DBNull.Value : cboBranchCode.Text.Trim();
                             cmd.Parameters.Add("@BranchCode", SqlDbType.VarChar, 5).Value =
                               (cfg.AllowAllBranches && chkAllBranches.Checked) ? (object)DBNull.Value : cboBranchCode.EditValue?.ToString();
                             cmd.Parameters.Add("@AccountCode", SqlDbType.VarChar, 20).Value =
                                 (cfg.SupportsAllAccounts && chkAllAccounts.Checked) ? (object)DBNull.Value
-                                : string.IsNullOrWhiteSpace(txtAccountCode.Text) ? (object)DBNull.Value : txtAccountCode.Text.Trim();
+                                : string.IsNullOrWhiteSpace(txtAccountCode.EditValue?.ToString()) ? (object)DBNull.Value : txtAccountCode.EditValue.ToString();
                             cmd.Parameters.Add("@DateFrom", SqlDbType.Date).Value = dteDateFrom.DateTime;
                             cmd.Parameters.Add("@DateTo", SqlDbType.Date).Value = dteDateTo.DateTime;
                             if (cfg.SpName == "sp_rpt_GLDetailTransactionReport")
@@ -458,14 +482,18 @@ namespace SalesInventorySystem.HOFormsDevEx
                             break;
 
                         case ParamMode.BranchAsOfDate:
+                            // cboBranchCode's DisplayMember is "DisplayText" ("888-BRANCHNAME"),
+                            // ValueMember is "BranchCode" -- .Text returned the display string
+                            // (truncated to 5 chars by this VarChar(5) param), which never matches
+                            // a real BranchCode and silently returned zero rows. Use EditValue.
                             cmd.Parameters.Add("@BranchCode", SqlDbType.VarChar, 5).Value =
-                                (cfg.AllowAllBranches && chkAllBranches.Checked) ? (object)DBNull.Value : cboBranchCode.Text.Trim();
+                                (cfg.AllowAllBranches && chkAllBranches.Checked) ? (object)DBNull.Value : cboBranchCode.EditValue?.ToString();
                             cmd.Parameters.Add("@AsOfDate", SqlDbType.Date).Value = dteAsOfDate.DateTime;
                             break;
 
                         case ParamMode.BranchDateRange:
                             cmd.Parameters.Add("@BranchCode", SqlDbType.VarChar, 5).Value =
-                                (cfg.AllowAllBranches && chkAllBranches.Checked) ? (object)DBNull.Value : cboBranchCode.Text.Trim();
+                                (cfg.AllowAllBranches && chkAllBranches.Checked) ? (object)DBNull.Value : cboBranchCode.EditValue?.ToString();
                             cmd.Parameters.Add("@DateFrom", SqlDbType.Date).Value = dteDateFrom.DateTime;
                             cmd.Parameters.Add("@DateTo", SqlDbType.Date).Value = dteDateTo.DateTime;
                             // sp_rpt_GeneralLedger_WithRunningBal has two extra optional params -
@@ -480,8 +508,8 @@ namespace SalesInventorySystem.HOFormsDevEx
 
                         case ParamMode.BranchAccountAsOfDate:
                             cmd.Parameters.Add("@BranchCode", SqlDbType.VarChar, 5).Value =
-                                (cfg.AllowAllBranches && chkAllBranches.Checked) ? (object)DBNull.Value : cboBranchCode.Text.Trim();
-                            cmd.Parameters.Add("@AccountCode", SqlDbType.VarChar, 20).Value = txtAccountCode.Text.Trim();
+                                (cfg.AllowAllBranches && chkAllBranches.Checked) ? (object)DBNull.Value : cboBranchCode.EditValue?.ToString();
+                            cmd.Parameters.Add("@AccountCode", SqlDbType.VarChar, 20).Value = txtAccountCode.EditValue?.ToString();
                             cmd.Parameters.Add("@AsOfDate", SqlDbType.Date).Value = dteAsOfDate.DateTime;
                             break;
 
