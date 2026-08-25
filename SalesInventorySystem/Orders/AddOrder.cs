@@ -719,15 +719,41 @@ namespace SalesInventorySystem
 
         private void btncancel_Click(object sender, EventArgs e)
         {
-            if (gridView1.RowCount == 0)
+            var selected = gridView1.GetSelectedRows();
+            if (selected == null || selected.Length == 0)
             {
                 XtraMessageBox.Show("No Such Line to cancel!");
+                return;
             }
-            else
+
+            decimal delta = 0m;
+            foreach (int handle in selected)
             {
-                gridView1.DeleteSelectedRows();
-                tot -= Convert.ToDecimal(gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "Qty").ToString()) * Convert.ToDecimal(gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "SellingPrice").ToString());
+                if (handle < 0) continue; // skip invalid handles
+                object qtyObj = gridView1.GetRowCellValue(handle, "Qty");
+                object priceObj = gridView1.GetRowCellValue(handle, "SellingPrice");
+
+                if (qtyObj == null || priceObj == null || qtyObj == DBNull.Value || priceObj == DBNull.Value)
+                    continue;
+
+                if (decimal.TryParse(qtyObj.ToString(), out decimal qty) &&
+                    decimal.TryParse(priceObj.ToString(), out decimal price))
+                {
+                    delta += qty * price;
+                }
             }
+
+            gridView1.DeleteSelectedRows();
+            tot -= delta;
+            //if (gridView1.RowCount == 0)
+            //{
+            //    XtraMessageBox.Show("No Such Line to cancel!");
+            //}
+            //else
+            //{
+            //    gridView1.DeleteSelectedRows();
+            //    tot -= Convert.ToDecimal(gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "Qty").ToString()) * Convert.ToDecimal(gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "SellingPrice").ToString());
+            //}
         }
 
         private void simpleButton9_Click(object sender, EventArgs e)

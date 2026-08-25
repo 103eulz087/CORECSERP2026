@@ -1275,6 +1275,18 @@
     <Compile Include="HOFormsDevEx\DispatchPerBarcode.Designer.cs">
       <DependentUpon>DispatchPerBarcode.cs</DependentUpon>
     </Compile>
+    <Compile Include="HOFormsDevEx\StockOutPerBarcode.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HOFormsDevEx\StockOutPerBarcode.Designer.cs">
+      <DependentUpon>StockOutPerBarcode.cs</DependentUpon>
+    </Compile>
+    <Compile Include="HOFormsDevEx\StockOutPerBarcodeDetails.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HOFormsDevEx\StockOutPerBarcodeDetails.Designer.cs">
+      <DependentUpon>StockOutPerBarcodeDetails.cs</DependentUpon>
+    </Compile>
     <Compile Include="HOFormsDevEx\CostAdjustmentDevEx.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -3928,6 +3940,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="HOFormsDevEx\DispatchPerBarcode.resx">
       <DependentUpon>DispatchPerBarcode.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HOFormsDevEx\StockOutPerBarcode.resx">
+      <DependentUpon>StockOutPerBarcode.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HOFormsDevEx\StockOutPerBarcodeDetails.resx">
+      <DependentUpon>StockOutPerBarcodeDetails.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="HOFormsDevEx\CostAdjustmentDevEx.resx">
       <DependentUpon>CostAdjustmentDevEx.cs</DependentUpon>

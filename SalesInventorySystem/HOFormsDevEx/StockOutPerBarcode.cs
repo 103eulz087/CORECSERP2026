@@ -9,29 +9,30 @@ using SalesInventorySystem.Classes;
 
 namespace SalesInventorySystem.HOFormsDevEx
 {
-    public partial class DispatchPerBarcode : DevExpress.XtraEditors.XtraForm, IResettableForm
+    // Standard inventory-out module design (see CLAUDE.md): Barcode scan +
+    // FIFO Auto selection + FIFO Manual (by shipment/batch) selection, staged
+    // in a grid and posted atomically. Structurally mirrors
+    // ConversionPerBarcode.cs's source-only deduction shape (no
+    // destination/output side, no GL posting, no approval workflow) --
+    // unlike DispatchPerBarcode.cs, a stock-out is a pure write-off, not a
+    // branch-to-branch transfer.
+    public partial class StockOutPerBarcode : DevExpress.XtraEditors.XtraForm, IResettableForm
     {
-        // Origin is whichever branch the dispatching user is logged into -- NOT
-        // hardcoded to HO/888. Any branch can be the supplying side of a transfer;
-        // spu_PostSTSDispatch independently verifies this branch is the one the
-        // approved Transfer Order request actually expects to supply it.
-        static string OriginBranch => Login.assignedBranch;
-
         private DataTable tableSource;
-        private DataTable tablePOLookup;
         private bool _dataLoaded;
         private bool _suppressSourceMethodChanged;
         private bool _suppressFifoTypeChanged;
 
         bool IsBarcodeMethod => Convert.ToString(radioGroupSourceMethod.EditValue) == "Barcode";
         bool IsManualFifo => Convert.ToString(radioGroupFifoType.EditValue) == "Manual";
+        string SelectedBranch => Convert.ToString(slkBranch.EditValue);
 
-        public DispatchPerBarcode()
+        public StockOutPerBarcode()
         {
             InitializeComponent();
         }
 
-        private void DispatchPerBarcode_Load(object sender, EventArgs e)
+        private void StockOutPerBarcode_Load(object sender, EventArgs e)
         {
             if (!_dataLoaded)
                 LoadData();
@@ -42,68 +43,50 @@ namespace SalesInventorySystem.HOFormsDevEx
             if (_dataLoaded)
                 return;
 
-            txtBranch.Text = OriginBranch;
+            LoadBranchDropdown();
+            LoadCategoryDropdown();
             BuildSourceGridShape();
-            LoadPONumberDropdown();
-            LoadFifoProductDropdown();
+            FetchNewReferenceNumber();
             UpdateSourceMethodVisibility();
-            ClearHeaderForNewPO();
             LoadPostedGrid();
+            EnableEntryControls(false);
 
             _dataLoaded = true;
         }
 
         // ------------------------------------------------------------------
-        // PO Number (header)
+        // Branch / Category (header)
         // ------------------------------------------------------------------
-        void LoadPONumberDropdown()
-        {
-            DataTable dt = FetchApprovedTransferOrders();
-            BindPONumberDropdown(dt);
-        }
-
-        // DB-only, safe to run on a background thread (ResetUIAsync does exactly that) --
-        // must NOT touch slkPONumber or any other UI control here.
-        DataTable FetchApprovedTransferOrders()
+        void LoadBranchDropdown()
         {
             using (var con = Database.getConnection())
-            using (var cmd = new SqlCommand("dbo.sp_GetApprovedTransferOrdersForDispatch", con))
+            using (var cmd = new SqlCommand(
+                "SELECT BranchCode, CONCAT(BranchCode, ' - ', BranchName) AS DisplayText FROM dbo.Branches ORDER BY BranchCode", con))
             {
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.Add("@OriginBranch", SqlDbType.VarChar, 10).Value = OriginBranch;
-
                 var dt = new DataTable();
                 con.Open();
                 using (var da = new SqlDataAdapter(cmd))
                     da.Fill(dt);
 
-                return dt;
+                slkBranch.Properties.View.Columns.Clear();
+                slkBranch.Properties.DataSource = dt;
+                slkBranch.Properties.DisplayMember = "DisplayText";
+                slkBranch.Properties.ValueMember = "BranchCode";
             }
         }
 
-        // UI-only -- must always run on the UI thread. Splitting this out from the DB
-        // fetch above is what ResetUIAsync() needs to avoid touching slkPONumber from the
-        // background thread its Task.Run() runs on ("Cross-thread operation not valid:
-        // Control 'slkPONumber' accessed from a thread other than the thread it was
-        // created on" -- hit by clicking New Entry once the form's handle already exists).
-        void BindPONumberDropdown(DataTable dt)
+        void LoadCategoryDropdown()
         {
-            tablePOLookup = dt;
-
-            slkPONumber.Properties.View.Columns.Clear();
-            slkPONumber.Properties.DataSource = null;
-            slkPONumber.Properties.DataSource = dt;
-            slkPONumber.Properties.DisplayMember = "DisplayText";
-            slkPONumber.Properties.ValueMember = "PONumber";
+            Database.displayComboBoxItems("SELECT Description FROM dbo.StockOutCategory ORDER BY Description", "Description", cboCategory);
         }
 
-        private void slkPONumber_EditValueChanged(object sender, EventArgs e)
+        private void slkBranch_EditValueChanged(object sender, EventArgs e)
         {
-            if (tableSource.Rows.Count > 0)
+            if (tableSource != null && tableSource.Rows.Count > 0)
             {
                 if (XtraMessageBox.Show(
-                        "Switching the PO Number will clear the items already staged for dispatch. Continue?",
-                        "Change PO Number", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                        "Switching the Branch will clear the items already staged for stock-out. Continue?",
+                        "Change Branch", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                 {
                     return;
                 }
@@ -111,43 +94,20 @@ namespace SalesInventorySystem.HOFormsDevEx
                 RecalculateTotals();
             }
 
-            if (slkPONumber.EditValue == null || string.IsNullOrEmpty(slkPONumber.EditValue.ToString()))
-            {
-                ClearHeaderForNewPO();
-                return;
-            }
+            // A product/shipment picked under the previous branch is meaningless once the
+            // branch changes (ProductCode alone doesn't guarantee it exists/means the same
+            // thing at the new branch, and a Manual-mode LookupKey is tied to the old
+            // branch's shipment/reference data entirely) -- clear it before reloading the
+            // dropdown for the new branch, same as radioGroupFifoType_EditValueChanged does
+            // on a FIFO Type switch.
+            slueFifoProduct.EditValue = null;
+            txtFifoQty.Value = 0;
 
-            string ponumber = slkPONumber.EditValue.ToString();
-            DataRow[] rows = tablePOLookup == null ? new DataRow[0] : tablePOLookup.Select($"PONumber = '{ponumber.Replace("'", "''")}'");
-            if (rows.Length == 0)
-            {
-                ClearHeaderForNewPO();
-                return;
-            }
+            bool hasBranch = !string.IsNullOrEmpty(SelectedBranch);
+            EnableEntryControls(hasBranch);
 
-            txtDestinationBranch.Text = rows[0]["DestinationBranch"].ToString();
-            txtEffectivityDate.Text = Convert.ToDateTime(rows[0]["EffectivityDate"]).ToString("yyyy-MM-dd");
-
-            // Reuse the DeliveryNo already assigned to this PO if a prior partial
-            // dispatch created one (same lookup AddBranchOrderSTS.cs already uses);
-            // otherwise generate a fresh one. ReferenceNo is not tracked as an
-            // independent identity anywhere downstream for this flow, so the
-            // DeliveryNo itself is reused as the ReferenceNo tag.
-            string existingDevNo = Database.getSingleData("DeliverySummary", "PONumber", ponumber, "DeliveryNo");
-            txtRefNo.Text = string.IsNullOrEmpty(existingDevNo)
-                ? IDGenerator.getIDNumberSP("sp_GetDeliveryNumber", "DeliveryNumber")
-                : existingDevNo;
-
-            EnableEntryControls(true);
-            if (IsBarcodeMethod) txtScanBarcode.Focus(); else slueFifoProduct.Focus();
-        }
-
-        void ClearHeaderForNewPO()
-        {
-            txtDestinationBranch.Text = "";
-            txtEffectivityDate.Text = "";
-            txtRefNo.Text = "";
-            EnableEntryControls(false);
+            if (hasBranch)
+                LoadFifoProductDropdown();
         }
 
         void EnableEntryControls(bool enabled)
@@ -161,13 +121,32 @@ namespace SalesInventorySystem.HOFormsDevEx
             btnSubmit.Enabled = enabled;
         }
 
+        bool RequireBranch()
+        {
+            if (string.IsNullOrEmpty(SelectedBranch))
+            {
+                BigAlert.Show("NO BRANCH", "Please select a Branch first.", MessageBoxIcon.Warning);
+                return false;
+            }
+            return true;
+        }
+
+        void FetchNewReferenceNumber()
+        {
+            txtRefNo.Text = IDGenerator.getIDNumberSP("sp_GetStockOutBarcodeNumber", "RefNo");
+        }
+
         public async Task ResetUIAsync()
         {
             try
             {
                 UseWaitCursor = true;
-                DataTable dt = await Task.Run(() => FetchApprovedTransferOrders());
-                BindPONumberDropdown(dt);
+                // Only the DB call runs in the background -- assigning txtRefNo.Text must
+                // happen back on the UI thread after the await resumes (cross-thread UI
+                // access bug found and fixed today in DispatchPerBarcode.cs/ConversionPerBarcode.cs;
+                // this form is built to avoid it from the start).
+                string refNo = await Task.Run(() => IDGenerator.getIDNumberSP("sp_GetStockOutBarcodeNumber", "RefNo"));
+                txtRefNo.Text = refNo;
                 ClearEntryOnly();
             }
             finally
@@ -178,16 +157,19 @@ namespace SalesInventorySystem.HOFormsDevEx
 
         void ClearEntryOnly()
         {
-            // IResettableForm is documented as being for reusable/reopenable forms, so a
-            // host could in principle call ResetUIAsync() before LoadData() has ever run.
             if (tableSource == null)
                 return;
 
+            // Deliberately does NOT clear slkBranch, unlike Dispatch's ClearEntryOnly clearing
+            // slkPONumber -- Branch has no dependent stale fields the way Dispatch's PO Number
+            // does (Destination Branch/Effectivity Date), so staying on the same branch across
+            // consecutive stock-outs is the more useful default, not an oversight.
             tableSource.Rows.Clear();
             slueFifoProduct.EditValue = null;
             txtFifoQty.Value = 0;
             txtScanBarcode.Text = "";
-            slkPONumber.EditValue = null;
+            cboCategory.EditValue = null;
+            txtRemarks.Text = "";
 
             _suppressSourceMethodChanged = true;
             radioGroupSourceMethod.EditValue = "Barcode";
@@ -196,10 +178,10 @@ namespace SalesInventorySystem.HOFormsDevEx
             _suppressFifoTypeChanged = true;
             radioGroupFifoType.EditValue = "Auto";
             _suppressFifoTypeChanged = false;
-            LoadFifoProductDropdown();
+            if (!string.IsNullOrEmpty(SelectedBranch))
+                LoadFifoProductDropdown();
 
             UpdateSourceMethodVisibility();
-            ClearHeaderForNewPO();
             RecalculateTotals();
         }
 
@@ -217,10 +199,10 @@ namespace SalesInventorySystem.HOFormsDevEx
         void LoadFifoProductDropdownAuto()
         {
             using (var con = Database.getConnection())
-            using (var cmd = new SqlCommand("dbo.sp_GetInventoryForDispatchDropdown", con))
+            using (var cmd = new SqlCommand("dbo.sp_GetInventoryForStockOutDropdown", con))
             {
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.Add("@BranchCode", SqlDbType.VarChar, 50).Value = OriginBranch;
+                cmd.Parameters.Add("@BranchCode", SqlDbType.VarChar, 50).Value = SelectedBranch;
 
                 var dt = new DataTable();
                 con.Open();
@@ -228,7 +210,6 @@ namespace SalesInventorySystem.HOFormsDevEx
                     da.Fill(dt);
 
                 slueFifoProduct.Properties.View.Columns.Clear();
-                slueFifoProduct.Properties.DataSource = null;
                 slueFifoProduct.Properties.DataSource = dt;
                 slueFifoProduct.Properties.DisplayMember = "DisplayText";
                 slueFifoProduct.Properties.ValueMember = "ProductCode";
@@ -238,10 +219,10 @@ namespace SalesInventorySystem.HOFormsDevEx
         void LoadFifoProductDropdownManual()
         {
             using (var con = Database.getConnection())
-            using (var cmd = new SqlCommand("dbo.sp_GetInventoryForDispatchManualDropdown", con))
+            using (var cmd = new SqlCommand("dbo.sp_GetInventoryForStockOutManualDropdown", con))
             {
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.Add("@BranchCode", SqlDbType.VarChar, 50).Value = OriginBranch;
+                cmd.Parameters.Add("@BranchCode", SqlDbType.VarChar, 50).Value = SelectedBranch;
 
                 var dt = new DataTable();
                 con.Open();
@@ -252,7 +233,6 @@ namespace SalesInventorySystem.HOFormsDevEx
                 // the SP builds -- ProductCode alone isn't unique per row (one product can
                 // have several batches in stock at once).
                 slueFifoProduct.Properties.View.Columns.Clear();
-                slueFifoProduct.Properties.DataSource = null;
                 slueFifoProduct.Properties.DataSource = dt;
                 slueFifoProduct.Properties.DisplayMember = "DisplayText";
                 slueFifoProduct.Properties.ValueMember = "LookupKey";
@@ -343,7 +323,7 @@ namespace SalesInventorySystem.HOFormsDevEx
 
         void ScanBarcode()
         {
-            if (!RequirePONumber()) return;
+            if (!RequireBranch()) return;
 
             string barcode = txtScanBarcode.Text.Trim();
             if (string.IsNullOrEmpty(barcode))
@@ -354,7 +334,7 @@ namespace SalesInventorySystem.HOFormsDevEx
 
             if (tableSource.Select($"Barcode = '{barcode.Replace("'", "''")}'").Length > 0)
             {
-                BigAlert.Show("ALREADY SCANNED", "This barcode is already in the Dispatch list.", MessageBoxIcon.Warning);
+                BigAlert.Show("ALREADY SCANNED", "This barcode is already in the Stock-Out list.", MessageBoxIcon.Warning);
                 txtScanBarcode.Text = "";
                 txtScanBarcode.Focus();
                 return;
@@ -363,7 +343,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             DataRow found = LookupInventoryByBarcode(barcode);
             if (found == null)
             {
-                BigAlert.Show("NOT FOUND", "No available inventory found for this barcode at your branch.", MessageBoxIcon.Warning);
+                BigAlert.Show("NOT FOUND", "No available inventory found for this barcode at the selected branch.", MessageBoxIcon.Warning);
                 txtScanBarcode.Text = "";
                 txtScanBarcode.Focus();
                 return;
@@ -391,11 +371,11 @@ namespace SalesInventorySystem.HOFormsDevEx
         DataRow LookupInventoryByBarcode(string barcode)
         {
             using (var con = Database.getConnection())
-            using (var cmd = new SqlCommand("dbo.sp_GetInventoryByBarcodeForDispatch", con))
+            using (var cmd = new SqlCommand("dbo.sp_GetInventoryByBarcodeForStockOut", con))
             {
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.Add("@Barcode", SqlDbType.VarChar, 100).Value = barcode;
-                cmd.Parameters.Add("@BranchCode", SqlDbType.VarChar, 50).Value = OriginBranch;
+                cmd.Parameters.Add("@BranchCode", SqlDbType.VarChar, 50).Value = SelectedBranch;
 
                 var dt = new DataTable();
                 con.Open();
@@ -423,7 +403,7 @@ namespace SalesInventorySystem.HOFormsDevEx
 
         void AddFifoProduct()
         {
-            if (!RequirePONumber()) return;
+            if (!RequireBranch()) return;
 
             if (slueFifoProduct.EditValue == null || string.IsNullOrEmpty(slueFifoProduct.EditValue.ToString()))
             {
@@ -481,7 +461,7 @@ namespace SalesInventorySystem.HOFormsDevEx
                 {
                     BigAlert.Show(
                         "LOT ALREADY STAGED",
-                        "One of the FIFO lots for this product is already in the Dispatch list from an earlier pick. Remove it first, or enter a smaller quantity.",
+                        "One of the FIFO lots for this product is already in the Stock-Out list from an earlier pick. Remove it first, or enter a smaller quantity.",
                         MessageBoxIcon.Warning);
                     return;
                 }
@@ -513,18 +493,18 @@ namespace SalesInventorySystem.HOFormsDevEx
         DataTable GetFifoBreakdown(string productCode, decimal requestedQty)
         {
             using (var con = Database.getConnection())
-            using (var cmd = new SqlCommand("dbo.sp_GetDispatchFIFOBreakdown", con))
+            using (var cmd = new SqlCommand("dbo.sp_GetStockOutFIFOBreakdown", con))
             {
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.Add("@ProductCode", SqlDbType.VarChar, 50).Value = productCode;
-                cmd.Parameters.Add("@BranchCode", SqlDbType.VarChar, 50).Value = OriginBranch;
+                cmd.Parameters.Add("@BranchCode", SqlDbType.VarChar, 50).Value = SelectedBranch;
                 cmd.Parameters.Add("@RequestedQty", SqlDbType.Decimal).Value = requestedQty;
                 cmd.Parameters["@RequestedQty"].Precision = 18;
                 cmd.Parameters["@RequestedQty"].Scale = 3;
 
                 var pStaged = cmd.Parameters.AddWithValue("@AlreadyStaged", BuildStagedLotsTVP());
                 pStaged.SqlDbType = SqlDbType.Structured;
-                pStaged.TypeName = "dbo.tt_STSDispatchStagedLots";
+                pStaged.TypeName = "dbo.tt_StockOutStagedLots";
 
                 var dt = new DataTable();
                 con.Open();
@@ -538,11 +518,11 @@ namespace SalesInventorySystem.HOFormsDevEx
         DataTable GetFifoBreakdownByShipment(string productCode, string shipmentNo, string referenceCode, decimal requestedQty)
         {
             using (var con = Database.getConnection())
-            using (var cmd = new SqlCommand("dbo.sp_GetDispatchFIFOBreakdownByShipment", con))
+            using (var cmd = new SqlCommand("dbo.sp_GetStockOutFIFOBreakdownByShipment", con))
             {
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.Add("@ProductCode", SqlDbType.VarChar, 50).Value = productCode;
-                cmd.Parameters.Add("@BranchCode", SqlDbType.VarChar, 50).Value = OriginBranch;
+                cmd.Parameters.Add("@BranchCode", SqlDbType.VarChar, 50).Value = SelectedBranch;
                 cmd.Parameters.Add("@ShipmentNo", SqlDbType.VarChar, 10).Value = shipmentNo;
                 cmd.Parameters.Add("@ReferenceCode", SqlDbType.VarChar, 50).Value = string.IsNullOrEmpty(referenceCode) ? (object)DBNull.Value : referenceCode;
                 cmd.Parameters.Add("@RequestedQty", SqlDbType.Decimal).Value = requestedQty;
@@ -551,7 +531,7 @@ namespace SalesInventorySystem.HOFormsDevEx
 
                 var pStaged = cmd.Parameters.AddWithValue("@AlreadyStaged", BuildStagedLotsTVP());
                 pStaged.SqlDbType = SqlDbType.Structured;
-                pStaged.TypeName = "dbo.tt_STSDispatchStagedLots";
+                pStaged.TypeName = "dbo.tt_StockOutStagedLots";
 
                 var dt = new DataTable();
                 con.Open();
@@ -575,16 +555,6 @@ namespace SalesInventorySystem.HOFormsDevEx
             return dt;
         }
 
-        bool RequirePONumber()
-        {
-            if (slkPONumber.EditValue == null || string.IsNullOrEmpty(slkPONumber.EditValue.ToString()))
-            {
-                BigAlert.Show("NO PO NUMBER", "Please select an approved PO Number first.", MessageBoxIcon.Warning);
-                return false;
-            }
-            return true;
-        }
-
         // ------------------------------------------------------------------
         // Submit / Post
         // ------------------------------------------------------------------
@@ -598,26 +568,26 @@ namespace SalesInventorySystem.HOFormsDevEx
             DataTable lines = BuildLinesTVP();
 
             using (var con = Database.getConnection())
-            using (var cmd = new SqlCommand("dbo.spu_PostSTSDispatch", con))
+            using (var cmd = new SqlCommand("dbo.spu_PostStockOutBarcode", con))
             {
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.CommandTimeout = 180;
-                cmd.Parameters.Add("@DeliveryNo", SqlDbType.VarChar, 20).Value = txtRefNo.Text;
-                cmd.Parameters.Add("@ReferenceNo", SqlDbType.VarChar, 10).Value = txtRefNo.Text;
-                cmd.Parameters.Add("@PONumber", SqlDbType.VarChar, 10).Value = slkPONumber.EditValue.ToString();
-                cmd.Parameters.Add("@OriginBranch", SqlDbType.VarChar, 10).Value = OriginBranch;
-                cmd.Parameters.Add("@DestinationBranch", SqlDbType.VarChar, 10).Value = txtDestinationBranch.Text;
-                cmd.Parameters.Add("@DispatchedBy", SqlDbType.VarChar, 50).Value = Login.Fullname;
+                cmd.Parameters.Add("@RefNo", SqlDbType.VarChar, 20).Value = txtRefNo.Text;
+                cmd.Parameters.Add("@BranchCode", SqlDbType.VarChar, 50).Value = SelectedBranch;
+                cmd.Parameters.Add("@Category", SqlDbType.VarChar, 100).Value = cboCategory.Text;
+                cmd.Parameters.Add("@Remarks", SqlDbType.VarChar, 259).Value =
+                    string.IsNullOrEmpty(txtRemarks.Text) ? (object)DBNull.Value : txtRemarks.Text;
+                cmd.Parameters.Add("@PreparedBy", SqlDbType.VarChar, 50).Value = Login.Fullname;
 
                 var pLines = cmd.Parameters.AddWithValue("@Lines", lines);
                 pLines.SqlDbType = SqlDbType.Structured;
-                pLines.TypeName = "dbo.tt_STSDispatchLines";
+                pLines.TypeName = "dbo.tt_StockOutBarcodeLines";
 
                 try
                 {
                     con.Open();
                     cmd.ExecuteNonQuery();
-                    BigAlert.Show("SUCCESS", "Dispatch posted successfully.", MessageBoxIcon.Information);
+                    BigAlert.Show("SUCCESS", "Stock-out posted successfully.", MessageBoxIcon.Information);
                     _ = ResetUIAsync();
                     LoadPostedGrid();
                 }
@@ -630,18 +600,24 @@ namespace SalesInventorySystem.HOFormsDevEx
 
         bool ValidateForSubmit()
         {
-            if (!RequirePONumber())
+            if (!RequireBranch())
                 return false;
+
+            if (string.IsNullOrEmpty(cboCategory.Text))
+            {
+                BigAlert.Show("NO CATEGORY", "Please select a Stock-Out Category.", MessageBoxIcon.Warning);
+                return false;
+            }
 
             if (tableSource.Rows.Count == 0)
             {
-                BigAlert.Show("NO ITEMS", "Please add at least one item to dispatch (scan a barcode or select a product).", MessageBoxIcon.Warning);
+                BigAlert.Show("NO ITEMS", "Please add at least one item to stock out (scan a barcode or select a product).", MessageBoxIcon.Warning);
                 return false;
             }
 
             if (string.IsNullOrEmpty(txtRefNo.Text))
             {
-                BigAlert.Show("NO DELIVERY NO", "Delivery No could not be resolved for this PO. Please reselect the PO Number.", MessageBoxIcon.Warning);
+                BigAlert.Show("NO REFERENCE NUMBER", "Reference number could not be resolved. Please reopen this screen.", MessageBoxIcon.Warning);
                 return false;
             }
 
@@ -675,7 +651,7 @@ namespace SalesInventorySystem.HOFormsDevEx
         {
             if (tableSource.Rows.Count == 0) return;
 
-            if (XtraMessageBox.Show("Clear all items staged for this dispatch?",
+            if (XtraMessageBox.Show("Clear all items staged for this Stock-Out?",
                     "Clear", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                 return;
 
@@ -687,7 +663,7 @@ namespace SalesInventorySystem.HOFormsDevEx
         {
             if (tableSource.Rows.Count > 0)
             {
-                if (XtraMessageBox.Show("Start a brand new Dispatch? Unsaved items will be lost.",
+                if (XtraMessageBox.Show("Start a brand new Stock-Out? Unsaved items will be lost.",
                         "New Entry", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                     return;
             }
@@ -697,15 +673,12 @@ namespace SalesInventorySystem.HOFormsDevEx
         // ------------------------------------------------------------------
         // Posted tab
         // ------------------------------------------------------------------
-        // No "Copy to New Entry" action here (unlike ConversionPerBarcode) --
-        // a dispatch is always tied to one specific APPROVED PO Number, so
-        // there's nothing reusable to copy forward into a new entry.
         void LoadPostedGrid()
         {
             Database.display(
-                "SELECT DeliveryNo, PONumber, ReferenceNumber, DestinationBranch, TotalItem, TotalQtyDelivered, " +
-                "Status, EffectivityDate, DateAdded, PreparedBy " +
-                "FROM dbo.vw_STSDispatchSummary WITH (NOLOCK) " +
+                "SELECT RefNo, BranchCode, Category, Remarks, TotalQty, TotalCost, Status, DateAdded, PreparedBy, " +
+                "ReversedBy, DateReversed " +
+                "FROM dbo.vw_StockOutBarcodeSummary WITH (NOLOCK) " +
                 "ORDER BY DateAdded DESC",
                 gridControlPosted, gridViewPosted);
             gridViewPosted.BestFitColumns();
@@ -716,101 +689,50 @@ namespace SalesInventorySystem.HOFormsDevEx
             LoadPostedGrid();
         }
 
-        string GetFocusedPostedDeliveryNo()
+        string GetFocusedPostedRefNo()
         {
             if (gridViewPosted.FocusedRowHandle < 0) return null;
-            var val = gridViewPosted.GetRowCellValue(gridViewPosted.FocusedRowHandle, "DeliveryNo");
+            var val = gridViewPosted.GetRowCellValue(gridViewPosted.FocusedRowHandle, "RefNo");
             return val == null ? null : val.ToString();
         }
 
         private void mnuViewDetails_Click(object sender, EventArgs e)
         {
-            string deliveryNo = GetFocusedPostedDeliveryNo();
-            if (string.IsNullOrEmpty(deliveryNo)) return;
+            string refNo = GetFocusedPostedRefNo();
+            if (string.IsNullOrEmpty(refNo)) return;
 
-            string ponumber = gridViewPosted.GetRowCellValue(gridViewPosted.FocusedRowHandle, "PONumber").ToString();
-
-            Database.display(
-                "SELECT dd.SeqNo, dd.ProductNo, dd.ProductName, dd.BarcodeNo, dd.QtyDelivered, dd.ActualQty, dd.Cost, " +
-                "dd.SellingPrice, dd.[Status], dd.DeliveryNo, dd.PONumber, dd.ReferenceNumber, dd.OriginBranch, " +
-                "ds.BranchCode AS DestinationBranch " +
-                "FROM dbo.DeliveryDetails dd WITH (NOLOCK) " +
-                "LEFT JOIN dbo.DeliverySummary ds WITH (NOLOCK) ON ds.DeliveryNo = dd.DeliveryNo AND ds.PONumber = dd.PONumber " +
-                "WHERE dd.DeliveryNo = '" + deliveryNo.Replace("'", "''") + "' AND dd.PONumber = '" + ponumber.Replace("'", "''") + "' " +
-                "AND dd.isReturned = 0 AND dd.isCancelled = 0 ORDER BY dd.SeqNo",
-                gridControlPosted, gridViewPosted);
+            StockOutPerBarcodeDetails details = new StockOutPerBarcodeDetails(refNo);
+            details.ShowDialog();
         }
 
-        // Reverses one delivered line at a time via the same, already-fixed
-        // sp_ReverseSTSInventoryTransfer ReceivedSTSBatchMode.cs uses for
-        // undelivered-item returns -- restores stock at the ORIGINAL origin
-        // branch (not necessarily the current user's own branch -- origin is
-        // per-dispatch now, not always HO) and, once nothing is left for this
-        // dispatch, corrects DeliverySummary.Status to RETURNED. Operates on
-        // whichever row is focused in the Posted grid; after "View Details"
-        // drills into DeliveryDetails lines, focus a line there and Reverse
-        // to undo just that line.
-        //
-        // Parameter mapping mirrors ReceivedSTSBatchMode.ReturnUnreceivedItems:
-        // @parmbranchcode is the branch CURRENTLY holding the stock (being
-        // reversed FROM) = this dispatch's DestinationBranch; @parmorigin is
-        // the branch stock gets RESTORED back TO = this dispatch's own
-        // OriginBranch (read back from the DeliveryDetails row, since the
-        // person clicking Reverse may not be at the same branch that
-        // originally dispatched it).
         private void mnuReversePosted_Click(object sender, EventArgs e)
         {
-            if (gridViewPosted.FocusedRowHandle < 0) return;
+            string refNo = GetFocusedPostedRefNo();
+            if (string.IsNullOrEmpty(refNo)) return;
 
-            object seqNoObj = gridViewPosted.GetRowCellValue(gridViewPosted.FocusedRowHandle, "SeqNo");
-            if (seqNoObj == null)
+            string status = gridViewPosted.GetRowCellValue(gridViewPosted.FocusedRowHandle, "Status").ToString();
+            if (status != "POSTED")
             {
-                BigAlert.Show("SELECT A LINE", "Open View Details first, then focus the specific delivered line you want to reverse.", MessageBoxIcon.Warning);
+                BigAlert.Show("NOT POSTED", "This Stock-Out is not in POSTED status.", MessageBoxIcon.Warning);
                 return;
             }
 
-            string deliveryNo = gridViewPosted.GetRowCellValue(gridViewPosted.FocusedRowHandle, "DeliveryNo") is DBNull
-                ? null : Convert.ToString(gridViewPosted.GetRowCellValue(gridViewPosted.FocusedRowHandle, "DeliveryNo"));
-
-            if (string.IsNullOrEmpty(deliveryNo))
-            {
-                BigAlert.Show("MISSING DELIVERY NO", "Could not resolve the Delivery No for the focused line.", MessageBoxIcon.Warning);
-                return;
-            }
-
-            string lineOriginBranch = gridViewPosted.GetRowCellValue(gridViewPosted.FocusedRowHandle, "OriginBranch")?.ToString();
-            string lineDestBranch = gridViewPosted.GetRowCellValue(gridViewPosted.FocusedRowHandle, "DestinationBranch")?.ToString();
-
-            if (string.IsNullOrEmpty(lineOriginBranch) || string.IsNullOrEmpty(lineDestBranch))
-            {
-                BigAlert.Show("MISSING BRANCH INFO", "Could not resolve the origin/destination branch for this line -- it may predate this column. Please verify manually before reversing.", MessageBoxIcon.Warning);
-                return;
-            }
-
-            if (XtraMessageBox.Show($"Reverse this dispatched line? This restores stock at Branch {lineOriginBranch} and, if nothing else remains, marks the delivery RETURNED.",
-                    "Reverse Dispatch Line", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+            if (XtraMessageBox.Show($"Reverse Stock-Out {refNo}? This restores the deducted stock.",
+                    "Reverse Stock-Out", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                 return;
 
             using (var con = Database.getConnection())
-            using (var cmd = new SqlCommand("dbo.sp_ReverseSTSInventoryTransfer", con))
+            using (var cmd = new SqlCommand("dbo.spu_ReverseStockOutBarcode", con))
             {
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.CommandTimeout = 120;
-                cmd.Parameters.AddWithValue("@parmdevno", deliveryNo);
-                cmd.Parameters.AddWithValue("@parmrefno", gridViewPosted.GetRowCellValue(gridViewPosted.FocusedRowHandle, "ReferenceNumber")?.ToString() ?? "");
-                cmd.Parameters.AddWithValue("@parmpono", gridViewPosted.GetRowCellValue(gridViewPosted.FocusedRowHandle, "PONumber")?.ToString() ?? "");
-                cmd.Parameters.AddWithValue("@parmprodno", gridViewPosted.GetRowCellValue(gridViewPosted.FocusedRowHandle, "ProductNo")?.ToString() ?? "");
-                cmd.Parameters.AddWithValue("@parmqty", Convert.ToDecimal(gridViewPosted.GetRowCellValue(gridViewPosted.FocusedRowHandle, "ActualQty")));
-                cmd.Parameters.AddWithValue("@parmbranchcode", lineDestBranch);
-                cmd.Parameters.AddWithValue("@parmorigin", lineOriginBranch);
-                cmd.Parameters.AddWithValue("@preparedby", Login.Fullname);
-                cmd.Parameters.AddWithValue("@parmdevseqno", Convert.ToInt32(seqNoObj));
+                cmd.Parameters.Add("@RefNo", SqlDbType.VarChar, 20).Value = refNo;
+                cmd.Parameters.Add("@ReversedBy", SqlDbType.VarChar, 50).Value = Login.Fullname;
 
                 try
                 {
                     con.Open();
                     cmd.ExecuteNonQuery();
-                    BigAlert.Show("REVERSED", "Dispatch line reversed successfully.", MessageBoxIcon.Information);
+                    BigAlert.Show("REVERSED", "Stock-out reversed successfully.", MessageBoxIcon.Information);
                     LoadPostedGrid();
                 }
                 catch (SqlException ex)

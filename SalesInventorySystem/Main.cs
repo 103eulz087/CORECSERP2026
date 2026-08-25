@@ -3145,6 +3145,20 @@ namespace SalesInventorySystem
             dispatchperbarcode.Show();
         }
 
+        private void btnStockOutPerBarcode_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            foreach (Form form in Application.OpenForms)
+            {
+                if (form.GetType() == typeof(HOFormsDevEx.StockOutPerBarcode))
+                {
+                    form.Activate();
+                    return;
+                }
+            }
+            HOFormsDevEx.StockOutPerBarcode stockoutperbarcode = new HOFormsDevEx.StockOutPerBarcode();
+            stockoutperbarcode.Show();
+        }
+
         private void barButtonItem24_ItemClick_1(object sender, ItemClickEventArgs e)
         {
 

@@ -29,8 +29,17 @@ If always single-shape (Simple Posting): true in-place edit is fine.
 Once a payment or other activity has touched a posting, fall back to the reversal SP instead of editing.
 5. Gross vs net cash bugs. Always self-accumulate net amounts; don't trust a caller-supplied parmcheckamount parameter at face value.
 6. Reset Entry not call after submitting or hit save button in UserControl Forms.
+7. `Inventory.ShipmentNo` alone is NOT a unique per-batch key — do not group/filter a "select this specific shipment" dropdown or FIFO breakdown by `ShipmentNo` alone. Conversion-output lots all carry the literal `ShipmentNo='CONVERSION'` and quantity-adjustment lots carry `ShipmentNo=''`, so multiple unrelated batches collapse into one row/scope. Group/filter by `Product+ShipmentNo+ReferenceCode` instead (composite `ValueMember` on the lookup control: `Product||ShipmentNo||ReferenceCode`). Hit and fixed in Conversion's and Dispatch's Manual-FIFO dropdowns; built correctly from the start in StockOutPerBarcode.
+8. `Task.Run(() => Method())` where `Method()` touches a form control (grid, TextEdit, etc.) throws `Cross-thread operation not valid` — but only once the form's window handle already exists, so it passes silently during initial `Load` and only surfaces later (e.g. on a "Reset Entry"/"New Entry" button click after the form is already shown). Split any such method into a DB-only fetch (safe inside `Task.Run`) and a UI-only bind/assign (run after the `await`, back on the UI thread). Hit and fixed in `DispatchPerBarcode.cs` and `ConversionPerBarcode.cs`'s `ResetUIAsync()`.
 
 ## Conventions
+
+**Standard inventory-out module design.** For any new module whose job is to *reduce* inventory (stock-out/write-off, dispatch, conversion source-consumption, etc.), use the Barcode-scan + FIFO-Auto + FIFO-Manual pattern, not a fresh design. Reference implementations: `HOFormsDevEx/ConversionPerBarcode.cs` (source-only deduction, no destination/GL side — closest template for a pure write-off), `HOFormsDevEx/DispatchPerBarcode.cs` (same pattern plus a destination branch + GL posting, for actual transfers), `HOFormsDevEx/StockOutPerBarcode.cs` (the plain write-off case — Branch + Category + Remarks header, no destination, no GL). Shape:
+- **Source Method** radio: `Scan Barcode` vs `Select Product (FIFO)`.
+- **FIFO Type** radio (only shown for the FIFO source method): `Auto (By Sequence)` walks a product's lots oldest-`SequenceNumber`-first; `Manual (By Shipment)` lets the user target one specific batch via a `SearchLookUpEdit` bound to a composite `ValueMember` of `Product||ShipmentNo||ReferenceCode` (`ShipmentNo` alone is NOT a unique batch key — see the known bug pattern below) and must not spill into other batches if that one is short.
+- Staged lines accumulate in an in-memory grid; Submit posts everything atomically via one TVP-taking `spu_Post...` SP (race-safe `UPDLOCK`+rowcount-guard deduction, `IsStock=0` cleanup for exhausted lots) — never one row at a time.
+- New Entry / Posted tabs; Posted supports View Details (drill into the line detail table/view) and Reverse (restore `Available`/`IsStock`, flip header `Status`).
+- Give each new module its own dedicated tables/TVPs/SPs — do not reuse another module's or a legacy module's tables even if the shape looks similar (avoids conflicting lifecycles/isDone-flag semantics).
 
 Module UI pattern (for modules with no formal mapping/approval step): two tabs — New Entry and Posted (View Details, Copy, Edit actions).
 Naming: sp_ for general procs, spu_ for update/posting procs.

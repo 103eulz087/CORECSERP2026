@@ -434,6 +434,14 @@ namespace SalesInventorySystem.Orders
             devrepfrm.txtpreparedby.Text = preparedby;
             analyze("spr_STSSummary", ponum, devrepfrm.gridControl1, devrepfrm.gridView1);
             devrepfrm.Show();
+            devrepfrm.gridView1.BestFitColumns();
+            devrepfrm.gridView1.Columns["SeqNo"].Visible = false;
+            devrepfrm.gridView1.Columns["ProductCode"].Visible = false;
+            if (GlobalCache.CompanyName != "VROSS")
+            {
+                devrepfrm.gridView1.Columns["BarcodeNo"].Visible = false;
+                devrepfrm.gridView1.Columns["TotalCost"].Visible = false;
+            }
 
             GridView view = devrepfrm.gridControl1.FocusedView as GridView;
             view.SortInfo.ClearAndAddRange(new GridColumnSortInfo[] {

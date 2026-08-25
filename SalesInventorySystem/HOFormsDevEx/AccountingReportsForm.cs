@@ -865,7 +865,11 @@ namespace SalesInventorySystem.HOFormsDevEx
                 return;
             }
 
-            using (var sfd = new SaveFileDialog { Filter = "Excel Files|*.xlsx", FileName = $"{lstReportType.SelectedItem}_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx" })
+            using (var sfd = new SaveFileDialog
+            {
+                Filter = "PDF File (*.pdf)|*.pdf|Excel Workbook (*.xlsx)|*.xlsx",
+                FileName = $"{lstReportType.SelectedItem}_{DateTime.Now:yyyyMMdd_HHmmss}"
+            })
             {
                 if (sfd.ShowDialog() != DialogResult.OK) return;
 
@@ -881,7 +885,37 @@ namespace SalesInventorySystem.HOFormsDevEx
                     // detail grid alone.
                     using (var ps = new DevExpress.XtraPrinting.PrintingSystem())
                     using (var compositeLink = new CompositeLink(ps))
+                    // Lead with the same title/subtitle already shown on screen (report name
+                    // + branch/account/as-of-date context, set per-report in BindResults()/
+                    // ApplyParamModeForSelection()) -- without this, an exported Bank
+                    // Reconciliation (or any other report) file has no self-contained record
+                    // of which account/branch/date it's actually for, which defeats "detailed
+                    // and readable" as a standalone document. PrintableComponentLink is a
+                    // grid/data-control print bridge (proven below for gridControlReport/
+                    // gridControlSummary) -- it is not documented to print a plain
+                    // LabelControl's text, so the title/subtitle go through a throwaway
+                    // one-row GridControl instead of wrapping the labels directly.
+                    using (var headerGrid = new DevExpress.XtraGrid.GridControl())
+                    using (var headerView = new GridView())
                     {
+                        headerGrid.ViewCollection.Add(headerView);
+                        headerGrid.MainView = headerView;
+                        headerView.GridControl = headerGrid;
+                        var headerData = new DataTable();
+                        headerData.Columns.Add("Report", typeof(string));
+                        headerData.Columns.Add("Details", typeof(string));
+                        headerData.Rows.Add(lblReportTitle.Text, lblReportSubtitle.Text);
+                        headerGrid.DataSource = headerData;
+                        headerView.OptionsView.ShowColumnHeaders = false;
+                        headerView.OptionsView.ShowGroupPanel = false;
+                        headerView.PopulateColumns();
+                        headerView.Columns["Report"].AppearanceCell.Font = new Font("Tahoma", 12F, FontStyle.Bold);
+                        headerView.Columns["Report"].AppearanceCell.Options.UseFont = true;
+                        headerView.BestFitColumns();
+
+                        var headerLink = new DevExpress.XtraPrinting.PrintableComponentLink(ps) { Component = headerGrid };
+                        compositeLink.Links.Add(headerLink);
+
                         var detailLink = new DevExpress.XtraPrinting.PrintableComponentLink(ps) { Component = gridControlReport };
                         compositeLink.Links.Add(detailLink);
 
@@ -892,11 +926,20 @@ namespace SalesInventorySystem.HOFormsDevEx
                         }
 
                         compositeLink.CreateDocument();
-                        // XlsxExportOptions has no "ExportType"/WYSIWYG property in this
-                        // DevExpress version - its defaults (ExportMode=SingleFile,
-                        // RawDataMode=false) already give the same single-file, formatted
-                        // export that was intended, so no explicit options are needed.
-                        compositeLink.ExportToXlsx(sfd.FileName, new DevExpress.XtraPrinting.XlsxExportOptions());
+
+                        bool wantsPdf = sfd.FileName.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase);
+                        if (wantsPdf)
+                        {
+                            compositeLink.ExportToPdf(sfd.FileName);
+                        }
+                        else
+                        {
+                            // XlsxExportOptions has no "ExportType"/WYSIWYG property in this
+                            // DevExpress version - its defaults (ExportMode=SingleFile,
+                            // RawDataMode=false) already give the same single-file, formatted
+                            // export that was intended, so no explicit options are needed.
+                            compositeLink.ExportToXlsx(sfd.FileName, new DevExpress.XtraPrinting.XlsxExportOptions());
+                        }
                     }
                     XtraMessageBox.Show("Exported successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }

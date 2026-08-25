@@ -189,7 +189,15 @@ namespace SalesInventorySystem.HOFormsDevEx
             try
             {
                 UseWaitCursor = true;
-                await Task.Run(() => FetchNewReferenceNumber());
+                // Only the DB call runs in the background -- assigning txtRefNo.Text must
+                // happen back on the UI thread after the await resumes. Task.Run(() =>
+                // FetchNewReferenceNumber()) used to run that assignment on the background
+                // thread pool thread itself, throwing "Cross-thread operation not valid:
+                // Control 'txtRefNo' accessed from a thread other than the thread it was
+                // created on" the moment New Entry/Reset Entry was clicked after the form
+                // was already shown (same bug found and fixed in DispatchPerBarcode.cs).
+                string refNo = await Task.Run(() => IDGenerator.getIDNumberSP("sp_GetConversionBarcodeNumber", "ConversionRefNo"));
+                txtRefNo.Text = refNo;
                 ClearEntryOnly(resetConversionType: true);
             }
             finally

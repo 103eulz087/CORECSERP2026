@@ -1874,3 +1874,6 @@ D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.cs
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInv.A74E2F72.Up2Date
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.exe
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.pdb
+D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.HOFormsDevEx.DispatchPerBarcode.resources
+D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.HOFormsDevEx.StockOutPerBarcode.resources
+D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.HOFormsDevEx.StockOutPerBarcodeDetails.resources

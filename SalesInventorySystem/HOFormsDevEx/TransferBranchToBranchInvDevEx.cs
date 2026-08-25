@@ -20,6 +20,11 @@ namespace SalesInventorySystem.HOFormsDevEx
         object objprodcode = null;
         object objbrcode = null;
         string globalprodcode = "", globalbranchcode = "";
+        // add() clears txtsearchlookupproduct.Text after a successful save, which re-fires
+        // EditValueChanged with the popup's FocusedRowHandle still at its invalid sentinel --
+        // without this flag, the "no product resolved" warning below would fire spuriously
+        // after every successful add, not just on an actual bad selection.
+        bool _suppressProductChanged;
         public delegate void AddDataDelegate(String myString);
         public AddDataDelegate myDelegate;
         public string wieght2 = "";
@@ -66,7 +71,25 @@ namespace SalesInventorySystem.HOFormsDevEx
 
         private void txtsearchlookupproduct_EditValueChanged(object sender, EventArgs e)
         {
+            if (_suppressProductChanged) return;
+
             objprodcode = SearchLookUpClass.getSingleValue(txtsearchlookupproduct, "Product");
+            // getSingleValue() reads Properties.View.FocusedRowHandle, which is only set once
+            // the popup grid has actually focused a row (mouse click / arrow-navigate). If the
+            // EditValue instead got resolved by typing matching text without ever opening/
+            // navigating the popup, FocusedRowHandle stays at its unset sentinel and
+            // GetRowCellValue returns null -- objprodcode.ToString() then threw
+            // "Object reference not set to an instance of an object", intermittently,
+            // depending purely on how the user picked the product. Guard instead of crash.
+            if (objprodcode == null)
+            {
+                globalprodcode = "";
+                BigAlert.Show("PRODUCT NOT SELECTED",
+                    "Could not resolve the selected product. Please reselect it from the dropdown list (use the mouse or arrow keys to pick a row).",
+                    MessageBoxIcon.Warning);
+                txtsearchlookupproduct.Focus();
+                return;
+            }
             globalprodcode = objprodcode.ToString();
             txtweight.Focus();
         }
@@ -85,7 +108,15 @@ namespace SalesInventorySystem.HOFormsDevEx
                     //}
                     //txtweight.Invoke(this.myDelegate, new Object[] { wieght2 });
 
-                    quantity = Decimal.Parse(txtweight.Text);
+                    // TryParse instead of Parse -- Parse throws FormatException (uncaught here,
+                    // since the only catch below is for SqlException) on empty/invalid input,
+                    // e.g. hitting Enter before typing a quantity or after backspacing it out.
+                    if (!Decimal.TryParse(txtweight.Text, out quantity))
+                    {
+                        BigAlert.Show("INVALID QUANTITY", "Please enter a valid quantity.", MessageBoxIcon.Warning);
+                        txtweight.Focus();
+                        return;
+                    }
                     strquantity = String.Format("{0:00.000}", quantity);
 
                     string barcode = Database.getSingleResultSet($"SELECT dbo.func_GenerateBarcodeReturnTransfer" +
@@ -187,6 +218,14 @@ namespace SalesInventorySystem.HOFormsDevEx
 
         void add()
         {
+            // Defensive second guard -- see txtsearchlookupproduct_EditValueChanged's comment
+            // for why objprodcode can be null here (a stale/never-resolved product selection).
+            if (objprodcode == null)
+            {
+                BigAlert.Show("NO PRODUCT", "Please select a product first.", MessageBoxIcon.Warning);
+                return;
+            }
+
             if (Convert.ToDouble(txtweight.Text) > Database.getTotalSummation2("Inventory", "Product = '" + objprodcode.ToString() + "' AND Branch='" + Login.assignedBranch + "' AND isWarehouse=1 and Available > 0 ", "Available")) //Database.getTotalSummation("Inventory", "Product", txtsku.Text.Substring(1, 6), "Quantity"))
             {
                 string mark = Database.getTotalSummation2("Inventory", "Product = '" + objprodcode.ToString() + "' AND Branch='" + Login.assignedBranch + "' AND isWarehouse=1  and Available > 0 ", "Available").ToString();
@@ -198,7 +237,15 @@ namespace SalesInventorySystem.HOFormsDevEx
                 displayForDelivery();
                 txtsearchlookupproduct.Focus();
                 txtweight.Text = "";
+                // Suppressed: clearing Text re-fires EditValueChanged with FocusedRowHandle
+                // back at its invalid sentinel (nothing focused in an empty popup), which
+                // would otherwise trip the "no product resolved" warning right after a
+                // successful add. objprodcode/globalprodcode are reset here directly instead.
+                _suppressProductChanged = true;
                 txtsearchlookupproduct.Text = "";
+                _suppressProductChanged = false;
+                objprodcode = null;
+                globalprodcode = "";
                 txtsku.Text = "";
             }
         }
@@ -259,7 +306,8 @@ namespace SalesInventorySystem.HOFormsDevEx
         private void txtbranch_EditValueChanged(object sender, EventArgs e)
         {
             objbrcode = SearchLookUpClass.getSingleValue(txtbranch, "BranchCode");
-            globalbranchcode = objbrcode.ToString();
+            // Same class of bug as txtsearchlookupproduct_EditValueChanged -- see its comment.
+            globalbranchcode = objbrcode?.ToString() ?? "";
         }
 
         void cancelLine()

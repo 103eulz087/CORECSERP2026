@@ -130,8 +130,14 @@ namespace SalesInventorySystem.Orders
             devrepfrm.txtpreparedby.Text = requestedby;
             analyze("spr_STSSummary", ponum, devrepfrm.gridControl1, devrepfrm.gridView1);
             devrepfrm.Show();
+            devrepfrm.gridView1.BestFitColumns();
             devrepfrm.gridView1.Columns["SeqNo"].Visible = false;
             devrepfrm.gridView1.Columns["ProductCode"].Visible = false;
+            if(GlobalCache.CompanyName != "VROSS")
+            {
+                devrepfrm.gridView1.Columns["BarcodeNo"].Visible = false;
+                devrepfrm.gridView1.Columns["TotalCost"].Visible = false;
+            }
 
             GridView view = devrepfrm.gridControl1.FocusedView as GridView;
             view.SortInfo.ClearAndAddRange(new GridColumnSortInfo[] {
@@ -458,7 +464,14 @@ namespace SalesInventorySystem.Orders
  
             //Database.displaySearchlookupEdit($"SELECT * FROM dbo.funcview_populateProducts('{Login.assignedBranch}') " +
             //  $"WHERE CategoryCode NOT IN(10,11,12) AND ProductCode in (Select distinct ProductCode FROM PurchaseOrderDetails WHERE PONumber in (SELECT PONumber FROM PurchaseOrderSummary WHERE EffectivityDate='{addbrorder.txteffectivedate.Text}') )", addbrorder.txtsearchlookupproduct, "Description", "Description");
-            Database.displaySearchlookupEdit($"SELECT * FROM dbo.funcview_populateProductsInPO('{Login.assignedBranch}','{addbrorder.txteffectivedate.Text}')", addbrorder.txtsearchlookupproduct, "Description", "Description");
+            if(GlobalCache.CompanyName.Equals("JFC"))
+            {
+                Database.displaySearchlookupEdit($"SELECT * FROM dbo.funcview_populateProductsInPO_JFC('{Login.assignedBranch}','{addbrorder.txteffectivedate.Text}')", addbrorder.txtsearchlookupproduct, "Description", "Description");
+            }
+            else
+            {
+                Database.displaySearchlookupEdit($"SELECT * FROM dbo.funcview_populateProductsInPO('{Login.assignedBranch}','{addbrorder.txteffectivedate.Text}')", addbrorder.txtsearchlookupproduct, "Description", "Description");
+            }
 
             if (Orders.AddBranchOrderSTS.isdone == true)
             {
@@ -526,12 +539,24 @@ namespace SalesInventorySystem.Orders
             string id = IDGenerator.getIDNumberSP("sp_GetReferenceNumber", "ReferenceNumber");
             branchno = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "InitiatingBranch").ToString();
             ponumber = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "PONumber").ToString();
-            devno = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "PONumber").ToString();
+            //devno = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "PONumber").ToString();
+
+            bool fExst = Database.checkifExist("SELECT 1 FROM DeliverySummary WHERE PONumber='" + ponumber + "'");
+            //bool fExst = Database.checkifExist("SELECT 1 FROM DeliveryDetails WHERE PONumber='" + ViewBranchOrderSTS.ponumber + "'");
+            string getID = Database.getSingleData("DeliverySummary", "PONumber", ponumber, "DeliveryNo");
+            if (fExst)
+            {
+                devno = getID;
+            }
+            else
+            {
+                devno = IDGenerator.getIDNumberSP("sp_GetDeliveryNumber", "DeliveryNumber");
+            }
 
             AddBranchOrderSTSBatchMode addbrorder = new AddBranchOrderSTSBatchMode();
             addbrorder.txtbrcode.Text = branchno;
             addbrorder.txtponum.Text = ponumber;
-            addbrorder.txtdevno.Text = IDGenerator.getIDNumberSP("sp_GetDeliveryNumber", "DeliveryNumber");
+            addbrorder.txtdevno.Text = devno;// IDGenerator.getIDNumberSP("sp_GetDeliveryNumber", "DeliveryNumber");
             addbrorder.txtrefno.Text = id;//IDGenerator.getReferenceNumber();
             //Database.display("SELECT * FROM view_TransferOrderDetailsSTS WHERE PONumber='" + addbrorder.txtponum.Text + "'", addbrorder.gridControl1, addbrorder.gridView1);//
             Database.display($"SELECT * FROM dbo.funcview_TransferOrderDetailsSTSBatchMode('{Login.assignedBranch}','{addbrorder.txtponum.Text}') ", addbrorder.gridControl1, addbrorder.gridView1);//

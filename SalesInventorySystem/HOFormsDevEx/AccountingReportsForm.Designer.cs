@@ -516,7 +516,7 @@
             this.btnExport.Name = "btnExport";
             this.btnExport.Size = new System.Drawing.Size(289, 39);
             this.btnExport.TabIndex = 20;
-            this.btnExport.Text = "⬇  Export to Excel";
+            this.btnExport.Text = "⬇  Export (PDF/Excel)";
             this.btnExport.Click += new System.EventHandler(this.btnExport_Click);
             // 
             // gridControlReport
