@@ -345,24 +345,28 @@ namespace SalesInventorySystem.Orders
             }
             con.Close();
         }
+        // Routes through sp_ReverseSTSInventoryTransfer (not sp_CancelDelivery/
+        // sp_CancelDeliveryFIFOJFC directly) so this "Return" action posts the
+        // same GL reversal ticket and DeliverySummary.Status correction as the
+        // "For Delivery" tab's return path (StocksOrder.cs) -- previously these
+        // were two divergent code paths, and this one skipped both.
         void returnOrder()
         {
             SqlConnection con = Database.getConnection();
             con.Open();
-            string query = "";
-            if(GlobalCache.CompanyName=="JFC")
-            {
-                query = "sp_CancelDeliveryFIFOJFC";
-            }
-            else
-            {
-                query = "sp_CancelDelivery";
-            }
+            string query = "sp_ReverseSTSInventoryTransfer";
             try
             {
                 string seqno = Convert.ToInt32(gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "SeqNo")).ToString();
-                string prodno = Convert.ToInt32(gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "ProductNo")).ToString();
-                string qtydeliv = Convert.ToInt32(gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "QtyDelivered")).ToString();
+                // Not round-tripped through Int32 -- ProductNo can be a
+                // zero-padded/alpha product code, and this proc actually uses
+                // it to restore origin Inventory (unlike the raw cancel SPs
+                // this used to call directly, where the loss was cosmetic).
+                string prodno = gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "ProductNo").ToString();
+                // Decimal, not Int32 -- this module has a weight-scale
+                // integration (fractional quantities are real here), and
+                // truncating would under-restore origin inventory on return.
+                decimal qtydeliv = Convert.ToDecimal(gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "QtyDelivered"));
                 SqlCommand com = new SqlCommand(query, con);
                 com.Parameters.AddWithValue("@parmdevno", txtdevno.Text);
                 com.Parameters.AddWithValue("@parmrefno", txtrefno.Text);
@@ -384,21 +388,30 @@ namespace SalesInventorySystem.Orders
             }
             con.Close();
         }
+        // Same as returnOrder() above but for barcode-scan mode -- routes
+        // through sp_ReverseSTSInventoryTransfer's @parmbarcode branch instead
+        // of calling sp_CancelDeliveryByBarcode directly, for the same reason.
         void returnOrderByBarcode()
         {
             SqlConnection con = Database.getConnection();
             con.Open();
-            string query = "sp_CancelDeliveryByBarcode";
+            string query = "sp_ReverseSTSInventoryTransfer";
             try
             {
+                string seqno = Convert.ToInt32(gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "SeqNo")).ToString();
+                string prodno = gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "ProductNo").ToString();
+                decimal qtydeliv = Convert.ToDecimal(gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "QtyDelivered"));
                 SqlCommand com = new SqlCommand(query, con);
-                com.Parameters.AddWithValue("@parmbranchcode", txtbrcode.Text);
-                com.Parameters.AddWithValue("@parmorigin", Login.assignedBranch);
                 com.Parameters.AddWithValue("@parmdevno", txtdevno.Text);
                 com.Parameters.AddWithValue("@parmrefno", txtrefno.Text);
                 com.Parameters.AddWithValue("@parmpono", txtponum.Text);
-                com.Parameters.AddWithValue("@parmbarcode", gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "BarcodeNo").ToString());
+                com.Parameters.AddWithValue("@parmprodno", prodno);
+                com.Parameters.AddWithValue("@parmqty", qtydeliv);
+                com.Parameters.AddWithValue("@parmbranchcode", txtbrcode.Text);
+                com.Parameters.AddWithValue("@parmorigin", Login.assignedBranch);
                 com.Parameters.AddWithValue("@preparedby", Login.Fullname);
+                com.Parameters.AddWithValue("@parmdevseqno", seqno);
+                com.Parameters.AddWithValue("@parmbarcode", gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "BarcodeNo").ToString());
                 com.CommandType = CommandType.StoredProcedure;
                 com.CommandText = query;
                 com.ExecuteNonQuery();

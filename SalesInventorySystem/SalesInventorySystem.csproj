@@ -1269,6 +1269,12 @@
     <Compile Include="HOFormsDevEx\ConversionPerBarcodeDetails.Designer.cs">
       <DependentUpon>ConversionPerBarcodeDetails.cs</DependentUpon>
     </Compile>
+    <Compile Include="HOFormsDevEx\DispatchPerBarcode.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HOFormsDevEx\DispatchPerBarcode.Designer.cs">
+      <DependentUpon>DispatchPerBarcode.cs</DependentUpon>
+    </Compile>
     <Compile Include="HOFormsDevEx\CostAdjustmentDevEx.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -3919,6 +3925,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="HOFormsDevEx\ConversionPerBarcodeDetails.resx">
       <DependentUpon>ConversionPerBarcodeDetails.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HOFormsDevEx\DispatchPerBarcode.resx">
+      <DependentUpon>DispatchPerBarcode.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="HOFormsDevEx\CostAdjustmentDevEx.resx">
       <DependentUpon>CostAdjustmentDevEx.cs</DependentUpon>

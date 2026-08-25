@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using DevExpress.XtraEditors;
 using DevExpress.XtraGrid.Views.Grid;
+using System.Data.SqlClient;
 
 namespace SalesInventorySystem.Orders
 {
@@ -62,23 +63,33 @@ namespace SalesInventorySystem.Orders
                 dateapproved = "";
                 approvedby = "";
                 totalqty = Database.getTotalSummation2("TransferOrderDetails", "PONumber='" + textEdit1.Text + "' ", "Qty");
-                Database.ExecuteQuery("INSERT INTO TransferOrderSummary VALUES('" + textEdit1.Text + "'" +
-                    ",'" + Login.assignedBranch + "'" +
-                    ",'" + destinationBranch + "'" +
-                    ",'" + totalqty + "'" +
-                    ",'" + approvalstatus + "'" +
-                    ",'" + DateTime.Now.ToString() + "'" +
-                    ",'" + DateTime.Now.ToString() + "'" +
-                    ",'" + txteffectivedate.Text + "'" +
-                    ",'" + Login.Fullname + "'" +
-                    ",'" + approvedby + "'" +
-                    ",'" + dateapproved + "'" +
-                    ",' '" +
-                    ",' '" +
-                    ",' '" +
-                    ",0" +
-                    ",'" + ordertype.Text + "'" +
-                    ",'" + txtgroup.Text + "')", "Request Successfully Updated!");
+
+                using (SqlConnection con = Database.getConnection())
+                using (SqlCommand cmd = new SqlCommand(
+                    "INSERT INTO TransferOrderSummary VALUES(@p1,@p2,@p3,@p4,@p5,@p6,@p7,@p8,@p9,@p10,@p11,@p12,@p13,@p14,@p15,@p16,@p17)", con))
+                {
+                    cmd.Parameters.AddWithValue("@p1", textEdit1.Text);
+                    cmd.Parameters.AddWithValue("@p2", Login.assignedBranch);
+                    cmd.Parameters.AddWithValue("@p3", destinationBranch);
+                    cmd.Parameters.AddWithValue("@p4", totalqty);
+                    cmd.Parameters.AddWithValue("@p5", approvalstatus);
+                    cmd.Parameters.AddWithValue("@p6", DateTime.Now.ToString());
+                    cmd.Parameters.AddWithValue("@p7", DateTime.Now.ToString());
+                    cmd.Parameters.AddWithValue("@p8", txteffectivedate.Text);
+                    cmd.Parameters.AddWithValue("@p9", Login.Fullname);
+                    cmd.Parameters.AddWithValue("@p10", approvedby);
+                    cmd.Parameters.AddWithValue("@p11", dateapproved);
+                    cmd.Parameters.AddWithValue("@p12", " ");
+                    cmd.Parameters.AddWithValue("@p13", " ");
+                    cmd.Parameters.AddWithValue("@p14", " ");
+                    cmd.Parameters.AddWithValue("@p15", 0);
+                    cmd.Parameters.AddWithValue("@p16", ordertype.Text);
+                    cmd.Parameters.AddWithValue("@p17", txtgroup.Text);
+
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                }
+
                 this.Dispose();
             }
             catch (Exception sqx)

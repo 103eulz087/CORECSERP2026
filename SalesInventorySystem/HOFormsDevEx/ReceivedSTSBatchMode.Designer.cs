@@ -87,9 +87,13 @@
             this.gridViewRcvd.DetailHeight = 431;
             this.gridViewRcvd.GridControl = this.gridControlRcvd;
             this.gridViewRcvd.Name = "gridViewRcvd";
+            this.gridViewRcvd.OptionsCustomization.AllowGroup = false;
+            this.gridViewRcvd.OptionsSelection.MultiSelect = true;
+            this.gridViewRcvd.OptionsSelection.MultiSelectMode = DevExpress.XtraGrid.Views.Grid.GridMultiSelectMode.CheckBoxRowSelect;
             this.gridViewRcvd.OptionsView.ColumnAutoWidth = false;
             this.gridViewRcvd.OptionsView.RowAutoHeight = true;
             this.gridViewRcvd.OptionsView.ShowFooter = true;
+            this.gridViewRcvd.OptionsView.ShowGroupPanel = false;
             this.gridViewRcvd.RowCellStyle += new DevExpress.XtraGrid.Views.Grid.RowCellStyleEventHandler(this.gridViewRcvd_RowCellStyle);
             this.gridViewRcvd.ShowingEditor += new System.ComponentModel.CancelEventHandler(this.gridViewRcvd_ShowingEditor);
             // 
@@ -197,7 +201,7 @@
             // 
             this.cancelLineToolStripMenuItem.Name = "cancelLineToolStripMenuItem";
             this.cancelLineToolStripMenuItem.Size = new System.Drawing.Size(153, 24);
-            this.cancelLineToolStripMenuItem.Text = "Cancel Line";
+            this.cancelLineToolStripMenuItem.Text = "Mark as Not Received";
             this.cancelLineToolStripMenuItem.Click += new System.EventHandler(this.cancelLineToolStripMenuItem_Click);
             // 
             // ReceivedSTSBatchMode

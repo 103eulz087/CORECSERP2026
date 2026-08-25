@@ -115,6 +115,7 @@
             this.btnTransferPerPallet = new DevExpress.XtraBars.BarButtonItem();
             this.btnTransferPerBarcode = new DevExpress.XtraBars.BarButtonItem();
             this.btnConversionPerBarcode = new DevExpress.XtraBars.BarButtonItem();
+            this.btnDispatchPerBarcode = new DevExpress.XtraBars.BarButtonItem();
             this.btnBackupDB = new DevExpress.XtraBars.BarButtonItem();
             this.barButtonItem66 = new DevExpress.XtraBars.BarButtonItem();
             this.btnCheckVoucher = new DevExpress.XtraBars.BarButtonItem();
@@ -531,6 +532,7 @@
             this.btnTransferPerPallet,
             this.btnTransferPerBarcode,
             this.btnConversionPerBarcode,
+            this.btnDispatchPerBarcode,
             this.barButtonItem24,
             this.btnInventoryCostRep,
             this.btnMerchants,
@@ -1324,6 +1326,13 @@
             this.btnConversionPerBarcode.Id = 237;
             this.btnConversionPerBarcode.Name = "btnConversionPerBarcode";
             this.btnConversionPerBarcode.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnConversionPerBarcode_ItemClick);
+            //
+            // btnDispatchPerBarcode
+            //
+            this.btnDispatchPerBarcode.Caption = "Dispatch Per Barcode";
+            this.btnDispatchPerBarcode.Id = 238;
+            this.btnDispatchPerBarcode.Name = "btnDispatchPerBarcode";
+            this.btnDispatchPerBarcode.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnDispatchPerBarcode_ItemClick);
             //
             // btnBackupDB
             // 
@@ -2882,6 +2891,7 @@
             this.ribbonPageGroupInventoryProcess.ItemLinks.Add(this.btnStockTransfer);
             this.ribbonPageGroupInventoryProcess.ItemLinks.Add(this.btnConversion);
             this.ribbonPageGroupInventoryProcess.ItemLinks.Add(this.btnConversionPerBarcode);
+            this.ribbonPageGroupInventoryProcess.ItemLinks.Add(this.btnDispatchPerBarcode);
             this.ribbonPageGroupInventoryProcess.ItemLinks.Add(this.btnReturnInventory);
             this.ribbonPageGroupInventoryProcess.ItemLinks.Add(this.btnInventoryIN);
             this.ribbonPageGroupInventoryProcess.ItemLinks.Add(this.btnInventorySettlement);
@@ -3521,6 +3531,7 @@
         private DevExpress.XtraBars.BarButtonItem btnTransferPerBarcode;
 
         private DevExpress.XtraBars.BarButtonItem btnConversionPerBarcode;
+        private DevExpress.XtraBars.BarButtonItem btnDispatchPerBarcode;
         private DevExpress.XtraBars.PopupMenu popupMenuInvTransfer;
 
         private DevExpress.XtraBars.BarButtonItem barButtonItem24;

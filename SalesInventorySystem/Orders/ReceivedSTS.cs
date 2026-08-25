@@ -172,10 +172,10 @@ namespace SalesInventorySystem.Orders
             HOFormsDevEx.ReceivedSTSBatchMode askdh = new HOFormsDevEx.ReceivedSTSBatchMode();
 
             askdh.txtshipmentno.Text = pono;
-            string query = $"SELECT * FROM dbo.[funcview_ReceivedSTS]('{pono}') ";
+            string query = $"SELECT * FROM dbo.[funcview_DeliveryDetailsForReceiving]('{pono}') ";
             HelperFunction.ShowWaitAndDisplayNonAsync(query, askdh.gridControlRcvd, askdh.gridViewRcvd, "Please wait", "Populating data into the database...");
 
-            askdh.gridView1.Focus();
+            askdh.gridViewRcvd.Focus();
             askdh.ShowDialog(this);
             if (HOFormsDevEx.ReceivedSTSBatchMode.isdone == true)
             {
