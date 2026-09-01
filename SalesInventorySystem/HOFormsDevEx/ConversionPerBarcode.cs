@@ -258,11 +258,17 @@ namespace SalesInventorySystem.HOFormsDevEx
             tableSource.Columns.Add("Qty", typeof(decimal));
             tableSource.Columns.Add("Cost", typeof(decimal));
             tableSource.Columns.Add("Amount", typeof(decimal));
+            // Only ever populated by AddFifoProduct()'s Manual (By Shipment) branch, with the
+            // consumed lot's own ReferenceCode -- carried through to spu_PostConversionBarcode
+            // so the new output lot can be stamped with it instead of the ConversionRefNo.
+            // Barcode-scan and Auto (By Sequence) rows leave this blank on purpose.
+            tableSource.Columns.Add("ReferenceCode", typeof(string));
             gridControlSource.DataSource = tableSource;
 
             gridViewSource.PopulateColumns();
             gridViewSource.Columns["SeqNo"].Visible = false;
             gridViewSource.Columns["InventorySeqNo"].Visible = false;
+            gridViewSource.Columns["ReferenceCode"].Visible = false;
             gridViewSource.Columns["ProductCode"].Caption = "Product Code";
             gridViewSource.Columns["Cost"].Caption = "Unit Cost";
             gridViewSource.BestFitColumns();
@@ -514,6 +520,8 @@ namespace SalesInventorySystem.HOFormsDevEx
                 row["Qty"] = lineQty;
                 row["Cost"] = lineCost;
                 row["Amount"] = lineQty * lineCost;
+                if (IsManualFifo)
+                    row["ReferenceCode"] = string.IsNullOrEmpty(referenceCode) ? (object)DBNull.Value : referenceCode;
                 tableSource.Rows.Add(row);
             }
 
@@ -795,6 +803,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             dt.Columns.Add("Description", typeof(string));
             dt.Columns.Add("Qty", typeof(decimal));
             dt.Columns.Add("Cost", typeof(decimal));
+            dt.Columns.Add("ReferenceCode", typeof(string));
 
             foreach (DataRow r in tableSource.Rows)
             {
@@ -804,7 +813,8 @@ namespace SalesInventorySystem.HOFormsDevEx
                     r["ProductCode"].ToString(),
                     r["Description"].ToString(),
                     Convert.ToDecimal(r["Qty"]),
-                    Convert.ToDecimal(r["Cost"]));
+                    Convert.ToDecimal(r["Cost"]),
+                    r.IsNull("ReferenceCode") ? (object)DBNull.Value : r["ReferenceCode"].ToString());
             }
             return dt;
         }

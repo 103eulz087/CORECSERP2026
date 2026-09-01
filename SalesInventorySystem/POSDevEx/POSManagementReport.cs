@@ -84,7 +84,13 @@ namespace SalesInventorySystem.POSDevEx
                 string query = "sp_ReplicateSales";
                 SqlCommand com = new SqlCommand(query, con);
                 com.Parameters.AddWithValue("@brcode", txtbranch.Text);
-                com.Parameters.AddWithValue("@petsa", txtsalesdatefrom.Text);
+                // sp_ReplicateSales now takes a @FromDate/@ToDate range (see
+                // 2026-09-01_sp_ReplicateSales_DateRange.sql). This call site wasn't
+                // part of that change's scope, so it keeps its existing single-date
+                // behavior by passing the same date for both ends -- txtsalesdateto
+                // exists on this form but isn't wired in here.
+                com.Parameters.AddWithValue("@FromDate", txtsalesdatefrom.Text);
+                com.Parameters.AddWithValue("@ToDate", txtsalesdatefrom.Text);
                 com.Parameters.AddWithValue("@machinename", txtmachine.Text);
                 com.CommandType = CommandType.StoredProcedure;
                 com.CommandText = query;
@@ -124,42 +130,44 @@ namespace SalesInventorySystem.POSDevEx
                 ispercashier = true;
             }
 
-            SqlConnection con = Database.getConnection();
-            con.Open();
-            gridControl1.BeginUpdate();
-            try
+            using (SqlConnection con = Database.getConnection())
             {
-                string query = "spr_POSReports";
-                SqlCommand com = new SqlCommand(query, con);
-                SqlDataAdapter adapter = new SqlDataAdapter(com);
-                DataTable table = new DataTable();
-                com.Parameters.AddWithValue("@parmbrcode", txtbranch.Text);
-                com.Parameters.AddWithValue("@datefrom", txtsalesdatefrom.Text);
-                com.Parameters.AddWithValue("@dateto", txtsalesdateto.Text);
-                com.Parameters.AddWithValue("@parmprocessby", txtcashier.Text);
-                com.Parameters.AddWithValue("@parmoption", reportcategory);
-                com.Parameters.AddWithValue("@parmpercashier", ispercashier);
-                com.Parameters.AddWithValue("@parmispermachine", ispermachine);
-                com.Parameters.AddWithValue("@parmmachinename", txtmachine.Text);
-                com.CommandType = CommandType.StoredProcedure;
-                com.CommandText = query;
-                com.ExecuteNonQuery();
-                gridView1.Columns.Clear();
-                gridControl1.DataSource = null;
-                adapter.Fill(table);
-                gridControl1.DataSource = table;
-                gridView1.BestFitColumns();
-                Classes.DevXGridViewSettings.setGridFormat(gridView1);
+                con.Open();
+                gridControl1.BeginUpdate();
+                try
+                {
+                    const string query = "spr_POSReports";
+                    using (SqlCommand com = new SqlCommand(query, con))
+                    using (SqlDataAdapter adapter = new SqlDataAdapter(com))
+                    {
+                        com.CommandType = CommandType.StoredProcedure;
+                        com.Parameters.AddWithValue("@parmbrcode", txtbranch.Text);
+                        com.Parameters.AddWithValue("@datefrom", txtsalesdatefrom.Text);
+                        com.Parameters.AddWithValue("@dateto", txtsalesdateto.Text);
+                        com.Parameters.AddWithValue("@parmprocessby", txtcashier.Text);
+                        com.Parameters.AddWithValue("@parmoption", reportcategory);
+                        com.Parameters.AddWithValue("@parmpercashier", ispercashier);
+                        com.Parameters.AddWithValue("@parmispermachine", ispermachine);
+                        com.Parameters.AddWithValue("@parmmachinename", txtmachine.Text);
+
+                        DataTable table = new DataTable();
+                        gridView1.Columns.Clear();
+                        gridControl1.DataSource = null;
+                        adapter.Fill(table); // single execution
+                        gridControl1.DataSource = table;
+                        gridView1.BestFitColumns();
+                        Classes.DevXGridViewSettings.setGridFormat(gridView1);
+                    }
+                }
+                catch (SqlException ex)
+                {
+                    XtraMessageBox.Show(ex.Message.ToString());
+                }
+                finally
+                {
+                    gridControl1.EndUpdate();
+                }
             }
-            catch (SqlException ex)
-            {
-                XtraMessageBox.Show(ex.Message.ToString());
-            }
-            finally
-            {
-                gridControl1.EndUpdate();
-            }
-            con.Close();
         }
         void executeB(int reportcategory)
         {
@@ -180,42 +188,44 @@ namespace SalesInventorySystem.POSDevEx
                 ispercashier = true;
             }
 
-            SqlConnection con = Database.getConnection();
-            con.Open();
-            gridControl4.BeginUpdate();
-            try
+            using (SqlConnection con = Database.getConnection())
             {
-                string query = "spr_POSReports2";
-                SqlCommand com = new SqlCommand(query, con);
-                SqlDataAdapter adapter = new SqlDataAdapter(com);
-                DataTable table = new DataTable();
-                com.Parameters.AddWithValue("@parmbrcode", txtbranch.Text);
-                com.Parameters.AddWithValue("@datefrom", txtsalesdatefrom.Text);
-                com.Parameters.AddWithValue("@dateto", txtsalesdateto.Text);
-                com.Parameters.AddWithValue("@parmprocessby", txtcashier.Text);
-                com.Parameters.AddWithValue("@parmoption", reportcategory);
-                com.Parameters.AddWithValue("@parmpercashier", ispercashier);
-                com.Parameters.AddWithValue("@parmispermachine", ispermachine);
-                com.Parameters.AddWithValue("@parmmachinename", txtmachine.Text);
-                com.CommandType = CommandType.StoredProcedure;
-                com.CommandText = query;
-                com.ExecuteNonQuery();
-                gridView11.Columns.Clear();
-                gridControl4.DataSource = null;
-                adapter.Fill(table);
-                gridControl4.DataSource = table;
-                gridView11.BestFitColumns();
-                Classes.DevXGridViewSettings.setGridFormat(gridView11);
+                con.Open();
+                gridControl4.BeginUpdate();
+                try
+                {
+                    const string query = "spr_POSReports2";
+                    using (SqlCommand com = new SqlCommand(query, con))
+                    using (SqlDataAdapter adapter = new SqlDataAdapter(com))
+                    {
+                        com.CommandType = CommandType.StoredProcedure;
+                        com.Parameters.AddWithValue("@parmbrcode", txtbranch.Text);
+                        com.Parameters.AddWithValue("@datefrom", txtsalesdatefrom.Text);
+                        com.Parameters.AddWithValue("@dateto", txtsalesdateto.Text);
+                        com.Parameters.AddWithValue("@parmprocessby", txtcashier.Text);
+                        com.Parameters.AddWithValue("@parmoption", reportcategory);
+                        com.Parameters.AddWithValue("@parmpercashier", ispercashier);
+                        com.Parameters.AddWithValue("@parmispermachine", ispermachine);
+                        com.Parameters.AddWithValue("@parmmachinename", txtmachine.Text);
+
+                        DataTable table = new DataTable();
+                        gridView11.Columns.Clear();
+                        gridControl4.DataSource = null;
+                        adapter.Fill(table); // single execution
+                        gridControl4.DataSource = table;
+                        gridView11.BestFitColumns();
+                        Classes.DevXGridViewSettings.setGridFormat(gridView11);
+                    }
+                }
+                catch (SqlException ex)
+                {
+                    XtraMessageBox.Show(ex.Message.ToString());
+                }
+                finally
+                {
+                    gridControl4.EndUpdate();
+                }
             }
-            catch (SqlException ex)
-            {
-                XtraMessageBox.Show(ex.Message.ToString());
-            }
-            finally
-            {
-                gridControl4.EndUpdate();
-            }
-            con.Close();
         }
 
         //void executeA(string reportcategory)
@@ -1585,31 +1595,45 @@ namespace SalesInventorySystem.POSDevEx
             showd.gridView3.Columns["Difference"].Summary.Clear();
             showd.gridView3.Columns["Difference"].Summary.Add(DevExpress.Data.SummaryItemType.Sum, "Difference", "{0}");
 
-            string total = "";// Database.getSingleResultSet($"SELECT dbo.func_getVatExManipValue('{txtbrcodemgmtdata.Text}','{txtsalesdatemgmtdata.Text}','{txtmanageddatapermachine.Text}')");
-            if (radtypeall.Checked == true)
+            // Replace the existing scalar-call block with this:
+
+            double total = 0.0;
+
+            // Try to reuse the data already loaded into the child form's grid
+            var dt = showd.gridControl2.DataSource as DataTable;
+            if (dt != null && dt.Rows.Count > 0)
             {
-                total=Database.getSingleResultSet($"SELECT dbo.func_getAllManipValue('{txtbrcodemgmtdata.Text}','{txtsalesdatemgmtdata.Text}','{txtmanageddatapermachine.Text}')");
+                try
+                {
+                    total = dt.AsEnumerable()
+                              .Where(r => r["TotalAmount"] != DBNull.Value)
+                              .Sum(r => Convert.ToDouble(r["TotalAmount"]));
+                }
+                catch
+                {
+                    total = 0.0; // safe fallback if parse fails
+                }
             }
-            if (radtypevatex.Checked == true)
+            else
             {
-                total=Database.getSingleResultSet($"SELECT dbo.func_getVatExManipValue('{txtbrcodemgmtdata.Text}','{txtsalesdatemgmtdata.Text}','{txtmanageddatapermachine.Text}')");
+                // Fallback: query DB only if the grid isn't populated
+                string sql = "";
+                if (radtypeall.Checked)
+                    sql = $"SELECT dbo.func_getAllManipValue('{txtbrcodemgmtdata.Text}','{txtsalesdatemgmtdata.Text}','{txtmanageddatapermachine.Text}')";
+                else if (radtypevatex.Checked)
+                    sql = $"SELECT dbo.func_getVatExManipValue('{txtbrcodemgmtdata.Text}','{txtsalesdatemgmtdata.Text}','{txtmanageddatapermachine.Text}')";
+                else if (radtypevatable.Checked)
+                    sql = $"SELECT dbo.func_getVatableManipValue('{txtbrcodemgmtdata.Text}','{txtsalesdatemgmtdata.Text}','{txtmanageddatapermachine.Text}')";
+
+                if (!string.IsNullOrEmpty(sql))
+                {
+                    string strTotal = Database.getSingleResultSet(sql);
+                    double.TryParse(strTotal, out total);
+                }
             }
-            if (radtypevatable.Checked == true)
-            {
-                total=Database.getSingleResultSet($"SELECT dbo.func_getVatableManipValue('{txtbrcodemgmtdata.Text}','{txtsalesdatemgmtdata.Text}','{txtmanageddatapermachine.Text}')");
-            }
-            if(String.IsNullOrEmpty(total))
-            {
-                total = "0";
-            }
-            //if (String.IsNullOrEmpty(total)) { total = "0"; }
-            double sumval = 0.0;
-            sumval = Convert.ToDouble(total) - Convert.ToDouble(txtrefundamount.Text);
-            // var summaryValue = gridView3.Columns["NewTotalAmount"].SummaryItem.SummaryValue;
-            //textEdit1.EditValue = summaryValue;
-            //var bb = showd.gridView3.Columns["TotalAmount"].Summary.Add(DevExpress.Data.SummaryItemType.Sum, "TotalAmount", "{0}").ToString();
-            showd.textEdit1.Text = txtvariance.Text;//sumval.ToString();
-            //string[] hidecols = { "SequenceNumber", "CategoryCode" };
+
+            double sumval = total - Convert.ToDouble(txtrefundamount.Text);
+            showd.textEdit1.Text = txtvariance.Text; // unchanged: you may want to set this to sumval.ToString() instead
         }
 
         void executeB(string reportcategory)

@@ -1190,7 +1190,13 @@ namespace SalesInventorySystem.POSDevEx
                 string query = "sp_ReplicateSales";
                 SqlCommand com = new SqlCommand(query, con);
                 com.Parameters.AddWithValue("@brcode", txtbranch.Text);
-                com.Parameters.AddWithValue("@petsa", txtsalesdatefrom.Text);
+                // sp_ReplicateSales now takes a @FromDate/@ToDate range (see
+                // 2026-09-01_sp_ReplicateSales_DateRange.sql). This call site wasn't
+                // part of that change's scope, so it keeps its existing single-date
+                // behavior by passing the same date for both ends -- txtsalesdateto
+                // exists on this form but isn't wired in here.
+                com.Parameters.AddWithValue("@FromDate", txtsalesdatefrom.Text);
+                com.Parameters.AddWithValue("@ToDate", txtsalesdatefrom.Text);
                 com.Parameters.AddWithValue("@machinename", txtmachine.Text);
                 com.CommandType = CommandType.StoredProcedure;
                 com.CommandText = query;

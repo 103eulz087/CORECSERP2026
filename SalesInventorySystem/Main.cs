@@ -3639,6 +3639,12 @@ namespace SalesInventorySystem
             //pcusatfsmr.ShowDialog(this);
         }
 
+        private void barbtnPOSAutomation_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            POSDevEx.POSDataManagementAutomation repos = new POSDevEx.POSDataManagementAutomation();
+            repos.Show();
+        }
+
         private void Main_FormClosing(object sender, FormClosingEventArgs e)
         {
             //bool confirm = HelperFunction.ConfirmDialog("Are you want to close the Main Window?", "Close Main Window");

@@ -1250,6 +1250,8 @@ D:\GITHUB\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.HOFo
 D:\GITHUB\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.HOFormsDevEx.ConversionPerBarcodeDetails.resources
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\bin\Debug\app.config
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\bin\Debug\SalesInventorySystem.exe.config
+D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\bin\Debug\SalesInventorySystem.exe.manifest
+D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\bin\Debug\SalesInventorySystem.application
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\bin\Debug\SalesInventorySystem.exe
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\bin\Debug\SalesInventorySystem.pdb
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\bin\Debug\Npgsql.dll
@@ -1353,7 +1355,6 @@ D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\bin\Debug\DevExpress.DataAccess.v
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\bin\Debug\DevExpress.XtraDiagram.v26.1.xml
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\bin\Debug\DevExpress.Diagram.v26.1.Core.xml
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.csproj.AssemblyReference.cache
-D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.exe.config
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.AccountingDevEx.AccountingBoard.resources
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.AccountingDevEx.AddExpenseDevExFrm.resources
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.AccountingDevEx.BalanceSheetAccountDetails.resources
@@ -1503,6 +1504,9 @@ D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.HO
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.HOFormsDevEx.ConversionDevEx.resources
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.HOFormsDevEx.ConversionPerBarcode.resources
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.HOFormsDevEx.ConversionPerBarcodeDetails.resources
+D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.HOFormsDevEx.DispatchPerBarcode.resources
+D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.HOFormsDevEx.StockOutPerBarcode.resources
+D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.HOFormsDevEx.StockOutPerBarcodeDetails.resources
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.HOFormsDevEx.CostAdjustmentDevEx.resources
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.HOFormsDevEx.CreditMemoDevEx.resources
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.HOFormsDevEx.CreditMemoDevHR.resources
@@ -1871,9 +1875,9 @@ D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.zz
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.csproj.GenerateResource.cache
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.exe.licenses
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.csproj.CoreCompileInputs.cache
+D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.exe.manifest
+D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.application
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInv.A74E2F72.Up2Date
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.exe
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.pdb
-D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.HOFormsDevEx.DispatchPerBarcode.resources
-D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.HOFormsDevEx.StockOutPerBarcode.resources
-D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.HOFormsDevEx.StockOutPerBarcodeDetails.resources
+D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.exe.config

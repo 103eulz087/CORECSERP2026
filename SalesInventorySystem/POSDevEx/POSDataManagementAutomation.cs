@@ -101,7 +101,18 @@ namespace SalesInventorySystem.POSDevEx
 
             try
             {
-                List<ProcessingBatch> batches = await GetPendingBatchesAsync();
+                // Read the filter fields fresh on every cycle (same as txtpercentage/radtypeall
+                // below) so a running automation picks up an in-flight filter change on its next
+                // tick, rather than only at the moment Start was clicked.
+                string filterBranchCode = txtbrcodemgmtdata.EditValue?.ToString();
+                DateTime? filterFromDate = txtfromsalesdatemgmtdata.EditValue == null
+                    ? (DateTime?)null : txtfromsalesdatemgmtdata.DateTime;
+                DateTime? filterToDate = txttosalesdatemgmtdata.EditValue == null
+                    ? (DateTime?)null : txttosalesdatemgmtdata.DateTime;
+                string filterMachineUsed = txtmanageddatapermachine.EditValue?.ToString();
+
+                List<ProcessingBatch> batches = await GetPendingBatchesAsync(
+                    filterBranchCode, filterFromDate, filterToDate, filterMachineUsed);
 
                 _totalBatches = batches.Count;
                 _processedCount = 0;
@@ -121,79 +132,31 @@ namespace SalesInventorySystem.POSDevEx
                 decimal percentage = 0m;
                 decimal.TryParse(txtpercentage.Text, out percentage);
 
-                //for (int i = 0; i < _totalBatches; i++)
-                //{
-                //    ProcessingBatch batch = batches[i];
+                // Replicate once per distinct Branch+Machine, covering that
+                // pairing's whole date span within this cycle's batches --
+                // instead of re-running the delete+reinsert once per
+                // individual date-batch below. Excludes the same degenerate
+                // rows (DateExecute NULL -> SalesDate == DateTime.MinValue)
+                // the per-date loop below already skips -- otherwise one bad
+                // row would drag a whole group's FromDate back to 0001-01-01
+                // and blow up its replication range.
+                foreach (var grp in batches
+                    .Where(b => b.SalesDate != DateTime.MinValue)
+                    .GroupBy(b => new { b.BranchCode, b.MachineUsed })
+                    .Select(g => new
+                    {
+                        g.Key.BranchCode,
+                        g.Key.MachineUsed,
+                        FromDate = g.Min(x => x.SalesDate),
+                        ToDate = g.Max(x => x.SalesDate)
+                    }))
+                {
+                    await ReplicateRangeAsync(grp.BranchCode, grp.FromDate, grp.ToDate, grp.MachineUsed);
+                }
 
-                //    await ReplicateBatchAsync(batch);
-
-                //    // ✅ UPDATE PROGRESS UI
-                //    lblCurrentBatch.Text = $"{batch.BranchCode} | {batch.SalesDate:yyyy-MM-dd} | {batch.MachineUsed}";
-                //    //lblProgress.Text = $"{i + 1} / {_totalBatches}";
-
-                //    double percent = ((double)(i + 1) / _totalBatches) * 100;
-                //    lblProgress.Text = $"{i + 1} / {_totalBatches} ({percent:N1}%)";
-
-                //    Application.DoEvents(); // keep UI responsive (optional)
-
-                //    // ✅ VALIDATION
-                //    if (string.IsNullOrWhiteSpace(batch.BranchCode) ||
-                //        batch.SalesDate == DateTime.MinValue ||
-                //        string.IsNullOrWhiteSpace(batch.MachineUsed))
-                //    {
-                //        _skippedCount++;
-                //        continue;
-                //    }
-
-                //    DataTable dt = await LoadData2Async(
-                //        batch.BranchCode,
-                //        batch.SalesDate,
-                //        batch.MachineUsed);
-
-                //    if (dt == null || dt.Rows.Count == 0)
-                //    {
-                //        _skippedCount++;
-                //        continue;
-                //    }
-
-                //    // ✅ COMPUTE TARGET
-                //    decimal target = 0m;
-
-                //    if (radtypeall.Checked)
-                //    {
-                //        target = batch.TotalNetSales * percentage;
-                //    }
-                //    else if (radtypevatex.Checked)
-                //    {
-                //        target = batch.VatExemptSale * percentage;
-                //    }
-                //    else
-                //    {
-                //        target = batch.TotalNetSales * percentage;
-                //    }
-
-                //    // ✅ PROCESS
-                //    ProcessDataTable(dt, target);
-
-                //    // ✅ EXECUTE
-                //    await ExecuteAsync(dt, batch);
-                //    //PrintZRead(batch.BranchCode, batch.SalesDate.ToString("yyyy-MM-dd"), batch.MachineUsed);
-
-                //    // ✅ ENQUEUE PRINT (THIS IS THE RIGHT PLACE)
-                //    _printQueue.Enqueue(new PrintJob
-                //    {
-                //        BranchCode = batch.BranchCode,
-                //        DateExecute = batch.SalesDate.ToString("yyyy-MM-dd"),
-                //        MachineUsed = batch.MachineUsed
-                //    });
-
-                //    _processedCount++;
-                //}
                 for (int i = 0; i < _totalBatches; i++)
                 {
                     ProcessingBatch batch = batches[i];
-
-                    await ReplicateBatchAsync(batch);
 
                     // Update Progress UI
                     lblCurrentBatch.Text = $"{batch.BranchCode} | {batch.SalesDate:yyyy-MM-dd} | {batch.MachineUsed}";
@@ -258,94 +221,10 @@ namespace SalesInventorySystem.POSDevEx
                     timer1.Start();
             }
         }
-        //private async Task RunProcessingCycleAsync()
-        //{
-        //    if (_isProcessing) return;
+        
 
-        //    _isProcessing = true;
-        //    timer1.Stop();
-
-        //    try
-        //    {
-        //        List<ProcessingBatch> batches = await GetPendingBatchesAsync();
-
-        //        _totalBatches = batches.Count;
-        //        _processedCount = 0;
-        //        _skippedCount = 0;
-
-        //        if (_totalBatches == 0)
-        //        {
-        //            lblStatus.Text = "No pending batches";
-        //            lblProgress.Text = "0 / 0";
-        //            return;
-        //        }
-        //        lblStatus.Text = "Running...";
-        //        lblStatus.ForeColor = Color.Green;
-
-        //        if (batches.Count == 0)
-        //            return;
-
-        //        foreach (ProcessingBatch batch in batches)
-        //        {
-        //            if (string.IsNullOrWhiteSpace(batch.BranchCode)) continue;
-        //            if (batch.SalesDate == DateTime.MinValue) continue;
-        //            if (string.IsNullOrWhiteSpace(batch.MachineUsed)) continue; 
-
-        //            DataTable dt = await LoadData2Async(
-        //                batch.BranchCode,
-        //                batch.SalesDate,
-        //                batch.MachineUsed);
-
-        //            if (dt == null || dt.Rows.Count == 0)
-        //            {
-        //                //await MarkBatchProcessedAsync(
-        //                //    batch.BranchCode,
-        //                //    batch.SalesDate,
-        //                //    batch.MachineUsed);
-        //                continue;
-        //            }
-
-        //            // ✅ NEW: compute dynamic target
-        //            decimal target = 0m;
-        //            decimal percentage = Convert.ToDecimal(txtpercentage.Text);
-        //            if(radtypeall.Checked == true)
-        //            {
-        //                target = batch.TotalNetSales * percentage;//0.30m;
-        //            }
-        //            else if(radtypevatex.Checked==true)
-        //            {
-        //                target = batch.VatExemptSale * percentage; //0.30m;
-        //            }
-        //            else
-        //            {
-        //                target = batch.TotalNetSales * percentage; // 0.30m;
-        //            }
-
-        //            ProcessDataTable(dt, target);
-
-        //            // Save selected preview rows
-        //            await ExecuteAsync(dt, batch);
-
-        //            // Mark current batch as processed
-        //            //await MarkBatchProcessedAsync(
-        //            //    batch.BranchCode,
-        //            //    batch.SalesDate,
-        //            //    batch.MachineUsed);
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        XtraMessageBox.Show(ex.Message, "Processing Error",
-        //            MessageBoxButtons.OK, MessageBoxIcon.Error);
-        //    }
-        //    finally
-        //    {
-        //        _isProcessing = false;
-        //        timer1.Start();
-        //    }
-        //}
-
-        private async Task<List<ProcessingBatch>> GetPendingBatchesAsync()
+        private async Task<List<ProcessingBatch>> GetPendingBatchesAsync(
+            string branchCode, DateTime? fromDate, DateTime? toDate, string machineUsed)
         {
             List<ProcessingBatch> batches = new List<ProcessingBatch>();
 
@@ -353,6 +232,14 @@ namespace SalesInventorySystem.POSDevEx
             using (SqlCommand cmd = new SqlCommand("sp_GetSalesDateForDataProcessing", conn))
             {
                 cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add("@BranchCode", SqlDbType.Char, 3).Value =
+                    string.IsNullOrWhiteSpace(branchCode) ? (object)DBNull.Value : branchCode;
+                cmd.Parameters.Add("@FromDate", SqlDbType.Date).Value =
+                    fromDate.HasValue ? (object)fromDate.Value.Date : DBNull.Value;
+                cmd.Parameters.Add("@ToDate", SqlDbType.Date).Value =
+                    toDate.HasValue ? (object)toDate.Value.Date : DBNull.Value;
+                cmd.Parameters.Add("@MachineUsed", SqlDbType.VarChar, 20).Value =
+                    string.IsNullOrWhiteSpace(machineUsed) ? (object)DBNull.Value : machineUsed;
 
                 await conn.OpenAsync();
 
@@ -387,15 +274,16 @@ namespace SalesInventorySystem.POSDevEx
             return batches;
         }
 
-        private async Task ReplicateBatchAsync(ProcessingBatch batch)
+        private async Task ReplicateRangeAsync(string branchCode, DateTime fromDate, DateTime toDate, string machineUsed)
         {
             using (SqlConnection con = Database.getConnection())
             using (SqlCommand cmd = new SqlCommand("dbo.sp_ReplicateSales", con))
             {
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.Add("@brcode", SqlDbType.Char, 3).Value = batch.BranchCode;
-                cmd.Parameters.Add("@petsa", SqlDbType.Date).Value = batch.SalesDate.Date;
-                cmd.Parameters.Add("@machinename", SqlDbType.VarChar, 20).Value = batch.MachineUsed;
+                cmd.Parameters.Add("@brcode", SqlDbType.Char, 3).Value = branchCode;
+                cmd.Parameters.Add("@FromDate", SqlDbType.Date).Value = fromDate.Date;
+                cmd.Parameters.Add("@ToDate", SqlDbType.Date).Value = toDate.Date;
+                cmd.Parameters.Add("@machinename", SqlDbType.VarChar, 20).Value = machineUsed;
 
                 await con.OpenAsync();
                 await cmd.ExecuteNonQueryAsync();
@@ -938,8 +826,30 @@ ORDER BY x.TotalAmount DESC, x.ReferenceNo, x.SequenceNumber;";
                     {
                         if (_printQueue.TryDequeue(out PrintJob job))
                         {
-                            // ✅ run printing in background
-                            PrintZRead(job.BranchCode, job.DateExecute, job.MachineUsed);
+                            // Use the management UI fields as parameters for printing.
+                            // Access UI controls safely from background thread via Invoke.
+                            string bcodeTxt = string.Empty;
+                            string dateTxt = string.Empty;
+                            string machineTxt = string.Empty;
+
+                            if (this.InvokeRequired)
+                            {
+                                this.Invoke(new Action(() =>
+                                {
+                                    bcodeTxt = txtbrcodemgmtdata.Text;
+                                    dateTxt = txtfromsalesdatemgmtdata.Text;
+                                    machineTxt = txtmanageddatapermachine.Text;
+                                }));
+                            }
+                            else
+                            {
+                                bcodeTxt = txtbrcodemgmtdata.Text;
+                                dateTxt = txtfromsalesdatemgmtdata.Text;
+                                machineTxt = txtmanageddatapermachine.Text;
+                            }
+
+                            // ✅ run printing in background using the management controls values
+                            PrintZRead(bcodeTxt, dateTxt, machineTxt);
                         }
                         else
                         {
@@ -962,7 +872,12 @@ ORDER BY x.TotalAmount DESC, x.ReferenceNo, x.SequenceNumber;";
 
         private void POSDataManagementAutomation_Load(object sender, EventArgs e)
         {
+            Database.displaySearchlookupEdit("SELECT BranchCode,BranchName FROM dbo.Branches", txtbrcodemgmtdata, "BranchCode", "BranchCode");
+        }
 
+        private void txtbrcodemgmtdata_EditValueChanged(object sender, EventArgs e)
+        {
+            Database.displaySearchlookupEdit("SELECT BranchCode,MachineUsed FROM POSInfoDetails WHERE BranchCode='" + txtbrcodemgmtdata.Text + "'", txtmanageddatapermachine, "MachineUsed", "MachineUsed");
         }
     }
 

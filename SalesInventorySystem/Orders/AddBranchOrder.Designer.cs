@@ -141,20 +141,23 @@
             this.tablePanel1.SetColumn(this.groupControl1, 1);
             this.groupControl1.Controls.Add(this.gridControl1);
             this.groupControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupControl1.Location = new System.Drawing.Point(967, 3);
+            this.groupControl1.Location = new System.Drawing.Point(559, 2);
+            this.groupControl1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.groupControl1.Name = "groupControl1";
             this.tablePanel1.SetRow(this.groupControl1, 0);
-            this.groupControl1.Size = new System.Drawing.Size(871, 494);
+            this.groupControl1.Size = new System.Drawing.Size(501, 314);
             this.groupControl1.TabIndex = 3;
             this.groupControl1.Text = "Order Details";
             // 
             // gridControl1
             // 
             this.gridControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControl1.Location = new System.Drawing.Point(2, 28);
+            this.gridControl1.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.gridControl1.Location = new System.Drawing.Point(2, 23);
             this.gridControl1.MainView = this.gridView1;
+            this.gridControl1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.gridControl1.Name = "gridControl1";
-            this.gridControl1.Size = new System.Drawing.Size(867, 464);
+            this.gridControl1.Size = new System.Drawing.Size(497, 289);
             this.gridControl1.TabIndex = 2;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1,
@@ -172,7 +175,6 @@
             this.gridView1.Appearance.Row.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.gridView1.Appearance.Row.Options.UseFont = true;
             this.gridView1.ColumnPanelRowHeight = 0;
-            this.gridView1.DetailHeight = 431;
             this.gridView1.FixedLineWidth = 3;
             this.gridView1.FooterPanelHeight = 0;
             this.gridView1.GridControl = this.gridControl1;
@@ -181,6 +183,7 @@
             this.gridView1.Name = "gridView1";
             this.gridView1.OptionsBehavior.Editable = false;
             this.gridView1.OptionsBehavior.ReadOnly = true;
+            this.gridView1.OptionsEditForm.PopupEditFormWidth = 686;
             this.gridView1.OptionsSelection.MultiSelectMode = DevExpress.XtraGrid.Views.Grid.GridMultiSelectMode.CellSelect;
             this.gridView1.OptionsView.ColumnAutoWidth = false;
             this.gridView1.OptionsView.RowAutoHeight = true;
@@ -193,13 +196,13 @@
             // 
             this.bandedGridView1.BandPanelRowHeight = 0;
             this.bandedGridView1.ColumnPanelRowHeight = 0;
-            this.bandedGridView1.DetailHeight = 431;
             this.bandedGridView1.FixedLineWidth = 3;
             this.bandedGridView1.FooterPanelHeight = 0;
             this.bandedGridView1.GridControl = this.gridControl1;
             this.bandedGridView1.GroupRowHeight = 0;
             this.bandedGridView1.LevelIndent = 0;
             this.bandedGridView1.Name = "bandedGridView1";
+            this.bandedGridView1.OptionsEditForm.PopupEditFormWidth = 686;
             this.bandedGridView1.PreviewIndent = 0;
             this.bandedGridView1.RowHeight = 0;
             this.bandedGridView1.ViewCaptionHeight = 0;
@@ -210,13 +213,13 @@
             this.advBandedGridView1.Bands.AddRange(new DevExpress.XtraGrid.Views.BandedGrid.GridBand[] {
             this.gridBand1});
             this.advBandedGridView1.ColumnPanelRowHeight = 0;
-            this.advBandedGridView1.DetailHeight = 431;
             this.advBandedGridView1.FixedLineWidth = 3;
             this.advBandedGridView1.FooterPanelHeight = 0;
             this.advBandedGridView1.GridControl = this.gridControl1;
             this.advBandedGridView1.GroupRowHeight = 0;
             this.advBandedGridView1.LevelIndent = 0;
             this.advBandedGridView1.Name = "advBandedGridView1";
+            this.advBandedGridView1.OptionsEditForm.PopupEditFormWidth = 686;
             this.advBandedGridView1.PreviewIndent = 0;
             this.advBandedGridView1.RowHeight = 0;
             this.advBandedGridView1.ViewCaptionHeight = 0;
@@ -224,18 +227,17 @@
             // gridBand1
             // 
             this.gridBand1.Caption = "gridBand1";
-            this.gridBand1.MinWidth = 12;
             this.gridBand1.Name = "gridBand1";
             this.gridBand1.VisibleIndex = 0;
-            this.gridBand1.Width = 82;
             // 
             // groupControl2
             // 
             this.groupControl2.Controls.Add(this.groupBox2);
             this.groupControl2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupControl2.Location = new System.Drawing.Point(2, 2);
+            this.groupControl2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.groupControl2.Name = "groupControl2";
-            this.groupControl2.Size = new System.Drawing.Size(1841, 172);
+            this.groupControl2.Size = new System.Drawing.Size(1328, 148);
             this.groupControl2.TabIndex = 4;
             this.groupControl2.Text = "Add Order";
             // 
@@ -272,9 +274,10 @@
             this.groupBox2.Controls.Add(this.labelControl2);
             this.groupBox2.Controls.Add(this.panel1);
             this.groupBox2.Dock = System.Windows.Forms.DockStyle.Top;
-            this.groupBox2.Location = new System.Drawing.Point(2, 28);
+            this.groupBox2.Location = new System.Drawing.Point(2, 23);
+            this.groupBox2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(1837, 145);
+            this.groupBox2.Size = new System.Drawing.Size(1324, 118);
             this.groupBox2.TabIndex = 0;
             this.groupBox2.Enter += new System.EventHandler(this.groupBox2_Enter);
             // 
@@ -282,45 +285,48 @@
             // 
             this.panel4.Controls.Add(this.labelControl15);
             this.panel4.Controls.Add(this.txtsearchlookupproduct);
-            this.panel4.Location = new System.Drawing.Point(8, 12);
+            this.panel4.Location = new System.Drawing.Point(7, 10);
+            this.panel4.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(444, 77);
+            this.panel4.Size = new System.Drawing.Size(381, 63);
             this.panel4.TabIndex = 90;
             // 
             // labelControl15
             // 
             this.labelControl15.Appearance.Font = new System.Drawing.Font("Tahoma", 7.75F, System.Drawing.FontStyle.Bold);
             this.labelControl15.Appearance.Options.UseFont = true;
-            this.labelControl15.Location = new System.Drawing.Point(15, 29);
+            this.labelControl15.Location = new System.Drawing.Point(13, 24);
+            this.labelControl15.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.labelControl15.Name = "labelControl15";
-            this.labelControl15.Size = new System.Drawing.Size(111, 16);
+            this.labelControl15.Size = new System.Drawing.Size(95, 12);
             this.labelControl15.TabIndex = 89;
             this.labelControl15.Text = "SELECT PRODUCT:";
             // 
             // txtsearchlookupproduct
             // 
-            this.txtsearchlookupproduct.Location = new System.Drawing.Point(132, 26);
+            this.txtsearchlookupproduct.Location = new System.Drawing.Point(113, 21);
+            this.txtsearchlookupproduct.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.txtsearchlookupproduct.Name = "txtsearchlookupproduct";
             this.txtsearchlookupproduct.Properties.Appearance.Options.UseFont = true;
             this.txtsearchlookupproduct.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.txtsearchlookupproduct.Properties.NullText = "";
             this.txtsearchlookupproduct.Properties.PopupView = this.searchLookUpEdit2View;
-            this.txtsearchlookupproduct.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;
-            this.txtsearchlookupproduct.Size = new System.Drawing.Size(257, 22);
+            this.txtsearchlookupproduct.Size = new System.Drawing.Size(220, 20);
             this.txtsearchlookupproduct.TabIndex = 88;
             this.txtsearchlookupproduct.EditValueChanged += new System.EventHandler(this.txtsearchlookupproduct_EditValueChanged);
             // 
             // searchLookUpEdit2View
             // 
             this.searchLookUpEdit2View.ColumnPanelRowHeight = 0;
-            this.searchLookUpEdit2View.DetailHeight = 349;
+            this.searchLookUpEdit2View.DetailHeight = 284;
             this.searchLookUpEdit2View.FixedLineWidth = 3;
             this.searchLookUpEdit2View.FocusRectStyle = DevExpress.XtraGrid.Views.Grid.DrawFocusRectStyle.RowFocus;
             this.searchLookUpEdit2View.FooterPanelHeight = 0;
             this.searchLookUpEdit2View.GroupRowHeight = 0;
             this.searchLookUpEdit2View.LevelIndent = 0;
             this.searchLookUpEdit2View.Name = "searchLookUpEdit2View";
+            this.searchLookUpEdit2View.OptionsEditForm.PopupEditFormWidth = 686;
             this.searchLookUpEdit2View.OptionsSelection.EnableAppearanceFocusedCell = false;
             this.searchLookUpEdit2View.OptionsView.ShowGroupPanel = false;
             this.searchLookUpEdit2View.PreviewIndent = 0;
@@ -330,9 +336,10 @@
             // simpleButton2
             // 
             this.simpleButton2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("simpleButton2.ImageOptions.Image")));
-            this.simpleButton2.Location = new System.Drawing.Point(1274, 88);
+            this.simpleButton2.Location = new System.Drawing.Point(1092, 72);
+            this.simpleButton2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.simpleButton2.Name = "simpleButton2";
-            this.simpleButton2.Size = new System.Drawing.Size(150, 32);
+            this.simpleButton2.Size = new System.Drawing.Size(129, 26);
             this.simpleButton2.TabIndex = 81;
             this.simpleButton2.Text = "Print All Barcode";
             this.simpleButton2.Click += new System.EventHandler(this.simpleButton2_Click_1);
@@ -340,9 +347,10 @@
             // simpleButton1
             // 
             this.simpleButton1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("simpleButton1.ImageOptions.Image")));
-            this.simpleButton1.Location = new System.Drawing.Point(776, 19);
+            this.simpleButton1.Location = new System.Drawing.Point(665, 15);
+            this.simpleButton1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.simpleButton1.Name = "simpleButton1";
-            this.simpleButton1.Size = new System.Drawing.Size(156, 32);
+            this.simpleButton1.Size = new System.Drawing.Size(134, 26);
             this.simpleButton1.TabIndex = 80;
             this.simpleButton1.Text = "Get Weight";
             this.simpleButton1.Click += new System.EventHandler(this.simpleButton1_Click_1);
@@ -350,9 +358,10 @@
             // btnsaveasdraft
             // 
             this.btnsaveasdraft.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnsaveasdraft.ImageOptions.Image")));
-            this.btnsaveasdraft.Location = new System.Drawing.Point(776, 61);
+            this.btnsaveasdraft.Location = new System.Drawing.Point(665, 50);
+            this.btnsaveasdraft.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btnsaveasdraft.Name = "btnsaveasdraft";
-            this.btnsaveasdraft.Size = new System.Drawing.Size(293, 32);
+            this.btnsaveasdraft.Size = new System.Drawing.Size(251, 26);
             this.btnsaveasdraft.TabIndex = 79;
             this.btnsaveasdraft.Text = "Save as Draft";
             this.btnsaveasdraft.Click += new System.EventHandler(this.btnsaveasdraft_Click);
@@ -360,9 +369,10 @@
             // btnchecker
             // 
             this.btnchecker.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnchecker.ImageOptions.Image")));
-            this.btnchecker.Location = new System.Drawing.Point(777, 99);
+            this.btnchecker.Location = new System.Drawing.Point(666, 80);
+            this.btnchecker.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btnchecker.Name = "btnchecker";
-            this.btnchecker.Size = new System.Drawing.Size(293, 32);
+            this.btnchecker.Size = new System.Drawing.Size(251, 26);
             this.btnchecker.TabIndex = 78;
             this.btnchecker.Text = "Checker (F5)";
             this.btnchecker.Click += new System.EventHandler(this.btnchecker_Click);
@@ -370,9 +380,10 @@
             // simpleButton11
             // 
             this.simpleButton11.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("simpleButton11.ImageOptions.Image")));
-            this.simpleButton11.Location = new System.Drawing.Point(665, 99);
+            this.simpleButton11.Location = new System.Drawing.Point(570, 80);
+            this.simpleButton11.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.simpleButton11.Name = "simpleButton11";
-            this.simpleButton11.Size = new System.Drawing.Size(104, 32);
+            this.simpleButton11.Size = new System.Drawing.Size(89, 26);
             this.simpleButton11.TabIndex = 77;
             this.simpleButton11.Text = "Save (F10)";
             this.simpleButton11.Click += new System.EventHandler(this.simpleButton11_Click);
@@ -380,9 +391,10 @@
             // simpleButton10
             // 
             this.simpleButton10.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("simpleButton10.ImageOptions.Image")));
-            this.simpleButton10.Location = new System.Drawing.Point(384, 99);
+            this.simpleButton10.Location = new System.Drawing.Point(329, 80);
+            this.simpleButton10.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.simpleButton10.Name = "simpleButton10";
-            this.simpleButton10.Size = new System.Drawing.Size(139, 32);
+            this.simpleButton10.Size = new System.Drawing.Size(119, 26);
             this.simpleButton10.TabIndex = 76;
             this.simpleButton10.Text = "Print Barcode (F8)";
             this.simpleButton10.Click += new System.EventHandler(this.simpleButton10_Click);
@@ -390,9 +402,10 @@
             // simpleButton9
             // 
             this.simpleButton9.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("simpleButton9.ImageOptions.Image")));
-            this.simpleButton9.Location = new System.Drawing.Point(289, 99);
+            this.simpleButton9.Location = new System.Drawing.Point(248, 80);
+            this.simpleButton9.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.simpleButton9.Name = "simpleButton9";
-            this.simpleButton9.Size = new System.Drawing.Size(87, 32);
+            this.simpleButton9.Size = new System.Drawing.Size(75, 26);
             this.simpleButton9.TabIndex = 75;
             this.simpleButton9.Text = "Clear (F6)";
             this.simpleButton9.Click += new System.EventHandler(this.simpleButton9_Click);
@@ -400,9 +413,10 @@
             // btncancel
             // 
             this.btncancel.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btncancel.ImageOptions.Image")));
-            this.btncancel.Location = new System.Drawing.Point(530, 99);
+            this.btncancel.Location = new System.Drawing.Point(454, 80);
+            this.btncancel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btncancel.Name = "btncancel";
-            this.btncancel.Size = new System.Drawing.Size(128, 32);
+            this.btncancel.Size = new System.Drawing.Size(110, 26);
             this.btncancel.TabIndex = 74;
             this.btncancel.Text = "Cancel Line (Del)";
             this.btncancel.Click += new System.EventHandler(this.btncancel_Click);
@@ -410,9 +424,10 @@
             // btnadd
             // 
             this.btnadd.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnadd.ImageOptions.Image")));
-            this.btnadd.Location = new System.Drawing.Point(178, 99);
+            this.btnadd.Location = new System.Drawing.Point(153, 80);
+            this.btnadd.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btnadd.Name = "btnadd";
-            this.btnadd.Size = new System.Drawing.Size(104, 32);
+            this.btnadd.Size = new System.Drawing.Size(89, 26);
             this.btnadd.TabIndex = 73;
             this.btnadd.Text = "Add (Enter)";
             this.btnadd.Click += new System.EventHandler(this.btnadd_Click);
@@ -421,21 +436,23 @@
             // 
             this.panel2.Controls.Add(this.txtbarcodescanning);
             this.panel2.Controls.Add(this.labelControl14);
-            this.panel2.Location = new System.Drawing.Point(8, 12);
+            this.panel2.Location = new System.Drawing.Point(7, 10);
+            this.panel2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(444, 75);
+            this.panel2.Size = new System.Drawing.Size(381, 61);
             this.panel2.TabIndex = 65;
             this.panel2.Visible = false;
             // 
             // txtbarcodescanning
             // 
             this.txtbarcodescanning.EditValue = "";
-            this.txtbarcodescanning.Location = new System.Drawing.Point(122, 6);
+            this.txtbarcodescanning.Location = new System.Drawing.Point(105, 5);
+            this.txtbarcodescanning.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.txtbarcodescanning.Name = "txtbarcodescanning";
             this.txtbarcodescanning.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 10.25F);
             this.txtbarcodescanning.Properties.Appearance.Options.UseFont = true;
             this.txtbarcodescanning.Properties.MaxLength = 50;
-            this.txtbarcodescanning.Size = new System.Drawing.Size(318, 28);
+            this.txtbarcodescanning.Size = new System.Drawing.Size(273, 24);
             this.txtbarcodescanning.TabIndex = 69;
             this.txtbarcodescanning.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtbarcodescanning_KeyDown);
             // 
@@ -443,30 +460,33 @@
             // 
             this.labelControl14.Appearance.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
             this.labelControl14.Appearance.Options.UseFont = true;
-            this.labelControl14.Location = new System.Drawing.Point(7, 10);
+            this.labelControl14.Location = new System.Drawing.Point(6, 8);
+            this.labelControl14.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.labelControl14.Name = "labelControl14";
-            this.labelControl14.Size = new System.Drawing.Size(115, 19);
+            this.labelControl14.Size = new System.Drawing.Size(93, 16);
             this.labelControl14.TabIndex = 68;
             this.labelControl14.Text = "Scan Barcode:";
             // 
             // barcodescanning
             // 
-            this.barcodescanning.Location = new System.Drawing.Point(5, 99);
+            this.barcodescanning.Location = new System.Drawing.Point(4, 80);
+            this.barcodescanning.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.barcodescanning.Name = "barcodescanning";
             this.barcodescanning.Properties.Caption = "Use Barcode Scanning?";
-            this.barcodescanning.Size = new System.Drawing.Size(162, 24);
+            this.barcodescanning.Size = new System.Drawing.Size(139, 20);
             this.barcodescanning.TabIndex = 66;
             this.barcodescanning.CheckedChanged += new System.EventHandler(this.barcodescanning_CheckedChanged);
             // 
             // txteffectivedate
             // 
             this.txteffectivedate.EditValue = "";
-            this.txteffectivedate.Location = new System.Drawing.Point(1531, 17);
+            this.txteffectivedate.Location = new System.Drawing.Point(1312, 14);
+            this.txteffectivedate.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.txteffectivedate.Name = "txteffectivedate";
             this.txteffectivedate.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 7.25F);
             this.txteffectivedate.Properties.Appearance.Options.UseFont = true;
             this.txteffectivedate.Properties.ReadOnly = true;
-            this.txteffectivedate.Size = new System.Drawing.Size(91, 22);
+            this.txteffectivedate.Size = new System.Drawing.Size(78, 18);
             this.txteffectivedate.TabIndex = 62;
             this.txteffectivedate.Visible = false;
             // 
@@ -474,30 +494,33 @@
             // 
             this.labelControl10.Appearance.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
             this.labelControl10.Appearance.Options.UseFont = true;
-            this.labelControl10.Location = new System.Drawing.Point(972, 214);
+            this.labelControl10.Location = new System.Drawing.Point(833, 174);
+            this.labelControl10.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.labelControl10.Name = "labelControl10";
-            this.labelControl10.Size = new System.Drawing.Size(116, 19);
+            this.labelControl10.Size = new System.Drawing.Size(93, 16);
             this.labelControl10.TabIndex = 61;
             this.labelControl10.Text = "EffectiveDate:";
             this.labelControl10.Visible = false;
             // 
             // checkBox1
             // 
-            this.checkBox1.Location = new System.Drawing.Point(939, 31);
+            this.checkBox1.Location = new System.Drawing.Point(805, 25);
+            this.checkBox1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Properties.Caption = "Auto GetWeight";
-            this.checkBox1.Size = new System.Drawing.Size(118, 24);
+            this.checkBox1.Size = new System.Drawing.Size(101, 20);
             this.checkBox1.TabIndex = 60;
             // 
             // txtweight
             // 
             this.txtweight.EditValue = "";
-            this.txtweight.Location = new System.Drawing.Point(530, 24);
+            this.txtweight.Location = new System.Drawing.Point(454, 20);
+            this.txtweight.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.txtweight.Name = "txtweight";
             this.txtweight.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 7.75F, System.Drawing.FontStyle.Bold);
             this.txtweight.Properties.Appearance.Options.UseFont = true;
             this.txtweight.Properties.MaxLength = 10;
-            this.txtweight.Size = new System.Drawing.Size(239, 22);
+            this.txtweight.Size = new System.Drawing.Size(205, 18);
             this.txtweight.TabIndex = 46;
             this.txtweight.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtweight_KeyDown_1);
             // 
@@ -505,20 +528,22 @@
             // 
             this.labelControl9.Appearance.Font = new System.Drawing.Font("Tahoma", 7.75F, System.Drawing.FontStyle.Bold);
             this.labelControl9.Appearance.Options.UseFont = true;
-            this.labelControl9.Location = new System.Drawing.Point(463, 27);
+            this.labelControl9.Location = new System.Drawing.Point(397, 22);
+            this.labelControl9.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.labelControl9.Name = "labelControl9";
-            this.labelControl9.Size = new System.Drawing.Size(61, 16);
+            this.labelControl9.Size = new System.Drawing.Size(46, 12);
             this.labelControl9.TabIndex = 45;
             this.labelControl9.Text = "Quantity:";
             // 
             // txtcomport
             // 
             this.txtcomport.EditValue = "COM1";
-            this.txtcomport.Location = new System.Drawing.Point(1159, 87);
+            this.txtcomport.Location = new System.Drawing.Point(993, 71);
+            this.txtcomport.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.txtcomport.Name = "txtcomport";
             this.txtcomport.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 7.25F);
             this.txtcomport.Properties.Appearance.Options.UseFont = true;
-            this.txtcomport.Size = new System.Drawing.Size(91, 22);
+            this.txtcomport.Size = new System.Drawing.Size(78, 18);
             this.txtcomport.TabIndex = 21;
             this.txtcomport.SelectedIndexChanged += new System.EventHandler(this.txtcomport_SelectedIndexChanged);
             // 
@@ -526,62 +551,68 @@
             // 
             this.labelControl6.Appearance.Font = new System.Drawing.Font("Tahoma", 7.75F, System.Drawing.FontStyle.Bold);
             this.labelControl6.Appearance.Options.UseFont = true;
-            this.labelControl6.Location = new System.Drawing.Point(1078, 90);
+            this.labelControl6.Location = new System.Drawing.Point(924, 73);
+            this.labelControl6.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.labelControl6.Name = "labelControl6";
-            this.labelControl6.Size = new System.Drawing.Size(70, 16);
+            this.labelControl6.Size = new System.Drawing.Size(59, 12);
             this.labelControl6.TabIndex = 18;
             this.labelControl6.Text = "COM PORT:";
             // 
             // txtrefno
             // 
             this.txtrefno.EditValue = "";
-            this.txtrefno.Location = new System.Drawing.Point(1401, 52);
+            this.txtrefno.Location = new System.Drawing.Point(1201, 42);
+            this.txtrefno.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.txtrefno.Name = "txtrefno";
             this.txtrefno.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 7.25F);
             this.txtrefno.Properties.Appearance.Options.UseFont = true;
             this.txtrefno.Properties.ReadOnly = true;
-            this.txtrefno.Size = new System.Drawing.Size(91, 22);
+            this.txtrefno.Size = new System.Drawing.Size(78, 18);
             this.txtrefno.TabIndex = 17;
             // 
             // labelControl5
             // 
             this.labelControl5.Appearance.Font = new System.Drawing.Font("Tahoma", 7.75F, System.Drawing.FontStyle.Bold);
             this.labelControl5.Appearance.Options.UseFont = true;
-            this.labelControl5.Location = new System.Drawing.Point(1274, 58);
+            this.labelControl5.Location = new System.Drawing.Point(1092, 47);
+            this.labelControl5.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.labelControl5.Name = "labelControl5";
-            this.labelControl5.Size = new System.Drawing.Size(121, 16);
+            this.labelControl5.Size = new System.Drawing.Size(93, 12);
             this.labelControl5.TabIndex = 16;
             this.labelControl5.Text = "ReferenceNumber:";
             // 
             // txtponum
             // 
             this.txtponum.EditValue = "";
-            this.txtponum.Location = new System.Drawing.Point(1401, 15);
+            this.txtponum.Location = new System.Drawing.Point(1201, 12);
+            this.txtponum.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.txtponum.Name = "txtponum";
             this.txtponum.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 7.25F);
             this.txtponum.Properties.Appearance.Options.UseFont = true;
             this.txtponum.Properties.ReadOnly = true;
-            this.txtponum.Size = new System.Drawing.Size(91, 22);
+            this.txtponum.Size = new System.Drawing.Size(78, 18);
             this.txtponum.TabIndex = 14;
             // 
             // txtbrcode
             // 
             this.txtbrcode.EditValue = "";
-            this.txtbrcode.Location = new System.Drawing.Point(1159, 17);
+            this.txtbrcode.Location = new System.Drawing.Point(993, 14);
+            this.txtbrcode.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.txtbrcode.Name = "txtbrcode";
             this.txtbrcode.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 7.25F);
             this.txtbrcode.Properties.Appearance.Options.UseFont = true;
             this.txtbrcode.Properties.ReadOnly = true;
-            this.txtbrcode.Size = new System.Drawing.Size(91, 22);
+            this.txtbrcode.Size = new System.Drawing.Size(78, 18);
             this.txtbrcode.TabIndex = 13;
             // 
             // labelControl4
             // 
             this.labelControl4.Appearance.Font = new System.Drawing.Font("Tahoma", 7.75F, System.Drawing.FontStyle.Bold);
             this.labelControl4.Appearance.Options.UseFont = true;
-            this.labelControl4.Location = new System.Drawing.Point(1272, 22);
+            this.labelControl4.Location = new System.Drawing.Point(1090, 18);
+            this.labelControl4.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.labelControl4.Name = "labelControl4";
-            this.labelControl4.Size = new System.Drawing.Size(123, 16);
+            this.labelControl4.Size = new System.Drawing.Size(96, 12);
             this.labelControl4.TabIndex = 12;
             this.labelControl4.Text = "Purchase Order  #:";
             // 
@@ -589,43 +620,47 @@
             // 
             this.labelControl1.Appearance.Font = new System.Drawing.Font("Tahoma", 7.75F, System.Drawing.FontStyle.Bold);
             this.labelControl1.Appearance.Options.UseFont = true;
-            this.labelControl1.Location = new System.Drawing.Point(1071, 22);
+            this.labelControl1.Location = new System.Drawing.Point(918, 18);
+            this.labelControl1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.labelControl1.Name = "labelControl1";
-            this.labelControl1.Size = new System.Drawing.Size(82, 16);
+            this.labelControl1.Size = new System.Drawing.Size(63, 12);
             this.labelControl1.TabIndex = 11;
             this.labelControl1.Text = "BranchCode:";
             // 
             // txtdevno
             // 
             this.txtdevno.EditValue = "";
-            this.txtdevno.Location = new System.Drawing.Point(1159, 54);
+            this.txtdevno.Location = new System.Drawing.Point(993, 44);
+            this.txtdevno.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.txtdevno.Name = "txtdevno";
             this.txtdevno.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 7.25F);
             this.txtdevno.Properties.Appearance.Options.UseFont = true;
             this.txtdevno.Properties.ReadOnly = true;
-            this.txtdevno.Size = new System.Drawing.Size(91, 22);
+            this.txtdevno.Size = new System.Drawing.Size(78, 18);
             this.txtdevno.TabIndex = 8;
             // 
             // labelControl3
             // 
             this.labelControl3.Appearance.Font = new System.Drawing.Font("Tahoma", 7.75F, System.Drawing.FontStyle.Bold);
             this.labelControl3.Appearance.Options.UseFont = true;
-            this.labelControl3.Location = new System.Drawing.Point(1075, 59);
+            this.labelControl3.Location = new System.Drawing.Point(921, 48);
+            this.labelControl3.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.labelControl3.Name = "labelControl3";
-            this.labelControl3.Size = new System.Drawing.Size(71, 16);
+            this.labelControl3.Size = new System.Drawing.Size(57, 12);
             this.labelControl3.TabIndex = 7;
             this.labelControl3.Text = "Delivery #:";
             // 
             // txtsku
             // 
             this.txtsku.EditValue = "";
-            this.txtsku.Location = new System.Drawing.Point(530, 56);
+            this.txtsku.Location = new System.Drawing.Point(454, 46);
+            this.txtsku.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.txtsku.Name = "txtsku";
             this.txtsku.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 7.25F);
             this.txtsku.Properties.Appearance.Options.UseFont = true;
             this.txtsku.Properties.MaxLength = 50;
             this.txtsku.Properties.ReadOnly = true;
-            this.txtsku.Size = new System.Drawing.Size(239, 22);
+            this.txtsku.Size = new System.Drawing.Size(205, 18);
             this.txtsku.TabIndex = 6;
             this.txtsku.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtsku_KeyDown);
             this.txtsku.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtsku_KeyPress);
@@ -634,9 +669,10 @@
             // 
             this.labelControl2.Appearance.Font = new System.Drawing.Font("Tahoma", 7.75F, System.Drawing.FontStyle.Bold);
             this.labelControl2.Appearance.Options.UseFont = true;
-            this.labelControl2.Location = new System.Drawing.Point(495, 60);
+            this.labelControl2.Location = new System.Drawing.Point(424, 49);
+            this.labelControl2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.labelControl2.Name = "labelControl2";
-            this.labelControl2.Size = new System.Drawing.Size(29, 16);
+            this.labelControl2.Size = new System.Drawing.Size(23, 12);
             this.labelControl2.TabIndex = 1;
             this.labelControl2.Text = "SKU:";
             // 
@@ -648,34 +684,37 @@
             this.panel1.Controls.Add(this.txtseqno);
             this.panel1.Controls.Add(this.searchLookUpEdit1);
             this.panel1.Controls.Add(this.labelControl11);
-            this.panel1.Location = new System.Drawing.Point(605, 257);
+            this.panel1.Location = new System.Drawing.Point(519, 209);
+            this.panel1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(766, 79);
+            this.panel1.Size = new System.Drawing.Size(657, 64);
             this.panel1.TabIndex = 64;
             // 
             // searchLookUpEditBranch
             // 
-            this.searchLookUpEditBranch.Location = new System.Drawing.Point(168, 6);
+            this.searchLookUpEditBranch.Location = new System.Drawing.Point(144, 5);
+            this.searchLookUpEditBranch.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.searchLookUpEditBranch.Name = "searchLookUpEditBranch";
             this.searchLookUpEditBranch.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.searchLookUpEditBranch.Properties.NullText = "";
             this.searchLookUpEditBranch.Properties.PopupView = this.gridView3;
             this.searchLookUpEditBranch.Properties.ReadOnly = true;
-            this.searchLookUpEditBranch.Size = new System.Drawing.Size(231, 22);
+            this.searchLookUpEditBranch.Size = new System.Drawing.Size(198, 20);
             this.searchLookUpEditBranch.TabIndex = 69;
             this.searchLookUpEditBranch.EditValueChanged += new System.EventHandler(this.searchLookUpEditBranch_EditValueChanged);
             // 
             // gridView3
             // 
             this.gridView3.ColumnPanelRowHeight = 0;
-            this.gridView3.DetailHeight = 349;
+            this.gridView3.DetailHeight = 284;
             this.gridView3.FixedLineWidth = 3;
             this.gridView3.FocusRectStyle = DevExpress.XtraGrid.Views.Grid.DrawFocusRectStyle.RowFocus;
             this.gridView3.FooterPanelHeight = 0;
             this.gridView3.GroupRowHeight = 0;
             this.gridView3.LevelIndent = 0;
             this.gridView3.Name = "gridView3";
+            this.gridView3.OptionsEditForm.PopupEditFormWidth = 686;
             this.gridView3.OptionsSelection.EnableAppearanceFocusedCell = false;
             this.gridView3.OptionsView.ShowGroupPanel = false;
             this.gridView3.PreviewIndent = 0;
@@ -686,9 +725,10 @@
             // 
             this.labelControl13.Appearance.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
             this.labelControl13.Appearance.Options.UseFont = true;
-            this.labelControl13.Location = new System.Drawing.Point(5, 6);
+            this.labelControl13.Location = new System.Drawing.Point(4, 5);
+            this.labelControl13.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.labelControl13.Name = "labelControl13";
-            this.labelControl13.Size = new System.Drawing.Size(62, 19);
+            this.labelControl13.Size = new System.Drawing.Size(50, 16);
             this.labelControl13.TabIndex = 68;
             this.labelControl13.Text = "Branch:";
             // 
@@ -696,25 +736,28 @@
             // 
             this.labelControl12.Appearance.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
             this.labelControl12.Appearance.Options.UseFont = true;
-            this.labelControl12.Location = new System.Drawing.Point(432, 8);
+            this.labelControl12.Location = new System.Drawing.Point(370, 6);
+            this.labelControl12.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.labelControl12.Name = "labelControl12";
-            this.labelControl12.Size = new System.Drawing.Size(111, 19);
+            this.labelControl12.Size = new System.Drawing.Size(88, 16);
             this.labelControl12.TabIndex = 65;
             this.labelControl12.Text = "SequenceNo.:";
             // 
             // txtseqno
             // 
             this.txtseqno.EditValue = "";
-            this.txtseqno.Location = new System.Drawing.Point(541, 5);
+            this.txtseqno.Location = new System.Drawing.Point(464, 4);
+            this.txtseqno.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.txtseqno.Name = "txtseqno";
             this.txtseqno.Properties.Appearance.Options.UseFont = true;
             this.txtseqno.Properties.ReadOnly = true;
-            this.txtseqno.Size = new System.Drawing.Size(91, 22);
+            this.txtseqno.Size = new System.Drawing.Size(78, 20);
             this.txtseqno.TabIndex = 67;
             // 
             // searchLookUpEdit1
             // 
-            this.searchLookUpEdit1.Location = new System.Drawing.Point(168, 35);
+            this.searchLookUpEdit1.Location = new System.Drawing.Point(144, 28);
+            this.searchLookUpEdit1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.searchLookUpEdit1.Name = "searchLookUpEdit1";
             this.searchLookUpEdit1.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 10.25F);
             this.searchLookUpEdit1.Properties.Appearance.Options.UseFont = true;
@@ -722,20 +765,21 @@
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.searchLookUpEdit1.Properties.NullText = "";
             this.searchLookUpEdit1.Properties.PopupView = this.searchLookUpEdit1View;
-            this.searchLookUpEdit1.Size = new System.Drawing.Size(556, 28);
+            this.searchLookUpEdit1.Size = new System.Drawing.Size(477, 24);
             this.searchLookUpEdit1.TabIndex = 22;
             this.searchLookUpEdit1.EditValueChanged += new System.EventHandler(this.searchLookUpEdit1_EditValueChanged);
             // 
             // searchLookUpEdit1View
             // 
             this.searchLookUpEdit1View.ColumnPanelRowHeight = 0;
-            this.searchLookUpEdit1View.DetailHeight = 349;
+            this.searchLookUpEdit1View.DetailHeight = 284;
             this.searchLookUpEdit1View.FixedLineWidth = 3;
             this.searchLookUpEdit1View.FocusRectStyle = DevExpress.XtraGrid.Views.Grid.DrawFocusRectStyle.RowFocus;
             this.searchLookUpEdit1View.FooterPanelHeight = 0;
             this.searchLookUpEdit1View.GroupRowHeight = 0;
             this.searchLookUpEdit1View.LevelIndent = 0;
             this.searchLookUpEdit1View.Name = "searchLookUpEdit1View";
+            this.searchLookUpEdit1View.OptionsEditForm.PopupEditFormWidth = 686;
             this.searchLookUpEdit1View.OptionsSelection.EnableAppearanceFocusedCell = false;
             this.searchLookUpEdit1View.OptionsView.ShowGroupPanel = false;
             this.searchLookUpEdit1View.PreviewIndent = 0;
@@ -746,9 +790,10 @@
             // 
             this.labelControl11.Appearance.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
             this.labelControl11.Appearance.Options.UseFont = true;
-            this.labelControl11.Location = new System.Drawing.Point(3, 40);
+            this.labelControl11.Location = new System.Drawing.Point(3, 32);
+            this.labelControl11.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.labelControl11.Name = "labelControl11";
-            this.labelControl11.Size = new System.Drawing.Size(168, 19);
+            this.labelControl11.Size = new System.Drawing.Size(137, 16);
             this.labelControl11.TabIndex = 21;
             this.labelControl11.Text = "Srce Prod Inventory:";
             // 
@@ -756,11 +801,13 @@
             // 
             this.tablePanel1.SetColumn(this.gridControl2, 0);
             this.gridControl2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControl2.Location = new System.Drawing.Point(3, 3);
+            this.gridControl2.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.gridControl2.Location = new System.Drawing.Point(2, 2);
             this.gridControl2.MainView = this.gridView2;
+            this.gridControl2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.gridControl2.Name = "gridControl2";
             this.tablePanel1.SetRow(this.gridControl2, 0);
-            this.gridControl2.Size = new System.Drawing.Size(958, 494);
+            this.gridControl2.Size = new System.Drawing.Size(552, 314);
             this.gridControl2.TabIndex = 3;
             this.gridControl2.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView2,
@@ -781,7 +828,6 @@
             this.gridView2.AppearancePrint.Row.Options.UseTextOptions = true;
             this.gridView2.AppearancePrint.Row.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center;
             this.gridView2.ColumnPanelRowHeight = 0;
-            this.gridView2.DetailHeight = 431;
             this.gridView2.FixedLineWidth = 3;
             this.gridView2.FooterPanelHeight = 0;
             this.gridView2.GridControl = this.gridControl2;
@@ -790,6 +836,7 @@
             this.gridView2.Name = "gridView2";
             this.gridView2.OptionsBehavior.Editable = false;
             this.gridView2.OptionsBehavior.ReadOnly = true;
+            this.gridView2.OptionsEditForm.PopupEditFormWidth = 686;
             this.gridView2.OptionsView.ColumnAutoWidth = false;
             this.gridView2.OptionsView.RowAutoHeight = true;
             this.gridView2.OptionsView.ShowFooter = true;
@@ -803,13 +850,13 @@
             // 
             this.bandedGridView2.BandPanelRowHeight = 0;
             this.bandedGridView2.ColumnPanelRowHeight = 0;
-            this.bandedGridView2.DetailHeight = 431;
             this.bandedGridView2.FixedLineWidth = 3;
             this.bandedGridView2.FooterPanelHeight = 0;
             this.bandedGridView2.GridControl = this.gridControl2;
             this.bandedGridView2.GroupRowHeight = 0;
             this.bandedGridView2.LevelIndent = 0;
             this.bandedGridView2.Name = "bandedGridView2";
+            this.bandedGridView2.OptionsEditForm.PopupEditFormWidth = 686;
             this.bandedGridView2.PreviewIndent = 0;
             this.bandedGridView2.RowHeight = 0;
             this.bandedGridView2.ViewCaptionHeight = 0;
@@ -820,13 +867,13 @@
             this.advBandedGridView2.Bands.AddRange(new DevExpress.XtraGrid.Views.BandedGrid.GridBand[] {
             this.gridBand2});
             this.advBandedGridView2.ColumnPanelRowHeight = 0;
-            this.advBandedGridView2.DetailHeight = 431;
             this.advBandedGridView2.FixedLineWidth = 3;
             this.advBandedGridView2.FooterPanelHeight = 0;
             this.advBandedGridView2.GridControl = this.gridControl2;
             this.advBandedGridView2.GroupRowHeight = 0;
             this.advBandedGridView2.LevelIndent = 0;
             this.advBandedGridView2.Name = "advBandedGridView2";
+            this.advBandedGridView2.OptionsEditForm.PopupEditFormWidth = 686;
             this.advBandedGridView2.PreviewIndent = 0;
             this.advBandedGridView2.RowHeight = 0;
             this.advBandedGridView2.ViewCaptionHeight = 0;
@@ -834,10 +881,8 @@
             // gridBand2
             // 
             this.gridBand2.Caption = "gridBand1";
-            this.gridBand2.MinWidth = 12;
             this.gridBand2.Name = "gridBand2";
             this.gridBand2.VisibleIndex = 0;
-            this.gridBand2.Width = 82;
             // 
             // contextMenuStrip1
             // 
@@ -845,12 +890,12 @@
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.printBarcodeToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(168, 28);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(146, 26);
             // 
             // printBarcodeToolStripMenuItem
             // 
             this.printBarcodeToolStripMenuItem.Name = "printBarcodeToolStripMenuItem";
-            this.printBarcodeToolStripMenuItem.Size = new System.Drawing.Size(167, 24);
+            this.printBarcodeToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
             this.printBarcodeToolStripMenuItem.Text = "Print Barcode";
             this.printBarcodeToolStripMenuItem.Click += new System.EventHandler(this.printBarcodeToolStripMenuItem_Click);
             // 
@@ -863,10 +908,11 @@
             this.tablePanel1.Controls.Add(this.groupControl1);
             this.tablePanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tablePanel1.Location = new System.Drawing.Point(2, 2);
+            this.tablePanel1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tablePanel1.Name = "tablePanel1";
             this.tablePanel1.Rows.AddRange(new DevExpress.Utils.Layout.TablePanelRow[] {
             new DevExpress.Utils.Layout.TablePanelRow(DevExpress.Utils.Layout.TablePanelEntityStyle.Absolute, 26F)});
-            this.tablePanel1.Size = new System.Drawing.Size(1841, 500);
+            this.tablePanel1.Size = new System.Drawing.Size(1328, 396);
             this.tablePanel1.TabIndex = 5;
             // 
             // panelControl1
@@ -874,27 +920,30 @@
             this.panelControl1.Controls.Add(this.groupControl2);
             this.panelControl1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelControl1.Location = new System.Drawing.Point(0, 0);
+            this.panelControl1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panelControl1.Name = "panelControl1";
-            this.panelControl1.Size = new System.Drawing.Size(1845, 176);
+            this.panelControl1.Size = new System.Drawing.Size(1332, 152);
             this.panelControl1.TabIndex = 6;
             // 
             // panelControl2
             // 
             this.panelControl2.Controls.Add(this.tablePanel1);
             this.panelControl2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelControl2.Location = new System.Drawing.Point(0, 176);
+            this.panelControl2.Location = new System.Drawing.Point(0, 152);
+            this.panelControl2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panelControl2.Name = "panelControl2";
-            this.panelControl2.Size = new System.Drawing.Size(1845, 504);
+            this.panelControl2.Size = new System.Drawing.Size(1332, 400);
             this.panelControl2.TabIndex = 7;
             // 
             // AddBranchOrder
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1845, 680);
+            this.ClientSize = new System.Drawing.Size(1332, 552);
             this.Controls.Add(this.panelControl2);
             this.Controls.Add(this.panelControl1);
             this.IconOptions.Icon = ((System.Drawing.Icon)(resources.GetObject("AddBranchOrder.IconOptions.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "AddBranchOrder";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Process Orders";

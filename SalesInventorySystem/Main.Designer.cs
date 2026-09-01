@@ -114,9 +114,6 @@
             this.popupMenuInvTransfer = new DevExpress.XtraBars.PopupMenu(this.components);
             this.btnTransferPerPallet = new DevExpress.XtraBars.BarButtonItem();
             this.btnTransferPerBarcode = new DevExpress.XtraBars.BarButtonItem();
-            this.btnConversionPerBarcode = new DevExpress.XtraBars.BarButtonItem();
-            this.btnDispatchPerBarcode = new DevExpress.XtraBars.BarButtonItem();
-            this.btnStockOutPerBarcode = new DevExpress.XtraBars.BarButtonItem();
             this.btnBackupDB = new DevExpress.XtraBars.BarButtonItem();
             this.barButtonItem66 = new DevExpress.XtraBars.BarButtonItem();
             this.btnCheckVoucher = new DevExpress.XtraBars.BarButtonItem();
@@ -239,6 +236,9 @@
             this.btnLockedUsers = new DevExpress.XtraBars.BarButtonItem();
             this.btnSalesManualEntry = new DevExpress.XtraBars.BarButtonItem();
             this.btnInventoryMapping = new DevExpress.XtraBars.BarButtonItem();
+            this.btnConversionPerBarcode = new DevExpress.XtraBars.BarButtonItem();
+            this.btnDispatchPerBarcode = new DevExpress.XtraBars.BarButtonItem();
+            this.btnStockOutPerBarcode = new DevExpress.XtraBars.BarButtonItem();
             this.barButtonItem24 = new DevExpress.XtraBars.BarButtonItem();
             this.btnInventoryCostRep = new DevExpress.XtraBars.BarButtonItem();
             this.btnMerchants = new DevExpress.XtraBars.BarButtonItem();
@@ -319,6 +319,7 @@
             this.barButtonItem103 = new DevExpress.XtraBars.BarButtonItem();
             this.barButtonItem1 = new DevExpress.XtraBars.BarButtonItem();
             this.barButtonItem5 = new DevExpress.XtraBars.BarButtonItem();
+            this.barbtnPOSAutomation = new DevExpress.XtraBars.BarButtonItem();
             ((System.ComponentModel.ISupportInitialize)(this.ribbonControl)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.popupMenuTickets)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.popupMenuInvTransfer)).BeginInit();
@@ -337,6 +338,7 @@
             // 
             this.ribbonControl.ApplicationButtonText = null;
             this.ribbonControl.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(236)))), ((int)(((byte)(239)))));
+            this.ribbonControl.EmptyAreaImageOptions.ImagePadding = new System.Windows.Forms.Padding(26, 24, 26, 24);
             this.ribbonControl.ExpandCollapseItem.Id = 0;
             this.ribbonControl.Items.AddRange(new DevExpress.XtraBars.BarItem[] {
             this.ribbonControl.ExpandCollapseItem,
@@ -571,11 +573,13 @@
             this.btnMonthEndCountConso,
             this.btnSummaryInventoryConso,
             this.btnSupplierDebitCreditMemo,
-            this.btnAccountingBoard});
+            this.btnAccountingBoard,
+            this.barbtnPOSAutomation});
             this.ribbonControl.Location = new System.Drawing.Point(0, 0);
-            this.ribbonControl.Margin = new System.Windows.Forms.Padding(0, 4, 0, 4);
-            this.ribbonControl.MaxItemId = 237;
+            this.ribbonControl.Margin = new System.Windows.Forms.Padding(0, 3, 0, 3);
+            this.ribbonControl.MaxItemId = 238;
             this.ribbonControl.Name = "ribbonControl";
+            this.ribbonControl.OptionsMenuMinWidth = 283;
             this.ribbonControl.PageHeaderItemLinks.Add(this.barStaticItem2);
             this.ribbonControl.Pages.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPage[] {
             this.ribbonPage1,
@@ -590,7 +594,7 @@
             this.ribbonControl.RibbonStyle = DevExpress.XtraBars.Ribbon.RibbonControlStyle.Office2013;
             this.ribbonControl.ShowApplicationButton = DevExpress.Utils.DefaultBoolean.False;
             this.ribbonControl.ShowPageHeadersMode = DevExpress.XtraBars.Ribbon.ShowPageHeadersMode.Show;
-            this.ribbonControl.Size = new System.Drawing.Size(1519, 193);
+            this.ribbonControl.Size = new System.Drawing.Size(1447, 158);
             this.ribbonControl.StatusBar = this.ribbonStatusBar;
             this.ribbonControl.SelectedPageChanged += new System.EventHandler(this.ribbonControl_SelectedPageChanged);
             this.ribbonControl.Click += new System.EventHandler(this.ribbon_Click);
@@ -1321,28 +1325,7 @@
             this.btnTransferPerBarcode.Id = 198;
             this.btnTransferPerBarcode.Name = "btnTransferPerBarcode";
             this.btnTransferPerBarcode.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnTransferPerBarcode_ItemClick);
-            //
-            // btnConversionPerBarcode
-            //
-            this.btnConversionPerBarcode.Caption = "Conversion";
-            this.btnConversionPerBarcode.Id = 237;
-            this.btnConversionPerBarcode.Name = "btnConversionPerBarcode";
-            this.btnConversionPerBarcode.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnConversionPerBarcode_ItemClick);
-            //
-            // btnDispatchPerBarcode
-            //
-            this.btnDispatchPerBarcode.Caption = "Dispatch Per Barcode";
-            this.btnDispatchPerBarcode.Id = 238;
-            this.btnDispatchPerBarcode.Name = "btnDispatchPerBarcode";
-            this.btnDispatchPerBarcode.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnDispatchPerBarcode_ItemClick);
-            //
-            // btnStockOutPerBarcode
-            //
-            this.btnStockOutPerBarcode.Caption = "Stock-Out Per Barcode";
-            this.btnStockOutPerBarcode.Id = 239;
-            this.btnStockOutPerBarcode.Name = "btnStockOutPerBarcode";
-            this.btnStockOutPerBarcode.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnStockOutPerBarcode_ItemClick);
-            //
+            // 
             // btnBackupDB
             // 
             this.btnBackupDB.Caption = "Backup DB";
@@ -2485,6 +2468,27 @@
             this.btnInventoryMapping.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
             this.btnInventoryMapping.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnInventoryMapping_ItemClick);
             // 
+            // btnConversionPerBarcode
+            // 
+            this.btnConversionPerBarcode.Caption = "Conversion";
+            this.btnConversionPerBarcode.Id = 237;
+            this.btnConversionPerBarcode.Name = "btnConversionPerBarcode";
+            this.btnConversionPerBarcode.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnConversionPerBarcode_ItemClick);
+            // 
+            // btnDispatchPerBarcode
+            // 
+            this.btnDispatchPerBarcode.Caption = "Dispatch Per Barcode";
+            this.btnDispatchPerBarcode.Id = 238;
+            this.btnDispatchPerBarcode.Name = "btnDispatchPerBarcode";
+            this.btnDispatchPerBarcode.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnDispatchPerBarcode_ItemClick);
+            // 
+            // btnStockOutPerBarcode
+            // 
+            this.btnStockOutPerBarcode.Caption = "Stock-Out Per Barcode";
+            this.btnStockOutPerBarcode.Id = 239;
+            this.btnStockOutPerBarcode.Name = "btnStockOutPerBarcode";
+            this.btnStockOutPerBarcode.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnStockOutPerBarcode_ItemClick);
+            // 
             // barButtonItem24
             // 
             this.barButtonItem24.Caption = "barButtonItem24";
@@ -2824,12 +2828,12 @@
             this.ribbonPageGroup13.ItemLinks.Add(this.btnSuppliersInfo);
             this.ribbonPageGroup13.ItemLinks.Add(this.btnCustodian);
             this.ribbonPageGroup13.ItemLinks.Add(this.btnUserAccess);
-            this.ribbonPageGroup13.ItemLinks.Add(this.btnMetrics);
             this.ribbonPageGroup13.ItemLinks.Add(this.btnPOSMachine);
             this.ribbonPageGroup13.ItemLinks.Add(this.btnReportHeaderSettings);
             this.ribbonPageGroup13.ItemLinks.Add(this.btnCompany);
             this.ribbonPageGroup13.ItemLinks.Add(this.btnLockedUsers);
             this.ribbonPageGroup13.ItemLinks.Add(this.btnMerchants);
+            this.ribbonPageGroup13.ItemLinks.Add(this.barbtnPOSAutomation);
             this.ribbonPageGroup13.Name = "ribbonPageGroup13";
             this.ribbonPageGroup13.Text = "GENERAL ADMINISTRATION";
             // 
@@ -3184,11 +3188,11 @@
             this.ribbonStatusBar.ItemLinks.Add(this.barHeaderItem4);
             this.ribbonStatusBar.ItemLinks.Add(this.barStaticItem8);
             this.ribbonStatusBar.ItemLinks.Add(this.barStaticCashierTransNo);
-            this.ribbonStatusBar.Location = new System.Drawing.Point(0, 681);
-            this.ribbonStatusBar.Margin = new System.Windows.Forms.Padding(0, 4, 0, 4);
+            this.ribbonStatusBar.Location = new System.Drawing.Point(0, 618);
+            this.ribbonStatusBar.Margin = new System.Windows.Forms.Padding(0, 3, 0, 3);
             this.ribbonStatusBar.Name = "ribbonStatusBar";
             this.ribbonStatusBar.Ribbon = this.ribbonControl;
-            this.ribbonStatusBar.Size = new System.Drawing.Size(1519, 30);
+            this.ribbonStatusBar.Size = new System.Drawing.Size(1447, 24);
             // 
             // barAndDockingController1
             // 
@@ -3258,18 +3262,27 @@
             this.barButtonItem5.Name = "barButtonItem5";
             this.barButtonItem5.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
             // 
+            // barbtnPOSAutomation
+            // 
+            this.barbtnPOSAutomation.Caption = "POS Auto";
+            this.barbtnPOSAutomation.Id = 237;
+            this.barbtnPOSAutomation.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("barbtnPOSAutomation.ImageOptions.Image")));
+            this.barbtnPOSAutomation.ImageOptions.LargeImage = ((System.Drawing.Image)(resources.GetObject("barbtnPOSAutomation.ImageOptions.LargeImage")));
+            this.barbtnPOSAutomation.Name = "barbtnPOSAutomation";
+            this.barbtnPOSAutomation.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.barbtnPOSAutomation_ItemClick);
+            // 
             // Main
             // 
             this.Appearance.BackColor = System.Drawing.SystemColors.Control;
             this.Appearance.Options.UseBackColor = true;
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1519, 711);
+            this.ClientSize = new System.Drawing.Size(1447, 642);
             this.Controls.Add(this.ribbonControl);
             this.Controls.Add(this.ribbonStatusBar);
             this.IconOptions.Image = ((System.Drawing.Image)(resources.GetObject("Main.IconOptions.Image")));
             this.IsMdiContainer = true;
-            this.Margin = new System.Windows.Forms.Padding(0, 4, 0, 4);
+            this.Margin = new System.Windows.Forms.Padding(0, 3, 0, 3);
             this.Name = "Main";
             this.Ribbon = this.ribbonControl;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -3591,5 +3604,6 @@
         private DevExpress.XtraBars.BarButtonItem btnSupplierDebitCreditMemo;
         private DevExpress.XtraBars.BarButtonItem btnAccountingBoard;
         private DevExpress.XtraBars.PopupMenu popupMenuTickets;
+        private DevExpress.XtraBars.BarButtonItem barbtnPOSAutomation;
     }
 }

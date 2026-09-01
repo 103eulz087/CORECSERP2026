@@ -138,8 +138,8 @@ namespace SalesInventorySystem
                ",BarcodeNo" +
                ",QtyDelivered " +
                "FROM DeliveryDetails " +
-               "WHERE DeliveryNo='" + txtdevno.Text + "' " +
-               "AND Status='PENDING' AND isCancelled=0 ORDER BY SeqNo ASC", gridControl2, gridView2);
+               "WHERE PONumber='" + txtponum.Text + "' " +
+               "AND Status='PENDING' AND isnull(isCancelled,0)=0 and isnull(isReturned,0)=0 ORDER BY SeqNo ASC", gridControl2, gridView2);
             }
            
 
