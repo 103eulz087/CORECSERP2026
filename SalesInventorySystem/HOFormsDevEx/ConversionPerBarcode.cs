@@ -48,6 +48,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             LoadOutputProductDropdown();
             UpdateSourceMethodVisibility();
             LoadPostedGrid();
+            LoadForPostingGrid();
 
             _dataLoaded = true;
         }
@@ -726,9 +727,9 @@ namespace SalesInventorySystem.HOFormsDevEx
                 {
                     con.Open();
                     cmd.ExecuteNonQuery();
-                    BigAlert.Show("SUCCESS", "Conversion posted successfully.", MessageBoxIcon.Information);
+                    BigAlert.Show("SUCCESS", "Conversion posted successfully. It is now in the For Posting tab, pending final cost review.", MessageBoxIcon.Information);
                     _ = ResetUIAsync();
-                    LoadPostedGrid();
+                    LoadForPostingGrid();
                 }
                 catch (SqlException ex)
                 {
@@ -861,16 +862,20 @@ namespace SalesInventorySystem.HOFormsDevEx
         }
 
         // ------------------------------------------------------------------
-        // Posted tab
+        // Posted tab -- only batches that are truly done: finalized (POSTED,
+        // permanent, GL already posted) or REVERSED. A batch still awaiting
+        // its final-cost review/Finalize lives in the For Posting tab
+        // instead (Status = 'FOR POSTING').
         // ------------------------------------------------------------------
         void LoadPostedGrid()
         {
             Database.display(
                 "SELECT ConversionRefNo, ConversionType, TotalSourceQty, TotalSourceCost, CuttingCharge, " +
                 "TotalDriplossQty, MaterialRatePerUnit, ChargeRatePerLine, Status, DateConverted, ConvertedBy, " +
-                "ReversedBy, DateReversed " +
+                "ReversedBy, DateReversed, FinalizedBy, DateFinalized " +
                 "FROM dbo.vw_ConversionBarcodeSummary WITH (NOLOCK) " +
                 "WHERE BranchCode = '" + Login.assignedBranch.Replace("'", "''") + "' " +
+                "AND Status IN ('POSTED', 'REVERSED') " +
                 "ORDER BY DateConverted DESC",
                 gridControlPosted, gridViewPosted);
             gridViewPosted.BestFitColumns();
@@ -879,6 +884,87 @@ namespace SalesInventorySystem.HOFormsDevEx
         private void btnRefreshPosted_Click(object sender, EventArgs e)
         {
             LoadPostedGrid();
+        }
+
+        // ------------------------------------------------------------------
+        // For Posting tab -- batches awaiting human final-cost review before
+        // GL posting. Reverse (restore Inventory, no GL to unwind since none
+        // exists yet) is only available from here, not from Posted.
+        // ------------------------------------------------------------------
+        void LoadForPostingGrid()
+        {
+            Database.display(
+                "SELECT ConversionRefNo, ConversionType, TotalSourceQty, TotalSourceCost, CuttingCharge, " +
+                "TotalDriplossQty, MaterialRatePerUnit, ChargeRatePerLine, Status, DateConverted, ConvertedBy " +
+                "FROM dbo.vw_ConversionBarcodeSummary WITH (NOLOCK) " +
+                "WHERE BranchCode = '" + Login.assignedBranch.Replace("'", "''") + "' " +
+                "AND Status = 'FOR POSTING' " +
+                "ORDER BY DateConverted DESC",
+                gridControlForPosting, gridViewForPosting);
+            gridViewForPosting.BestFitColumns();
+        }
+
+        private void btnRefreshForPosting_Click(object sender, EventArgs e)
+        {
+            LoadForPostingGrid();
+        }
+
+        string GetFocusedForPostingRefNo()
+        {
+            if (gridViewForPosting.FocusedRowHandle < 0) return null;
+            var val = gridViewForPosting.GetRowCellValue(gridViewForPosting.FocusedRowHandle, "ConversionRefNo");
+            return val == null ? null : val.ToString();
+        }
+
+        private void mnuFinalize_Click(object sender, EventArgs e)
+        {
+            string refNo = GetFocusedForPostingRefNo();
+            if (string.IsNullOrEmpty(refNo)) return;
+
+            ConversionPerBarcodeFinalize finalizeForm = new ConversionPerBarcodeFinalize(refNo);
+            if (finalizeForm.ShowDialog() == DialogResult.OK)
+            {
+                LoadForPostingGrid();
+                LoadPostedGrid();
+            }
+        }
+
+        private void mnuReverseForPosting_Click(object sender, EventArgs e)
+        {
+            string refNo = GetFocusedForPostingRefNo();
+            if (string.IsNullOrEmpty(refNo)) return;
+
+            string status = gridViewForPosting.GetRowCellValue(gridViewForPosting.FocusedRowHandle, "Status").ToString();
+            if (status != "FOR POSTING")
+            {
+                BigAlert.Show("NOT FOR POSTING", "This Conversion is not in FOR POSTING status.", MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (XtraMessageBox.Show($"Reverse Conversion {refNo}? This restores source stock and zeroes out the converted stock (only allowed if it hasn't been moved yet).",
+                    "Reverse Conversion", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                return;
+
+            using (var con = Database.getConnection())
+            using (var cmd = new SqlCommand("dbo.spu_ReverseConversionBarcode", con))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add("@ConversionRefNo", SqlDbType.VarChar, 20).Value = refNo;
+                cmd.Parameters.Add("@ReversedBy", SqlDbType.VarChar, 50).Value = Login.Fullname;
+
+                try
+                {
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                    BigAlert.Show("REVERSED", "Conversion reversed successfully.", MessageBoxIcon.Information);
+                    LoadForPostingGrid();
+                    LoadPostedGrid();
+                }
+                catch (SqlException ex)
+                {
+                    BigAlert.Show("REVERSE FAILED", ex.Message, MessageBoxIcon.Error);
+                }
+            }
         }
 
         string GetFocusedPostedRefNo()
@@ -918,41 +1004,5 @@ namespace SalesInventorySystem.HOFormsDevEx
             txtCharge.Value = decimal.TryParse(charge, out decimal chargeValue) ? chargeValue : 0;
         }
 
-        private void mnuReversePosted_Click(object sender, EventArgs e)
-        {
-            string refNo = GetFocusedPostedRefNo();
-            if (string.IsNullOrEmpty(refNo)) return;
-
-            string status = gridViewPosted.GetRowCellValue(gridViewPosted.FocusedRowHandle, "Status").ToString();
-            if (status != "POSTED")
-            {
-                BigAlert.Show("NOT POSTED", "This Conversion is not in POSTED status.", MessageBoxIcon.Warning);
-                return;
-            }
-
-            if (XtraMessageBox.Show($"Reverse Conversion {refNo}? This restores source stock and zeroes out the converted stock (only allowed if it hasn't been moved yet).",
-                    "Reverse Conversion", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
-                return;
-
-            using (var con = Database.getConnection())
-            using (var cmd = new SqlCommand("dbo.spu_ReverseConversionBarcode", con))
-            {
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.Add("@ConversionRefNo", SqlDbType.VarChar, 20).Value = refNo;
-                cmd.Parameters.Add("@ReversedBy", SqlDbType.VarChar, 50).Value = Login.Fullname;
-
-                try
-                {
-                    con.Open();
-                    cmd.ExecuteNonQuery();
-                    BigAlert.Show("REVERSED", "Conversion reversed successfully.", MessageBoxIcon.Information);
-                    LoadPostedGrid();
-                }
-                catch (SqlException ex)
-                {
-                    BigAlert.Show("REVERSE FAILED", ex.Message, MessageBoxIcon.Error);
-                }
-            }
-        }
     }
 }

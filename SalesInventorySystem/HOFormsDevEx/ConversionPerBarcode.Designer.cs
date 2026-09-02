@@ -89,10 +89,17 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.contextMenuStripPosted = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.mnuViewDetails = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuCopyToNewEntry = new System.Windows.Forms.ToolStripMenuItem();
-            this.mnuReversePosted = new System.Windows.Forms.ToolStripMenuItem();
             this.gridViewPosted = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.panelPostedTop = new DevExpress.XtraEditors.PanelControl();
             this.btnRefreshPosted = new DevExpress.XtraEditors.SimpleButton();
+            this.xtraTabPageForPosting = new DevExpress.XtraTab.XtraTabPage();
+            this.gridControlForPosting = new DevExpress.XtraGrid.GridControl();
+            this.contextMenuStripForPosting = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.mnuFinalize = new System.Windows.Forms.ToolStripMenuItem();
+            this.mnuReverseForPosting = new System.Windows.Forms.ToolStripMenuItem();
+            this.gridViewForPosting = new DevExpress.XtraGrid.Views.Grid.GridView();
+            this.panelForPostingTop = new DevExpress.XtraEditors.PanelControl();
+            this.btnRefreshForPosting = new DevExpress.XtraEditors.SimpleButton();
             ((System.ComponentModel.ISupportInitialize)(this.xtraTabControl1)).BeginInit();
             this.xtraTabControl1.SuspendLayout();
             this.xtraTabPageNewEntry.SuspendLayout();
@@ -135,6 +142,12 @@ namespace SalesInventorySystem.HOFormsDevEx
             ((System.ComponentModel.ISupportInitialize)(this.gridViewPosted)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelPostedTop)).BeginInit();
             this.panelPostedTop.SuspendLayout();
+            this.xtraTabPageForPosting.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.gridControlForPosting)).BeginInit();
+            this.contextMenuStripForPosting.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.gridViewForPosting)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.panelForPostingTop)).BeginInit();
+            this.panelForPostingTop.SuspendLayout();
             this.SuspendLayout();
             // 
             // xtraTabControl1
@@ -148,6 +161,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.xtraTabControl1.TabIndex = 0;
             this.xtraTabControl1.TabPages.AddRange(new DevExpress.XtraTab.XtraTabPage[] {
             this.xtraTabPageNewEntry,
+            this.xtraTabPageForPosting,
             this.xtraTabPagePosted});
             // 
             // xtraTabPageNewEntry
@@ -831,10 +845,9 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.contextMenuStripPosted.ImageScalingSize = new System.Drawing.Size(32, 32);
             this.contextMenuStripPosted.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.mnuViewDetails,
-            this.mnuCopyToNewEntry,
-            this.mnuReversePosted});
+            this.mnuCopyToNewEntry});
             this.contextMenuStripPosted.Name = "contextMenuStripPosted";
-            this.contextMenuStripPosted.Size = new System.Drawing.Size(176, 70);
+            this.contextMenuStripPosted.Size = new System.Drawing.Size(176, 48);
             // 
             // mnuViewDetails
             // 
@@ -849,14 +862,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.mnuCopyToNewEntry.Size = new System.Drawing.Size(175, 22);
             this.mnuCopyToNewEntry.Text = "Copy To New Entry";
             this.mnuCopyToNewEntry.Click += new System.EventHandler(this.mnuCopyToNewEntry_Click);
-            // 
-            // mnuReversePosted
-            // 
-            this.mnuReversePosted.Name = "mnuReversePosted";
-            this.mnuReversePosted.Size = new System.Drawing.Size(175, 22);
-            this.mnuReversePosted.Text = "Reverse";
-            this.mnuReversePosted.Click += new System.EventHandler(this.mnuReversePosted_Click);
-            // 
+            //
             // gridViewPosted
             // 
             this.gridViewPosted.DetailHeight = 284;
@@ -886,9 +892,86 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.btnRefreshPosted.TabIndex = 0;
             this.btnRefreshPosted.Text = "Refresh";
             this.btnRefreshPosted.Click += new System.EventHandler(this.btnRefreshPosted_Click);
-            // 
+            //
+            // xtraTabPageForPosting
+            //
+            this.xtraTabPageForPosting.Controls.Add(this.gridControlForPosting);
+            this.xtraTabPageForPosting.Controls.Add(this.panelForPostingTop);
+            this.xtraTabPageForPosting.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.xtraTabPageForPosting.Name = "xtraTabPageForPosting";
+            this.xtraTabPageForPosting.Size = new System.Drawing.Size(1352, 763);
+            this.xtraTabPageForPosting.Text = "For Posting";
+            //
+            // gridControlForPosting
+            //
+            this.gridControlForPosting.ContextMenuStrip = this.contextMenuStripForPosting;
+            this.gridControlForPosting.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.gridControlForPosting.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.gridControlForPosting.Location = new System.Drawing.Point(0, 37);
+            this.gridControlForPosting.MainView = this.gridViewForPosting;
+            this.gridControlForPosting.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.gridControlForPosting.Name = "gridControlForPosting";
+            this.gridControlForPosting.Size = new System.Drawing.Size(1352, 726);
+            this.gridControlForPosting.TabIndex = 1;
+            this.gridControlForPosting.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
+            this.gridViewForPosting});
+            this.gridControlForPosting.DoubleClick += new System.EventHandler(this.mnuFinalize_Click);
+            //
+            // contextMenuStripForPosting
+            //
+            this.contextMenuStripForPosting.ImageScalingSize = new System.Drawing.Size(32, 32);
+            this.contextMenuStripForPosting.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mnuFinalize,
+            this.mnuReverseForPosting});
+            this.contextMenuStripForPosting.Name = "contextMenuStripForPosting";
+            this.contextMenuStripForPosting.Size = new System.Drawing.Size(176, 48);
+            //
+            // mnuFinalize
+            //
+            this.mnuFinalize.Name = "mnuFinalize";
+            this.mnuFinalize.Size = new System.Drawing.Size(175, 22);
+            this.mnuFinalize.Text = "Finalize";
+            this.mnuFinalize.Click += new System.EventHandler(this.mnuFinalize_Click);
+            //
+            // mnuReverseForPosting
+            //
+            this.mnuReverseForPosting.Name = "mnuReverseForPosting";
+            this.mnuReverseForPosting.Size = new System.Drawing.Size(175, 22);
+            this.mnuReverseForPosting.Text = "Reverse";
+            this.mnuReverseForPosting.Click += new System.EventHandler(this.mnuReverseForPosting_Click);
+            //
+            // gridViewForPosting
+            //
+            this.gridViewForPosting.DetailHeight = 284;
+            this.gridViewForPosting.GridControl = this.gridControlForPosting;
+            this.gridViewForPosting.Name = "gridViewForPosting";
+            this.gridViewForPosting.OptionsBehavior.Editable = false;
+            this.gridViewForPosting.OptionsBehavior.ReadOnly = true;
+            this.gridViewForPosting.OptionsEditForm.PopupEditFormWidth = 686;
+            this.gridViewForPosting.OptionsView.ColumnAutoWidth = false;
+            //
+            // panelForPostingTop
+            //
+            this.panelForPostingTop.Controls.Add(this.btnRefreshForPosting);
+            this.panelForPostingTop.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panelForPostingTop.Location = new System.Drawing.Point(0, 0);
+            this.panelForPostingTop.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.panelForPostingTop.Name = "panelForPostingTop";
+            this.panelForPostingTop.Size = new System.Drawing.Size(1352, 37);
+            this.panelForPostingTop.TabIndex = 0;
+            //
+            // btnRefreshForPosting
+            //
+            this.btnRefreshForPosting.Location = new System.Drawing.Point(12, 6);
+            this.btnRefreshForPosting.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btnRefreshForPosting.Name = "btnRefreshForPosting";
+            this.btnRefreshForPosting.Size = new System.Drawing.Size(86, 24);
+            this.btnRefreshForPosting.TabIndex = 0;
+            this.btnRefreshForPosting.Text = "Refresh";
+            this.btnRefreshForPosting.Click += new System.EventHandler(this.btnRefreshForPosting_Click);
+            //
             // ConversionPerBarcode
-            // 
+            //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1354, 788);
@@ -946,6 +1029,12 @@ namespace SalesInventorySystem.HOFormsDevEx
             ((System.ComponentModel.ISupportInitialize)(this.gridViewPosted)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelPostedTop)).EndInit();
             this.panelPostedTop.ResumeLayout(false);
+            this.xtraTabPageForPosting.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.gridControlForPosting)).EndInit();
+            this.contextMenuStripForPosting.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.gridViewForPosting)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.panelForPostingTop)).EndInit();
+            this.panelForPostingTop.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -1013,8 +1102,15 @@ namespace SalesInventorySystem.HOFormsDevEx
         private System.Windows.Forms.ContextMenuStrip contextMenuStripPosted;
         private System.Windows.Forms.ToolStripMenuItem mnuViewDetails;
         private System.Windows.Forms.ToolStripMenuItem mnuCopyToNewEntry;
-        private System.Windows.Forms.ToolStripMenuItem mnuReversePosted;
         private DevExpress.XtraEditors.PanelControl panelPostedTop;
         private DevExpress.XtraEditors.SimpleButton btnRefreshPosted;
+        private DevExpress.XtraTab.XtraTabPage xtraTabPageForPosting;
+        private DevExpress.XtraGrid.GridControl gridControlForPosting;
+        private DevExpress.XtraGrid.Views.Grid.GridView gridViewForPosting;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStripForPosting;
+        private System.Windows.Forms.ToolStripMenuItem mnuFinalize;
+        private System.Windows.Forms.ToolStripMenuItem mnuReverseForPosting;
+        private DevExpress.XtraEditors.PanelControl panelForPostingTop;
+        private DevExpress.XtraEditors.SimpleButton btnRefreshForPosting;
     }
 }

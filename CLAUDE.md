@@ -63,6 +63,7 @@ SP Backup Renaming: add suffix timestamp in sp name for backup before creating n
 - `GlobalCache.InitializeCompanyData()` is called first thing in `Program.Main` and opens a DB connection immediately at startup to load company info — DB connectivity (registry key configured) is a hard prerequisite for the app to even start.
 - `Classes/GlobalVariables.cs` holds static, process-wide mutable state (current user, session flags, shared `SqlConnection`/`OleDbConnection`/`DataSet` instances) that most forms read/write directly instead of passing state explicitly. Many other classes (e.g. `Database`) inherit from `GlobalVariables` to get this state in scope.
 - SQL Server databases are involved: `CORECSERP_002_DEV` (sales/inventory/POS/Accounting), if there are changes has been made in `CORECSERP_002_DEV` should also apply in `CORECSJFC2026_STAGING` database but ask confirmation first.
+- As of 2026-09-02, both `CORECSERP_002_DEV` and `CORECSJFC2026_STAGING` are hosted on `corex.itcoreapps.com` (a single server, connected to directly by database name — no named instance/port needed). Credentials for this server are stored in the registry per the mechanism above (`HKCU\AAITCRE\ConnSettingsMain` for DEV, `ConnSettingsServer` for STAGING) — never in this file or any other checked-in source.
 
 ## Module / folder structure
 

@@ -1250,8 +1250,6 @@ D:\GITHUB\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.HOFo
 D:\GITHUB\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.HOFormsDevEx.ConversionPerBarcodeDetails.resources
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\bin\Debug\app.config
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\bin\Debug\SalesInventorySystem.exe.config
-D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\bin\Debug\SalesInventorySystem.exe.manifest
-D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\bin\Debug\SalesInventorySystem.application
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\bin\Debug\SalesInventorySystem.exe
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\bin\Debug\SalesInventorySystem.pdb
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\bin\Debug\Npgsql.dll
@@ -1875,12 +1873,9 @@ D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.zz
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.csproj.GenerateResource.cache
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.exe.licenses
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.csproj.CoreCompileInputs.cache
-D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.exe.manifest
-D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.application
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInv.A74E2F72.Up2Date
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.exe
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.pdb
-D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.exe.config
 D:\GITHUB\CORECSERP2026\SalesInventorySystem\bin\Debug\SalesInventorySystem.exe.manifest
 D:\GITHUB\CORECSERP2026\SalesInventorySystem\bin\Debug\SalesInventorySystem.application
 D:\GITHUB\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.HOFormsDevEx.DispatchPerBarcode.resources
@@ -1888,3 +1883,4 @@ D:\GITHUB\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.HOFo
 D:\GITHUB\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.HOFormsDevEx.StockOutPerBarcodeDetails.resources
 D:\GITHUB\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.exe.manifest
 D:\GITHUB\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.application
+D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.HOFormsDevEx.ConversionPerBarcodeFinalize.resources

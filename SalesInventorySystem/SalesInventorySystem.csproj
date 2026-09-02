@@ -56,7 +56,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Gemini_Generated_Image_knbj2tknbj2tknbjNew.ico</ApplicationIcon>
+    <ApplicationIcon>corexicon.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>
@@ -69,7 +69,7 @@
     <ManifestKeyFile>SalesInventorySystem_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <GenerateManifests>true</GenerateManifests>
+    <GenerateManifests>false</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
     <SignManifests>false</SignManifests>
@@ -1283,6 +1283,12 @@
     </Compile>
     <Compile Include="HOFormsDevEx\ConversionPerBarcodeDetails.Designer.cs">
       <DependentUpon>ConversionPerBarcodeDetails.cs</DependentUpon>
+    </Compile>
+    <Compile Include="HOFormsDevEx\ConversionPerBarcodeFinalize.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HOFormsDevEx\ConversionPerBarcodeFinalize.Designer.cs">
+      <DependentUpon>ConversionPerBarcodeFinalize.cs</DependentUpon>
     </Compile>
     <Compile Include="HOFormsDevEx\DispatchPerBarcode.cs">
       <SubType>Form</SubType>
@@ -3953,6 +3959,9 @@
     <EmbeddedResource Include="HOFormsDevEx\ConversionPerBarcodeDetails.resx">
       <DependentUpon>ConversionPerBarcodeDetails.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="HOFormsDevEx\ConversionPerBarcodeFinalize.resx">
+      <DependentUpon>ConversionPerBarcodeFinalize.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="HOFormsDevEx\DispatchPerBarcode.resx">
       <DependentUpon>DispatchPerBarcode.cs</DependentUpon>
     </EmbeddedResource>
@@ -5132,6 +5141,7 @@
       <SubType>Form</SubType>
     </Compile>
     <Content Include="CORECSICON.ico" />
+    <Content Include="corexicon.ico" />
     <Content Include="Gemini_Generated_Image_knbj2tknbj2tknbjNew.ico" />
     <Content Include="icon175x175.ico" />
     <Content Include="Images\noimagefound.jpg" />
@@ -5195,6 +5205,8 @@
     <None Include="Resources\SalesSummary2_32x32.png" />
     <None Include="Resources\sparkposlogo.jpg" />
     <None Include="Resources\corecslogindesign.jpg" />
+    <None Include="Resources\corexlogindesign.png" />
+    <None Include="Resources\COREXXX.png" />
     <Content Include="spireicon.ico" />
     <Content Include="spireicon1.ico" />
   </ItemGroup>

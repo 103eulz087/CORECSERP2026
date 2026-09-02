@@ -17,7 +17,7 @@ namespace SalesInventorySystem
 
             DevExpress.UserSkins.BonusSkins.Register();
             //UserLookAndFeel.Default.SetSkinStyle(SkinStyle.);
-            UserLookAndFeel.Default.SetSkinStyle(SkinStyle.WXI);
+            UserLookAndFeel.Default.SetSkinStyle(SkinStyle.WXICompact);
 
             // 1. Load your global cache first!
             GlobalCache.InitializeCompanyData();

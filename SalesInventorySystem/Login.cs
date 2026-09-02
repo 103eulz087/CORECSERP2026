@@ -94,7 +94,7 @@ namespace SalesInventorySystem
                 Database.ExecuteQuery("UPDATE POSType set isAutoSystemDeduct=1");
             }
             tryCheckUpdate(); //#tryCheckUpdateV1();
-            labelversion.Text= HelperFunction.readFileVersion();
+            //labelversion.Text= HelperFunction.readFileVersion();
 
            
             try
@@ -255,8 +255,8 @@ namespace SalesInventorySystem
                 return;
             }
 
-            btnLogin.Enabled = false;
-            btnLogin.Text = "Connecting...";
+            buttonLogin.Enabled = false;
+            buttonLogin.Text = "Connecting...";
             Cursor = Cursors.WaitCursor;
 
             try
@@ -305,8 +305,8 @@ namespace SalesInventorySystem
             }
             finally
             {
-                btnLogin.Enabled = true;
-                btnLogin.Text = "Login";
+                buttonLogin.Enabled = true;
+                buttonLogin.Text = "LOGIN";
                 Cursor = Cursors.Default;
             }
 

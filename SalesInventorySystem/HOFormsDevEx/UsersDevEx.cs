@@ -395,7 +395,7 @@ namespace SalesInventorySystem.HOFormsDevEx
 
         private void resetPasswordToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Database.ExecuteQuery($"UPDATE Users SET MustChangePassword=1 WHERE UserID='{txtuserid.Text}'","Successfully Updated!..");
+            Database.ExecuteQuery($"UPDATE Users SET MustChangePassword=1 WHERE UserID='{gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "UserID").ToString()}'","Successfully Updated!..");
         }
     }
 }
