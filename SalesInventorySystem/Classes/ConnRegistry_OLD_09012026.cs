@@ -1,6 +1,5 @@
 ﻿using Microsoft.Win32;
 using SalesInventorySystem;
-using SalesInventorySystem.Classes;
 
 public static class ConnRegistry
 {
@@ -53,13 +52,11 @@ public static class ConnRegistry
             "Persist Security Info = True;";
 
         // 🔵 Write to MAIN (existing behavior)
-        // dbconn/password are the real secrets -- DPAPI-protected (CurrentUser scope)
-        // before hitting the registry; servername/dbname/userId aren't secrets on their own.
-        SetTo(MainKeyPath, "dbconn", RegistryProtection.Protect(dbconn));
+        SetTo(MainKeyPath, "dbconn", dbconn);
         SetTo(MainKeyPath, "servername", serverNameWithPort);
         SetTo(MainKeyPath, "dbname", dbName);
         SetTo(MainKeyPath, "serverid", userId);
-        SetTo(MainKeyPath, "serverpassword", RegistryProtection.Protect(password));
+        SetTo(MainKeyPath, "serverpassword", password);
 
     }
     public static void SetTargetConnSettingsServer(string serverNameWithPort, string dbName, string userId, string password, int timeoutSeconds = 3600)
@@ -75,11 +72,11 @@ public static class ConnRegistry
         //if (GlobalConfig.Token == "MTQ2NzgwNjAz" || GlobalConfig.Token == "ODM1NTI0ODYz"
         //            || GlobalConfig.Token == "NjQwOTg4MzU1" || GlobalConfig.Token == "ODU2NDE4OTA3")
         //{
-        SetTo(ServerKeyPath, "dbconn", RegistryProtection.Protect(dbconn));
+        SetTo(ServerKeyPath, "dbconn", dbconn);
         SetTo(ServerKeyPath, "servername", serverNameWithPort);
         SetTo(ServerKeyPath, "dbname", dbName);
         SetTo(ServerKeyPath, "serverid", userId);
-        SetTo(ServerKeyPath, "serverpassword", RegistryProtection.Protect(password));
+        SetTo(ServerKeyPath, "serverpassword", password);
         //}
     }
 }

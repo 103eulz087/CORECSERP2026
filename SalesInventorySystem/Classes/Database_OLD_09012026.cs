@@ -115,13 +115,10 @@ namespace SalesInventorySystem
                     {
                         object regValue = key.GetValue("dbconn");
 
-                        // Safely check for null before converting to string! Unprotect() is a
-                        // no-op fallback for any regkeypath whose "dbconn" was never
-                        // DPAPI-protected in the first place -- safe for every caller of this
-                        // generic method, not just the ones this session updated.
+                        // Safely check for null before converting to string!
                         if (regValue != null)
                         {
-                            connectionString = RegistryProtection.Unprotect(regValue.ToString());
+                            connectionString = regValue.ToString();
                         }
                     }
                 }
@@ -238,7 +235,7 @@ namespace SalesInventorySystem
 
                         if (regValue != null)
                         {
-                            _cachedConnectionString = RegistryProtection.Unprotect(regValue.ToString());
+                            _cachedConnectionString = regValue.ToString();
                         }
                     }
                 }
@@ -310,10 +307,7 @@ namespace SalesInventorySystem
                         object regValue = regkey.GetValue("dbconn");
                         if (regValue != null)
                         {
-                            // Unprotect() is a no-op fallback for any regkeyname whose "dbconn"
-                            // was never DPAPI-protected -- safe for every caller of this generic
-                            // method, not just the paths this session updated.
-                            cachedString = RegistryProtection.Unprotect(regValue.ToString());
+                            cachedString = regValue.ToString();
 
                             // 3. Save it to the cache so we never have to read the registry for this key again!
                             _connectionCache.TryAdd(regkeyname, cachedString);

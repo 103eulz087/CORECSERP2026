@@ -692,8 +692,8 @@ ELSE
                         ConnRegistry.SetTargetConnSettingsServer(
                                serverNameWithPort: "erp.itcoreapps.com,4281",
                                dbName: "CORECSERP_001",
-                               userId: "erp001_svc",
-                               password: "1tc0r3X_0365_001"
+                               userId: "erp001_user",
+                               password: "$tr0ngP@ssw0rd2026!"
                         );
                     }
                     else if(GlobalConfig.Token == "ODM1NTI0ODYz") //VROSS STORE
@@ -701,8 +701,8 @@ ELSE
                         ConnRegistry.SetTargetConnSettingsServer(
                                serverNameWithPort: "erp.itcoreapps.com,4281",
                                dbName: "CORECSERP_003",
-                               userId: "erp003_svc",
-                               password: "1tc0r3X_0365_003"
+                               userId: "erp003_user",
+                               password: "$tr0ngP@ssw0rd2026003!"
                         );
                     }
                     else if(GlobalConfig.Token == "NjQwOTg4MzU1") //KRAFT STORE
@@ -710,8 +710,8 @@ ELSE
                         ConnRegistry.SetTargetConnSettingsServer(
                                serverNameWithPort: "erp.itcoreapps.com,4281",
                                dbName: "CORECSERP_004",
-                               userId: "erp004_svc",
-                               password: "1tc0r3X_0365_004"
+                               userId: "erp004_user",
+                               password: "$tr0ngP@ssw0rd2026004!"
                         );
                     }
                     else if(GlobalConfig.Token == "1234567890XX") //ITCORE STORE
@@ -719,8 +719,8 @@ ELSE
                         ConnRegistry.SetTargetConnSettingsServer(
                                serverNameWithPort: "erp.itcoreapps.com,4281",
                                dbName: "CORECSERP_001",
-                               userId: "erp001_svc",
-                               password: "1tc0r3X_0365_001"
+                               userId: "erp001_user",
+                               password: "$tr0ngP@ssw0rd2026!"
                         );
                     }
                     else if(GlobalConfig.Token == "ONEzNTE4NjEx") //ONELOVE STORE
@@ -728,8 +728,8 @@ ELSE
                         ConnRegistry.SetTargetConnSettingsServer(
                                serverNameWithPort: "erp.itcoreapps.com,4281",
                                dbName: "CORECSERP_001",
-                               userId: "erp001_svc",
-                               password: "1tc0r3X_0365_001"
+                               userId: "erp001_user",
+                               password: "$tr0ngP@ssw0rd2026!"
                         );
                     }
                    
@@ -747,8 +747,8 @@ ELSE
                     ConnRegistry.SetTargetConnSettingsServer(
                         serverNameWithPort: "erp.itcoreapps.com,4281",
                         dbName: "CORECSERP_003",
-                        userId: "erp003_svc",
-                        password: "1tc0r3X_0365_003"
+                        userId: "erp003_user",
+                        password: "$tr0ngP@ssw0rd2026003!"
                     );
 
                     ConnRegistry.Set("db_migrated_to", targetStamp);
@@ -783,8 +783,8 @@ ELSE
                         ConnRegistry.SetTarget(
                                serverNameWithPort: "erp.itcoreapps.com,4281",
                                dbName: "CORECSERP_001",
-                               userId: "erp001_svc",
-                               password: "1tc0r3X_0365_001"
+                               userId: "erp001_user",
+                               password: "$tr0ngP@ssw0rd2026!"
                            );
                     }
                     else if ((GlobalConfig.Token == "ATk1NjU1NTU1" //VROSSACCTG
@@ -795,8 +795,8 @@ ELSE
                         ConnRegistry.SetTarget(
                                serverNameWithPort: "erp.itcoreapps.com,4281",
                                dbName: "CORECSERP_003",
-                               userId: "erp003_svc",
-                               password: "1tc0r3X_0365_003"
+                               userId: "erp003_user",
+                               password: "$tr0ngP@ssw0rd2026003!"
                            );
                     }
                     

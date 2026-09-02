@@ -1,6 +1,5 @@
 ﻿using DevExpress.XtraEditors;
 using Microsoft.Win32;
-using SalesInventorySystem.Classes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -82,15 +81,11 @@ namespace SalesInventorySystem
         {
             //regkey = Registry.CurrentUser.CreateSubKey(txtconnsettingsname.Text);
             regkey = Registry.CurrentUser.CreateSubKey(@"AAITCRE\ConnSettingsMain");
-            string dbconn = "Data Source=" + txtservername.Text + ";Initial Catalog=" + cbodbname.Text + ";User ID =" + txtserverid.Text + ";Password=" + txtserverpassword.Text + ";Connection Timeout = 3600;Persist Security Info = True;";
-            // dbconn/serverpassword are the real secrets here -- DPAPI-protected (CurrentUser
-            // scope) before hitting the registry, so a dumped registry value is ciphertext,
-            // not a usable password. servername/dbname/serverid aren't secrets on their own.
-            regkey.SetValue("dbconn", RegistryProtection.Protect(dbconn));
+            regkey.SetValue("dbconn", "Data Source=" + txtservername.Text + ";Initial Catalog=" + cbodbname.Text + ";User ID =" + txtserverid.Text + ";Password=" + txtserverpassword.Text + ";Connection Timeout = 3600;Persist Security Info = True;");
             regkey.SetValue("servername", txtservername.Text);
             regkey.SetValue("dbname", cbodbname.Text);
             regkey.SetValue("serverid", txtserverid.Text);
-            regkey.SetValue("serverpassword", RegistryProtection.Protect(txtserverpassword.Text));
+            regkey.SetValue("serverpassword", txtserverpassword.Text);
             Application.Restart();
             //Thread.Sleep(3000);
         }
