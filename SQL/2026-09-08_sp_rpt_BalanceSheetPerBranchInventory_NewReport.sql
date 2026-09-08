@@ -118,7 +118,7 @@ BEGIN
     (
         SELECT
              coa.AccountCode
-            ,coa.Description + ' - ' + b.BranchName AS AccountDescription
+            ,coa.Description + ' - ' + ISNULL(b.BranchName, b.BranchCode) AS AccountDescription
             ,b.BranchCode
             ,b.BranchName
             -- all three per-branch accounts are 101% (Current Assets) -- sign as-is
@@ -129,7 +129,13 @@ BEGIN
         CROSS JOIN Branches b
         LEFT JOIN LatestPerBranchFinal lpb
             ON lpb.AccountCode = coa.AccountCode AND lpb.BranchCode = b.BranchCode
+        -- FIX (sp-reviewer): match BSBase's YearEndIndicator='BS' guard for
+        -- defensive consistency -- these 3 codes are asset/BS accounts today,
+        -- but without this, a future COA mistag to 'IS' would silently drop
+        -- the account from BSBase/SET 2 while PerBranchBase/SET 1 kept
+        -- showing it, producing an unreconcilable report.
         WHERE coa.AccountType = 'D'
+          AND coa.YearEndIndicator = 'BS'
           AND (@BranchCode IS NULL OR b.BranchCode = @BranchCode)
     ),
     CurrentEarnings AS
