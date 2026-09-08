@@ -260,6 +260,7 @@
             "Trial Balance",
             "Income Statement",
             "Balance Sheet",
+            "Balance Sheet (Per-Branch Inventory)",
             "Bank Reconciliation",
             "Consolidated GL"});
             this.lstReportType.Location = new System.Drawing.Point(19, 37);

@@ -98,6 +98,14 @@ namespace SalesInventorySystem.HOFormsDevEx
                 Description = "Assets, Liabilities, and Equity as of a specific date, single branch. Check 'All Branches' for a company-wide consolidated snapshot.",
                 AllowAllBranches = true
             },
+            ["Balance Sheet (Per-Branch Inventory)"] = new ReportConfig
+            {
+                SpName = "sp_rpt_BalanceSheetPerBranchInventory",
+                Mode = ParamMode.BranchAsOfDate,
+                Shape = ResultShape.Standard2Set,
+                Description = "Same as Balance Sheet, but Petty Cash Fund and Inventory (VAT/VAT-Exempt) are broken out one row per branch instead of one consolidated row -- matches accounting's Google Sheets format. Check 'All Branches' to see every branch's rows at once.",
+                AllowAllBranches = true
+            },
             ["Bank Reconciliation"] = new ReportConfig
             {
                 SpName = "sp_rpt_BankReconciliationWithDate",
