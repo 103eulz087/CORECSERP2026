@@ -21,6 +21,7 @@ namespace SalesInventorySystem.HOForms
     public partial class ViewForDeliveryDetails : XtraForm
     {
         //string referenceNumber = "";
+        public static string refno1 = "";
         public static bool isupdated = false;
         public ViewForDeliveryDetails()
         {
@@ -46,6 +47,12 @@ namespace SalesInventorySystem.HOForms
                 bool confirm = HelperFunction.ConfirmDialog("Are you sure that the Invoice you Enter is Correct?", "Confirm Invoice Number");
                 if (confirm == true)
                 {
+                    bool checkifInvoiceExists = Database.checkifExist("SELECT TOP(1) InvoiceNo FROM DeliverySummary WHERE InvoiceNo='" + txtsino.Text + "'");
+                    if (checkifInvoiceExists == true)
+                    {
+                        XtraMessageBox.Show("Invoice Number Already Exists!");
+                        return;
+                    }
                     Database.ExecuteQuery("UPDATE DeliverySummary SET InvoiceNo='" + txtsino.Text + "',isInvoiceUpdate='1' WHERE PONumber = '" + txtpono.Text + "' ");
                     //forchecking i think it is not used
                     //because it is not yet inserted in Sales.. it will inserted after Confirm Order
@@ -171,15 +178,16 @@ namespace SalesInventorySystem.HOForms
         }
         void printSalesInvoice(GridView view)
         {
-            string custkey="",custname = "", custaddress = "", custterm = "";
+            string custkey="",custname = "", custaddress = "", custterm = "", tinno = ""; ;
             //get customername from purchaseordersummary
             custkey = Database.getSingleQuery("PurchaseOrderSummary", "PONumber='" + txtpono.Text + "'", "Customer");
 
-            var row = Database.getMultipleQuery("Customers", "CustomerKey='" + custkey + "'", "CustomerName,CustomerAddress,Term");
+            var row = Database.getMultipleQuery("Customers", "CustomerKey='" + custkey + "'", "CustomerName,CustomerAddress,Term,TinNo");
             custname = row["CustomerName"].ToString();
             custaddress = row["CustomerAddress"].ToString();//Database.getSingleQuery("Customers", "CustomerName='" + custname + "'", "CustomerAddress");
             custterm = row["Term"].ToString();// Database.getSingleQuery("Customers", "CustomerName='" + custname + "'", "Term");
-            
+            tinno = row["TinNo"].ToString();// Database.getSingleQuery("Customers", "CustomerName='" + custname + "'", "Term");
+            refno1 = view.GetRowCellValue(view.FocusedRowHandle, "PONumber").ToString();
             Reporting.SalesInvoiceDexEx viewdet = new Reporting.SalesInvoiceDexEx();
             viewdet.Show();
 
@@ -189,11 +197,21 @@ namespace SalesInventorySystem.HOForms
             }
             else
             {
-
                 analyze("spview_SalesInvoice", txtpono.Text, viewdet.gridControl4, viewdet.gridView4);
             }
+            if (GlobalCache.CompanyName == "JFC")
+            {
+                Classes.DevXGridViewSettings.ShowFooterCountTotal(viewdet.gridView4, "Cnt"); //NEW
+            }
+            viewdet.txtinvoiceno.Text = view.GetRowCellValue(view.FocusedRowHandle, "InvoiceNo").ToString();
 
-            viewdet.txtpono.Text = txtpono.Text;
+            if (GlobalCache.CompanyName == "JFC")
+            {
+                viewdet.txtinvoicedate.Text = view.GetRowCellValue(view.FocusedRowHandle, "InvoiceDate").ToString();
+            }
+            //viewdet.txtpono.Text = txtpono.Text;
+            viewdet.txtpono.Text = refno1;
+            viewdet.txtcusttin.Text = tinno;
             double vatablesales = 0.0, vatexemptsale = 0.0, vatamount = 0.0, totalsales = 0.0, lessvat = 0.0, netofvat = 0.0, amountdue = 0.0, addvat = 0.0, vatsales = 0.0, totalamountdue = 0.0;
             for (int i = 0; i <= viewdet.gridView4.RowCount - 1; i++)
             {

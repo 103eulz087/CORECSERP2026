@@ -1014,6 +1014,12 @@
     <Compile Include="HOFormsDevEx\AccountingReportsForm.Designer.cs">
       <DependentUpon>AccountingReportsForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="HOFormsDevEx\AccountingReportsFormV2.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="HOFormsDevEx\AccountingReportsFormV2.Designer.cs">
+      <DependentUpon>AccountingReportsFormV2.cs</DependentUpon>
+    </Compile>
     <Compile Include="HOFormsDevEx\AccountMasterListDevEx.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -1350,6 +1356,12 @@
     <Compile Include="HOFormsDevEx\CustomersInfoDevEx.Designer.cs">
       <DependentUpon>CustomersInfoDevEx.cs</DependentUpon>
     </Compile>
+    <Compile Include="HOFormsDevEx\CustomersInfoV2DevEx.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HOFormsDevEx\CustomersInfoV2DevEx.Designer.cs">
+      <DependentUpon>CustomersInfoV2DevEx.cs</DependentUpon>
+    </Compile>
     <Compile Include="HOFormsDevEx\DebitMemoDevEx.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -1625,6 +1637,12 @@
     </Compile>
     <Compile Include="HOFormsDevEx\ReceivedSTSBatchMode.Designer.cs">
       <DependentUpon>ReceivedSTSBatchMode.cs</DependentUpon>
+    </Compile>
+    <Compile Include="HOFormsDevEx\ReceivedSTSBatchModeFIFO.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HOFormsDevEx\ReceivedSTSBatchModeFIFO.Designer.cs">
+      <DependentUpon>ReceivedSTSBatchModeFIFO.cs</DependentUpon>
     </Compile>
     <Compile Include="HOFormsDevEx\ReceivedTransferBranchInventory.cs">
       <SubType>Form</SubType>
@@ -3170,6 +3188,30 @@
     <Compile Include="Reporting\ConversionReports.Designer.cs">
       <DependentUpon>ConversionReports.cs</DependentUpon>
     </Compile>
+    <Compile Include="Reporting\InventoryReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Reporting\InventoryReport.Designer.cs">
+      <DependentUpon>InventoryReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reporting\ConversionReportMasterDetail.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Reporting\ConversionReportMasterDetail.Designer.cs">
+      <DependentUpon>ConversionReportMasterDetail.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reporting\InventoryUnitActivityReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Reporting\InventoryUnitActivityReport.Designer.cs">
+      <DependentUpon>InventoryUnitActivityReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reporting\ItemCostingReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Reporting\ItemCostingReport.Designer.cs">
+      <DependentUpon>ItemCostingReport.cs</DependentUpon>
+    </Compile>
     <Compile Include="Reporting\CounterReceiptDevEx.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -3824,6 +3866,9 @@
     <EmbeddedResource Include="HOFormsDevEx\AccountingReportsForm.resx">
       <DependentUpon>AccountingReportsForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="HOFormsDevEx\AccountingReportsFormV2.resx">
+      <DependentUpon>AccountingReportsFormV2.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="HOFormsDevEx\AccountMasterListDevEx.resx">
       <DependentUpon>AccountMasterListDevEx.cs</DependentUpon>
     </EmbeddedResource>
@@ -3961,6 +4006,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="HOFormsDevEx\ConversionPerBarcodeFinalize.resx">
       <DependentUpon>ConversionPerBarcodeFinalize.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HOFormsDevEx\CustomersInfoV2DevEx.resx">
+      <DependentUpon>CustomersInfoV2DevEx.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="HOFormsDevEx\DispatchPerBarcode.resx">
       <DependentUpon>DispatchPerBarcode.cs</DependentUpon>
@@ -4953,6 +5001,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Reporting\InventoryLedgerDevEx.resx">
       <DependentUpon>InventoryLedgerDevEx.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reporting\InventoryReport.resx">
+      <DependentUpon>InventoryReport.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Reporting\InventoryUnitActivity.resx">
       <DependentUpon>InventoryUnitActivity.cs</DependentUpon>

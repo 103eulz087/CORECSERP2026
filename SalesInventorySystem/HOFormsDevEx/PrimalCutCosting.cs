@@ -31,24 +31,92 @@ namespace SalesInventorySystem.HOFormsDevEx
             Database.displaySearchlookupEdit("SELECT ShipmentNo,SupplierName FROM view_POSUMMARYREP ORDER BY ShipmentNo DESC", txtshipmentno,"ShipmentNo","ShipmentNo");
         }
 
+        // Costing Method: Per Shipment (BatchCode=0, wildcard -- one cost applies across every
+        // batch of that product in the shipment, exactly today's behavior) vs. Per Shipment +
+        // Batch Code (a real Inventory.BatchCode -- costs only that one batch's holding lots).
+        bool IsCombinationMode => Convert.ToInt32(radioGroupCostingMethod.EditValue) == 1;
+
+        // Single-quote escape for values interpolated into ad-hoc query strings built via
+        // Database.display()/checkifExist()/displaySearchlookupEdit(), none of which expose a
+        // parameterized overload -- matches this file's existing string-interpolation
+        // convention, just guarded against a shipment number containing an apostrophe.
+        string ShipmentNoEscaped => txtshipmentno.Text.Trim().Replace("'", "''");
+
+        void PopulateBatchCodes()
+        {
+            Database.displaySearchlookupEdit($"EXEC dbo.sp_GetBatchCodesForShipment '{ShipmentNoEscaped}'", txtbatchcode, "BatchCode", "BatchCode");
+        }
+
         private void searchLookUpEdit_EditValueChanged(object sender, EventArgs e)
         {
-            bool isExists = Database.checkifExist($"SELECT 1 FROM dbo.TempCosting WHERE ShipmentNo='{txtshipmentno.Text}'");
+            if (IsCombinationMode)
+            {
+                // A newly selected shipment has its own set of batch codes -- clear the
+                // previous selection and require a fresh pick before showing any grid, so
+                // Per Shipment's BatchCode=0 rows can never leak into Combination mode.
+                txtbatchcode.EditValue = null;
+                PopulateBatchCodes();
+                gridControl1.DataSource = null;
+                return;
+            }
+
+            bool isExists = Database.checkifExist($"SELECT 1 FROM dbo.TempCosting WHERE ShipmentNo='{ShipmentNoEscaped}' AND BatchCode=0");
             if (!isExists)
                 XtraMessageBox.Show("This Shipment Number has not been defined for costing yet.");
 
-            refreshGrid(isExists);
+            refreshGrid(isExists, 0);
         }
 
-        // Reloads gridView1 for the currently selected shipment, then reapplies the Cost
-        // column's numeric editor -- Database.display() clears and rebinds columns on every
-        // call, so any ColumnEdit assigned before a reload is wiped and must be reapplied
-        // after. Also called after a successful save so already-transferred/held items are
-        // reflected instead of the grid showing stale pre-save state.
-        void refreshGrid(bool costingAlreadyDefined)
+        private void radioGroupCostingMethod_EditValueChanged(object sender, EventArgs e)
+        {
+            bool combo = IsCombinationMode;
+            labelBatchCode.Visible = combo;
+            txtbatchcode.Visible = combo;
+            txtbatchcode.EditValue = null;
+            gridControl1.DataSource = null;
+
+            if (string.IsNullOrWhiteSpace(txtshipmentno.Text))
+                return;
+
+            if (combo)
+            {
+                PopulateBatchCodes();
+            }
+            else
+            {
+                bool isExists = Database.checkifExist($"SELECT 1 FROM dbo.TempCosting WHERE ShipmentNo='{ShipmentNoEscaped}' AND BatchCode=0");
+                refreshGrid(isExists, 0);
+            }
+        }
+
+        private void txtbatchcode_EditValueChanged(object sender, EventArgs e)
+        {
+            if (txtbatchcode.EditValue == null || txtbatchcode.EditValue == DBNull.Value)
+            {
+                gridControl1.DataSource = null;
+                return;
+            }
+
+            int batchCode = Convert.ToInt32(txtbatchcode.EditValue);
+            bool isExists = Database.checkifExist($"SELECT 1 FROM dbo.TempCosting WHERE ShipmentNo='{ShipmentNoEscaped}' AND BatchCode={batchCode}");
+            if (!isExists)
+                XtraMessageBox.Show("This Shipment/Batch Code combination has not been defined for costing yet.");
+
+            refreshGrid(isExists, batchCode);
+        }
+
+        // Reloads gridView1 for the currently selected shipment (and, in Combination mode, the
+        // selected batch), then reapplies the Cost column's numeric editor -- Database.display()
+        // clears and rebinds columns on every call, so any ColumnEdit assigned before a reload is
+        // wiped and must be reapplied after. Also called after a successful save so already-
+        // transferred/held items are reflected instead of the grid showing stale pre-save state.
+        // batchCode=0 means Per Shipment -- TempCosting rows are always keyed with the exact
+        // BatchCode they were saved under, so this must match it precisely (never a wildcard)
+        // or Per Shipment and Combination rows for the same item would double up in the grid.
+        void refreshGrid(bool costingAlreadyDefined, int batchCode)
         {
             if (costingAlreadyDefined)
-                Database.display($"SELECT ItemCode as ProductCode,Parts as Description,CostPerKg as Cost FROM dbo.TempCosting WHERE ShipmentNo='{txtshipmentno.Text}'", gridControl1, gridView1);
+                Database.display($"SELECT ItemCode as ProductCode,Parts as Description,CostPerKg as Cost FROM dbo.TempCosting WHERE ShipmentNo='{ShipmentNoEscaped}' AND BatchCode={batchCode}", gridControl1, gridView1);
             else
                 Database.display($"SELECT * FROM dbo.view_PrimalCutPartsForCosting", gridControl1, gridView1);
 
@@ -75,6 +143,17 @@ namespace SalesInventorySystem.HOFormsDevEx
             {
                 XtraMessageBox.Show("Please select a Shipment Number.");
                 return;
+            }
+
+            int batchCode = 0;
+            if (IsCombinationMode)
+            {
+                if (txtbatchcode.EditValue == null || txtbatchcode.EditValue == DBNull.Value)
+                {
+                    XtraMessageBox.Show("Please select a Batch Code.");
+                    return;
+                }
+                batchCode = Convert.ToInt32(txtbatchcode.EditValue);
             }
 
             if (gridView1.RowCount == 0)
@@ -119,6 +198,7 @@ namespace SalesInventorySystem.HOFormsDevEx
                     com.Parameters.Add("@ShipmentNo", SqlDbType.VarChar, 10).Value = txtshipmentno.Text.Trim();
                     com.Parameters.Add("@Branch", SqlDbType.VarChar, 5).Value = Login.assignedBranch;
                     com.Parameters.Add("@PreparedBy", SqlDbType.VarChar, 50).Value = Login.Fullname;
+                    com.Parameters.Add("@BatchCode", SqlDbType.Int).Value = batchCode;
 
                     con.Open();
                     int transferredCount = 0;
@@ -144,7 +224,7 @@ namespace SalesInventorySystem.HOFormsDevEx
 
                 // Refresh so already-transferred/held rows reflect the outcome instead of the
                 // grid still showing stale pre-save state (Known Bug Pattern #6).
-                refreshGrid(true);
+                refreshGrid(true, batchCode);
             }
             catch (SqlException ex)
             {

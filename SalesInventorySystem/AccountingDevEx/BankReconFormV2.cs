@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Globalization;
@@ -73,11 +74,16 @@ namespace SalesInventorySystem.AccountingDevEx
             btnAddDIT.Click += (s, e) => BtnAdd_Click("DIT");
             btnResolveDIT.Click += (s, e) => BtnResolve_Click(_selDitID);
             btnDeleteDIT.Click += (s, e) => BtnDelete_Click(_selDitID);
+            chkSelectAllDIT.CheckedChanged += ChkSelectAllDIT_CheckedChanged;
+            btnBulkResolveDIT.Click += BtnBulkResolveDIT_Click;
+            btnResolveGroupDIT.Click += BtnResolveGroupDIT_Click;
 
             btnAddOC.Click += (s, e) => BtnAdd_Click("OC");
             btnResolveOC.Click += (s, e) => BtnResolve_Click(_selOcID);
             btnDeleteOC.Click += (s, e) => BtnDelete_Click(_selOcID);
             btnAutoMatch.Click += BtnAutoMatch_Click;
+            chkSelectAllOC.CheckedChanged += ChkSelectAllOC_CheckedChanged;
+            btnBulkResolveOC.Click += BtnBulkResolveOC_Click;
 
             btnAddBankSide.Click += (s, e) => BtnAdd_Click("BDM"); // dialog lets user switch to BCM/BC/NSF/ADB
             btnResolveBankSide.Click += (s, e) => BtnResolve_Click(_selBankSideID);
@@ -102,6 +108,16 @@ namespace SalesInventorySystem.AccountingDevEx
                 btnResolveDIT.Enabled = has && !_isLocked;
                 btnDeleteDIT.Enabled = has && !_isLocked;
                 _selDitID = has ? SafeInt(viewDIT.GetRowCellValue(viewDIT.FocusedRowHandle, "ReconID")) : 0;
+
+                // Works whether the focused row is a plain data row or a collapsed/expanded
+                // ControlNo group row -- GetRowCellValue on the grouped column returns the
+                // group's key value either way. Only enabled when that ControlNo is real (not
+                // blank), since a blank-ControlNo "group" is just every unrelated plain DIT item
+                // with no batch reference, not something that should ever be bulk-resolved together.
+                string focusedControlNo = null;
+                if (viewDIT.FocusedRowHandle != DevExpress.XtraGrid.GridControl.InvalidRowHandle)
+                    focusedControlNo = Convert.ToString(viewDIT.GetRowCellValue(viewDIT.FocusedRowHandle, "ControlNo"));
+                btnResolveGroupDIT.Enabled = !_isLocked && !string.IsNullOrWhiteSpace(focusedControlNo);
             };
 
             viewOC.FocusedRowChanged += (s, e) =>
@@ -136,9 +152,15 @@ namespace SalesInventorySystem.AccountingDevEx
                 cmbBranch, "BranchCode", "BranchCode");
             cmbBranch.EditValue = Login.assignedBranch;
 
+            // DisplayMember is the combined "Code - Description" text (Code-Name display
+            // convention) so the closed editor is readable; ValueMember stays AccountCode
+            // alone since _account (read via cmbAccount.EditValue) is used as a bare account
+            // code in every downstream WHERE clause and SqlParameter.
             Database.displaySearchlookupEdit(
-                "SELECT AccountCode, Description FROM ChartOfAccounts WHERE AccountCode LIKE '10102%' AND AccountType='D' ORDER BY AccountCode",
-                cmbAccount, "AccountCode", "AccountCode");
+                "SELECT AccountCode, Description, AccountCode + ' - ' + Description AS DisplayText FROM ChartOfAccounts WHERE AccountCode LIKE '10102%' AND AccountType='D' ORDER BY AccountCode",
+                cmbAccount, "DisplayText", "AccountCode");
+            if (cmbAccount.Properties.View.Columns["DisplayText"] != null)
+                cmbAccount.Properties.View.Columns["DisplayText"].Visible = false;
         }
 
         private void SetDefaultPeriod()
@@ -208,10 +230,17 @@ namespace SalesInventorySystem.AccountingDevEx
                 }
 
                 _dtDIT = ds.Tables.Count > 1 ? ds.Tables[1] : new DataTable();
+                // In-memory only, never persisted -- backs the Check-All / bulk-resolve
+                // checkbox column. Added before binding so BindGrid's DataSource assignment
+                // auto-generates a real grid column for it.
+                if (!_dtDIT.Columns.Contains("Selected")) _dtDIT.Columns.Add("Selected", typeof(bool));
                 BindGrid(gridDIT, viewDIT, _dtDIT);
+                ConfigureDitGridExtras();
 
                 _dtOC = ds.Tables.Count > 2 ? ds.Tables[2] : new DataTable();
+                if (!_dtOC.Columns.Contains("Selected")) _dtOC.Columns.Add("Selected", typeof(bool));
                 BindGrid(gridOC, viewOC, _dtOC);
+                ConfigureOcGridExtras();
 
                 // NEW — third result set: BCM/BDM/BC/NSF/ADB
                 _dtBankSide = ds.Tables.Count > 3 ? ds.Tables[3] : new DataTable();
@@ -248,6 +277,11 @@ namespace SalesInventorySystem.AccountingDevEx
             btnAddBankSide.Enabled = !locked;
             btnLock.Enabled = !locked;
             btnAutoMatch.Enabled = !locked;
+            chkSelectAllDIT.Enabled = !locked;
+            btnBulkResolveDIT.Enabled = !locked;
+            if (locked) btnResolveGroupDIT.Enabled = false; // re-enabled per-focus by viewDIT.FocusedRowChanged once unlocked
+            chkSelectAllOC.Enabled = !locked;
+            btnBulkResolveOC.Enabled = !locked;
         }
 
         private void BindGrid(DevExpress.XtraGrid.GridControl grid, GridView view, DataTable dt)
@@ -318,6 +352,228 @@ namespace SalesInventorySystem.AccountingDevEx
                 col.DisplayFormat.FormatType = DevExpress.Utils.FormatType.DateTime;
                 col.DisplayFormat.FormatString = "yyyy-MM-dd";
             }
+        }
+
+        // Adds the ControlNo column and turns the in-memory "Selected" column into a real
+        // checkbox -- while keeping every other column locked to read-only, since
+        // viewDIT.OptionsBehavior.Editable now has to be true at the view level for
+        // the checkbox to be togglable at all. Filtering (e.g. by ControlNo) is done via
+        // the grid's normal column-header filter dropdown, not a separate auto-filter row.
+        private void ConfigureDitGridExtras()
+        {
+            FormatCol(viewDIT, "ControlNo", 100, false);
+
+            foreach (DevExpress.XtraGrid.Columns.GridColumn col in viewDIT.Columns)
+                col.OptionsColumn.AllowEdit = col.FieldName == "Selected";
+
+            var colSelected = viewDIT.Columns["Selected"];
+            if (colSelected != null)
+            {
+                var repoCheck = new DevExpress.XtraEditors.Repository.RepositoryItemCheckEdit();
+                gridDIT.RepositoryItems.Add(repoCheck);
+                colSelected.ColumnEdit = repoCheck;
+                colSelected.Caption = "";
+                colSelected.OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.False;
+                colSelected.VisibleIndex = 0;
+            }
+
+            // Group by ControlNo so line items belonging to the same real collection batch
+            // (see BankReconItemForm's ControlNo picker -- sourced from
+            // sp_BankRecon_GetControlNoCandidates, a genuine shared batch reference, not a
+            // free-typed value) display as one line with a summed total instead of N separate
+            // rows, matching the same ControlNo-grouping pattern already used in
+            // POSSalesReportDevEx.cs's Cash Receipts Book grid. Expanded by default so nothing
+            // is hidden vs. the pre-grouping flat-grid behavior -- the user can manually collapse
+            // a batch's group to see just the one summary line if they want. A collapsed group's
+            // children fall out of ChkSelectAllDIT/GetVisibleRowHandle's traversal by design --
+            // that's fine, a collapsed batch is meant to be resolved via btnResolveGroupDIT below,
+            // not via the per-row checkbox + Bulk Resolve path.
+            var colControlNo = viewDIT.Columns["ControlNo"];
+            if (colControlNo != null)
+            {
+                colControlNo.GroupIndex = 0;
+                viewDIT.OptionsView.ShowGroupPanel = false;
+
+                viewDIT.GroupSummary.Clear();
+                viewDIT.GroupSummary.Add(DevExpress.Data.SummaryItemType.Count, "ControlNo", colControlNo, "{0} item(s)");
+                var colAmount = viewDIT.Columns["Amount"];
+                if (colAmount != null)
+                    viewDIT.GroupSummary.Add(DevExpress.Data.SummaryItemType.Sum, "Amount", colAmount, "Total: {0:N2}");
+            }
+
+            viewDIT.BestFitColumns();
+            if (colSelected != null) colSelected.Width = 30;
+
+            viewDIT.ExpandAllGroups();
+
+            chkSelectAllDIT.Checked = false;
+        }
+
+        // Only affects rows currently passing the filter row -- GetVisibleRowHandle
+        // walks the filtered/visible row set, not every underlying row in _dtDIT. Now that
+        // viewDIT is grouped by ControlNo, that traversal also yields group-row handles
+        // (negative, one per ControlNo band) alongside real data-row handles -- skip those,
+        // since "Selected" isn't the grouped column and a group row can't carry a per-row
+        // checkbox value. A collapsed group's children are correctly excluded from this loop
+        // entirely (not just skipped) -- see the comment on btnResolveGroupDIT below for why
+        // that's the intended split between the two resolve paths.
+        private void ChkSelectAllDIT_CheckedChanged(object sender, EventArgs e)
+        {
+            for (int i = 0; i < viewDIT.RowCount; i++)
+            {
+                int handle = viewDIT.GetVisibleRowHandle(i);
+                if (viewDIT.IsGroupRow(handle)) continue;
+                viewDIT.SetRowCellValue(handle, "Selected", chkSelectAllDIT.Checked);
+            }
+        }
+
+        private void BtnBulkResolveDIT_Click(object sender, EventArgs e)
+        {
+            if (_isLocked) return;
+
+            var ids = new List<int>();
+            foreach (DataRow row in _dtDIT.Rows)
+                if (row["Selected"] is bool sel && sel)
+                    ids.Add(SafeInt(row["ReconID"]));
+
+            if (ids.Count == 0)
+            {
+                XtraMessageBox.Show("No items checked. Filter by Control No and check the rows you want to resolve.");
+                return;
+            }
+
+            if (XtraMessageBox.Show($"Mark {ids.Count} checked item(s) as cleared by the bank?", "Confirm Bulk Resolve", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                return;
+
+            ResolveReconIDs(ids, "DIT");
+        }
+
+        // Resolves every unresolved DIT row sharing the focused row's/group's ControlNo in one
+        // click -- the counterpart to btnBulkResolveDIT's checkbox-driven flow, for the case
+        // where the user just wants to clear an entire collection batch without expanding its
+        // group and checking each row individually. Reuses the exact same
+        // sp_BankRecon_BulkResolveItems SP via ResolveReconIDs, just sourced from a ControlNo
+        // match instead of the "Selected" column.
+        private void BtnResolveGroupDIT_Click(object sender, EventArgs e)
+        {
+            if (_isLocked) return;
+
+            int handle = viewDIT.FocusedRowHandle;
+            string controlNo = handle != DevExpress.XtraGrid.GridControl.InvalidRowHandle
+                ? Convert.ToString(viewDIT.GetRowCellValue(handle, "ControlNo"))
+                : null;
+
+            if (string.IsNullOrWhiteSpace(controlNo))
+            {
+                XtraMessageBox.Show("Select a row or group with a Control No first.");
+                return;
+            }
+
+            var ids = new List<int>();
+            foreach (DataRow row in _dtDIT.Rows)
+            {
+                if (Convert.ToString(row["ControlNo"]) != controlNo) continue;
+                if (row["IsResolved"] is bool resolved && resolved) continue;
+                ids.Add(SafeInt(row["ReconID"]));
+            }
+
+            if (ids.Count == 0)
+            {
+                XtraMessageBox.Show("All items under this Control No are already cleared.");
+                return;
+            }
+
+            if (XtraMessageBox.Show($"Mark all {ids.Count} item(s) under Control No '{controlNo}' as cleared by the bank?", "Confirm Resolve Batch", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                return;
+
+            ResolveReconIDs(ids, "DIT");
+        }
+
+        // Shared by BtnBulkResolveDIT_Click, BtnResolveGroupDIT_Click, and BtnBulkResolveOC_Click --
+        // all three just differ in how they gather the ReconID list beforehand.
+        private void ResolveReconIDs(List<int> ids, string itemType)
+        {
+            try
+            {
+                var dtIds = new DataTable();
+                dtIds.Columns.Add("ReconID", typeof(int));
+                foreach (var id in ids) dtIds.Rows.Add(id);
+
+                int resolved = 0;
+                using (var con = Database.getConnection())
+                using (var cmd = new SqlCommand("sp_BankRecon_BulkResolveItems", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    var p = cmd.Parameters.Add("@ReconIDs", SqlDbType.Structured);
+                    p.TypeName = "dbo.tt_BankReconIDList";
+                    p.Value = dtIds;
+                    cmd.Parameters.Add("@ResolvedBy", SqlDbType.VarChar, 50).Value = Login.Fullname;
+                    cmd.Parameters.Add("@ItemType", SqlDbType.VarChar, 5).Value = itemType;
+
+                    con.Open();
+                    using (var rdr = cmd.ExecuteReader())
+                        if (rdr.Read()) resolved = SafeInt(rdr["ResolvedCount"]);
+                }
+
+                LoadPeriod();
+                RefreshSummary();
+                SetStatus($"{resolved} item(s) marked cleared.");
+            }
+            catch (SqlException ex) { SetStatus(ex.Message, err: true); }
+        }
+
+        // Same Selected-checkbox / Check-All / Bulk Resolve pattern as the DIT grid --
+        // OC has no ControlNo column, so no extra column formatting is needed here.
+        private void ConfigureOcGridExtras()
+        {
+            foreach (DevExpress.XtraGrid.Columns.GridColumn col in viewOC.Columns)
+                col.OptionsColumn.AllowEdit = col.FieldName == "Selected";
+
+            var colSelected = viewOC.Columns["Selected"];
+            if (colSelected != null)
+            {
+                var repoCheck = new DevExpress.XtraEditors.Repository.RepositoryItemCheckEdit();
+                gridOC.RepositoryItems.Add(repoCheck);
+                colSelected.ColumnEdit = repoCheck;
+                colSelected.Caption = "";
+                colSelected.OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.False;
+                colSelected.VisibleIndex = 0;
+            }
+
+            viewOC.BestFitColumns();
+            if (colSelected != null) colSelected.Width = 30;
+
+            chkSelectAllOC.Checked = false;
+        }
+
+        private void ChkSelectAllOC_CheckedChanged(object sender, EventArgs e)
+        {
+            for (int i = 0; i < viewOC.RowCount; i++)
+            {
+                int handle = viewOC.GetVisibleRowHandle(i);
+                viewOC.SetRowCellValue(handle, "Selected", chkSelectAllOC.Checked);
+            }
+        }
+
+        private void BtnBulkResolveOC_Click(object sender, EventArgs e)
+        {
+            if (_isLocked) return;
+
+            var ids = new List<int>();
+            foreach (DataRow row in _dtOC.Rows)
+                if (row["Selected"] is bool sel && sel)
+                    ids.Add(SafeInt(row["ReconID"]));
+
+            if (ids.Count == 0)
+            {
+                XtraMessageBox.Show("No items checked.");
+                return;
+            }
+
+            if (XtraMessageBox.Show($"Mark {ids.Count} checked item(s) as cleared by the bank?", "Confirm Bulk Resolve", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                return;
+
+            ResolveReconIDs(ids, "OC");
         }
 
         private void RefreshSummary()
@@ -412,6 +668,9 @@ namespace SalesInventorySystem.AccountingDevEx
             using (var dlg = new BankReconItemForm(isNew: true))
             {
                 dlg.ItemType = defaultItemType;
+                dlg.BranchCode = _branch;
+                dlg.AccountCode = _account;
+                dlg.LoadControlNoCandidates();
                 if (dlg.ShowDialog(this) != DialogResult.OK) return;
 
                 try
@@ -760,6 +1019,11 @@ namespace SalesInventorySystem.AccountingDevEx
         }
 
         private void btnPrint_Click_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void panelControl6_Paint(object sender, PaintEventArgs e)
         {
 
         }

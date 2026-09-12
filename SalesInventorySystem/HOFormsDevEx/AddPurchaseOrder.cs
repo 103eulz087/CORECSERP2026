@@ -53,35 +53,43 @@ namespace SalesInventorySystem.HOFormsDevEx
         {
             suppkey = SearchLookUpClass.getSingleValue(searchLookUpEdit1, "SupplierKey");
            
+            // func_viewPurchaseOrder(JFC) returns Quantity as SQL int -- a RepositoryItemSpinEdit
+            // on the grid column alone can't make a decimal stick, because the bound DataTable
+            // column itself is System.Int32 and truncates the edited value back to whole numbers
+            // the moment the cell commits. Cast it to decimal in the query itself so the actual
+            // bound column type supports fractional values; every other column is unchanged.
             if (GlobalCache.CompanyName=="JFC")
             {
-                Database.display("SELECT * FROM func_viewPurchaseOrderJFC('" + Login.assignedBranch + "','" + suppkey + "')", gridControl1, gridView1);
+                Database.display("SELECT ProductCode,Barcode,ProductName,Cost,CAST(Quantity AS DECIMAL(10,2)) AS Quantity,Units,ReferenceCode,AvailableQty FROM func_viewPurchaseOrderJFC('" + Login.assignedBranch + "','" + suppkey + "')", gridControl1, gridView1);
             }
             else
             {
-                Database.display("SELECT * FROM func_viewPurchaseOrder('" + Login.assignedBranch + "','" + suppkey + "')", gridControl1, gridView1);
+                Database.display("SELECT ProductCode,Barcode,ProductName,Cost,CAST(Quantity AS DECIMAL(10,2)) AS Quantity,Units,AvailableQty FROM func_viewPurchaseOrder('" + Login.assignedBranch + "','" + suppkey + "')", gridControl1, gridView1);
             }
-            //if (radProducts.Checked==true)
-            //{
-            //    Database.display("SELECT * FROM func_viewPurchaseOrder('" + Login.assignedBranch + "','" + suppkey + "')", gridControl1, gridView1);
-            //}
-            //else
-            //{
-            //    Database.display("SELECT * FROM func_viewServicesOrder('" + Login.assignedBranch + "','" + suppkey + "')", gridControl1, gridView1);
+            applyQuantitySpinEditor();
+        }
 
-            //}
-            
-            //Database.display("SELECT a.ProductCode" +
-            //       ",a.ProductName" +
-            //       ",a.CostKg as Cost " +
-            //       ",0 as Quantity " +
-            //       ",' ' as Units " +
-            //       ",b. " +
-            //       "FROM InventoryCost as a " +
-            //       "LEFT OUTER JOIN Inventory as b " +
-            //       "ON a.ProductCode=b.Product " +
-            //       "AND b.Branch='"+Login.assignedBranch+"' " +
-            //       "WHERE a.SupplierID='" + suppkey + "'", gridControl1, gridView1);
+        // Quantity comes back from func_viewPurchaseOrder(JFC) as a whole-number SQL type, so
+        // DevExpress auto-generates an integer-only editor for the column by default -- the
+        // downstream insert()/ExecuteSP paths already Convert.ToDecimal(...) the entered value,
+        // so the pipeline is decimal-ready; this just lets the grid actually accept a fractional
+        // quantity. Database.display() clears and rebinds columns on every call, so this must be
+        // reapplied after every reload (same pattern as PrimalCutCosting.cs's applyCostSpinEditor).
+        void applyQuantitySpinEditor()
+        {
+            if (gridView1.Columns["Quantity"] == null) return;
+
+            var spinQty = new DevExpress.XtraEditors.Repository.RepositoryItemSpinEdit();
+            spinQty.IsFloatValue = true;
+            spinQty.MinValue = 0;
+            spinQty.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+            spinQty.DisplayFormat.FormatString = "n2";
+            spinQty.EditFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+            spinQty.EditFormat.FormatString = "n2";
+            spinQty.Mask.MaskType = DevExpress.XtraEditors.Mask.MaskType.Numeric;
+            spinQty.Mask.EditMask = "n2";
+            gridControl1.RepositoryItems.Add(spinQty);
+            gridView1.Columns["Quantity"].ColumnEdit = spinQty;
         }
 
         private void btnnew_Click(object sender, EventArgs e)
@@ -468,6 +476,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             AddPurchaseOrderSubmit addposub = new AddPurchaseOrderSubmit();
             Database.display($"SELECT ShipmentNo,ProductCategory,OrderCode,Description,Quantity,Cost,TotalCost " +
                 $"FROM view_PODetails WHERE ShipmentNo='{txtshipmentno.Text}'",gridControl1,gridView1);
+            applyQuantitySpinEditor();
             addposub.ShowDialog(this);
 
         }

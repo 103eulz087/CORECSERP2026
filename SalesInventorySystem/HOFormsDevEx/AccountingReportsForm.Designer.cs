@@ -99,12 +99,12 @@
             ((System.ComponentModel.ISupportInitialize)(this.lstReportType)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.cboBranchCode.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtAccountCode.Properties)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dteAsOfDate.Properties.CalendarTimeProperties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dteAsOfDate.Properties)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dteDateFrom.Properties.CalendarTimeProperties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dteAsOfDate.Properties.CalendarTimeProperties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dteDateFrom.Properties)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dteDateTo.Properties.CalendarTimeProperties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dteDateFrom.Properties.CalendarTimeProperties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dteDateTo.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dteDateTo.Properties.CalendarTimeProperties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chkAllBranches.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chkAllAccounts.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chkIncludeZeroActivity.Properties)).BeginInit();
@@ -133,9 +133,8 @@
             this.pnlHeader.Controls.Add(this.lblBreadcrumb);
             this.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlHeader.Location = new System.Drawing.Point(0, 0);
-            this.pnlHeader.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.pnlHeader.Name = "pnlHeader";
-            this.pnlHeader.Size = new System.Drawing.Size(1400, 79);
+            this.pnlHeader.Size = new System.Drawing.Size(1200, 64);
             this.pnlHeader.TabIndex = 7;
             // 
             // lblReportTitle
@@ -144,10 +143,9 @@
             this.lblReportTitle.Appearance.ForeColor = System.Drawing.Color.Black;
             this.lblReportTitle.Appearance.Options.UseFont = true;
             this.lblReportTitle.Appearance.Options.UseForeColor = true;
-            this.lblReportTitle.Location = new System.Drawing.Point(579, 11);
-            this.lblReportTitle.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.lblReportTitle.Location = new System.Drawing.Point(496, 9);
             this.lblReportTitle.Name = "lblReportTitle";
-            this.lblReportTitle.Size = new System.Drawing.Size(151, 28);
+            this.lblReportTitle.Size = new System.Drawing.Size(123, 23);
             this.lblReportTitle.TabIndex = 0;
             this.lblReportTitle.Text = "Trial Balance";
             // 
@@ -157,10 +155,9 @@
             this.lblReportSubtitle.Appearance.ForeColor = System.Drawing.SystemColors.GrayText;
             this.lblReportSubtitle.Appearance.Options.UseFont = true;
             this.lblReportSubtitle.Appearance.Options.UseForeColor = true;
-            this.lblReportSubtitle.Location = new System.Drawing.Point(579, 46);
-            this.lblReportSubtitle.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.lblReportSubtitle.Location = new System.Drawing.Point(496, 37);
             this.lblReportSubtitle.Name = "lblReportSubtitle";
-            this.lblReportSubtitle.Size = new System.Drawing.Size(224, 17);
+            this.lblReportSubtitle.Size = new System.Drawing.Size(178, 13);
             this.lblReportSubtitle.TabIndex = 1;
             this.lblReportSubtitle.Text = "Select parameters and click Generate";
             // 
@@ -172,10 +169,9 @@
             this.lblTitle.Appearance.Options.UseBackColor = true;
             this.lblTitle.Appearance.Options.UseFont = true;
             this.lblTitle.Appearance.Options.UseForeColor = true;
-            this.lblTitle.Location = new System.Drawing.Point(19, 12);
-            this.lblTitle.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.lblTitle.Location = new System.Drawing.Point(16, 10);
             this.lblTitle.Name = "lblTitle";
-            this.lblTitle.Size = new System.Drawing.Size(243, 27);
+            this.lblTitle.Size = new System.Drawing.Size(189, 21);
             this.lblTitle.TabIndex = 0;
             this.lblTitle.Text = "JFC ERP  ·  GL Reports";
             // 
@@ -187,10 +183,9 @@
             this.lblBreadcrumb.Appearance.Options.UseBackColor = true;
             this.lblBreadcrumb.Appearance.Options.UseFont = true;
             this.lblBreadcrumb.Appearance.Options.UseForeColor = true;
-            this.lblBreadcrumb.Location = new System.Drawing.Point(19, 44);
-            this.lblBreadcrumb.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.lblBreadcrumb.Location = new System.Drawing.Point(16, 36);
             this.lblBreadcrumb.Name = "lblBreadcrumb";
-            this.lblBreadcrumb.Size = new System.Drawing.Size(514, 16);
+            this.lblBreadcrumb.Size = new System.Drawing.Size(426, 13);
             this.lblBreadcrumb.TabIndex = 1;
             this.lblBreadcrumb.Text = "GL Detail · Trial Balance · Income Statement · Balance Sheet · Bank Recon · Conso" +
     "lidated";
@@ -222,10 +217,9 @@
             this.pnlSidebar.Controls.Add(this.btnGenerate);
             this.pnlSidebar.Controls.Add(this.btnExport);
             this.pnlSidebar.Dock = System.Windows.Forms.DockStyle.Left;
-            this.pnlSidebar.Location = new System.Drawing.Point(0, 79);
-            this.pnlSidebar.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.pnlSidebar.Location = new System.Drawing.Point(0, 64);
             this.pnlSidebar.Name = "pnlSidebar";
-            this.pnlSidebar.Size = new System.Drawing.Size(329, 906);
+            this.pnlSidebar.Size = new System.Drawing.Size(282, 736);
             this.pnlSidebar.TabIndex = 6;
             // 
             // lblReportTypeCaption
@@ -236,10 +230,9 @@
             this.lblReportTypeCaption.Appearance.Options.UseBackColor = true;
             this.lblReportTypeCaption.Appearance.Options.UseFont = true;
             this.lblReportTypeCaption.Appearance.Options.UseForeColor = true;
-            this.lblReportTypeCaption.Location = new System.Drawing.Point(19, 15);
-            this.lblReportTypeCaption.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.lblReportTypeCaption.Location = new System.Drawing.Point(16, 12);
             this.lblReportTypeCaption.Name = "lblReportTypeCaption";
-            this.lblReportTypeCaption.Size = new System.Drawing.Size(84, 16);
+            this.lblReportTypeCaption.Size = new System.Drawing.Size(72, 12);
             this.lblReportTypeCaption.TabIndex = 0;
             this.lblReportTypeCaption.Text = "REPORT TYPE";
             // 
@@ -259,14 +252,14 @@
             "General Ledger (All Accounts)",
             "Trial Balance",
             "Income Statement",
+            "Income Statement (Real-Time)",
             "Balance Sheet",
-            "Balance Sheet (Per-Branch Inventory)",
+            "Balance Sheet (Real-Time)",
             "Bank Reconciliation",
             "Consolidated GL"});
-            this.lstReportType.Location = new System.Drawing.Point(19, 37);
-            this.lstReportType.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.lstReportType.Location = new System.Drawing.Point(16, 30);
             this.lstReportType.Name = "lstReportType";
-            this.lstReportType.Size = new System.Drawing.Size(289, 207);
+            this.lstReportType.Size = new System.Drawing.Size(248, 168);
             this.lstReportType.TabIndex = 1;
             this.lstReportType.SelectedIndexChanged += new System.EventHandler(this.lstReportType_SelectedIndexChanged);
             // 
@@ -278,10 +271,9 @@
             this.lblParametersCaption.Appearance.Options.UseBackColor = true;
             this.lblParametersCaption.Appearance.Options.UseFont = true;
             this.lblParametersCaption.Appearance.Options.UseForeColor = true;
-            this.lblParametersCaption.Location = new System.Drawing.Point(19, 258);
-            this.lblParametersCaption.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.lblParametersCaption.Location = new System.Drawing.Point(16, 210);
             this.lblParametersCaption.Name = "lblParametersCaption";
-            this.lblParametersCaption.Size = new System.Drawing.Size(86, 16);
+            this.lblParametersCaption.Size = new System.Drawing.Size(71, 12);
             this.lblParametersCaption.TabIndex = 2;
             this.lblParametersCaption.Text = "PARAMETERS";
             // 
@@ -289,10 +281,9 @@
             // 
             this.lblStatus.Appearance.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(140)))), ((int)(((byte)(148)))), ((int)(((byte)(165)))));
             this.lblStatus.Appearance.Options.UseForeColor = true;
-            this.lblStatus.Location = new System.Drawing.Point(12, 801);
-            this.lblStatus.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.lblStatus.Location = new System.Drawing.Point(10, 651);
             this.lblStatus.Name = "lblStatus";
-            this.lblStatus.Size = new System.Drawing.Size(35, 16);
+            this.lblStatus.Size = new System.Drawing.Size(31, 13);
             this.lblStatus.TabIndex = 5;
             this.lblStatus.Text = "Ready";
             // 
@@ -304,20 +295,18 @@
             this.lblBranchCode.Appearance.Options.UseBackColor = true;
             this.lblBranchCode.Appearance.Options.UseFont = true;
             this.lblBranchCode.Appearance.Options.UseForeColor = true;
-            this.lblBranchCode.Location = new System.Drawing.Point(19, 337);
-            this.lblBranchCode.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.lblBranchCode.Location = new System.Drawing.Point(16, 274);
             this.lblBranchCode.Name = "lblBranchCode";
-            this.lblBranchCode.Size = new System.Drawing.Size(80, 14);
+            this.lblBranchCode.Size = new System.Drawing.Size(71, 11);
             this.lblBranchCode.TabIndex = 3;
             this.lblBranchCode.Text = "BRANCH CODE";
             // 
             // cboBranchCode
             // 
-            this.cboBranchCode.Location = new System.Drawing.Point(19, 356);
-            this.cboBranchCode.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.cboBranchCode.Location = new System.Drawing.Point(16, 289);
             this.cboBranchCode.Name = "cboBranchCode";
             this.cboBranchCode.Properties.NullText = "";
-            this.cboBranchCode.Size = new System.Drawing.Size(289, 22);
+            this.cboBranchCode.Size = new System.Drawing.Size(248, 20);
             this.cboBranchCode.TabIndex = 4;
             // 
             // lblAccountCode
@@ -328,20 +317,18 @@
             this.lblAccountCode.Appearance.Options.UseBackColor = true;
             this.lblAccountCode.Appearance.Options.UseFont = true;
             this.lblAccountCode.Appearance.Options.UseForeColor = true;
-            this.lblAccountCode.Location = new System.Drawing.Point(19, 286);
-            this.lblAccountCode.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.lblAccountCode.Location = new System.Drawing.Point(16, 232);
             this.lblAccountCode.Name = "lblAccountCode";
-            this.lblAccountCode.Size = new System.Drawing.Size(90, 14);
+            this.lblAccountCode.Size = new System.Drawing.Size(80, 11);
             this.lblAccountCode.TabIndex = 5;
             this.lblAccountCode.Text = "ACCOUNT CODE";
             // 
             // txtAccountCode
             // 
-            this.txtAccountCode.Location = new System.Drawing.Point(19, 305);
-            this.txtAccountCode.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.txtAccountCode.Location = new System.Drawing.Point(16, 248);
             this.txtAccountCode.Name = "txtAccountCode";
             this.txtAccountCode.Properties.NullText = "";
-            this.txtAccountCode.Size = new System.Drawing.Size(289, 22);
+            this.txtAccountCode.Size = new System.Drawing.Size(248, 20);
             this.txtAccountCode.TabIndex = 6;
             // 
             // lblAsOfDate
@@ -352,20 +339,18 @@
             this.lblAsOfDate.Appearance.Options.UseBackColor = true;
             this.lblAsOfDate.Appearance.Options.UseFont = true;
             this.lblAsOfDate.Appearance.Options.UseForeColor = true;
-            this.lblAsOfDate.Location = new System.Drawing.Point(19, 386);
-            this.lblAsOfDate.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.lblAsOfDate.Location = new System.Drawing.Point(16, 314);
             this.lblAsOfDate.Name = "lblAsOfDate";
-            this.lblAsOfDate.Size = new System.Drawing.Size(69, 14);
+            this.lblAsOfDate.Size = new System.Drawing.Size(59, 11);
             this.lblAsOfDate.TabIndex = 7;
             this.lblAsOfDate.Text = "AS-OF DATE";
             // 
             // dteAsOfDate
             // 
             this.dteAsOfDate.EditValue = new System.DateTime(2026, 7, 14, 0, 0, 0, 0);
-            this.dteAsOfDate.Location = new System.Drawing.Point(19, 405);
-            this.dteAsOfDate.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.dteAsOfDate.Location = new System.Drawing.Point(16, 329);
             this.dteAsOfDate.Name = "dteAsOfDate";
-            this.dteAsOfDate.Size = new System.Drawing.Size(289, 22);
+            this.dteAsOfDate.Size = new System.Drawing.Size(248, 20);
             this.dteAsOfDate.TabIndex = 8;
             // 
             // lblDateFrom
@@ -376,20 +361,18 @@
             this.lblDateFrom.Appearance.Options.UseBackColor = true;
             this.lblDateFrom.Appearance.Options.UseFont = true;
             this.lblDateFrom.Appearance.Options.UseForeColor = true;
-            this.lblDateFrom.Location = new System.Drawing.Point(19, 386);
-            this.lblDateFrom.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.lblDateFrom.Location = new System.Drawing.Point(16, 314);
             this.lblDateFrom.Name = "lblDateFrom";
-            this.lblDateFrom.Size = new System.Drawing.Size(66, 14);
+            this.lblDateFrom.Size = new System.Drawing.Size(57, 11);
             this.lblDateFrom.TabIndex = 9;
             this.lblDateFrom.Text = "DATE FROM";
             // 
             // dteDateFrom
             // 
             this.dteDateFrom.EditValue = new System.DateTime(2026, 7, 14, 0, 0, 0, 0);
-            this.dteDateFrom.Location = new System.Drawing.Point(19, 405);
-            this.dteDateFrom.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.dteDateFrom.Location = new System.Drawing.Point(16, 329);
             this.dteDateFrom.Name = "dteDateFrom";
-            this.dteDateFrom.Size = new System.Drawing.Size(289, 22);
+            this.dteDateFrom.Size = new System.Drawing.Size(248, 20);
             this.dteDateFrom.TabIndex = 10;
             // 
             // lblDateTo
@@ -400,55 +383,49 @@
             this.lblDateTo.Appearance.Options.UseBackColor = true;
             this.lblDateTo.Appearance.Options.UseFont = true;
             this.lblDateTo.Appearance.Options.UseForeColor = true;
-            this.lblDateTo.Location = new System.Drawing.Point(19, 435);
-            this.lblDateTo.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.lblDateTo.Location = new System.Drawing.Point(16, 353);
             this.lblDateTo.Name = "lblDateTo";
-            this.lblDateTo.Size = new System.Drawing.Size(52, 14);
+            this.lblDateTo.Size = new System.Drawing.Size(43, 11);
             this.lblDateTo.TabIndex = 11;
             this.lblDateTo.Text = "DATE TO";
             // 
             // dteDateTo
             // 
             this.dteDateTo.EditValue = new System.DateTime(2026, 7, 14, 0, 0, 0, 0);
-            this.dteDateTo.Location = new System.Drawing.Point(19, 454);
-            this.dteDateTo.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.dteDateTo.Location = new System.Drawing.Point(16, 369);
             this.dteDateTo.Name = "dteDateTo";
-            this.dteDateTo.Size = new System.Drawing.Size(289, 22);
+            this.dteDateTo.Size = new System.Drawing.Size(248, 20);
             this.dteDateTo.TabIndex = 12;
             // 
             // chkAllBranches
             // 
-            this.chkAllBranches.Location = new System.Drawing.Point(19, 547);
-            this.chkAllBranches.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.chkAllBranches.Location = new System.Drawing.Point(16, 444);
             this.chkAllBranches.Name = "chkAllBranches";
             this.chkAllBranches.Properties.Caption = "All Branches (Pivot - one column per branch + Grand Total)";
-            this.chkAllBranches.Size = new System.Drawing.Size(289, 24);
+            this.chkAllBranches.Size = new System.Drawing.Size(248, 20);
             this.chkAllBranches.TabIndex = 13;
             this.chkAllBranches.CheckedChanged += new System.EventHandler(this.chkAllBranches_CheckedChanged);
             // 
             // chkAllAccounts
             // 
-            this.chkAllAccounts.Location = new System.Drawing.Point(19, 547);
-            this.chkAllAccounts.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.chkAllAccounts.Location = new System.Drawing.Point(16, 444);
             this.chkAllAccounts.Name = "chkAllAccounts";
             this.chkAllAccounts.Properties.Caption = "All Accounts (ignore Account Code filter above)";
-            this.chkAllAccounts.Size = new System.Drawing.Size(289, 24);
+            this.chkAllAccounts.Size = new System.Drawing.Size(248, 20);
             this.chkAllAccounts.TabIndex = 14;
             this.chkAllAccounts.CheckedChanged += new System.EventHandler(this.chkAllAccounts_CheckedChanged);
             // 
             // chkIncludeZeroActivity
             // 
-            this.chkIncludeZeroActivity.Location = new System.Drawing.Point(19, 547);
-            this.chkIncludeZeroActivity.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.chkIncludeZeroActivity.Location = new System.Drawing.Point(16, 444);
             this.chkIncludeZeroActivity.Name = "chkIncludeZeroActivity";
             this.chkIncludeZeroActivity.Properties.Caption = "Include accounts with no activity";
-            this.chkIncludeZeroActivity.Size = new System.Drawing.Size(289, 24);
+            this.chkIncludeZeroActivity.Size = new System.Drawing.Size(248, 20);
             this.chkIncludeZeroActivity.TabIndex = 15;
             // 
             // rgConsolidatedMode
             // 
-            this.rgConsolidatedMode.Location = new System.Drawing.Point(19, 484);
-            this.rgConsolidatedMode.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.rgConsolidatedMode.Location = new System.Drawing.Point(16, 393);
             this.rgConsolidatedMode.Name = "rgConsolidatedMode";
             this.rgConsolidatedMode.Properties.Appearance.BackColor = System.Drawing.SystemColors.Control;
             this.rgConsolidatedMode.Properties.Appearance.ForeColor = System.Drawing.Color.Black;
@@ -457,7 +434,7 @@
             this.rgConsolidatedMode.Properties.Items.AddRange(new DevExpress.XtraEditors.Controls.RadioGroupItem[] {
             new DevExpress.XtraEditors.Controls.RadioGroupItem("TB", "Trial Balance (as-of date)"),
             new DevExpress.XtraEditors.Controls.RadioGroupItem("IS", "Income Statement (date range)")});
-            this.rgConsolidatedMode.Size = new System.Drawing.Size(289, 51);
+            this.rgConsolidatedMode.Size = new System.Drawing.Size(248, 41);
             this.rgConsolidatedMode.TabIndex = 16;
             this.rgConsolidatedMode.SelectedIndexChanged += new System.EventHandler(this.rgConsolidatedMode_SelectedIndexChanged);
             // 
@@ -470,10 +447,9 @@
             this.lblDescription.Appearance.Options.UseFont = true;
             this.lblDescription.Appearance.Options.UseForeColor = true;
             this.lblDescription.AutoSizeMode = DevExpress.XtraEditors.LabelAutoSizeMode.None;
-            this.lblDescription.Location = new System.Drawing.Point(12, 592);
-            this.lblDescription.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.lblDescription.Location = new System.Drawing.Point(10, 481);
             this.lblDescription.Name = "lblDescription";
-            this.lblDescription.Size = new System.Drawing.Size(289, 74);
+            this.lblDescription.Size = new System.Drawing.Size(248, 60);
             this.lblDescription.TabIndex = 17;
             // 
             // lblSpName
@@ -484,10 +460,9 @@
             this.lblSpName.Appearance.Options.UseBackColor = true;
             this.lblSpName.Appearance.Options.UseFont = true;
             this.lblSpName.Appearance.Options.UseForeColor = true;
-            this.lblSpName.Location = new System.Drawing.Point(12, 833);
-            this.lblSpName.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.lblSpName.Location = new System.Drawing.Point(10, 677);
             this.lblSpName.Name = "lblSpName";
-            this.lblSpName.Size = new System.Drawing.Size(0, 15);
+            this.lblSpName.Size = new System.Drawing.Size(0, 12);
             this.lblSpName.TabIndex = 18;
             // 
             // btnGenerate
@@ -498,10 +473,9 @@
             this.btnGenerate.Appearance.Options.UseBackColor = true;
             this.btnGenerate.Appearance.Options.UseFont = true;
             this.btnGenerate.Appearance.Options.UseForeColor = true;
-            this.btnGenerate.Location = new System.Drawing.Point(12, 702);
-            this.btnGenerate.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnGenerate.Location = new System.Drawing.Point(10, 570);
             this.btnGenerate.Name = "btnGenerate";
-            this.btnGenerate.Size = new System.Drawing.Size(289, 44);
+            this.btnGenerate.Size = new System.Drawing.Size(248, 36);
             this.btnGenerate.TabIndex = 19;
             this.btnGenerate.Text = "▶  Generate Report";
             this.btnGenerate.Click += new System.EventHandler(this.btnGenerate_Click);
@@ -512,10 +486,9 @@
             this.btnExport.Appearance.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(235)))));
             this.btnExport.Appearance.Options.UseBackColor = true;
             this.btnExport.Appearance.Options.UseForeColor = true;
-            this.btnExport.Location = new System.Drawing.Point(12, 754);
-            this.btnExport.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnExport.Location = new System.Drawing.Point(10, 613);
             this.btnExport.Name = "btnExport";
-            this.btnExport.Size = new System.Drawing.Size(289, 39);
+            this.btnExport.Size = new System.Drawing.Size(248, 32);
             this.btnExport.TabIndex = 20;
             this.btnExport.Text = "⬇  Export (PDF/Excel)";
             this.btnExport.Click += new System.EventHandler(this.btnExport_Click);
@@ -523,22 +496,20 @@
             // gridControlReport
             // 
             this.gridControlReport.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControlReport.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.gridControlReport.Location = new System.Drawing.Point(2, 2);
             this.gridControlReport.MainView = this.gridViewReport;
-            this.gridControlReport.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.gridControlReport.Name = "gridControlReport";
-            this.gridControlReport.Size = new System.Drawing.Size(1061, 604);
+            this.gridControlReport.Size = new System.Drawing.Size(908, 491);
             this.gridControlReport.TabIndex = 2;
             this.gridControlReport.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewReport});
             // 
             // gridViewReport
             // 
-            this.gridViewReport.DetailHeight = 431;
             this.gridViewReport.GridControl = this.gridControlReport;
             this.gridViewReport.Name = "gridViewReport";
             this.gridViewReport.OptionsBehavior.Editable = false;
+            this.gridViewReport.OptionsEditForm.PopupEditFormWidth = 686;
             this.gridViewReport.OptionsView.ShowGroupPanel = false;
             // 
             // lblSummaryCaption
@@ -547,10 +518,9 @@
             this.lblSummaryCaption.Appearance.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(201)))), ((int)(((byte)(162)))), ((int)(((byte)(39)))));
             this.lblSummaryCaption.Appearance.Options.UseFont = true;
             this.lblSummaryCaption.Appearance.Options.UseForeColor = true;
-            this.lblSummaryCaption.Location = new System.Drawing.Point(5, 6);
-            this.lblSummaryCaption.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.lblSummaryCaption.Location = new System.Drawing.Point(4, 5);
             this.lblSummaryCaption.Name = "lblSummaryCaption";
-            this.lblSummaryCaption.Size = new System.Drawing.Size(66, 16);
+            this.lblSummaryCaption.Size = new System.Drawing.Size(53, 12);
             this.lblSummaryCaption.TabIndex = 3;
             this.lblSummaryCaption.Text = "SUMMARY";
             // 
@@ -558,23 +528,21 @@
             // 
             this.tablePanel1.SetColumn(this.gridControlSummary, 0);
             this.gridControlSummary.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControlSummary.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.gridControlSummary.Location = new System.Drawing.Point(3, 657);
+            this.gridControlSummary.Location = new System.Drawing.Point(3, 534);
             this.gridControlSummary.MainView = this.gridViewSummary;
-            this.gridControlSummary.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.gridControlSummary.Name = "gridControlSummary";
             this.tablePanel1.SetRow(this.gridControlSummary, 2);
-            this.gridControlSummary.Size = new System.Drawing.Size(1065, 245);
+            this.gridControlSummary.Size = new System.Drawing.Size(912, 199);
             this.gridControlSummary.TabIndex = 4;
             this.gridControlSummary.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewSummary});
             // 
             // gridViewSummary
             // 
-            this.gridViewSummary.DetailHeight = 431;
             this.gridViewSummary.GridControl = this.gridControlSummary;
             this.gridViewSummary.Name = "gridViewSummary";
             this.gridViewSummary.OptionsBehavior.Editable = false;
+            this.gridViewSummary.OptionsEditForm.PopupEditFormWidth = 686;
             this.gridViewSummary.OptionsView.ShowGroupPanel = false;
             // 
             // tablePanel1
@@ -585,13 +553,14 @@
             this.tablePanel1.Controls.Add(this.gridControlSummary);
             this.tablePanel1.Controls.Add(this.panelControl1);
             this.tablePanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tablePanel1.Location = new System.Drawing.Point(329, 79);
+            this.tablePanel1.Location = new System.Drawing.Point(282, 64);
+            this.tablePanel1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tablePanel1.Name = "tablePanel1";
             this.tablePanel1.Rows.AddRange(new DevExpress.Utils.Layout.TablePanelRow[] {
             new DevExpress.Utils.Layout.TablePanelRow(DevExpress.Utils.Layout.TablePanelEntityStyle.Absolute, 613.9998F),
             new DevExpress.Utils.Layout.TablePanelRow(DevExpress.Utils.Layout.TablePanelEntityStyle.Absolute, 38.79974F),
             new DevExpress.Utils.Layout.TablePanelRow(DevExpress.Utils.Layout.TablePanelEntityStyle.Absolute, 26F)});
-            this.tablePanel1.Size = new System.Drawing.Size(1071, 906);
+            this.tablePanel1.Size = new System.Drawing.Size(918, 736);
             this.tablePanel1.TabIndex = 8;
             // 
             // panelControl2
@@ -599,10 +568,11 @@
             this.tablePanel1.SetColumn(this.panelControl2, 0);
             this.panelControl2.Controls.Add(this.lblSummaryCaption);
             this.panelControl2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelControl2.Location = new System.Drawing.Point(3, 617);
+            this.panelControl2.Location = new System.Drawing.Point(3, 501);
+            this.panelControl2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panelControl2.Name = "panelControl2";
             this.tablePanel1.SetRow(this.panelControl2, 1);
-            this.panelControl2.Size = new System.Drawing.Size(1065, 33);
+            this.panelControl2.Size = new System.Drawing.Size(912, 28);
             this.panelControl2.TabIndex = 1;
             // 
             // panelControl1
@@ -610,22 +580,22 @@
             this.tablePanel1.SetColumn(this.panelControl1, 0);
             this.panelControl1.Controls.Add(this.gridControlReport);
             this.panelControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelControl1.Location = new System.Drawing.Point(3, 3);
+            this.panelControl1.Location = new System.Drawing.Point(3, 2);
+            this.panelControl1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panelControl1.Name = "panelControl1";
             this.tablePanel1.SetRow(this.panelControl1, 0);
-            this.panelControl1.Size = new System.Drawing.Size(1065, 608);
+            this.panelControl1.Size = new System.Drawing.Size(912, 495);
             this.panelControl1.TabIndex = 0;
             // 
             // AccountingReportsForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.tablePanel1);
             this.Controls.Add(this.pnlSidebar);
             this.Controls.Add(this.pnlHeader);
-            this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "AccountingReportsForm";
-            this.Size = new System.Drawing.Size(1400, 985);
+            this.Size = new System.Drawing.Size(1200, 800);
             this.Load += new System.EventHandler(this.AccountingReportsForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pnlHeader)).EndInit();
             this.pnlHeader.ResumeLayout(false);

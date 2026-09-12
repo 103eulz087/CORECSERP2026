@@ -36,6 +36,20 @@
 
         private DevExpress.XtraGrid.GridControl gridDIT;
         private DevExpress.XtraGrid.Views.Grid.GridView viewDIT;
+        // NEW -- the DIT grid (gridDIT, embedded in tabOC alongside gridOC) had no visible
+        // action bar at all: btnAddDIT/btnResolveDIT/btnDeleteDIT existed and were already
+        // wired to click handlers in BankReconFormV2.cs, but were never added to any
+        // container's Controls -- they could never render or be clicked. This panel finally
+        // hosts them (re-parented below), plus the new ControlNo filter/check-all/bulk-resolve
+        // controls for this task.
+        private DevExpress.XtraEditors.PanelControl pnlDitActions;
+        private DevExpress.XtraEditors.CheckEdit chkSelectAllDIT;
+        private DevExpress.XtraEditors.SimpleButton btnBulkResolveDIT;
+        // NEW -- resolves every DIT row sharing the focused row's/group's ControlNo in one
+        // click (same sp_BankRecon_BulkResolveItems call as Bulk Resolve, just sourced from a
+        // ControlNo match instead of individually-checked rows). Pairs with grouping viewDIT by
+        // ControlNo in ConfigureDitGridExtras() so a real collection batch collapses to one line.
+        private DevExpress.XtraEditors.SimpleButton btnResolveGroupDIT;
 
         private DevExpress.XtraGrid.GridControl gridOC;
         private DevExpress.XtraGrid.Views.Grid.GridView viewOC;
@@ -43,6 +57,9 @@
         private DevExpress.XtraEditors.SimpleButton btnResolveOC;
         private DevExpress.XtraEditors.SimpleButton btnDeleteOC;
         private DevExpress.XtraEditors.SimpleButton btnAutoMatch;
+        // NEW -- same Selected-checkbox / Check-All / Bulk Resolve pattern as the DIT grid.
+        private DevExpress.XtraEditors.CheckEdit chkSelectAllOC;
+        private DevExpress.XtraEditors.SimpleButton btnBulkResolveOC;
 
         private DevExpress.XtraGrid.GridControl gridBankSide;
         private DevExpress.XtraGrid.Views.Grid.GridView viewBankSide;
@@ -97,6 +114,13 @@
             this.panelControl1 = new DevExpress.XtraEditors.PanelControl();
             this.gridDIT = new DevExpress.XtraGrid.GridControl();
             this.viewDIT = new DevExpress.XtraGrid.Views.Grid.GridView();
+            this.pnlDitActions = new DevExpress.XtraEditors.PanelControl();
+            this.btnAddDIT = new DevExpress.XtraEditors.SimpleButton();
+            this.btnResolveDIT = new DevExpress.XtraEditors.SimpleButton();
+            this.btnDeleteDIT = new DevExpress.XtraEditors.SimpleButton();
+            this.chkSelectAllDIT = new DevExpress.XtraEditors.CheckEdit();
+            this.btnBulkResolveDIT = new DevExpress.XtraEditors.SimpleButton();
+            this.btnResolveGroupDIT = new DevExpress.XtraEditors.SimpleButton();
             this.panelControl3 = new DevExpress.XtraEditors.PanelControl();
             this.panelControl4 = new DevExpress.XtraEditors.PanelControl();
             this.panelControl6 = new DevExpress.XtraEditors.PanelControl();
@@ -105,6 +129,8 @@
             this.simpleButton1 = new DevExpress.XtraEditors.SimpleButton();
             this.btnAddOC = new DevExpress.XtraEditors.SimpleButton();
             this.btnResolveOC = new DevExpress.XtraEditors.SimpleButton();
+            this.chkSelectAllOC = new DevExpress.XtraEditors.CheckEdit();
+            this.btnBulkResolveOC = new DevExpress.XtraEditors.SimpleButton();
             this.tabDIT = new DevExpress.XtraTab.XtraTabPage();
             this.pnlDITButtons = new DevExpress.XtraEditors.PanelControl();
             this.tabBankSide = new DevExpress.XtraTab.XtraTabPage();
@@ -137,15 +163,13 @@
             this.pnlFooter = new DevExpress.XtraEditors.PanelControl();
             this.btnLock = new DevExpress.XtraEditors.SimpleButton();
             this.btnPrint = new DevExpress.XtraEditors.SimpleButton();
-            this.btnDeleteDIT = new DevExpress.XtraEditors.SimpleButton();
-            this.btnResolveDIT = new DevExpress.XtraEditors.SimpleButton();
-            this.btnAddDIT = new DevExpress.XtraEditors.SimpleButton();
             this.contextMenuStripDIT = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.markAsClearedToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.markAsUnclearedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStripOC = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.markAsClearedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.markAsUnclearedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.markAsUnclearedToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.panelControl2 = new DevExpress.XtraEditors.PanelControl();
             ((System.ComponentModel.ISupportInitialize)(this.pnlHeader)).BeginInit();
             this.pnlHeader.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.cmbBranch.Properties)).BeginInit();
@@ -170,10 +194,14 @@
             this.panelControl1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridDIT)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.viewDIT)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pnlDitActions)).BeginInit();
+            this.pnlDitActions.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.chkSelectAllDIT.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl4)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl6)).BeginInit();
             this.panelControl6.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.chkSelectAllOC.Properties)).BeginInit();
             this.tabDIT.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pnlDITButtons)).BeginInit();
             this.tabBankSide.SuspendLayout();
@@ -187,6 +215,8 @@
             this.pnlFooter.SuspendLayout();
             this.contextMenuStripDIT.SuspendLayout();
             this.contextMenuStripOC.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.panelControl2)).BeginInit();
+            this.panelControl2.SuspendLayout();
             this.SuspendLayout();
             // 
             // pnlHeader
@@ -398,6 +428,7 @@
             // 
             this.tablePanel1.SetColumn(this.panelControl7, 1);
             this.panelControl7.Controls.Add(this.gridOC);
+            this.panelControl7.Controls.Add(this.panelControl2);
             this.panelControl7.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelControl7.Location = new System.Drawing.Point(661, 3);
             this.panelControl7.Name = "panelControl7";
@@ -413,7 +444,7 @@
             this.gridOC.MainView = this.viewOC;
             this.gridOC.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.gridOC.Name = "gridOC";
-            this.gridOC.Size = new System.Drawing.Size(663, 437);
+            this.gridOC.Size = new System.Drawing.Size(663, 394);
             this.gridOC.TabIndex = 0;
             this.gridOC.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.viewOC});
@@ -424,14 +455,15 @@
             this.viewOC.DetailHeight = 431;
             this.viewOC.GridControl = this.gridOC;
             this.viewOC.Name = "viewOC";
-            this.viewOC.OptionsBehavior.Editable = false;
             this.viewOC.OptionsSelection.EnableAppearanceFocusedCell = false;
+            this.viewOC.OptionsView.ShowFooter = true;
             this.viewOC.OptionsView.ShowGroupPanel = false;
             // 
             // panelControl1
             // 
             this.tablePanel1.SetColumn(this.panelControl1, 0);
             this.panelControl1.Controls.Add(this.gridDIT);
+            this.panelControl1.Controls.Add(this.pnlDitActions);
             this.panelControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelControl1.Location = new System.Drawing.Point(3, 3);
             this.panelControl1.Name = "panelControl1";
@@ -447,7 +479,7 @@
             this.gridDIT.MainView = this.viewDIT;
             this.gridDIT.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.gridDIT.Name = "gridDIT";
-            this.gridDIT.Size = new System.Drawing.Size(648, 437);
+            this.gridDIT.Size = new System.Drawing.Size(648, 394);
             this.gridDIT.TabIndex = 0;
             this.gridDIT.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.viewDIT});
@@ -458,10 +490,82 @@
             this.viewDIT.DetailHeight = 431;
             this.viewDIT.GridControl = this.gridDIT;
             this.viewDIT.Name = "viewDIT";
-            this.viewDIT.OptionsBehavior.Editable = false;
             this.viewDIT.OptionsSelection.EnableAppearanceFocusedCell = false;
+            this.viewDIT.OptionsView.ShowFooter = true;
             this.viewDIT.OptionsView.ShowGroupPanel = false;
             // 
+            // pnlDitActions
+            // 
+            this.pnlDitActions.Controls.Add(this.btnAddDIT);
+            this.pnlDitActions.Controls.Add(this.btnResolveDIT);
+            this.pnlDitActions.Controls.Add(this.btnDeleteDIT);
+            this.pnlDitActions.Controls.Add(this.chkSelectAllDIT);
+            this.pnlDitActions.Controls.Add(this.btnBulkResolveDIT);
+            this.pnlDitActions.Controls.Add(this.btnResolveGroupDIT);
+            this.pnlDitActions.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.pnlDitActions.Location = new System.Drawing.Point(2, 351);
+            this.pnlDitActions.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.pnlDitActions.Name = "pnlDitActions";
+            this.pnlDitActions.Size = new System.Drawing.Size(648, 88);
+            this.pnlDitActions.TabIndex = 6;
+            // 
+            // btnAddDIT
+            // 
+            this.btnAddDIT.Location = new System.Drawing.Point(7, 10);
+            this.btnAddDIT.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.btnAddDIT.Name = "btnAddDIT";
+            this.btnAddDIT.Size = new System.Drawing.Size(160, 32);
+            this.btnAddDIT.TabIndex = 0;
+            this.btnAddDIT.Text = "Add Deposit in Transit";
+            // 
+            // btnResolveDIT
+            // 
+            this.btnResolveDIT.Enabled = false;
+            this.btnResolveDIT.Location = new System.Drawing.Point(175, 10);
+            this.btnResolveDIT.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.btnResolveDIT.Name = "btnResolveDIT";
+            this.btnResolveDIT.Size = new System.Drawing.Size(109, 32);
+            this.btnResolveDIT.TabIndex = 1;
+            this.btnResolveDIT.Text = "Mark Cleared";
+            // 
+            // btnDeleteDIT
+            // 
+            this.btnDeleteDIT.Enabled = false;
+            this.btnDeleteDIT.Location = new System.Drawing.Point(293, 10);
+            this.btnDeleteDIT.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.btnDeleteDIT.Name = "btnDeleteDIT";
+            this.btnDeleteDIT.Size = new System.Drawing.Size(79, 32);
+            this.btnDeleteDIT.TabIndex = 2;
+            this.btnDeleteDIT.Text = "Delete";
+            // 
+            // chkSelectAllDIT
+            // 
+            this.chkSelectAllDIT.Location = new System.Drawing.Point(385, 12);
+            this.chkSelectAllDIT.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.chkSelectAllDIT.Name = "chkSelectAllDIT";
+            this.chkSelectAllDIT.Properties.Caption = "Check All (filtered)";
+            this.chkSelectAllDIT.Size = new System.Drawing.Size(150, 20);
+            this.chkSelectAllDIT.TabIndex = 3;
+            // 
+            // btnBulkResolveDIT
+            // 
+            this.btnBulkResolveDIT.Location = new System.Drawing.Point(545, 10);
+            this.btnBulkResolveDIT.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.btnBulkResolveDIT.Name = "btnBulkResolveDIT";
+            this.btnBulkResolveDIT.Size = new System.Drawing.Size(95, 25);
+            this.btnBulkResolveDIT.TabIndex = 4;
+            this.btnBulkResolveDIT.Text = "Bulk Resolve";
+            //
+            // btnResolveGroupDIT
+            //
+            this.btnResolveGroupDIT.Enabled = false;
+            this.btnResolveGroupDIT.Location = new System.Drawing.Point(7, 52);
+            this.btnResolveGroupDIT.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.btnResolveGroupDIT.Name = "btnResolveGroupDIT";
+            this.btnResolveGroupDIT.Size = new System.Drawing.Size(280, 28);
+            this.btnResolveGroupDIT.TabIndex = 5;
+            this.btnResolveGroupDIT.Text = "Resolve Entire Batch (Control No)";
+            //
             // panelControl3
             // 
             this.panelControl3.Location = new System.Drawing.Point(287, 220);
@@ -488,6 +592,7 @@
             this.panelControl6.Name = "panelControl6";
             this.panelControl6.Size = new System.Drawing.Size(1335, 50);
             this.panelControl6.TabIndex = 4;
+            this.panelControl6.Paint += new System.Windows.Forms.PaintEventHandler(this.panelControl6_Paint);
             // 
             // btnAutoMatch
             // 
@@ -497,6 +602,7 @@
             this.btnAutoMatch.Size = new System.Drawing.Size(197, 32);
             this.btnAutoMatch.TabIndex = 3;
             this.btnAutoMatch.Text = "Auto-Match Cleared Checks";
+            this.btnAutoMatch.Visible = false;
             // 
             // btnDeleteOC
             // 
@@ -507,6 +613,7 @@
             this.btnDeleteOC.Size = new System.Drawing.Size(92, 32);
             this.btnDeleteOC.TabIndex = 2;
             this.btnDeleteOC.Text = "Delete";
+            this.btnDeleteOC.Visible = false;
             this.btnDeleteOC.Click += new System.EventHandler(this.btnDeleteOC_Click);
             // 
             // simpleButton1
@@ -517,6 +624,7 @@
             this.simpleButton1.Size = new System.Drawing.Size(187, 32);
             this.simpleButton1.TabIndex = 1;
             this.simpleButton1.Text = "Add Deposit in Transit";
+            this.simpleButton1.Visible = false;
             this.simpleButton1.Click += new System.EventHandler(this.simpleButton1_Click);
             // 
             // btnAddOC
@@ -527,6 +635,7 @@
             this.btnAddOC.Size = new System.Drawing.Size(187, 32);
             this.btnAddOC.TabIndex = 0;
             this.btnAddOC.Text = "Add Outstanding Check";
+            this.btnAddOC.Visible = false;
             this.btnAddOC.Click += new System.EventHandler(this.btnAddOC_Click);
             // 
             // btnResolveOC
@@ -538,7 +647,26 @@
             this.btnResolveOC.Size = new System.Drawing.Size(127, 32);
             this.btnResolveOC.TabIndex = 1;
             this.btnResolveOC.Text = "Mark Cleared";
+            this.btnResolveOC.Visible = false;
             this.btnResolveOC.Click += new System.EventHandler(this.btnResolveOC_Click);
+            // 
+            // chkSelectAllOC
+            // 
+            this.chkSelectAllOC.Location = new System.Drawing.Point(397, 8);
+            this.chkSelectAllOC.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.chkSelectAllOC.Name = "chkSelectAllOC";
+            this.chkSelectAllOC.Properties.Caption = "Check All (filtered)";
+            this.chkSelectAllOC.Size = new System.Drawing.Size(150, 20);
+            this.chkSelectAllOC.TabIndex = 4;
+            // 
+            // btnBulkResolveOC
+            // 
+            this.btnBulkResolveOC.Location = new System.Drawing.Point(557, 4);
+            this.btnBulkResolveOC.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.btnBulkResolveOC.Name = "btnBulkResolveOC";
+            this.btnBulkResolveOC.Size = new System.Drawing.Size(95, 32);
+            this.btnBulkResolveOC.TabIndex = 5;
+            this.btnBulkResolveOC.Text = "Bulk Resolve";
             // 
             // tabDIT
             // 
@@ -876,32 +1004,6 @@
             this.btnPrint.Text = "Print";
             this.btnPrint.Click += new System.EventHandler(this.btnPrint_Click_1);
             // 
-            // btnDeleteDIT
-            // 
-            this.btnDeleteDIT.Enabled = false;
-            this.btnDeleteDIT.Location = new System.Drawing.Point(293, 10);
-            this.btnDeleteDIT.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
-            this.btnDeleteDIT.Name = "btnDeleteDIT";
-            this.btnDeleteDIT.Size = new System.Drawing.Size(79, 32);
-            this.btnDeleteDIT.TabIndex = 2;
-            // 
-            // btnResolveDIT
-            // 
-            this.btnResolveDIT.Enabled = false;
-            this.btnResolveDIT.Location = new System.Drawing.Point(175, 10);
-            this.btnResolveDIT.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
-            this.btnResolveDIT.Name = "btnResolveDIT";
-            this.btnResolveDIT.Size = new System.Drawing.Size(109, 32);
-            this.btnResolveDIT.TabIndex = 1;
-            // 
-            // btnAddDIT
-            // 
-            this.btnAddDIT.Location = new System.Drawing.Point(7, 10);
-            this.btnAddDIT.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
-            this.btnAddDIT.Name = "btnAddDIT";
-            this.btnAddDIT.Size = new System.Drawing.Size(160, 32);
-            this.btnAddDIT.TabIndex = 0;
-            // 
             // contextMenuStripDIT
             // 
             this.contextMenuStripDIT.ImageScalingSize = new System.Drawing.Size(20, 20);
@@ -918,6 +1020,13 @@
             this.markAsClearedToolStripMenuItem1.Text = "Mark as Cleared";
             this.markAsClearedToolStripMenuItem1.Click += new System.EventHandler(this.markAsClearedToolStripMenuItem1_Click);
             // 
+            // markAsUnclearedToolStripMenuItem
+            // 
+            this.markAsUnclearedToolStripMenuItem.Name = "markAsUnclearedToolStripMenuItem";
+            this.markAsUnclearedToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
+            this.markAsUnclearedToolStripMenuItem.Text = "Mark as Uncleared";
+            this.markAsUnclearedToolStripMenuItem.Click += new System.EventHandler(this.markAsUnclearedToolStripMenuItem_Click);
+            // 
             // contextMenuStripOC
             // 
             this.contextMenuStripOC.ImageScalingSize = new System.Drawing.Size(20, 20);
@@ -930,23 +1039,26 @@
             // markAsClearedToolStripMenuItem
             // 
             this.markAsClearedToolStripMenuItem.Name = "markAsClearedToolStripMenuItem";
-            this.markAsClearedToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.markAsClearedToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
             this.markAsClearedToolStripMenuItem.Text = "Mark as Cleared";
             this.markAsClearedToolStripMenuItem.Click += new System.EventHandler(this.markAsClearedToolStripMenuItem_Click);
-            // 
-            // markAsUnclearedToolStripMenuItem
-            // 
-            this.markAsUnclearedToolStripMenuItem.Name = "markAsUnclearedToolStripMenuItem";
-            this.markAsUnclearedToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.markAsUnclearedToolStripMenuItem.Text = "Mark as Uncleared";
-            this.markAsUnclearedToolStripMenuItem.Click += new System.EventHandler(this.markAsUnclearedToolStripMenuItem_Click);
             // 
             // markAsUnclearedToolStripMenuItem1
             // 
             this.markAsUnclearedToolStripMenuItem1.Name = "markAsUnclearedToolStripMenuItem1";
-            this.markAsUnclearedToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.markAsUnclearedToolStripMenuItem1.Size = new System.Drawing.Size(171, 22);
             this.markAsUnclearedToolStripMenuItem1.Text = "Mark as Uncleared";
             this.markAsUnclearedToolStripMenuItem1.Click += new System.EventHandler(this.markAsUnclearedToolStripMenuItem1_Click);
+            // 
+            // panelControl2
+            // 
+            this.panelControl2.Controls.Add(this.chkSelectAllOC);
+            this.panelControl2.Controls.Add(this.btnBulkResolveOC);
+            this.panelControl2.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.panelControl2.Location = new System.Drawing.Point(2, 396);
+            this.panelControl2.Name = "panelControl2";
+            this.panelControl2.Size = new System.Drawing.Size(663, 43);
+            this.panelControl2.TabIndex = 1;
             // 
             // BankReconFormV2
             // 
@@ -986,10 +1098,14 @@
             this.panelControl1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.gridDIT)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.viewDIT)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pnlDitActions)).EndInit();
+            this.pnlDitActions.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.chkSelectAllDIT.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl4)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl6)).EndInit();
             this.panelControl6.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.chkSelectAllOC.Properties)).EndInit();
             this.tabDIT.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pnlDITButtons)).EndInit();
             this.tabBankSide.ResumeLayout(false);
@@ -1004,6 +1120,8 @@
             this.pnlFooter.ResumeLayout(false);
             this.contextMenuStripDIT.ResumeLayout(false);
             this.contextMenuStripOC.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.panelControl2)).EndInit();
+            this.panelControl2.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -1027,5 +1145,6 @@
         private DevExpress.XtraEditors.PanelControl panelControl6;
         private System.Windows.Forms.ToolStripMenuItem markAsUnclearedToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem markAsUnclearedToolStripMenuItem1;
+        private DevExpress.XtraEditors.PanelControl panelControl2;
     }
 }

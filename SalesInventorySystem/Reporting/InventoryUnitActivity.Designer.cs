@@ -86,19 +86,16 @@
             // 
             this.groupControl2.Controls.Add(this.gridControl2);
             this.groupControl2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupControl2.Location = new System.Drawing.Point(0, 88);
-            this.groupControl2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.groupControl2.Location = new System.Drawing.Point(0, 73);
             this.groupControl2.Name = "groupControl2";
-            this.groupControl2.Size = new System.Drawing.Size(1316, 756);
+            this.groupControl2.Size = new System.Drawing.Size(1128, 613);
             this.groupControl2.TabIndex = 40;
             // 
             // gridControl2
             // 
             this.gridControl2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControl2.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.gridControl2.Location = new System.Drawing.Point(2, 25);
+            this.gridControl2.Location = new System.Drawing.Point(2, 23);
             this.gridControl2.MainView = this.gridView2;
-            this.gridControl2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.gridControl2.Name = "gridControl2";
             this.gridControl2.RepositoryItems.AddRange(new DevExpress.XtraEditors.Repository.RepositoryItem[] {
             this.repositoryItemComboBox1,
@@ -108,7 +105,7 @@
             this.repositoryItemSearchLookUpEditOffsetCreditGLCode,
             this.repositoryItemSearchLookUpEditEWTDebitGLCode,
             this.repositoryItemSearchLookUpEditEWTCreditGLCode});
-            this.gridControl2.Size = new System.Drawing.Size(1312, 729);
+            this.gridControl2.Size = new System.Drawing.Size(1124, 588);
             this.gridControl2.TabIndex = 8;
             this.gridControl2.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView2,
@@ -120,12 +117,13 @@
             this.gridView2.Appearance.HeaderPanel.Options.UseFont = true;
             this.gridView2.Appearance.Row.Font = new System.Drawing.Font("Tahoma", 9.25F);
             this.gridView2.Appearance.Row.Options.UseFont = true;
-            this.gridView2.DetailHeight = 224;
+            this.gridView2.DetailHeight = 182;
             this.gridView2.FixedLineWidth = 1;
             this.gridView2.GridControl = this.gridControl2;
             this.gridView2.Name = "gridView2";
             this.gridView2.OptionsBehavior.Editable = false;
             this.gridView2.OptionsBehavior.ReadOnly = true;
+            this.gridView2.OptionsEditForm.PopupEditFormWidth = 686;
             this.gridView2.OptionsView.ColumnAutoWidth = false;
             this.gridView2.OptionsView.RowAutoHeight = true;
             this.gridView2.OptionsView.ShowFooter = true;
@@ -150,8 +148,10 @@
             // 
             // repositoryItemSearchLookUpEdit1View
             // 
+            this.repositoryItemSearchLookUpEdit1View.DetailHeight = 284;
             this.repositoryItemSearchLookUpEdit1View.FocusRectStyle = DevExpress.XtraGrid.Views.Grid.DrawFocusRectStyle.RowFocus;
             this.repositoryItemSearchLookUpEdit1View.Name = "repositoryItemSearchLookUpEdit1View";
+            this.repositoryItemSearchLookUpEdit1View.OptionsEditForm.PopupEditFormWidth = 686;
             this.repositoryItemSearchLookUpEdit1View.OptionsSelection.EnableAppearanceFocusedCell = false;
             this.repositoryItemSearchLookUpEdit1View.OptionsView.ShowGroupPanel = false;
             // 
@@ -165,8 +165,10 @@
             // 
             // gridView1
             // 
+            this.gridView1.DetailHeight = 284;
             this.gridView1.FocusRectStyle = DevExpress.XtraGrid.Views.Grid.DrawFocusRectStyle.RowFocus;
             this.gridView1.Name = "gridView1";
+            this.gridView1.OptionsEditForm.PopupEditFormWidth = 686;
             this.gridView1.OptionsSelection.EnableAppearanceFocusedCell = false;
             this.gridView1.OptionsView.ShowGroupPanel = false;
             // 
@@ -187,8 +189,10 @@
             // 
             // gridView4
             // 
+            this.gridView4.DetailHeight = 284;
             this.gridView4.FocusRectStyle = DevExpress.XtraGrid.Views.Grid.DrawFocusRectStyle.RowFocus;
             this.gridView4.Name = "gridView4";
+            this.gridView4.OptionsEditForm.PopupEditFormWidth = 686;
             this.gridView4.OptionsSelection.EnableAppearanceFocusedCell = false;
             this.gridView4.OptionsView.ShowGroupPanel = false;
             // 
@@ -202,8 +206,10 @@
             // 
             // gridView6
             // 
+            this.gridView6.DetailHeight = 284;
             this.gridView6.FocusRectStyle = DevExpress.XtraGrid.Views.Grid.DrawFocusRectStyle.RowFocus;
             this.gridView6.Name = "gridView6";
+            this.gridView6.OptionsEditForm.PopupEditFormWidth = 686;
             this.gridView6.OptionsSelection.EnableAppearanceFocusedCell = false;
             this.gridView6.OptionsView.ShowGroupPanel = false;
             // 
@@ -217,33 +223,34 @@
             // 
             // gridView7
             // 
+            this.gridView7.DetailHeight = 284;
             this.gridView7.FocusRectStyle = DevExpress.XtraGrid.Views.Grid.DrawFocusRectStyle.RowFocus;
             this.gridView7.Name = "gridView7";
+            this.gridView7.OptionsEditForm.PopupEditFormWidth = 686;
             this.gridView7.OptionsSelection.EnableAppearanceFocusedCell = false;
             this.gridView7.OptionsView.ShowGroupPanel = false;
             // 
             // gridView5
             // 
-            this.gridView5.DetailHeight = 224;
+            this.gridView5.DetailHeight = 182;
             this.gridView5.FixedLineWidth = 1;
             this.gridView5.GridControl = this.gridControl2;
             this.gridView5.Name = "gridView5";
+            this.gridView5.OptionsEditForm.PopupEditFormWidth = 686;
             // 
             // labelControl1
             // 
             this.labelControl1.Appearance.Font = new System.Drawing.Font("Tahoma", 10.25F);
             this.labelControl1.Appearance.Options.UseFont = true;
-            this.labelControl1.Location = new System.Drawing.Point(16, 42);
-            this.labelControl1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.labelControl1.Location = new System.Drawing.Point(14, 34);
             this.labelControl1.Name = "labelControl1";
-            this.labelControl1.Size = new System.Drawing.Size(99, 21);
+            this.labelControl1.Size = new System.Drawing.Size(84, 17);
             this.labelControl1.TabIndex = 31;
             this.labelControl1.Text = "Branch Code:";
             // 
             // comboBoxEdit1
             // 
-            this.comboBoxEdit1.Location = new System.Drawing.Point(981, 87);
-            this.comboBoxEdit1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.comboBoxEdit1.Location = new System.Drawing.Point(841, 71);
             this.comboBoxEdit1.Name = "comboBoxEdit1";
             this.comboBoxEdit1.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
@@ -253,7 +260,7 @@
             "2019",
             "2020",
             "2021"});
-            this.comboBoxEdit1.Size = new System.Drawing.Size(222, 22);
+            this.comboBoxEdit1.Size = new System.Drawing.Size(190, 20);
             this.comboBoxEdit1.TabIndex = 34;
             this.comboBoxEdit1.Visible = false;
             // 
@@ -261,10 +268,9 @@
             // 
             this.labelControl3.Appearance.Font = new System.Drawing.Font("Tahoma", 10.25F);
             this.labelControl3.Appearance.Options.UseFont = true;
-            this.labelControl3.Location = new System.Drawing.Point(865, 87);
-            this.labelControl3.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.labelControl3.Location = new System.Drawing.Point(741, 71);
             this.labelControl3.Name = "labelControl3";
-            this.labelControl3.Size = new System.Drawing.Size(40, 21);
+            this.labelControl3.Size = new System.Drawing.Size(32, 17);
             this.labelControl3.TabIndex = 36;
             this.labelControl3.Text = "Year:";
             this.labelControl3.Visible = false;
@@ -273,18 +279,16 @@
             // 
             this.labelControl2.Appearance.Font = new System.Drawing.Font("Tahoma", 10.25F);
             this.labelControl2.Appearance.Options.UseFont = true;
-            this.labelControl2.Location = new System.Drawing.Point(865, 55);
-            this.labelControl2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.labelControl2.Location = new System.Drawing.Point(741, 45);
             this.labelControl2.Name = "labelControl2";
-            this.labelControl2.Size = new System.Drawing.Size(52, 21);
+            this.labelControl2.Size = new System.Drawing.Size(44, 17);
             this.labelControl2.TabIndex = 35;
             this.labelControl2.Text = "Month:";
             this.labelControl2.Visible = false;
             // 
             // monthEdit1
             // 
-            this.monthEdit1.Location = new System.Drawing.Point(981, 55);
-            this.monthEdit1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.monthEdit1.Location = new System.Drawing.Point(841, 45);
             this.monthEdit1.Name = "monthEdit1";
             this.monthEdit1.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
@@ -292,15 +296,14 @@
             this.monthEdit1.Properties.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Custom;
             this.monthEdit1.Properties.EditFormat.FormatString = "\"MM/yyyy\"";
             this.monthEdit1.Properties.EditFormat.FormatType = DevExpress.Utils.FormatType.Custom;
-            this.monthEdit1.Size = new System.Drawing.Size(222, 22);
+            this.monthEdit1.Size = new System.Drawing.Size(190, 20);
             this.monthEdit1.TabIndex = 33;
             this.monthEdit1.Visible = false;
             // 
             // txtbrcode
             // 
             this.txtbrcode.EditValue = "";
-            this.txtbrcode.Location = new System.Drawing.Point(132, 40);
-            this.txtbrcode.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.txtbrcode.Location = new System.Drawing.Point(113, 32);
             this.txtbrcode.Name = "txtbrcode";
             this.txtbrcode.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtbrcode.Properties.Appearance.Options.UseFont = true;
@@ -308,13 +311,15 @@
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.txtbrcode.Properties.NullText = "";
             this.txtbrcode.Properties.PopupView = this.searchLookUpEdit1View;
-            this.txtbrcode.Size = new System.Drawing.Size(222, 26);
+            this.txtbrcode.Size = new System.Drawing.Size(190, 22);
             this.txtbrcode.TabIndex = 32;
             // 
             // searchLookUpEdit1View
             // 
+            this.searchLookUpEdit1View.DetailHeight = 284;
             this.searchLookUpEdit1View.FocusRectStyle = DevExpress.XtraGrid.Views.Grid.DrawFocusRectStyle.RowFocus;
             this.searchLookUpEdit1View.Name = "searchLookUpEdit1View";
+            this.searchLookUpEdit1View.OptionsEditForm.PopupEditFormWidth = 686;
             this.searchLookUpEdit1View.OptionsSelection.EnableAppearanceFocusedCell = false;
             this.searchLookUpEdit1View.OptionsView.ShowGroupPanel = false;
             // 
@@ -323,9 +328,10 @@
             this.simpleButton1.Appearance.Font = new System.Drawing.Font("Tahoma", 8.5F);
             this.simpleButton1.Appearance.Options.UseFont = true;
             this.simpleButton1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("simpleButton1.ImageOptions.Image")));
-            this.simpleButton1.Location = new System.Drawing.Point(362, 36);
+            this.simpleButton1.Location = new System.Drawing.Point(310, 29);
+            this.simpleButton1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.simpleButton1.Name = "simpleButton1";
-            this.simpleButton1.Size = new System.Drawing.Size(150, 34);
+            this.simpleButton1.Size = new System.Drawing.Size(129, 28);
             this.simpleButton1.TabIndex = 37;
             this.simpleButton1.Text = "Extract";
             this.simpleButton1.Click += new System.EventHandler(this.simpleButton1_Click);
@@ -335,9 +341,10 @@
             this.simpleButton2.Appearance.Font = new System.Drawing.Font("Tahoma", 8.5F);
             this.simpleButton2.Appearance.Options.UseFont = true;
             this.simpleButton2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("simpleButton2.ImageOptions.Image")));
-            this.simpleButton2.Location = new System.Drawing.Point(518, 42);
+            this.simpleButton2.Location = new System.Drawing.Point(444, 34);
+            this.simpleButton2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.simpleButton2.Name = "simpleButton2";
-            this.simpleButton2.Size = new System.Drawing.Size(188, 85);
+            this.simpleButton2.Size = new System.Drawing.Size(161, 69);
             this.simpleButton2.TabIndex = 38;
             this.simpleButton2.Text = "Generate Cost Journal";
             this.simpleButton2.Visible = false;
@@ -347,10 +354,9 @@
             // 
             this.radlist.AutoSize = true;
             this.radlist.Checked = true;
-            this.radlist.Location = new System.Drawing.Point(713, 58);
-            this.radlist.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.radlist.Location = new System.Drawing.Point(611, 47);
             this.radlist.Name = "radlist";
-            this.radlist.Size = new System.Drawing.Size(56, 21);
+            this.radlist.Size = new System.Drawing.Size(46, 17);
             this.radlist.TabIndex = 39;
             this.radlist.TabStop = true;
             this.radlist.Text = "LIST";
@@ -360,10 +366,9 @@
             // radupdate
             // 
             this.radupdate.AutoSize = true;
-            this.radupdate.Location = new System.Drawing.Point(713, 86);
-            this.radupdate.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.radupdate.Location = new System.Drawing.Point(611, 70);
             this.radupdate.Name = "radupdate";
-            this.radupdate.Size = new System.Drawing.Size(80, 21);
+            this.radupdate.Size = new System.Drawing.Size(64, 17);
             this.radupdate.TabIndex = 40;
             this.radupdate.Text = "UPDATE";
             this.radupdate.UseVisualStyleBackColor = true;
@@ -383,16 +388,15 @@
             this.groupControl1.Controls.Add(this.labelControl1);
             this.groupControl1.Dock = System.Windows.Forms.DockStyle.Top;
             this.groupControl1.Location = new System.Drawing.Point(0, 0);
-            this.groupControl1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.groupControl1.Name = "groupControl1";
-            this.groupControl1.Size = new System.Drawing.Size(1316, 88);
+            this.groupControl1.Size = new System.Drawing.Size(1128, 73);
             this.groupControl1.TabIndex = 39;
             // 
             // InventoryUnitActivity
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1316, 844);
+            this.ClientSize = new System.Drawing.Size(1128, 686);
             this.Controls.Add(this.groupControl2);
             this.Controls.Add(this.groupControl1);
             this.Margin = new System.Windows.Forms.Padding(2);

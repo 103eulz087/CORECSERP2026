@@ -41,7 +41,7 @@ namespace SalesInventorySystem.Reporting
 
         private void ConversionReports_Load(object sender, EventArgs e)
         {
-            tabControl1.TabPages.RemoveAt(3);
+            
             datefrom.Text = DateTime.Today.ToShortDateString();
             dateto.Text = DateTime.Today.ToShortDateString();
 
@@ -128,105 +128,105 @@ namespace SalesInventorySystem.Reporting
 
                     gridView3.Columns["ConID"].OptionsColumn.AllowMerge = DevExpress.Utils.DefaultBoolean.True;
                 }
-                else if (tabControl1.SelectedTab.Equals(SUMMARYDETAIL))
-                {
-                    string masterQuery = @"
-                    SELECT *
-                    FROM ConversionSummary
-                    WHERE DateConverted >= @DateFrom
-                      AND DateConverted <  DATEADD(day,1,@DateTo)
-                      AND BranchCode = @Branch
-                      AND isConfirm = 1";
+                //else if (tabControl1.SelectedTab.Equals(SUMMARYDETAIL))
+                //{
+                //    string masterQuery = @"
+                //    SELECT *
+                //    FROM ConversionSummary
+                //    WHERE DateConverted >= @DateFrom
+                //      AND DateConverted <  DATEADD(day,1,@DateTo)
+                //      AND BranchCode = @Branch
+                //      AND isConfirm = 1";
 
-                    string detailQuery = @"
-                    SELECT d.*
-                    FROM ConversionDetails d
-                    WHERE d.BranchCode = @Branch
-                      AND EXISTS (
-                          SELECT 1
-                          FROM ConversionSummary s
-                          WHERE s.ConID = d.ConID
-                            AND s.BranchCode = @Branch
-                            AND s.isConfirm = 1
-                            AND s.DateConverted >= @DateFrom
-                            AND s.DateConverted <  DATEADD(day,1,@DateTo)
-                      )";
-
-
-                    string subDetailQuery = @"
-                   SELECT f.*
-                    FROM ConversionFIFO f
-                    WHERE f.BranchCode = @Branch
-                      AND EXISTS (
-                          SELECT 1
-                          FROM ConversionDetails d
-                          WHERE d.ConID = f.ConID
-                            AND d.BranchCode = @Branch
-                            AND EXISTS (
-                                SELECT 1
-                                FROM ConversionSummary s
-                                WHERE s.ConID = d.ConID
-                                  AND s.BranchCode = @Branch
-                                  AND s.isConfirm = 1
-                                  AND s.DateConverted >= @DateFrom
-                                  AND s.DateConverted <  DATEADD(day,1,@DateTo)
-                            )
-                      )";
-
-                    var masterParams = new[]
-                    {
-                        new SqlParameter("@DateFrom", datefrom.DateTime),
-                        new SqlParameter("@DateTo", dateto.DateTime),
-                        new SqlParameter("@Branch", objbrcode.ToString())
-                    };
-
-                    var detailParams = new[]
-                    {
-                    new SqlParameter("@DateFrom", datefrom.DateTime),
-                    new SqlParameter("@DateTo", dateto.DateTime),
-                    new SqlParameter("@Branch", objbrcode.ToString()) 
-                    };
-
-                    var subdetailParams = new[]
-                   {
-                    new SqlParameter("@DateFrom", datefrom.DateTime),
-                    new SqlParameter("@DateTo", dateto.DateTime),
-                    new SqlParameter("@Branch", objbrcode.ToString())
-                    };
-
-                    //Database.GridMasterDetail(
-                    //    masterQuery,
-                    //    detailQuery,
-                    //    "Master",
-                    //    "Detail",
-                    //    "PONumber",
-                    //    "PONumber",
-                    //    "DeliveryDetails",
-                    //    gridControl4,
-                    //    masterParams,
-                    //    detailParams
-                    //);
+                //    string detailQuery = @"
+                //    SELECT d.*
+                //    FROM ConversionDetails d
+                //    WHERE d.BranchCode = @Branch
+                //      AND EXISTS (
+                //          SELECT 1
+                //          FROM ConversionSummary s
+                //          WHERE s.ConID = d.ConID
+                //            AND s.BranchCode = @Branch
+                //            AND s.isConfirm = 1
+                //            AND s.DateConverted >= @DateFrom
+                //            AND s.DateConverted <  DATEADD(day,1,@DateTo)
+                //      )";
 
 
-                    Database.GridMasterDetail3(
-                        masterQuery,
-                        detailQuery,
-                        subDetailQuery,
-                        "Master",
-                        "Detail",
-                        "SubDetail",
-                        "Rel_Master_Detail",
-                        "Rel_Detail_Sub",
-                        "ConID",        // master key
-                        "ConID",        // FK in detail
-                        "SequenceRefNum",// unique key in detail
-                        "SequenceReferenceNumber",// FK in subdetail
-                        gridControl4,
-                        masterParams, detailParams, subdetailParams
-                    );
+                //    string subDetailQuery = @"
+                //   SELECT f.*
+                //    FROM ConversionFIFO f
+                //    WHERE f.BranchCode = @Branch
+                //      AND EXISTS (
+                //          SELECT 1
+                //          FROM ConversionDetails d
+                //          WHERE d.ConID = f.ConID
+                //            AND d.BranchCode = @Branch
+                //            AND EXISTS (
+                //                SELECT 1
+                //                FROM ConversionSummary s
+                //                WHERE s.ConID = d.ConID
+                //                  AND s.BranchCode = @Branch
+                //                  AND s.isConfirm = 1
+                //                  AND s.DateConverted >= @DateFrom
+                //                  AND s.DateConverted <  DATEADD(day,1,@DateTo)
+                //            )
+                //      )";
+
+                //    var masterParams = new[]
+                //    {
+                //        new SqlParameter("@DateFrom", datefrom.DateTime),
+                //        new SqlParameter("@DateTo", dateto.DateTime),
+                //        new SqlParameter("@Branch", objbrcode.ToString())
+                //    };
+
+                //    var detailParams = new[]
+                //    {
+                //    new SqlParameter("@DateFrom", datefrom.DateTime),
+                //    new SqlParameter("@DateTo", dateto.DateTime),
+                //    new SqlParameter("@Branch", objbrcode.ToString()) 
+                //    };
+
+                //    var subdetailParams = new[]
+                //   {
+                //    new SqlParameter("@DateFrom", datefrom.DateTime),
+                //    new SqlParameter("@DateTo", dateto.DateTime),
+                //    new SqlParameter("@Branch", objbrcode.ToString())
+                //    };
+
+                //    //Database.GridMasterDetail(
+                //    //    masterQuery,
+                //    //    detailQuery,
+                //    //    "Master",
+                //    //    "Detail",
+                //    //    "PONumber",
+                //    //    "PONumber",
+                //    //    "DeliveryDetails",
+                //    //    gridControl4,
+                //    //    masterParams,
+                //    //    detailParams
+                //    //);
 
 
-                }
+                //    Database.GridMasterDetail3(
+                //        masterQuery,
+                //        detailQuery,
+                //        subDetailQuery,
+                //        "Master",
+                //        "Detail",
+                //        "SubDetail",
+                //        "Rel_Master_Detail",
+                //        "Rel_Detail_Sub",
+                //        "ConID",        // master key
+                //        "ConID",        // FK in detail
+                //        "SequenceRefNum",// unique key in detail
+                //        "SequenceReferenceNumber",// FK in subdetail
+                //        gridControl4,
+                //        masterParams, detailParams, subdetailParams
+                //    );
+
+
+                //}
             }
             else
             {

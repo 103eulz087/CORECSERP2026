@@ -15,6 +15,7 @@ using System.Data.SqlClient;
 using DevExpress.XtraReports.UI;
 using DevExpress.XtraGrid;
 using SalesInventorySystem.Classes;
+using DevExpress.XtraRichEdit.Commands;
 
 namespace SalesInventorySystem.Orders
 {
@@ -756,6 +757,10 @@ namespace SalesInventorySystem.Orders
                 {
                     XtraMessageBox.Show("Please Select COM-PORT");
                 }
+                //else if(String.IsNullOrEmpty(txtsearchlookupproduct.Text))
+                //{
+                //    XtraMessageBox.Show("Please Select Product");
+                //}
                 else
                 {
                     for (int i = 0; i <= gridView2.RowCount - 1; i++)
@@ -777,28 +782,28 @@ namespace SalesInventorySystem.Orders
                         productcode = pcode.ToString();//getProductCode();
                                                        //txtsku.Text = Database.getSingleQuery("Products", "BranchCode='" + Login.assignedBranch + "' AND ProductCode='" + pcode + "' ", "Barcode");
                         string barcode = "";
-                //        if (GlobalCache.CompanyName=="JFC")
-                //        {
-                //            if(String.IsNullOrEmpty(referencecode.ToString()))
-                //            {
-                //                XtraMessageBox.Show("No Reference Code");
-                //                return;
-                //            }
-                //            else
-                //            {
-                //                barcode = referencecode.ToString();
-                //            }
-                //        }
-                //        else
-                //        {
-                //            barcode = Database.getSingleResultSet($"SELECT dbo.func_GenerateBarcodeSTS" +
-                //$"('{Login.assignedBranch}',0,'{txtponum.Text}','{productcode.ToString()}','{strquantity}','2') ");
-                //        }
+                        //        if (GlobalCache.CompanyName=="JFC")
+                        //        {
+                        //            if(String.IsNullOrEmpty(referencecode.ToString()))
+                        //            {
+                        //                XtraMessageBox.Show("No Reference Code");
+                        //                return;
+                        //            }
+                        //            else
+                        //            {
+                        //                barcode = referencecode.ToString();
+                        //            }
+                        //        }
+                        //        else
+                        //        {
+                        //            barcode = Database.getSingleResultSet($"SELECT dbo.func_GenerateBarcodeSTS" +
+                        //$"('{Login.assignedBranch}',0,'{txtponum.Text}','{productcode.ToString()}','{strquantity}','2') ");
+                        //        }
                         barcode = Database.getSingleResultSet($"SELECT dbo.func_GenerateBarcodeSTS" +
                $"('{Login.assignedBranch}',0,'{txtponum.Text}','{productcode.ToString()}','{strquantity}','2') ");
 
                         txtsku.Text = barcode;
-                       
+
                         btnadd.Focus();
                     }
 

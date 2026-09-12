@@ -90,20 +90,36 @@ namespace SalesInventorySystem.HOFormsDevEx
                 SupportsAllBranchPivot = true,
                 PivotSpName = "sp_rpt_IncomeStatementAllBranchesPivot_TEST"   // TODO: not yet built - see note in form
             },
-            ["Balance Sheet"] = new ReportConfig
+            ["Income Statement (Real-Time)"] = new ReportConfig
             {
-                SpName = "sp_rpt_BalanceSheetWithDate",
-                Mode = ParamMode.BranchAsOfDate,
+                SpName = "sp_rpt_IncomeStatementLiveWithDate",
+                Mode = ParamMode.BranchDateRange,
                 Shape = ResultShape.Standard2Set,
-                Description = "Assets, Liabilities, and Equity as of a specific date, single branch. Check 'All Branches' for a company-wide consolidated snapshot.",
+                Description = "Same as Income Statement, but folds in ticket activity not yet run through the nightly GL posting job -- reflects today's entries immediately. Check 'All Branches' for a company-wide consolidated total, or 'Include Zero Activity' to list every IS account regardless of activity.",
                 AllowAllBranches = true
             },
-            ["Balance Sheet (Per-Branch Inventory)"] = new ReportConfig
+            //["Balance Sheet"] = new ReportConfig
+            //{
+            //    SpName = "sp_rpt_BalanceSheetWithDate",
+            //    Mode = ParamMode.BranchAsOfDate,
+            //    Shape = ResultShape.Standard2Set,
+            //    Description = "Assets, Liabilities, and Equity as of a specific date, single branch. Check 'All Branches' for a company-wide consolidated snapshot.",
+            //    AllowAllBranches = true
+            //},
+            ["Balance Sheet"] = new ReportConfig
             {
                 SpName = "sp_rpt_BalanceSheetPerBranchInventory",
                 Mode = ParamMode.BranchAsOfDate,
                 Shape = ResultShape.Standard2Set,
                 Description = "Same as Balance Sheet, but Petty Cash Fund and Inventory (VAT/VAT-Exempt) are broken out one row per branch instead of one consolidated row -- matches accounting's Google Sheets format. Check 'All Branches' to see every branch's rows at once.",
+                AllowAllBranches = true
+            },
+            ["Balance Sheet (Real-Time)"] = new ReportConfig
+            {
+                SpName = "sp_rpt_BalanceSheetLiveWithDate",
+                Mode = ParamMode.BranchAsOfDate,
+                Shape = ResultShape.Standard2Set,
+                Description = "Same as Balance Sheet, but folds in ticket activity not yet run through the nightly GL posting job -- reflects today's entries immediately. Does not include the per-branch Petty Cash/Inventory breakout ('Balance Sheet' does). Check 'All Branches' for a company-wide consolidated snapshot, or 'Include Zero Activity' to list every BS account regardless of balance.",
                 AllowAllBranches = true
             },
             ["Bank Reconciliation"] = new ReportConfig
@@ -336,7 +352,9 @@ namespace SalesInventorySystem.HOFormsDevEx
             bool showDateRange = cfg.Mode == ParamMode.BranchAccountDateRange || cfg.Mode == ParamMode.BranchDateRange;
             bool showAllBranch = cfg.SupportsAllBranchPivot || cfg.AllowAllBranches;
             bool showAllAccounts = cfg.SupportsAllAccounts;
-            bool showZeroChk = cfg.SpName == "sp_rpt_GLDetailTransactionReport";
+            bool showZeroChk = cfg.SpName == "sp_rpt_GLDetailTransactionReport"
+                || cfg.SpName == "sp_rpt_BalanceSheetLiveWithDate"
+                || cfg.SpName == "sp_rpt_IncomeStatementLiveWithDate";
             bool showConsolidated = cfg.Mode == ParamMode.ConsolidatedGL;
             bool showBranch = !showConsolidated; // consolidated is always all-branch
 
@@ -497,6 +515,8 @@ namespace SalesInventorySystem.HOFormsDevEx
                             cmd.Parameters.Add("@BranchCode", SqlDbType.VarChar, 5).Value =
                                 (cfg.AllowAllBranches && chkAllBranches.Checked) ? (object)DBNull.Value : cboBranchCode.EditValue?.ToString();
                             cmd.Parameters.Add("@AsOfDate", SqlDbType.Date).Value = dteAsOfDate.DateTime;
+                            if (cfg.SpName == "sp_rpt_BalanceSheetLiveWithDate")
+                                cmd.Parameters.Add("@IncludeZeroActivity", SqlDbType.Bit).Value = chkIncludeZeroActivity.Checked;
                             break;
 
                         case ParamMode.BranchDateRange:
@@ -512,6 +532,8 @@ namespace SalesInventorySystem.HOFormsDevEx
                                 cmd.Parameters.Add("@AccountType", SqlDbType.VarChar, 10).Value = DBNull.Value;
                                 cmd.Parameters.Add("@SkipZero", SqlDbType.Bit).Value = !chkIncludeZeroActivity.Checked;
                             }
+                            if (cfg.SpName == "sp_rpt_IncomeStatementLiveWithDate")
+                                cmd.Parameters.Add("@IncludeZeroActivity", SqlDbType.Bit).Value = chkIncludeZeroActivity.Checked;
                             break;
 
                         case ParamMode.BranchAccountAsOfDate:

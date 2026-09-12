@@ -1778,10 +1778,15 @@ namespace SalesInventorySystem
                                 grid.LevelTree.Nodes.Clear();
                                 ds.Relations.Clear();
 
-                                // Create relation (constraints are OK now because detail is filtered)
-                                ds.Relations.Add(relationName,
+                                // Create relation. Use DataRelation with createConstraints=false so
+                                // orphaned detail rows do not cause "constraint cannot be enabled"
+                                // exceptions when a detail row has no matching master row.
+                                ds.Relations.Add(new DataRelation(
+                                    relationName,
                                     ds.Tables[masterTable].Columns[masterKey],
-                                    ds.Tables[detailTable].Columns[detailKey]);
+                                    ds.Tables[detailTable].Columns[detailKey],
+                                    false
+                                ));
 
                                 grid.DataSource = ds;
                                 grid.DataMember = masterTable;
@@ -1838,10 +1843,13 @@ namespace SalesInventorySystem
                     grid.LevelTree.Nodes.Clear();
                     ds.Relations.Clear();
 
-                    // Create relation (constraints are OK now because detail is filtered)
-                    ds.Relations.Add(relationName,
+                    // Create relation. Avoid enabling constraints so missing parents won't throw.
+                    ds.Relations.Add(new DataRelation(
+                        relationName,
                         ds.Tables[masterTable].Columns[masterKey],
-                        ds.Tables[detailTable].Columns[detailKey]);
+                        ds.Tables[detailTable].Columns[detailKey],
+                        false
+                    ));
 
                     grid.DataSource = ds;
                     grid.DataMember = masterTable;
@@ -1923,6 +1931,105 @@ namespace SalesInventorySystem
                 col.Summary.Add(SummaryItemType.Sum, name, "{0:n2}");
             }
         }
+        // Two SIBLING detail levels off the same master row (e.g. a conversion's source
+        // deduction lines and its output lines both keyed by ConversionRefNo) -- distinct
+        // from GridMasterDetail3's chained Master->Detail->SubDetail, where SubDetail keys
+        // off Detail rather than Master. Both LevelTree nodes are added directly under the
+        // master, so expanding a master row shows both detail relations as separate tabs.
+        public static void GridMasterDetail2Children(
+                                            string masterQuery,
+                                            string detail1Query,
+                                            string detail2Query,
+                                            string masterTable,
+                                            string detail1Table,
+                                            string detail2Table,
+                                            string relMasterDetail1,
+                                            string relMasterDetail2,
+                                            string masterKey,
+                                            string detail1FKToMaster,
+                                            string detail2FKToMaster,
+                                            GridControl grid,
+                                            SqlParameter[] masterParams = null,
+                                            SqlParameter[] detail1Params = null,
+                                            SqlParameter[] detail2Params = null,
+                                            string[] detail1SumColumns = null,
+                                            string[] detail2SumColumns = null
+                                        )
+        {
+            try
+            {
+                using (SqlConnection con = Database.getConnection())
+                using (SqlDataAdapter daMaster = new SqlDataAdapter(masterQuery, con))
+                using (SqlDataAdapter daDetail1 = new SqlDataAdapter(detail1Query, con))
+                using (SqlDataAdapter daDetail2 = new SqlDataAdapter(detail2Query, con))
+                {
+                    if (masterParams != null) daMaster.SelectCommand.Parameters.AddRange(CloneParams(masterParams));
+                    if (detail1Params != null) daDetail1.SelectCommand.Parameters.AddRange(CloneParams(detail1Params));
+                    if (detail2Params != null) daDetail2.SelectCommand.Parameters.AddRange(CloneParams(detail2Params));
+
+                    DataSet ds = new DataSet();
+                    daMaster.Fill(ds, masterTable);
+                    daDetail1.Fill(ds, detail1Table);
+                    daDetail2.Fill(ds, detail2Table);
+
+                    grid.DataSource = null;
+                    grid.LevelTree.Nodes.Clear();
+                    ds.Relations.Clear();
+
+                    // Relation 1: Master -> Detail1
+                    ds.Relations.Add(new DataRelation(
+                        relMasterDetail1,
+                        ds.Tables[masterTable].Columns[masterKey],
+                        ds.Tables[detail1Table].Columns[detail1FKToMaster],
+                        false // avoid constraint issues when a detail has rows outside the filtered master set
+                    ));
+
+                    // Relation 2: Master -> Detail2
+                    ds.Relations.Add(new DataRelation(
+                        relMasterDetail2,
+                        ds.Tables[masterTable].Columns[masterKey],
+                        ds.Tables[detail2Table].Columns[detail2FKToMaster],
+                        false
+                    ));
+
+                    // Bind master
+                    grid.DataSource = ds;
+                    grid.DataMember = masterTable;
+                    grid.ForceInitialize();
+
+                    // Master view
+                    GridView masterView = grid.MainView as GridView ?? new GridView(grid);
+                    ConfigureView(masterView);
+
+                    // Detail1 view
+                    GridView detail1View = new GridView(grid);
+                    ConfigureView(detail1View);
+
+                    // Detail2 view
+                    GridView detail2View = new GridView(grid);
+                    ConfigureView(detail2View);
+
+                    if (detail1SumColumns != null && detail1SumColumns.Length > 0)
+                        AddFooterSums_Whitelist(detail1View, detail1SumColumns);
+                    else
+                        AddFooterSums_FromTableSchema(detail1View, ds.Tables[detail1Table]);
+
+                    if (detail2SumColumns != null && detail2SumColumns.Length > 0)
+                        AddFooterSums_Whitelist(detail2View, detail2SumColumns);
+                    else
+                        AddFooterSums_FromTableSchema(detail2View, ds.Tables[detail2Table]);
+
+                    // Both levels sit directly under the master (siblings), not nested.
+                    grid.LevelTree.Nodes.Add(relMasterDetail1, detail1View);
+                    grid.LevelTree.Nodes.Add(relMasterDetail2, detail2View);
+                }
+            }
+            catch (Exception ex)
+            {
+                XtraMessageBox.Show(ex.Message, "Master-Detail Error");
+            }
+        }
+
         public static void GridMasterDetail3(
                                             string masterQuery,
                                             string detailQuery,

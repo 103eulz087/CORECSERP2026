@@ -1,5 +1,7 @@
 ﻿using DevExpress.XtraEditors;
 using System;
+using System.Data;
+using System.Data.SqlClient;
 using System.Drawing;
 using System.Globalization;
 using System.Windows.Forms;
@@ -8,8 +10,24 @@ namespace SalesInventorySystem.AccountingDevEx
 {
     public partial class BankReconItemForm : XtraForm
     {
-        public string ItemType { get; set; }
+        // Custom setter (not an auto-property) so that BtnAdd_Click's existing
+        // "dlg.ItemType = defaultItemType;" pattern -- called AFTER the dialog is already
+        // fully constructed -- actually takes effect. Previously ItemType was a plain
+        // auto-property: the dropdown pre-selection only ever ran once, inside BuildDialog()
+        // during the constructor, using whatever value ItemType held at THAT moment (always
+        // "OC", set two lines above InitializeComponent()). Every caller's post-construction
+        // assignment (Add DIT, Add BankSide, etc.) was silently a no-op -- the dialog always
+        // opened on "OC" regardless of which Add button was clicked.
+        private string _itemType = "OC";
+        public string ItemType
+        {
+            get => _itemType;
+            set { _itemType = value; if (cmbType != null) ApplySelectedItemType(); }
+        }
         public string ReferenceNo { get; set; }
+        public string ControlNo { get; set; }
+        public string BranchCode { get; set; }
+        public string AccountCode { get; set; }
         public DateTime ItemDate { get; set; }
         public string Payee { get; set; }
         public decimal Amount { get; set; }
@@ -24,6 +42,8 @@ namespace SalesInventorySystem.AccountingDevEx
 
         private ComboBoxEdit cmbType;
         private TextEdit txtRef;
+        private SearchLookUpEdit cmbControlNo;
+        private LabelControl lblControlNo;
         private TextEdit txtPayee;
         private TextEdit txtAmount;
         private TextEdit txtRemarks;
@@ -42,7 +62,7 @@ namespace SalesInventorySystem.AccountingDevEx
             this.Text = isNew ? "Add Reconciling Item" : "Edit Reconciling Item";
             this.BackColor = Color.FromArgb(24, 28, 39);
             this.ForeColor = C_TEXT;
-            this.ClientSize = new Size(400, 360);
+            this.ClientSize = new Size(400, 410); // +50 vs. original for the new Control No field
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.StartPosition = FormStartPosition.CenterParent;
@@ -70,6 +90,7 @@ namespace SalesInventorySystem.AccountingDevEx
                 "NSF - NSF / Returned Check"
             });
             cmbType.SelectedIndex = 0;
+            cmbType.SelectedIndexChanged += (s, e) => UpdateControlNoVisibility();
             AddField("Item Type", cmbType, ref y);
 
             // Reference No
@@ -77,6 +98,22 @@ namespace SalesInventorySystem.AccountingDevEx
             txtRef.Font = F_MONO;
             StyleText(txtRef);
             AddField("Reference No (check/OR number)", txtRef, ref y);
+
+            // Control No -- DIT only. Picked from a real collection batch
+            // (TransactionCheque/TransactionOnline.ControlNo) rather than freely typed,
+            // so it's guaranteed to match an actual deposit slip -- confirmed with user
+            // 2026-09-03. Populated by LoadControlNoCandidates(), called by the caller
+            // once BranchCode/AccountCode are set (both are unknown at construction time).
+            cmbControlNo = new SearchLookUpEdit();
+            cmbControlNo.Font = F_MONO;
+            cmbControlNo.Properties.Appearance.BackColor = C_CARD;
+            cmbControlNo.Properties.Appearance.ForeColor = C_TEXT;
+            // Known Bug Pattern #2: DisableTextEditor -- must only accept a picked
+            // ControlNo, never free-typed text that could bypass ValueMember.
+            cmbControlNo.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;
+            cmbControlNo.Properties.NullText = "(none -- optional)";
+            cmbControlNo.EditValueChanged += CmbControlNo_EditValueChanged;
+            lblControlNo = AddField("Control No (real collection batch -- DIT only)", cmbControlNo, ref y);
 
             // Date
             dtItemDate = new DateEdit();
@@ -135,15 +172,7 @@ namespace SalesInventorySystem.AccountingDevEx
             // Populate edit values
             if (!string.IsNullOrEmpty(ItemType))
             {
-                int i;
-                for (i = 0; i < cmbType.Properties.Items.Count; i++)
-                {
-                    if (cmbType.Properties.Items[i].ToString().StartsWith(ItemType))
-                    {
-                        cmbType.SelectedIndex = i;
-                        break;
-                    }
-                }
+                ApplySelectedItemType();
 
                 txtRef.Text = ReferenceNo;
                 dtItemDate.EditValue = ItemDate;
@@ -151,6 +180,83 @@ namespace SalesInventorySystem.AccountingDevEx
                 txtAmount.Text = Amount.ToString("N2");
                 txtRemarks.Text = Remarks;
             }
+
+            UpdateControlNoVisibility();
+        }
+
+        // Shared by the ItemType property setter (so BtnAdd_Click's post-construction
+        // "dlg.ItemType = ..." actually takes effect) and BuildDialog's initial population.
+        private void ApplySelectedItemType()
+        {
+            for (int i = 0; i < cmbType.Properties.Items.Count; i++)
+            {
+                if (cmbType.Properties.Items[i].ToString().StartsWith(_itemType))
+                {
+                    cmbType.SelectedIndex = i;
+                    break;
+                }
+            }
+            UpdateControlNoVisibility();
+        }
+
+        private void UpdateControlNoVisibility()
+        {
+            if (cmbControlNo == null || lblControlNo == null) return;
+            bool isDit = cmbType.Text.StartsWith("DIT");
+            lblControlNo.Visible = isDit;
+            cmbControlNo.Visible = isDit;
+        }
+
+        // Called by the caller once BranchCode/AccountCode are known (BtnAdd_Click, after
+        // construction) -- the dialog itself has no access to which branch/account the
+        // parent BankReconFormV2 currently has loaded.
+        public void LoadControlNoCandidates()
+        {
+            if (string.IsNullOrWhiteSpace(BranchCode) || string.IsNullOrWhiteSpace(AccountCode)) return;
+
+            try
+            {
+                var table = new DataTable();
+                using (var con = Database.getConnection())
+                using (var cmd = new SqlCommand("dbo.sp_BankRecon_GetControlNoCandidates", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add("@BranchCode", SqlDbType.VarChar, 5).Value = BranchCode;
+                    cmd.Parameters.Add("@AccountCode", SqlDbType.VarChar, 20).Value = AccountCode;
+
+                    con.Open();
+                    new SqlDataAdapter(cmd).Fill(table);
+                }
+
+                cmbControlNo.Properties.View.Columns.Clear();
+                cmbControlNo.Properties.DataSource = null;
+                cmbControlNo.Properties.DataSource = table;
+                cmbControlNo.Properties.DisplayMember = "ControlNo";
+                cmbControlNo.Properties.ValueMember = "ControlNo";
+            }
+            catch (SqlException)
+            {
+                // Fail silently, same as Database.displaySearchlookupEdit -- the picker
+                // just shows empty instead of crashing the dialog.
+            }
+        }
+
+        // Auto-fills Amount/Date from the real collection batch total once a Control No is
+        // picked -- Payee is left for manual entry (a deposit slip can bundle multiple
+        // customers, so there's no single correct payee to default to) unless still blank.
+        private void CmbControlNo_EditValueChanged(object sender, EventArgs e)
+        {
+            var row = cmbControlNo.Properties.View.GetFocusedDataRow();
+            if (row == null) return;
+
+            if (row.Table.Columns.Contains("TotalAmount") && row["TotalAmount"] != DBNull.Value)
+                txtAmount.Text = Convert.ToDecimal(row["TotalAmount"]).ToString("N2");
+
+            if (row.Table.Columns.Contains("ItemDate") && row["ItemDate"] != DBNull.Value)
+                dtItemDate.EditValue = Convert.ToDateTime(row["ItemDate"]);
+
+            if (string.IsNullOrWhiteSpace(txtPayee.Text))
+                txtPayee.Text = "Collections - Control #" + cmbControlNo.EditValue;
         }
 
         private void BtnOK_Click(object sender, EventArgs e)
@@ -183,12 +289,14 @@ namespace SalesInventorySystem.AccountingDevEx
             Payee = txtPayee.Text.Trim();
             Amount = Math.Round(amt, 2);
             Remarks = txtRemarks.Text.Trim();
+            ControlNo = (cmbControlNo.Visible && cmbControlNo.EditValue != null && cmbControlNo.EditValue != DBNull.Value)
+                ? cmbControlNo.EditValue.ToString() : null;
 
             this.DialogResult = DialogResult.OK;
             this.Close();
         }
 
-        private void AddField(string label, Control ctrl, ref int y)
+        private LabelControl AddField(string label, Control ctrl, ref int y)
         {
             LabelControl lbl = new LabelControl();
             lbl.Text = label.ToUpper();
@@ -203,6 +311,7 @@ namespace SalesInventorySystem.AccountingDevEx
             this.Controls.Add(ctrl);
 
             y += 50;
+            return lbl;
         }
 
         private void StyleText(TextEdit ctl)

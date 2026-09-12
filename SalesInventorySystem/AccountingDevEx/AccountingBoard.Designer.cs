@@ -35,6 +35,7 @@ namespace SalesInventorySystem.AccountingDevEx
         private AccordionControlElement menuManualTicket;
         private AccordionControlElement menuBankRecon;
         private AccordionControlElement menuReports;
+        private AccordionControlElement menuReportsV2;
         private AccordionControlElement menuGLTicketEntries;
 
         protected override void Dispose(bool disposing)
@@ -64,6 +65,7 @@ namespace SalesInventorySystem.AccountingDevEx
             this.menuManualTicket = new DevExpress.XtraBars.Navigation.AccordionControlElement();
             this.menuBankRecon = new DevExpress.XtraBars.Navigation.AccordionControlElement();
             this.menuReports = new DevExpress.XtraBars.Navigation.AccordionControlElement();
+            this.menuReportsV2 = new DevExpress.XtraBars.Navigation.AccordionControlElement();
             this.menuGLTicketEntries = new DevExpress.XtraBars.Navigation.AccordionControlElement();
             ((System.ComponentModel.ISupportInitialize)(this.fluentDesignFormControl1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.accordionControl1)).BeginInit();
@@ -72,17 +74,19 @@ namespace SalesInventorySystem.AccountingDevEx
             // fluentDesignFormContainer1
             // 
             this.fluentDesignFormContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.fluentDesignFormContainer1.Location = new System.Drawing.Point(260, 39);
+            this.fluentDesignFormContainer1.Location = new System.Drawing.Point(223, 31);
+            this.fluentDesignFormContainer1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.fluentDesignFormContainer1.Name = "fluentDesignFormContainer1";
-            this.fluentDesignFormContainer1.Size = new System.Drawing.Size(1227, 723);
+            this.fluentDesignFormContainer1.Size = new System.Drawing.Size(1052, 588);
             this.fluentDesignFormContainer1.TabIndex = 0;
             // 
             // fluentDesignFormControl1
             // 
             this.fluentDesignFormControl1.FluentDesignForm = this;
             this.fluentDesignFormControl1.Location = new System.Drawing.Point(0, 0);
+            this.fluentDesignFormControl1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.fluentDesignFormControl1.Name = "fluentDesignFormControl1";
-            this.fluentDesignFormControl1.Size = new System.Drawing.Size(1487, 39);
+            this.fluentDesignFormControl1.Size = new System.Drawing.Size(1275, 31);
             this.fluentDesignFormControl1.TabIndex = 2;
             this.fluentDesignFormControl1.TabStop = false;
             // 
@@ -97,10 +101,12 @@ namespace SalesInventorySystem.AccountingDevEx
             this.menuManualTicket,
             this.menuBankRecon,
             this.menuReports,
+            this.menuReportsV2,
             this.menuGLTicketEntries});
-            this.accordionControl1.Location = new System.Drawing.Point(0, 39);
+            this.accordionControl1.Location = new System.Drawing.Point(0, 31);
+            this.accordionControl1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.accordionControl1.Name = "accordionControl1";
-            this.accordionControl1.Size = new System.Drawing.Size(260, 723);
+            this.accordionControl1.Size = new System.Drawing.Size(223, 588);
             this.accordionControl1.TabIndex = 1;
             this.accordionControl1.ViewType = DevExpress.XtraBars.Navigation.AccordionControlViewType.HamburgerMenu;
             this.accordionControl1.ElementClick += new DevExpress.XtraBars.Navigation.ElementClickEventHandler(this.AccordionMain_ElementClick);
@@ -202,7 +208,15 @@ namespace SalesInventorySystem.AccountingDevEx
             this.menuReports.Style = DevExpress.XtraBars.Navigation.ElementStyle.Item;
             this.menuReports.Tag = "navReports";
             this.menuReports.Text = "Reports";
-            // 
+            this.menuReports.Click += new System.EventHandler(this.menuReports_Click);
+            //
+            // menuReportsV2
+            //
+            this.menuReportsV2.Name = "menuReportsV2";
+            this.menuReportsV2.Style = DevExpress.XtraBars.Navigation.ElementStyle.Item;
+            this.menuReportsV2.Tag = "navReportsV2";
+            this.menuReportsV2.Text = "Reports V2";
+            //
             // menuGLTicketEntries
             // 
             this.menuGLTicketEntries.Name = "menuGLTicketEntries";
@@ -212,14 +226,15 @@ namespace SalesInventorySystem.AccountingDevEx
             // 
             // AccountingBoard
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1487, 762);
+            this.ClientSize = new System.Drawing.Size(1275, 619);
             this.ControlContainer = this.fluentDesignFormContainer1;
             this.Controls.Add(this.fluentDesignFormContainer1);
             this.Controls.Add(this.accordionControl1);
             this.Controls.Add(this.fluentDesignFormControl1);
             this.FluentDesignFormControl = this.fluentDesignFormControl1;
+            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "AccountingBoard";
             this.NavigationControl = this.accordionControl1;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

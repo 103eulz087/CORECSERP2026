@@ -163,7 +163,7 @@ namespace SalesInventorySystem.HOFormsDevEx
 
         void displayAO()
         {
-            Database.displaySearchlookupEdit("SELECT UserID,FullName FROM Users", txtao, "UserID", "UserID");
+            Database.displaySearchlookupEdit("SELECT * FROM AccountOfficers", txtao, "AccountOfficerName", "AccountOfficerName");
         }
         void display()
         {
@@ -244,14 +244,15 @@ namespace SalesInventorySystem.HOFormsDevEx
                 string isactive = "";
                
                 txtbdate.Text = "";
-                if (Convert.ToBoolean(gridView1.GetRowCellValue(gridView1.FocusedRowHandle,"isActive").ToString()) == true)
-                {
-                    checkBox1.Checked = true;
-                }
-                else
-                {
-                    checkBox1.Checked = false;
-                }
+                // isActive is stored/returned as "1"/"0" (see sp_addCust's @isActive param), not a
+                // true bit->bool value, so Convert.ToBoolean(string) throws FormatException here
+                // ("String was not recognized as a valid Boolean.") -- it only accepts "True"/"False".
+                object rawActive = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "isActive");
+                checkBox1.Checked = rawActive is bool activeBool
+                    ? activeBool
+                    : int.TryParse(rawActive?.ToString(), out int activeInt)
+                        ? activeInt != 0
+                        : Convert.ToBoolean(rawActive);
 
                 id = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "CustomerKey").ToString();
                 name= gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "CustomerName").ToString();

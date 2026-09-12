@@ -67,7 +67,7 @@ namespace SalesInventorySystem
                 }
                 else
                 {
-                    Database.display("SELECT * FROM view_POSummary WHERE Status='FOR APPROVAL' and EffectivityDate >= '" + datefromforapproval.Text + "' and EffectivityDate <= '" + datetoforapproval.Text + "' AND BranchCode='" + Login.assignedBranch + "'", gridControl1, gridView1);
+                    Database.display("SELECT * FROM view_POSummary WHERE  BranchCode='" + Login.assignedBranch + "' AND Status='FOR APPROVAL' and EffectivityDate >= '" + datefromforapproval.Text + "' and EffectivityDate <= '" + datetoforapproval.Text + "' AND BranchCode='" + Login.assignedBranch + "'", gridControl1, gridView1);
                 }
             }
             else if (tabMain.SelectedTabPage.Equals(tabApproved))
@@ -78,7 +78,7 @@ namespace SalesInventorySystem
                 }
                 else
                 {
-                    Database.display("SELECT * FROM view_POSummary WHERE Status='APPROVED' and EffectivityDate >= '" + datefromapproved.Text + "' and EffectivityDate <= '" + datetoapproved.Text + "' AND BranchCode='" + Login.assignedBranch + "' ORDER BY DateAdded DESC", gridControl2, gridView2);
+                    Database.display("SELECT * FROM view_POSummary WHERE BranchCode='" + Login.assignedBranch + "' AND Status='APPROVED' and EffectivityDate >= '" + datefromapproved.Text + "' and EffectivityDate <= '" + datetoapproved.Text + "' AND BranchCode='" + Login.assignedBranch + "' ORDER BY DateAdded DESC", gridControl2, gridView2);
                 }
             }
             else if (tabMain.SelectedTabPage.Equals(tabRejected))
@@ -89,12 +89,12 @@ namespace SalesInventorySystem
                 }
                 else
                 {
-                    Database.display("SELECT * FROM view_POSummary WHERE Status='REJECTED' and EffectivityDate >= '" + datefromrejected.Text + "' and EffectivityDate <= '" + datefromrejected.Text + "' AND BranchCode='" + Login.assignedBranch + "'", gridControl3, gridView3);
+                    Database.display("SELECT * FROM view_POSummary WHERE BranchCode='" + Login.assignedBranch + "' AND Status='REJECTED' and EffectivityDate >= '" + datefromrejected.Text + "' and EffectivityDate <= '" + datefromrejected.Text + "' AND BranchCode='" + Login.assignedBranch + "'", gridControl3, gridView3);
                 }
             }
             else if (tabMain.SelectedTabPage.Equals(tabForDelivery))
             {
-                Database.display("SELECT * FROM view_OrdersForDelivery WHERE Status='FOR DELIVERY'  and EffectivityDate >= '" + datefromdelivered.Text + "' and EffectivityDate <= '" + datetodelivered.Text + "' ORDER BY PONumber", gridControl4, gridView4);
+                Database.display("SELECT * FROM view_OrdersForDelivery WHERE BranchCode='" + Login.assignedBranch + "' AND Status='FOR DELIVERY'  and EffectivityDate >= '" + datefromdelivered.Text + "' and EffectivityDate <= '" + datetodelivered.Text + "' ORDER BY PONumber", gridControl4, gridView4);
                 Classes.DevXGridViewSettings.ShowFooterCountTotal(gridView4, "DeliveryNo");
                 Classes.DevXGridViewSettings.ShowFooterTotal(gridView4, "TotalItem");
                 Classes.DevXGridViewSettings.ShowFooterTotal(gridView4, "TotalQtyDelivered");
@@ -119,7 +119,7 @@ namespace SalesInventorySystem
                 "CASE WHEN EXISTS (SELECT 1 FROM CreditMemo cm WHERE cm.PONumber = v.PONumber) THEN 1 ELSE 0 END AS HasCreditMemo, " +
                 "CASE WHEN EXISTS (SELECT 1 FROM ReturnedOrderDetails rod WHERE rod.PONumber = v.PONumber) THEN 1 ELSE 0 END AS HasReturnOrder " +
                 "FROM view_DeliverySummary v " +
-                "WHERE v.Status='DELIVERED' and v.DateApproved >= '" + dateFromDeliv.Text + "' and v.DateApproved < DATEADD(DAY,1,'" + dateToDeliv.Text + "')  AND v.BranchCode='" + Login.assignedBranch + "' " +
+                "WHERE v.BranchCode='"+Login.assignedBranch+"' and v.Status='DELIVERED' and v.DateApproved >= '" + dateFromDeliv.Text + "' and v.DateApproved < DATEADD(DAY,1,'" + dateToDeliv.Text + "')  AND v.BranchCode='" + Login.assignedBranch + "' " +
                 // Already fully paid (Balance=0) POs are excluded from this list. Only excludes
                 // when a TransactionChargeSales row exists AND shows Balance=0 -- a PO with no AR
                 // row at all still shows, rather than being silently hidden.
@@ -150,12 +150,12 @@ namespace SalesInventorySystem
         // Delivery/BatchSales/ConfirmOrder pipeline the Products sub-tabs above use.)
         void loadForApprovalServices()
         {
-            Database.display("SELECT * FROM view_ServiceOrderSummary WHERE Status='FOR APPROVAL' and DateAdded >= '" + dateFromForApprovalServices.Text + "' and DateAdded < DATEADD(DAY,1,'" + dateToForApprovalServices.Text + "') AND BranchCode='" + Login.assignedBranch + "' ORDER BY DateAdded DESC", gridControlForApprovalServices, gridViewForApprovalServices);
+            Database.display("SELECT * FROM view_ServiceOrderSummary WHERE  BranchCode='" + Login.assignedBranch + "' AND Status='FOR APPROVAL' and DateAdded >= '" + dateFromForApprovalServices.Text + "' and DateAdded < DATEADD(DAY,1,'" + dateToForApprovalServices.Text + "') AND BranchCode='" + Login.assignedBranch + "' ORDER BY DateAdded DESC", gridControlForApprovalServices, gridViewForApprovalServices);
         }
 
         void loadApprovedServices()
         {
-            Database.display("SELECT * FROM view_ServiceOrderSummary WHERE Status='APPROVED' and DateApproved >= '" + dateFromApprovedServices.Text + "' and DateApproved < DATEADD(DAY,1,'" + dateToApprovedServices.Text + "') AND BranchCode='" + Login.assignedBranch + "' ORDER BY DateApproved DESC", gridControlApprovedServices, gridViewApprovedServices);
+            Database.display("SELECT * FROM view_ServiceOrderSummary WHERE  BranchCode='" + Login.assignedBranch + "' AND Status='APPROVED' and DateApproved >= '" + dateFromApprovedServices.Text + "' and DateApproved < DATEADD(DAY,1,'" + dateToApprovedServices.Text + "') AND BranchCode='" + Login.assignedBranch + "' ORDER BY DateApproved DESC", gridControlApprovedServices, gridViewApprovedServices);
         }
 
         // NOTE: this sub-tab's controls are still under their DevExpress-assigned default
@@ -164,7 +164,7 @@ namespace SalesInventorySystem
         // VS Designer's Properties panel (safe, updates all references) whenever convenient.
         void loadRejectedServices()
         {
-            Database.display("SELECT * FROM view_ServiceOrderSummary WHERE Status='REJECTED' and DateRejected >= '" + dateTimePicker2.Text + "' and DateRejected < DATEADD(DAY,1,'" + dateTimePicker1.Text + "') AND BranchCode='" + Login.assignedBranch + "' ORDER BY DateRejected DESC", gridControl6, gridView6);
+            Database.display("SELECT * FROM view_ServiceOrderSummary WHERE  BranchCode='" + Login.assignedBranch + "' AND Status='REJECTED' and DateRejected >= '" + dateTimePicker2.Text + "' and DateRejected < DATEADD(DAY,1,'" + dateTimePicker1.Text + "') AND BranchCode='" + Login.assignedBranch + "' ORDER BY DateRejected DESC", gridControl6, gridView6);
         }
 
         private void btnApproveService_Click(object sender, EventArgs e)
@@ -280,6 +280,7 @@ namespace SalesInventorySystem
             if (e.Button == MouseButtons.Right)
             {
                 contextMenuStrip1.Show(gridControl1, e.Location);
+
             }
         }
 
@@ -458,7 +459,7 @@ namespace SalesInventorySystem
             Database.display("SELECT * FROM view_BranchOrderDetails WHERE PONumber='" + refno1 + "' and isReturned=0", salesret.gridControl1, salesret.gridView1);
             salesret.txtpono.Text = refno1;
             salesret.txtdevno.Text = devno;
-            //salesret.txtbrcode.Text = gridView4.GetRowCellValue(gridView4.FocusedRowHandle, "BranchCode").ToString();
+            salesret.txtbrcode.Text = gridView4.GetRowCellValue(gridView4.FocusedRowHandle, "BranchCode").ToString();
             salesret.txtstatus.Text = "FOR DELIVERY";
         }
 
@@ -589,12 +590,17 @@ namespace SalesInventorySystem
                 analyze("spview_SalesInvoice", refno1, viewdet.gridControl4, viewdet.gridView4);
             }
 
-            string compname = Database.getSingleQuery("CompanyProfile", "CompanyName='JFC'", "CompanyName");
-            if (compname == "JFC")
+           // string compname = Database.getSingleQuery("CompanyProfile", "CompanyName='JFC'", "CompanyName");
+            if (GlobalCache.CompanyName == "JFC")
             {
                 Classes.DevXGridViewSettings.ShowFooterCountTotal(viewdet.gridView4, "Cnt"); //NEW
             }
-            viewdet.txtinvoiceno.Text = gridView4.GetRowCellValue(gridView4.FocusedRowHandle, "InvoiceNo").ToString(); ;
+            viewdet.txtinvoiceno.Text = view.GetRowCellValue(view.FocusedRowHandle, "InvoiceNo").ToString();
+
+            if(GlobalCache.CompanyName=="JFC")
+            {
+                viewdet.txtinvoicedate.Text = view.GetRowCellValue(view.FocusedRowHandle, "EffectivityDate").ToString();
+            }
             viewdet.txtpono.Text = refno1;
             viewdet.txtcusttin.Text = tinno;
             double vatablesales = 0.0, vatexemptsale = 0.0, vatamount = 0.0, totalsales = 0.0, lessvat = 0.0, netofvat = 0.0, amountdue = 0.0, addvat = 0.0, vatsales = 0.0, totalamountdue = 0.0;
@@ -1014,7 +1020,7 @@ namespace SalesInventorySystem
             //WHERE DateAdded >= @DateFrom
             //          AND DateAdded<DATEADD(day,1,@DateTo)
             //view_OrdersForDelivery  is combination of 2 views view_ForDelivery(PurchaseOrderSummary,DeliverySummary,Customers) and view_DeliveryReciept(DeliveryDetails)
-            Database.display("SELECT * FROM view_OrdersForDelivery WHERE Status='FOR DELIVERY' and EffectivityDate >= '" + datefromdelivered.Text + "' and EffectivityDate < DATEADD(day,1,'" + datetodelivered.Text + "')  ORDER BY PONumber", gridControl4, gridView4);
+            Database.display("SELECT * FROM view_OrdersForDelivery WHERE  BranchCode='" + Login.assignedBranch + "' AND  Status='FOR DELIVERY' and EffectivityDate >= '" + datefromdelivered.Text + "' and EffectivityDate < DATEADD(day,1,'" + datetodelivered.Text + "')  ORDER BY PONumber", gridControl4, gridView4);
             Classes.DevXGridViewSettings.ShowFooterCountTotal(gridView4, "DeliveryNo");
             Classes.DevXGridViewSettings.ShowFooterTotal(gridView4, "TotalItem");
             Classes.DevXGridViewSettings.ShowFooterTotal(gridView4, "TotalQtyDelivered");
@@ -1095,8 +1101,10 @@ namespace SalesInventorySystem
             if (e.Button == MouseButtons.Right)
             {
                 contextMenuForDelivery.Show(gridControl4, e.Location);
-                //contextMenuForDelivery.Items[1].Visible = false;
+                contextMenuForDelivery.Items[1].Visible = false;
                 //contextMenuForDelivery.Items[2].Visible = false;
+                contextMenuForDelivery.Items[3].Visible = false;
+                contextMenuForDelivery.Items[6].Visible = false; 
             }
         }
 

@@ -104,7 +104,8 @@ namespace SalesInventorySystem.Reporting
                 double zeroratedsales = 0.0;
 
 
-                xct.xrdate.Text = String.Format("{0:MMMM dd yyyy}", DateTime.Now);
+                xct.xrdate.Text = DateTime.Parse(txtinvoicedate.Text).ToString("MMMM dd yyyy");
+                //String.Format("{0:MMMM dd yyyy}", DateTime.Now);
 
                 xct.xrlblinvoicenum.Text = txtinvoiceno.Text;
 
