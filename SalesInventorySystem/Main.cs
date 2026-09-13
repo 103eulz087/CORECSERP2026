@@ -3645,6 +3645,11 @@ namespace SalesInventorySystem
             repos.Show();
         }
 
+        private void btnBranchInterBranchTransfer_ItemClick(object sender, ItemClickEventArgs e)
+        {
+
+        }
+
         private void Main_FormClosing(object sender, FormClosingEventArgs e)
         {
             //bool confirm = HelperFunction.ConfirmDialog("Are you want to close the Main Window?", "Close Main Window");

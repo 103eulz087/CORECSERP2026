@@ -272,6 +272,7 @@
             this.btnSummaryInventoryConso = new DevExpress.XtraBars.BarButtonItem();
             this.btnSupplierDebitCreditMemo = new DevExpress.XtraBars.BarButtonItem();
             this.btnAccountingBoard = new DevExpress.XtraBars.BarButtonItem();
+            this.barbtnPOSAutomation = new DevExpress.XtraBars.BarButtonItem();
             this.ribbonPage1 = new DevExpress.XtraBars.Ribbon.RibbonPage();
             this.ribbonPageGroup20 = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             this.ribbonPageGroup2 = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
@@ -319,7 +320,6 @@
             this.barButtonItem103 = new DevExpress.XtraBars.BarButtonItem();
             this.barButtonItem1 = new DevExpress.XtraBars.BarButtonItem();
             this.barButtonItem5 = new DevExpress.XtraBars.BarButtonItem();
-            this.barbtnPOSAutomation = new DevExpress.XtraBars.BarButtonItem();
             ((System.ComponentModel.ISupportInitialize)(this.ribbonControl)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.popupMenuTickets)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.popupMenuInvTransfer)).BeginInit();
@@ -2680,6 +2680,7 @@
             this.btnBranchInterBranchTransfer.Id = 226;
             this.btnBranchInterBranchTransfer.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("btnBranchInterBranchTransfer.ImageOptions.SvgImage")));
             this.btnBranchInterBranchTransfer.Name = "btnBranchInterBranchTransfer";
+            this.btnBranchInterBranchTransfer.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnBranchInterBranchTransfer_ItemClick);
             // 
             // btnInventoryConsoReport
             // 
@@ -2788,6 +2789,15 @@
             this.btnAccountingBoard.ImageOptions.LargeImage = ((System.Drawing.Image)(resources.GetObject("btnAccountingBoard.ImageOptions.LargeImage")));
             this.btnAccountingBoard.Name = "btnAccountingBoard";
             this.btnAccountingBoard.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnVouchering_ItemClick);
+            // 
+            // barbtnPOSAutomation
+            // 
+            this.barbtnPOSAutomation.Caption = "POS Auto";
+            this.barbtnPOSAutomation.Id = 237;
+            this.barbtnPOSAutomation.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("barbtnPOSAutomation.ImageOptions.Image")));
+            this.barbtnPOSAutomation.ImageOptions.LargeImage = ((System.Drawing.Image)(resources.GetObject("barbtnPOSAutomation.ImageOptions.LargeImage")));
+            this.barbtnPOSAutomation.Name = "barbtnPOSAutomation";
+            this.barbtnPOSAutomation.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.barbtnPOSAutomation_ItemClick);
             // 
             // ribbonPage1
             // 
@@ -3261,15 +3271,6 @@
             this.barButtonItem5.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("barButtonItem5.ImageOptions.Image")));
             this.barButtonItem5.Name = "barButtonItem5";
             this.barButtonItem5.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
-            // 
-            // barbtnPOSAutomation
-            // 
-            this.barbtnPOSAutomation.Caption = "POS Auto";
-            this.barbtnPOSAutomation.Id = 237;
-            this.barbtnPOSAutomation.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("barbtnPOSAutomation.ImageOptions.Image")));
-            this.barbtnPOSAutomation.ImageOptions.LargeImage = ((System.Drawing.Image)(resources.GetObject("barbtnPOSAutomation.ImageOptions.LargeImage")));
-            this.barbtnPOSAutomation.Name = "barbtnPOSAutomation";
-            this.barbtnPOSAutomation.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.barbtnPOSAutomation_ItemClick);
             // 
             // Main
             // 
