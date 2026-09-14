@@ -45,8 +45,16 @@ namespace SalesInventorySystem
                 else if (radioButton2.Checked == true) //SUMMARY
                 {
                     //string query = $"SELECT * FROM func_view_BranchInventory('{Login.assignedBranch}') ";
-                    string query = "SELECT * FROM view_BranchInventory WHERE Branch='" + Login.assignedBranch + "' ";
-                    HelperFunction.ShowWaitAndDisplay(query, gridControl1, gridView1, "Please wait", "Populating data into the database...");
+                    string query = "";
+                    if(GlobalCache.CompanyName =="JFC")
+                    {
+                        query = "SELECT * FROM view_BranchInventoryJFC WHERE Branch='" + Login.assignedBranch + "' ";
+                    }
+                    else
+                    {
+                        query = "SELECT * FROM view_BranchInventory WHERE Branch='" + Login.assignedBranch + "' ";
+                    }
+                        HelperFunction.ShowWaitAndDisplay(query, gridControl1, gridView1, "Please wait", "Populating data into the database...");
 
                     GridView view = gridControl1.FocusedView as GridView;
                     view.SortInfo.ClearAndAddRange(new GridColumnSortInfo[] {

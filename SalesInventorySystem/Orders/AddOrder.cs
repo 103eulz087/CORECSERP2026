@@ -24,6 +24,11 @@ namespace SalesInventorySystem
         object srvcid = null,srvccustid=null;
         DataTable table;
         DataTable serviceTable;
+        // Guards against re-allocating a real PO/SO number on a retried Save after a failed
+        // insert -- once true for the current draft, saveAll()/saveAllServices() reuse the
+        // already-allocated number instead of burning another one from the atomic counter.
+        bool poNumberAllocated = false;
+        bool soNumberAllocated = false;
         //string itemno,desc,unitprice,sellingprice,prodname;
         //string number;
         public static string Isconnected = "";
@@ -32,7 +37,19 @@ namespace SalesInventorySystem
         public AddOrder()
         {
             InitializeComponent();
-            
+
+            // Database.displaySearchlookupEdit() rebinds Properties.DataSource at runtime
+            // (populateCustomer(), called from LoadData()) without ever fitting the popup
+            // grid's columns, so they render shrunk/cramped. BestFitColumns() has to run on
+            // Popup (not right after binding) since the popup grid isn't sized yet at bind
+            // time -- same pattern already used for repoaccountcode in AddExpenseDevExFrm.cs.
+            // BestFitColumns() alone wasn't enough here: txtcustomer itself is only 192px wide
+            // (see Designer.cs), and a SearchLookUpEdit's popup defaults to roughly the
+            // editor's own width -- so best-fit columns were computed correctly, then squeezed
+            // straight back down to fit that narrow popup. PopupFormMinSize forces the popup
+            // itself to open wide enough first.
+            txtcustomer.Properties.PopupFormMinSize = new Size(500, 300);
+            txtcustomer.Popup += (s, e) => txtcustomer.Properties.View.BestFitColumns();
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -408,7 +425,10 @@ namespace SalesInventorySystem
             gridControl1.DataSource = table;
             gridView1.BestFitColumns();
 
-            textEdit1.Text = IDGenerator.getIDNumberSP("sp_GetPurchaseOrderNumber", "PONumber"); //IDGenerator.getPONumber();
+            // Display-only preview -- does not consume the counter. The real number is
+            // allocated atomically (sp_GetPurchaseOrderNumber) once, in saveAll(), at Save time.
+            textEdit1.Text = IDGenerator.getIDNumberSP("sp_PeekPurchaseOrderNumber", "PONumber");
+            poNumberAllocated = false;
 
             txtpname.Enabled = true;
             Database.displaySearchlookupEdit("SELECT ProductCategory,ProductCode,Description FROM view_Products WHERE BranchCode='" + Login.assignedBranch + "' ", txtpname, "Description", "ProductCode");
@@ -442,7 +462,7 @@ namespace SalesInventorySystem
                 {
                     if (txtcustomer.Enabled == true && txtcustomer.Text == "")
                     {
-                        XtraMessageBox.Show("Customer Field must be Selected!");
+                        BigAlert.Show("SELECT CUSTOMER","Customer Field must be Selected!",MessageBoxIcon.Warning);
                         return;
                     }
 
@@ -451,7 +471,7 @@ namespace SalesInventorySystem
                     // instead of letting objcustkey.ToString() below throw.
                     if (objcustkey == null || objcustkey == DBNull.Value)
                     {
-                        XtraMessageBox.Show("Please re-select the customer before submitting.");
+                        BigAlert.Show("EMPTY","Please re-select the customer before submitting.", MessageBoxIcon.Warning);
                         return;
                     }
                 }
@@ -473,6 +493,17 @@ namespace SalesInventorySystem
                         gridView1.GetRowCellValue(i, "Units").ToString(),
                         gridView1.GetRowCellValue(i, "Remarks")?.ToString() ?? "",
                         Convert.ToDecimal(gridView1.GetRowCellValue(i, "SellingPrice")));
+                }
+
+                // Allocate the real, final PO number now -- textEdit1.Text so far only held the
+                // non-consuming preview from LoadData(); saveFinalSalesOrder() below reads the
+                // same field, so it picks up this real number too. Guarded so a retried Save
+                // after a failed insert reuses this draft's already-allocated number instead of
+                // burning another one.
+                if (!poNumberAllocated)
+                {
+                    textEdit1.Text = IDGenerator.getIDNumberSP("sp_GetPurchaseOrderNumber", "PONumber");
+                    poNumberAllocated = true;
                 }
 
                 using (SqlConnection con = Database.getConnection())
@@ -498,7 +529,7 @@ namespace SalesInventorySystem
                 gridControl1.DataSource = null;
                 gridView1.Columns.Clear();
 
-                XtraMessageBox.Show("Succesfully Saved");
+                BigAlert.Show("SUCESS","Succesfully Saved", MessageBoxIcon.Information);
               
                 Isconnected = "OK";
                 if(chckfinal.Checked.Equals(true))
@@ -577,6 +608,16 @@ namespace SalesInventorySystem
                         Convert.ToDecimal(gridViewitem.GetRowCellValue(i, "SellingPrice")));
                 }
 
+                // Allocate the real, final Service Order number now -- txtposervices.Text so far
+                // only held the non-consuming preview from btnnewservices_Click(). Guarded so a
+                // retried Save after a failed insert reuses this draft's already-allocated
+                // number instead of burning another one.
+                if (!soNumberAllocated)
+                {
+                    txtposervices.Text = IDGenerator.getIDNumberSP("sp_GetServiceOrderNumber", "SONumber");
+                    soNumberAllocated = true;
+                }
+
                 using (SqlConnection con = Database.getConnection())
                 {
                     con.Open();
@@ -595,7 +636,7 @@ namespace SalesInventorySystem
                     com.ExecuteNonQuery();
                 }
 
-                XtraMessageBox.Show("Request Successfully Updated!");
+                BigAlert.Show("SUCCESS","Request Successfully Added!",MessageBoxIcon.Warning);
 
                 serviceTable.Clear();
                 gridControlitem.DataSource = null;
@@ -902,7 +943,10 @@ namespace SalesInventorySystem
             gridControlitem.DataSource = serviceTable;
             gridViewitem.BestFitColumns();
 
-            txtposervices.Text = IDGenerator.getIDNumberSP("sp_GetPurchaseOrderNumber", "PONumber"); //IDGenerator.getPONumber();
+            // Display-only preview from its own counter (sonumber) -- Services no longer shares
+            // the Products PO sequence. Real number is allocated atomically in saveAllServices().
+            txtposervices.Text = IDGenerator.getIDNumberSP("sp_PeekServiceOrderNumber", "SONumber");
+            soNumberAllocated = false;
             txtservices.Enabled = true;
             populateCustomer(txtcustomersservices);
             populateServices();

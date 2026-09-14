@@ -74,6 +74,8 @@
             this.gridControlitem = new DevExpress.XtraGrid.GridControl();
             this.gridViewitem = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.txtcontrolno = new DevExpress.XtraEditors.TextEdit();
+            this.labelControl7 = new DevExpress.XtraEditors.LabelControl();
             this.txteffectivitydateservices = new DevExpress.XtraEditors.DateEdit();
             this.labelControl4 = new DevExpress.XtraEditors.LabelControl();
             this.txtqtyservices = new DevExpress.XtraEditors.SpinEdit();
@@ -94,8 +96,6 @@
             this.txtposervices = new DevExpress.XtraEditors.TextEdit();
             this.labelControl21 = new DevExpress.XtraEditors.LabelControl();
             this.labelControl22 = new DevExpress.XtraEditors.LabelControl();
-            this.labelControl7 = new DevExpress.XtraEditors.LabelControl();
-            this.txtcontrolno = new DevExpress.XtraEditors.TextEdit();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.textEdit1.Properties)).BeginInit();
@@ -122,6 +122,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.gridControlitem)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridViewitem)).BeginInit();
             this.groupBox3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.txtcontrolno.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txteffectivitydateservices.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txteffectivitydateservices.Properties.CalendarTimeProperties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtqtyservices.Properties)).BeginInit();
@@ -131,7 +132,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.txtcustomersservices.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView4)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtposervices.Properties)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.txtcontrolno.Properties)).BeginInit();
             this.SuspendLayout();
             // 
             // labelControl1
@@ -188,9 +188,9 @@
             this.labelControl3.Appearance.Options.UseFont = true;
             this.labelControl3.Location = new System.Drawing.Point(17, 22);
             this.labelControl3.Name = "labelControl3";
-            this.labelControl3.Size = new System.Drawing.Size(34, 14);
+            this.labelControl3.Size = new System.Drawing.Size(96, 14);
             this.labelControl3.TabIndex = 8;
-            this.labelControl3.Text = "PO #:";
+            this.labelControl3.Text = "PO # (Preview):";
             // 
             // textEdit1
             // 
@@ -249,6 +249,7 @@
             // 
             // ordertype
             // 
+            this.ordertype.EditValue = "MAIN";
             this.ordertype.Location = new System.Drawing.Point(511, 115);
             this.ordertype.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ordertype.Name = "ordertype";
@@ -262,6 +263,7 @@
             // 
             // comboBox1
             // 
+            this.comboBox1.EditValue = "Kg";
             this.comboBox1.Location = new System.Drawing.Point(511, 85);
             this.comboBox1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.comboBox1.Name = "comboBox1";
@@ -306,12 +308,13 @@
             this.btnexport.Size = new System.Drawing.Size(100, 26);
             this.btnexport.TabIndex = 67;
             this.btnexport.Text = "Export to Excel";
+            this.btnexport.Visible = false;
             this.btnexport.Click += new System.EventHandler(this.btnexport_Click);
             // 
             // simpleButton9
             // 
             this.simpleButton9.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("simpleButton9.ImageOptions.Image")));
-            this.simpleButton9.Location = new System.Drawing.Point(375, 168);
+            this.simpleButton9.Location = new System.Drawing.Point(305, 168);
             this.simpleButton9.Name = "simpleButton9";
             this.simpleButton9.Size = new System.Drawing.Size(82, 26);
             this.simpleButton9.TabIndex = 66;
@@ -321,7 +324,7 @@
             // btncancel
             // 
             this.btncancel.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btncancel.ImageOptions.Image")));
-            this.btncancel.Location = new System.Drawing.Point(253, 168);
+            this.btncancel.Location = new System.Drawing.Point(183, 168);
             this.btncancel.Name = "btncancel";
             this.btncancel.Size = new System.Drawing.Size(116, 26);
             this.btncancel.TabIndex = 65;
@@ -331,7 +334,7 @@
             // btnsave
             // 
             this.btnsave.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.Save_16x16__5_;
-            this.btnsave.Location = new System.Drawing.Point(174, 168);
+            this.btnsave.Location = new System.Drawing.Point(104, 168);
             this.btnsave.Name = "btnsave";
             this.btnsave.Size = new System.Drawing.Size(73, 26);
             this.btnsave.TabIndex = 64;
@@ -341,7 +344,7 @@
             // btnadd
             // 
             this.btnadd.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.Add_16x16__2_;
-            this.btnadd.Location = new System.Drawing.Point(83, 168);
+            this.btnadd.Location = new System.Drawing.Point(13, 168);
             this.btnadd.Name = "btnadd";
             this.btnadd.Size = new System.Drawing.Size(84, 26);
             this.btnadd.TabIndex = 63;
@@ -351,11 +354,12 @@
             // btnnew
             // 
             this.btnnew.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.New_16x16__5_;
-            this.btnnew.Location = new System.Drawing.Point(17, 168);
+            this.btnnew.Location = new System.Drawing.Point(567, 169);
             this.btnnew.Name = "btnnew";
             this.btnnew.Size = new System.Drawing.Size(60, 26);
             this.btnnew.TabIndex = 62;
             this.btnnew.Text = "New";
+            this.btnnew.Visible = false;
             this.btnnew.Click += new System.EventHandler(this.btnnew_Click);
             // 
             // txtpname
@@ -473,6 +477,7 @@
             // 
             // txtpaytype
             // 
+            this.txtpaytype.EditValue = "CREDIT";
             this.txtpaytype.Location = new System.Drawing.Point(79, 37);
             this.txtpaytype.Name = "txtpaytype";
             this.txtpaytype.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F);
@@ -666,6 +671,25 @@
             this.groupBox3.TabIndex = 11;
             this.groupBox3.TabStop = false;
             // 
+            // txtcontrolno
+            // 
+            this.txtcontrolno.Location = new System.Drawing.Point(755, 21);
+            this.txtcontrolno.Name = "txtcontrolno";
+            this.txtcontrolno.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtcontrolno.Properties.Appearance.Options.UseFont = true;
+            this.txtcontrolno.Size = new System.Drawing.Size(183, 22);
+            this.txtcontrolno.TabIndex = 96;
+            // 
+            // labelControl7
+            // 
+            this.labelControl7.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F, System.Drawing.FontStyle.Bold);
+            this.labelControl7.Appearance.Options.UseFont = true;
+            this.labelControl7.Location = new System.Drawing.Point(675, 27);
+            this.labelControl7.Name = "labelControl7";
+            this.labelControl7.Size = new System.Drawing.Size(74, 14);
+            this.labelControl7.TabIndex = 95;
+            this.labelControl7.Text = "Control No.:";
+            // 
             // txteffectivitydateservices
             // 
             this.txteffectivitydateservices.EditValue = null;
@@ -706,6 +730,7 @@
             // 
             // txtpaytypeservices
             // 
+            this.txtpaytypeservices.EditValue = "CREDIT";
             this.txtpaytypeservices.Location = new System.Drawing.Point(465, 58);
             this.txtpaytypeservices.Name = "txtpaytypeservices";
             this.txtpaytypeservices.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F);
@@ -879,28 +904,9 @@
             this.labelControl22.Appearance.Options.UseFont = true;
             this.labelControl22.Location = new System.Drawing.Point(14, 26);
             this.labelControl22.Name = "labelControl22";
-            this.labelControl22.Size = new System.Drawing.Size(34, 14);
+            this.labelControl22.Size = new System.Drawing.Size(96, 14);
             this.labelControl22.TabIndex = 70;
-            this.labelControl22.Text = "PO #:";
-            // 
-            // labelControl7
-            // 
-            this.labelControl7.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F, System.Drawing.FontStyle.Bold);
-            this.labelControl7.Appearance.Options.UseFont = true;
-            this.labelControl7.Location = new System.Drawing.Point(675, 27);
-            this.labelControl7.Name = "labelControl7";
-            this.labelControl7.Size = new System.Drawing.Size(74, 14);
-            this.labelControl7.TabIndex = 95;
-            this.labelControl7.Text = "Control No.:";
-            // 
-            // txtcontrolno
-            // 
-            this.txtcontrolno.Location = new System.Drawing.Point(755, 21);
-            this.txtcontrolno.Name = "txtcontrolno";
-            this.txtcontrolno.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtcontrolno.Properties.Appearance.Options.UseFont = true;
-            this.txtcontrolno.Size = new System.Drawing.Size(183, 22);
-            this.txtcontrolno.TabIndex = 96;
+            this.labelControl22.Text = "SO # (Preview):";
             // 
             // AddOrder
             // 
@@ -944,6 +950,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.gridViewitem)).EndInit();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.txtcontrolno.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txteffectivitydateservices.Properties.CalendarTimeProperties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txteffectivitydateservices.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtqtyservices.Properties)).EndInit();
@@ -953,7 +960,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.txtcustomersservices.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView4)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtposervices.Properties)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.txtcontrolno.Properties)).EndInit();
             this.ResumeLayout(false);
 
         }

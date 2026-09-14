@@ -34,8 +34,8 @@ namespace SalesInventorySystem.AccountingDevEx
         private const string PageExpenseBatch = "navExpenseBatch";
         private const string PageManualTicket = "navManualTicket";
         private const string PageBankRecon = "navBankRecon";
-        private const string PageReports = "navReports";
-        private const string PageReportsV2 = "navReportsV2";
+        //private const string PageReports = "navReports";
+        //private const string PageReportsV2 = "navReportsV2";
         private const string PageGLTicketEntries = "navGLTicketEntries";
 
         // ---------------------------------------------------------------
@@ -98,18 +98,18 @@ namespace SalesInventorySystem.AccountingDevEx
                 _bankRecon = new BankReconFormV2();
                 return _bankRecon;
             },
-            [PageReports] = () =>
-            {
-                _accountingReports = new HOFormsDevEx.AccountingReportsForm();
-                _accountingReports.LoadData();
-                return _accountingReports;
-            },
-            [PageReportsV2] = () =>
-            {
-                _accountingReportsV2 = new HOFormsDevEx.AccountingReportsFormV2();
-                _accountingReportsV2.LoadData();
-                return _accountingReportsV2;
-            },
+            //[PageReports] = () =>
+            //{
+            //    _accountingReports = new HOFormsDevEx.AccountingReportsForm();
+            //    _accountingReports.LoadData();
+            //    return _accountingReports;
+            //},
+            //[PageReportsV2] = () =>
+            //{
+            //    _accountingReportsV2 = new HOFormsDevEx.AccountingReportsFormV2();
+            //    _accountingReportsV2.LoadData();
+            //    return _accountingReportsV2;
+            //},
             [PageGLTicketEntries] = () =>
             {
                 _accountingTicketReports = new AccountingDevEx.TicketInquiryFrm();
@@ -282,8 +282,8 @@ namespace SalesInventorySystem.AccountingDevEx
         private ClientPaymentsDevExAcctg _clientPayment;
         private HOFormsDevEx.AccountMasterListDevEx _accountMasterList;
         private HOFormsDevEx.ManualJournalVoucherMultiBranchFrm _manualVoucherMultiBranch;
-        private HOFormsDevEx.AccountingReportsForm _accountingReports;
-        private HOFormsDevEx.AccountingReportsFormV2 _accountingReportsV2;
+        //private HOFormsDevEx.AccountingReportsForm _accountingReports;
+        //private HOFormsDevEx.AccountingReportsFormV2 _accountingReportsV2;
         private AccountingDevEx.TicketInquiryFrm _accountingTicketReports;
         //private Reporting.ViewTicketDevExRep _accountingTicketReports;
         //private HOFormsDevEx.AddExpenseDevExFrm _addExpenseSingleMode;

@@ -252,7 +252,7 @@
             this.repositoryItemSearchLookUpEditEWTDebitGLCode,
             this.repositoryItemSearchLookUpEditEWTCreditGLCode,
             this.repositoryItemCheckEditPayCharge});
-            this.gridControl2.Size = new System.Drawing.Size(1484, 471);
+            this.gridControl2.Size = new System.Drawing.Size(1484, 508);
             this.gridControl2.TabIndex = 6;
             this.gridControl2.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView2,
@@ -533,7 +533,7 @@
             // gridControlPaymentDetails
             // 
             this.gridControlPaymentDetails.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControlPaymentDetails.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.gridControlPaymentDetails.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(2);
             this.gridControlPaymentDetails.Location = new System.Drawing.Point(2, 389);
             this.gridControlPaymentDetails.MainView = this.gridViewPaymentDetails;
             this.gridControlPaymentDetails.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
@@ -594,11 +594,11 @@
             this.groupBox2.BackColor = System.Drawing.Color.White;
             this.groupBox2.Controls.Add(this.gridControl2);
             this.groupBox2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox2.Location = new System.Drawing.Point(0, 290);
+            this.groupBox2.Location = new System.Drawing.Point(0, 253);
             this.groupBox2.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Padding = new System.Windows.Forms.Padding(2, 3, 2, 3);
-            this.groupBox2.Size = new System.Drawing.Size(1488, 491);
+            this.groupBox2.Size = new System.Drawing.Size(1488, 528);
             this.groupBox2.TabIndex = 20;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Transaction with Balances";
@@ -644,7 +644,7 @@
             this.groupBox1.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(2, 3, 2, 3);
-            this.groupBox1.Size = new System.Drawing.Size(1488, 290);
+            this.groupBox1.Size = new System.Drawing.Size(1488, 253);
             this.groupBox1.TabIndex = 19;
             this.groupBox1.TabStop = false;
             this.groupBox1.Enter += new System.EventHandler(this.groupBox1_Enter);
@@ -652,7 +652,7 @@
             // txtcustname
             // 
             this.txtcustname.Location = new System.Drawing.Point(118, 65);
-            this.txtcustname.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.txtcustname.Margin = new System.Windows.Forms.Padding(2);
             this.txtcustname.Name = "txtcustname";
             this.txtcustname.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
@@ -858,7 +858,7 @@
             // 
             // txtcreditdesc
             // 
-            this.txtcreditdesc.Location = new System.Drawing.Point(485, 209);
+            this.txtcreditdesc.Location = new System.Drawing.Point(377, 258);
             this.txtcreditdesc.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.txtcreditdesc.Name = "txtcreditdesc";
             this.txtcreditdesc.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F);
@@ -870,7 +870,7 @@
             // 
             // txtdebitdesc
             // 
-            this.txtdebitdesc.Location = new System.Drawing.Point(485, 183);
+            this.txtdebitdesc.Location = new System.Drawing.Point(486, 173);
             this.txtdebitdesc.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.txtdebitdesc.Name = "txtdebitdesc";
             this.txtdebitdesc.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F);
@@ -948,7 +948,7 @@
             this.simpleButton4.Appearance.Font = new System.Drawing.Font("Tahoma", 8.5F);
             this.simpleButton4.Appearance.Options.UseFont = true;
             this.simpleButton4.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("simpleButton4.ImageOptions.Image")));
-            this.simpleButton4.Location = new System.Drawing.Point(485, 242);
+            this.simpleButton4.Location = new System.Drawing.Point(486, 202);
             this.simpleButton4.Margin = new System.Windows.Forms.Padding(2);
             this.simpleButton4.Name = "simpleButton4";
             this.simpleButton4.Size = new System.Drawing.Size(218, 40);
@@ -960,7 +960,7 @@
             // 
             this.label20.AutoSize = true;
             this.label20.Font = new System.Drawing.Font("Tahoma", 9.25F);
-            this.label20.Location = new System.Drawing.Point(403, 211);
+            this.label20.Location = new System.Drawing.Point(295, 260);
             this.label20.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label20.Name = "label20";
             this.label20.Size = new System.Drawing.Size(75, 16);
@@ -972,7 +972,7 @@
             // 
             this.label19.AutoSize = true;
             this.label19.Font = new System.Drawing.Font("Tahoma", 9.25F);
-            this.label19.Location = new System.Drawing.Point(403, 186);
+            this.label19.Location = new System.Drawing.Point(404, 176);
             this.label19.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label19.Name = "label19";
             this.label19.Size = new System.Drawing.Size(75, 16);
@@ -1027,7 +1027,7 @@
             // 
             // txtcreditglcode
             // 
-            this.txtcreditglcode.Location = new System.Drawing.Point(215, 209);
+            this.txtcreditglcode.Location = new System.Drawing.Point(107, 258);
             this.txtcreditglcode.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.txtcreditglcode.Name = "txtcreditglcode";
             this.txtcreditglcode.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -1056,7 +1056,7 @@
             // 
             this.label17.AutoSize = true;
             this.label17.Font = new System.Drawing.Font("Tahoma", 9.25F);
-            this.label17.Location = new System.Drawing.Point(115, 211);
+            this.label17.Location = new System.Drawing.Point(7, 260);
             this.label17.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label17.Name = "label17";
             this.label17.Size = new System.Drawing.Size(93, 16);
@@ -1204,7 +1204,7 @@
             // 
             // txtdebitglcode
             // 
-            this.txtdebitglcode.Location = new System.Drawing.Point(215, 183);
+            this.txtdebitglcode.Location = new System.Drawing.Point(216, 173);
             this.txtdebitglcode.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.txtdebitglcode.Name = "txtdebitglcode";
             this.txtdebitglcode.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -1232,7 +1232,7 @@
             // 
             this.label7.AutoSize = true;
             this.label7.Font = new System.Drawing.Font("Tahoma", 9.25F);
-            this.label7.Location = new System.Drawing.Point(114, 186);
+            this.label7.Location = new System.Drawing.Point(115, 176);
             this.label7.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(88, 16);
@@ -1604,7 +1604,7 @@
             this.refreshDisplayToolStripMenuItem,
             this.showSalesItemsToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(187, 130);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(187, 108);
             // 
             // editPaymentToolStripMenuItem
             // 

@@ -25,7 +25,7 @@ namespace SalesInventorySystem.HOFormsDevEx
     //      as ONE grid instead of a detail grid + summary grid pair.
     // The original AccountingReportsForm is untouched and still reachable
     // from its own nav entry -- this is an additional, parallel module.
-    public partial class AccountingReportsFormV2 : DevExpress.XtraEditors.XtraUserControl
+    public partial class AccountingReportsFormV2 : DevExpress.XtraEditors.XtraForm
     {
         // ── How to slice each SP's result sets into (main grid, summary grid).
         //    Verified against the actual SP bodies (GLREPORTS_BODY.txt) -
@@ -95,40 +95,54 @@ namespace SalesInventorySystem.HOFormsDevEx
                 Description = "Snapshot of all account balances at a specific date. Works for any date - not just month-end. Debit must equal Credit. Check 'All Branches' for a company-wide consolidated snapshot.",
                 AllowAllBranches = true
             },
-            ["Income Statement"] = new ReportConfig
+            //["Income Statement"] = new ReportConfig
+            //{
+            //    // V2-only: single-grid Income Statement -- see class header comment (Balance
+            //    // Sheet did this first; Income Statement follows the same RowType-discriminator
+            //    // pattern, with an extra ExpenseSubSection nesting level Balance Sheet doesn't
+            //    // have -- see SQL/2026-09-13_sp_rpt_IncomeStatementWithDateSingleGrid_NewReport.sql).
+            //    // Not the same SP as V1's "Income Statement" entry (that one still returns 2
+            //    // result sets for the sidebar-era 2-grid layout).
+            //    SpName = "sp_rpt_IncomeStatementWithDateSingleGrid",
+            //    Mode = ParamMode.BranchDateRange,
+            //    Shape = ResultShape.SingleSet,
+            //    Description = "Revenue, Cost of Goods Sold, and Operating Expenses (with sub-breakdowns) for a date range, single branch -- line items, subsection/section subtotals, and Gross Profit/Operating Income/Other Income/Net Income all in ONE grid. Check 'All Branches' for a side-by-side pivot with Grand Total (also merged into one grid -- see SQL/2026-09-13_sp_rpt_IncomeStatementAllBranchesPivot_MergeSingleGrid.sql).",
+            //    SupportsAllBranchPivot = true,
+            //    // Already exists live -- built directly in SSMS, not previously tracked in this
+            //    // repo (see SQL/2026-09-13_sp_rpt_IncomeStatementAllBranchesPivot_MergeSingleGrid.sql,
+            //    // which fixes it to merge its two result sets into the one this form actually
+            //    // binds to for SingleSet shape).
+            //    PivotSpName = "sp_rpt_IncomeStatementAllBranchesPivot_TEST"
+            //},
+            ["Income Statement (v2)"] = new ReportConfig
             {
-                SpName = "sp_rpt_IncomeStatementWithDate",
+                SpName = "sp_rpt_IncomeStatementLiveWithDateSingleGrid",
                 Mode = ParamMode.BranchDateRange,
-                Shape = ResultShape.Standard2Set,
-                Description = "Revenue and expense activity for a date range, single branch. Check 'All Branches' for a side-by-side pivot with Grand Total.",
+                Shape = ResultShape.SingleSet,
+                Description = "Same as Income Statement, but folds in ticket activity not yet run through the nightly GL posting job -- reflects today's entries immediately, and (like this form's 'Income Statement' entry) renders as ONE grid instead of a detail grid + summary grid pair. Check 'All Branches' for a side-by-side pivot with Grand Total (same as the non-real-time entry), or 'Include Zero Activity' to list every IS account regardless of activity (single-branch mode only -- the pivot SP doesn't take that parameter, matching the non-real-time pivot).",
+                AllowAllBranches = true,
                 SupportsAllBranchPivot = true,
-                PivotSpName = "sp_rpt_IncomeStatementAllBranchesPivot_TEST"   // TODO: not yet built - see note in form
+                PivotSpName = "sp_rpt_IncomeStatementLiveAllBranchesPivot"   // SQL/2026-09-13_sp_rpt_IncomeStatementLiveAllBranchesPivot_NewReport.sql
             },
-            ["Income Statement (Real-Time)"] = new ReportConfig
+            //["Balance Sheet"] = new ReportConfig
+            //{
+            //    // V2-only: single-grid Balance Sheet -- see class header comment.
+            //    // Not the same SP as V1's "Balance Sheet" entry (that one still
+            //    // returns 2 result sets for the sidebar-era 2-grid layout).
+            //    SpName = "sp_rpt_BalanceSheetPerBranchInventorySingleGrid",
+            //    Mode = ParamMode.BranchAsOfDate,
+            //    Shape = ResultShape.SingleSet,
+            //    Description = "Assets, Liabilities, and Equity as of a specific date -- posting GL accounts, per-section subtotals, and grand totals in ONE grid (Petty Cash Fund/Inventory VAT/VAT-Exempt still broken out one row per branch). Check 'All Branches' to see every branch's rows at once.",
+            //    AllowAllBranches = true
+            //},
+            ["Balance Sheet V2)"] = new ReportConfig
             {
-                SpName = "sp_rpt_IncomeStatementLiveWithDate",
-                Mode = ParamMode.BranchDateRange,
-                Shape = ResultShape.Standard2Set,
-                Description = "Same as Income Statement, but folds in ticket activity not yet run through the nightly GL posting job -- reflects today's entries immediately. Check 'All Branches' for a company-wide consolidated total, or 'Include Zero Activity' to list every IS account regardless of activity.",
-                AllowAllBranches = true
-            },
-            ["Balance Sheet"] = new ReportConfig
-            {
-                // V2-only: single-grid Balance Sheet -- see class header comment.
-                // Not the same SP as V1's "Balance Sheet" entry (that one still
-                // returns 2 result sets for the sidebar-era 2-grid layout).
-                SpName = "sp_rpt_BalanceSheetPerBranchInventorySingleGrid",
+                // V2-only: single-grid, matching this form's "Balance Sheet" entry -- see
+                // SQL/2026-09-13_sp_rpt_BalanceSheetLiveWithDateSingleGrid_NewReport.sql.
+                SpName = "sp_rpt_BalanceSheetLiveWithDateSingleGrid",
                 Mode = ParamMode.BranchAsOfDate,
                 Shape = ResultShape.SingleSet,
-                Description = "Assets, Liabilities, and Equity as of a specific date -- posting GL accounts, per-section subtotals, and grand totals in ONE grid (Petty Cash Fund/Inventory VAT/VAT-Exempt still broken out one row per branch). Check 'All Branches' to see every branch's rows at once.",
-                AllowAllBranches = true
-            },
-            ["Balance Sheet (Real-Time)"] = new ReportConfig
-            {
-                SpName = "sp_rpt_BalanceSheetLiveWithDate",
-                Mode = ParamMode.BranchAsOfDate,
-                Shape = ResultShape.Standard2Set,
-                Description = "Same as Balance Sheet, but folds in ticket activity not yet run through the nightly GL posting job -- reflects today's entries immediately. Does not include the per-branch Petty Cash/Inventory breakout, and (unlike this form's 'Balance Sheet' entry) still uses a separate summary grid for section totals. Check 'All Branches' for a company-wide consolidated snapshot, or 'Include Zero Activity' to list every BS account regardless of balance.",
+                Description = "Same as Balance Sheet, but folds in ticket activity not yet run through the nightly GL posting job -- reflects today's entries immediately, and (like this form's 'Balance Sheet' entry) renders as ONE grid instead of a detail grid + summary grid pair. Still does not include the per-branch Petty Cash/Inventory breakout. Check 'All Branches' for a company-wide consolidated snapshot, or 'Include Zero Activity' to list every BS account regardless of balance.",
                 AllowAllBranches = true
             },
             ["Bank Reconciliation"] = new ReportConfig
@@ -319,6 +333,7 @@ namespace SalesInventorySystem.HOFormsDevEx
         }
         private void AccountingReportsFormV2_Load(object sender, EventArgs e)
         {
+            LoadData();
         }
 
         private void cboReportType_SelectedIndexChanged(object sender, EventArgs e)
@@ -334,7 +349,7 @@ namespace SalesInventorySystem.HOFormsDevEx
 
             lblReportTitle.Text = cboReportType.SelectedItem.ToString();
             lblReportSubtitle.Text = $"Branch: {cboBranchCode.Text} · Select parameters and click Generate";
-            lblDescription.Text = cfg.Description;
+            //lblDescription.Text = cfg.Description;
             lblSpName.Text = "SP: " + cfg.SpName;
 
             bool showAccount = cfg.Mode == ParamMode.BranchAccountDateRange || cfg.Mode == ParamMode.BranchAccountAsOfDate;
@@ -344,7 +359,9 @@ namespace SalesInventorySystem.HOFormsDevEx
             bool showAllAccounts = cfg.SupportsAllAccounts;
             bool showZeroChk = cfg.SpName == "sp_rpt_GLDetailTransactionReport"
                 || cfg.SpName == "sp_rpt_BalanceSheetLiveWithDate"
-                || cfg.SpName == "sp_rpt_IncomeStatementLiveWithDate";
+                || cfg.SpName == "sp_rpt_BalanceSheetLiveWithDateSingleGrid"
+                || cfg.SpName == "sp_rpt_IncomeStatementLiveWithDate"
+                || cfg.SpName == "sp_rpt_IncomeStatementLiveWithDateSingleGrid";
             bool showConsolidated = cfg.Mode == ParamMode.ConsolidatedGL;
             bool showBranch = !showConsolidated; // consolidated is always all-branch
 
@@ -402,6 +419,14 @@ namespace SalesInventorySystem.HOFormsDevEx
                 ? (isPivot ? "All Branches (pivot) · Select date range and click Generate"
                            : "All Branches (Consolidated) · Select parameters and click Generate")
                 : $"Branch: {cboBranchCode.Text} · Select parameters and click Generate";
+
+            // Pivot SPs only ever receive @DateFrom/@DateTo (see RunPivotReport) -- "Include Zero
+            // Activity" has no effect once All Branches routes to the pivot path, so hide it
+            // rather than leave a control checked/visible that's silently ignored.
+            if (isPivot && allBranches)
+                chkIncludeZeroActivity.Visible = false;
+            else if (cfg != null)
+                ApplyParamModeForSelection();
         }
 
         private void chkAllAccounts_CheckedChanged(object sender, EventArgs e)
@@ -478,7 +503,8 @@ namespace SalesInventorySystem.HOFormsDevEx
                             cmd.Parameters.Add("@BranchCode", SqlDbType.VarChar, 5).Value =
                                 (cfg.AllowAllBranches && chkAllBranches.Checked) ? (object)DBNull.Value : cboBranchCode.EditValue?.ToString();
                             cmd.Parameters.Add("@AsOfDate", SqlDbType.Date).Value = dteAsOfDate.DateTime;
-                            if (cfg.SpName == "sp_rpt_BalanceSheetLiveWithDate")
+                            if (cfg.SpName == "sp_rpt_BalanceSheetLiveWithDate"
+                                || cfg.SpName == "sp_rpt_BalanceSheetLiveWithDateSingleGrid")
                                 cmd.Parameters.Add("@IncludeZeroActivity", SqlDbType.Bit).Value = chkIncludeZeroActivity.Checked;
                             break;
 
@@ -492,7 +518,8 @@ namespace SalesInventorySystem.HOFormsDevEx
                                 cmd.Parameters.Add("@AccountType", SqlDbType.VarChar, 10).Value = DBNull.Value;
                                 cmd.Parameters.Add("@SkipZero", SqlDbType.Bit).Value = !chkIncludeZeroActivity.Checked;
                             }
-                            if (cfg.SpName == "sp_rpt_IncomeStatementLiveWithDate")
+                            if (cfg.SpName == "sp_rpt_IncomeStatementLiveWithDate"
+                                || cfg.SpName == "sp_rpt_IncomeStatementLiveWithDateSingleGrid")
                                 cmd.Parameters.Add("@IncludeZeroActivity", SqlDbType.Bit).Value = chkIncludeZeroActivity.Checked;
                             break;
 
@@ -553,7 +580,7 @@ namespace SalesInventorySystem.HOFormsDevEx
                     var ds = new DataSet();
                     new SqlDataAdapter(cmd).Fill(ds);
 
-                    BindResults(ds, cfg);
+                    BindResults(ds, cfg, isPivotResult: true);
                 }
 
                 lblReportSubtitle.Text = $"All Branches (pivot) · Generated {DateTime.Now:g}";
@@ -574,7 +601,7 @@ namespace SalesInventorySystem.HOFormsDevEx
         // ── Binds each SP's result sets according to its verified shape.
         //    Not all reports return "Set1=main, Set2=summary" - see the
         //    ResultShape enum and each ReportConfig's Shape value. ──
-        private void BindResults(DataSet ds, ReportConfig cfg)
+        private void BindResults(DataSet ds, ReportConfig cfg, bool isPivotResult = false)
         {
             gridViewReport.Columns.Clear();
             gridViewSummary.Columns.Clear();
@@ -632,19 +659,33 @@ namespace SalesInventorySystem.HOFormsDevEx
             // Dock=Fill reclaim the space; show it again for shapes that do have a summary.
             pnlSummaryContainer.Visible = gridControlSummary.DataSource != null;
 
-            FormatGridColumns(gridViewReport);
+            // A pivot result's per-branch columns are named after actual branches, so
+            // FormatGridColumns' keyword heuristic below can never match them by name --
+            // treat every column not explicitly a known text/id column as numeric instead.
+            FormatGridColumns(gridViewReport, treatUnknownColumnsAsMoney: isPivotResult);
             FormatGridColumns(gridViewSummary);
 
             if (gridViewReport.Columns["TicketNumber"] != null)
                 gridViewReport.Columns["TicketNumber"].Visible = false;
 
-            // BSSection/RowType are used purely to drive row ordering/styling for the
-            // single-grid Balance Sheet -- redundant to show as their own columns
-            // once every row is already grouped/bolded by section on screen.
+            // BSSection/ISSection/ExpenseSubSection/RowType are used purely to drive row
+            // ordering/styling for the single-grid Balance Sheet and Income Statement --
+            // redundant to show as their own columns once every row is already grouped/bolded
+            // by section on screen.
             if (gridViewReport.Columns["BSSection"] != null)
                 gridViewReport.Columns["BSSection"].Visible = false;
+            if (gridViewReport.Columns["ISSection"] != null)
+                gridViewReport.Columns["ISSection"].Visible = false;
+            if (gridViewReport.Columns["ExpenseSubSection"] != null)
+                gridViewReport.Columns["ExpenseSubSection"].Visible = false;
             if (gridViewReport.Columns["RowType"] != null)
                 gridViewReport.Columns["RowType"].Visible = false;
+            // Internal sign-flip helper for the Income Statement single-grid SPs' COGS section
+            // subtotal (see their header comments) -- not meant for display, and its name would
+            // otherwise incidentally match FormatGridColumns' "cogs" substring check and render
+            // as "0.00"/"1.00" instead of being hidden.
+            if (gridViewReport.Columns["IsContraCOGS"] != null)
+                gridViewReport.Columns["IsContraCOGS"].Visible = false;
 
             gridViewReport.OptionsView.ColumnAutoWidth = false;
             gridViewSummary.OptionsView.ColumnAutoWidth = false;
@@ -676,7 +717,17 @@ namespace SalesInventorySystem.HOFormsDevEx
         private static readonly Color G_ROW_GRANDTOTAL_BG = Color.FromArgb(74, 61, 15);
         private static readonly Color G_ROW_GRANDTOTAL_FG = Color.FromArgb(255, 221, 130);
 
-        private void FormatGridColumns(GridView view)
+        // Columns that are never money values even in a pivot grid, where every OTHER column
+        // (AccountCode/AccountDescription aside) is an arbitrary branch name and therefore
+        // can't be recognized by the keyword heuristic below.
+        private static readonly HashSet<string> G_PIVOT_NON_MONEY_COLUMNS =
+            new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "RowType", "ISSection", "ExpenseSubSection", "BSSection",
+                "AccountCode", "AccountDescription", "IsContraCOGS", "TicketNumber"
+            };
+
+        private void FormatGridColumns(GridView view, bool treatUnknownColumnsAsMoney = false)
         {
             foreach (DevExpress.XtraGrid.Columns.GridColumn col in view.Columns)
             {
@@ -686,6 +737,10 @@ namespace SalesInventorySystem.HOFormsDevEx
                             || fn.Contains("income") || fn.Contains("expense") || fn.Contains("revenue")
                             || fn.Contains("cogs") || fn.Contains("profit");
                 bool isDate = fn.Contains("date");
+
+                if (!isMoney && !isDate && treatUnknownColumnsAsMoney
+                    && !G_PIVOT_NON_MONEY_COLUMNS.Contains(col.FieldName))
+                    isMoney = true;
 
                 if (isMoney)
                 {
@@ -743,7 +798,8 @@ namespace SalesInventorySystem.HOFormsDevEx
             if (rowTypeVal != null)
             {
                 string rt = rowTypeVal.ToString().ToUpperInvariant();
-                isStructuralRow = rt == "OPENING" || rt == "HEADER" || rt == "PERIOD" || rt == "ENDING" || rt == "SUBTOTAL";
+                isStructuralRow = rt == "OPENING" || rt == "HEADER" || rt == "PERIOD" || rt == "ENDING" || rt == "SUBTOTAL"
+                    || rt == "SECTION_SUBTOTAL" || rt == "SUBSECTION_SUBTOTAL";
                 isGrandTotalRow = rt == "GRANDTOTAL" || rt == "GRANDTOTAL_DIFF";
                 isGrandTotalDiffRow = rt == "GRANDTOTAL_DIFF";
             }

@@ -1,26 +1,27 @@
-﻿using System;
+﻿using DevExpress.XtraBars;
+using DevExpress.XtraBars.Helpers;
+using DevExpress.XtraBars.Localization;
+using DevExpress.XtraBars.Ribbon;
+using DevExpress.XtraEditors;
+using DevExpress.XtraReports.UI;
+using SalesInventorySystem.HOFormsDevEx;
+using SalesInventorySystem.HotelManagement;
+using SalesInventorySystem.POS;
+using SalesInventorySystem.Reporting;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Drawing;
-using System.Text;
-using System.Windows.Forms;
-using DevExpress.XtraBars;
 using System.Data.SqlClient;
-using System.Net.Sockets;
-using System.Threading;
+using System.Drawing;
 using System.Net;
-using DevExpress.XtraBars.Localization;
-using DevExpress.XtraBars.Helpers;
-using DevExpress.XtraBars.Ribbon;
-using DevExpress.XtraEditors;
-using SalesInventorySystem.POS;
-using SalesInventorySystem.HotelManagement;
-using DevExpress.XtraReports.UI;
-using System.Threading.Tasks;
-using System.Reflection;
 using System.Net.Http;
-using SalesInventorySystem.Reporting;
+using System.Net.Sockets;
+using System.Reflection;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace SalesInventorySystem
 {
@@ -1645,17 +1646,17 @@ namespace SalesInventorySystem
 
         private void barButtonItem50_ItemClick(object sender, ItemClickEventArgs e)
         {
-            //foreach (Form form in Application.OpenForms)
-            //{
-            //    if (form.GetType() == typeof(AccountingDevEx.BalanceSheetDevEx))
-            //    {
-            //        form.Activate();
-            //        return;
-            //    }
-            //}
-            //AccountingDevEx.BalanceSheetDevEx pcusatfsmr = new AccountingDevEx.BalanceSheetDevEx();
-            //pcusatfsmr.MdiParent = this;
-            //pcusatfsmr.Show();
+            foreach (Form form in Application.OpenForms)
+            {
+                if (form.GetType() == typeof(HOFormsDevEx.AccountingReportsFormV2))
+                {
+                    form.Activate();
+                    return;
+                }
+            }
+            HOFormsDevEx.AccountingReportsFormV2 pcusatfsmr = new HOFormsDevEx.AccountingReportsFormV2();
+            pcusatfsmr.MdiParent = this;
+            pcusatfsmr.Show();
             //Reporting.AccountingReportsForm pcusatfsmr = new Reporting.AccountingReportsForm();
             //pcusatfsmr.Show();
             //HOFormsDevEx.AccountingReportsForm pcusatfsmr = new HOFormsDevEx.AccountingReportsForm();

@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using DevExpress.XtraEditors;
 using System.Data.SqlClient;
 using DevExpress.XtraGrid.Views.Grid;
+using SalesInventorySystem.Classes;
 
 namespace SalesInventorySystem.HOFormsDevEx
 {
@@ -94,7 +95,10 @@ namespace SalesInventorySystem.HOFormsDevEx
 
         private void btnnew_Click(object sender, EventArgs e)
         {
-            txtshipmentno.Text = IDGenerator.getIDNumberSP("sp_GetShipmentNo", "ShipmentNo");
+            // Display-only preview -- does not consume the counter. The real number is
+            // allocated atomically (sp_GetShipmentNo) once, in save(), right before Save
+            // actually inserts anything.
+            txtshipmentno.Text = IDGenerator.getIDNumberSP("sp_PeekShipmentNo", "ShipmentNo");
 
             displaySupplier();
             displayBranch();
@@ -466,9 +470,22 @@ namespace SalesInventorySystem.HOFormsDevEx
             bool confirm = HelperFunction.ConfirmDialog("Are you sure you want to save this Purchase Order?", "Confirm Purchase Order");
             if (!confirm) return;
 
+            // Allocate the real, final Shipment No now -- txtshipmentno.Text so far only held
+            // the non-consuming preview from btnnew_Click(). insert() (and ExecuteSP() below)
+            // both read txtshipmentno.Text, so they pick up the real number too.
+            txtshipmentno.Text = IDGenerator.getIDNumberSP("sp_GetShipmentNo", "ShipmentNo");
+            if (String.IsNullOrEmpty(txtshipmentno.Text))
+            {
+                // getIDNumberSP swallows SqlException and returns "" on failure (e.g. a deadlock
+                // under sp_GetShipmentNo's locking) -- without this guard, insert()/ExecuteSP()
+                // below would silently save this PO with a blank Shipment No.
+                XtraMessageBox.Show("Failed to allocate Shipment No. Please try again.");
+                return;
+            }
+
             insert();
             ExecuteSP("SAVE"); // Pass action explicitly
-            XtraMessageBox.Show("PO Successfully Created!...");
+            BigAlert.Show("Success","PO Successfully Created! Shipment No: " + txtshipmentno.Text,MessageBoxIcon.Information);
         }
         
         void showSaveAndSubmitForm()

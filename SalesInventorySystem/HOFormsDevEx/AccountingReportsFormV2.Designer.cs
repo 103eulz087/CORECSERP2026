@@ -12,11 +12,6 @@ namespace SalesInventorySystem.HOFormsDevEx
 
         #region Windows Form Designer generated code
 
-        // ── Header ──
-        private DevExpress.XtraEditors.PanelControl pnlHeader;
-        private DevExpress.XtraEditors.LabelControl lblTitle;
-        private DevExpress.XtraEditors.LabelControl lblBreadcrumb;
-
         // ── Top parameter bar (replaces the old left sidebar) ──
         private DevExpress.XtraEditors.PanelControl pnlTopParams;
         private DevExpress.XtraEditors.LabelControl lblReportTypeCaption;
@@ -36,17 +31,11 @@ namespace SalesInventorySystem.HOFormsDevEx
         private DevExpress.XtraEditors.CheckEdit chkAllAccounts;
         private DevExpress.XtraEditors.CheckEdit chkIncludeZeroActivity;
         private DevExpress.XtraEditors.RadioGroup rgConsolidatedMode;
-
-        private DevExpress.XtraEditors.LabelControl lblDescription;
         private DevExpress.XtraEditors.LabelControl lblSpName;
         private DevExpress.XtraEditors.LabelControl lblStatus;
 
         private DevExpress.XtraEditors.SimpleButton btnGenerate;
         private DevExpress.XtraEditors.SimpleButton btnExport;
-
-        // ── Report display (now full-width, below the top bar) ──
-        private DevExpress.XtraEditors.LabelControl lblReportTitle;
-        private DevExpress.XtraEditors.LabelControl lblReportSubtitle;
         private DevExpress.XtraEditors.PanelControl pnlReportArea;
         private DevExpress.XtraEditors.PanelControl pnlReportGrid;
         private DevExpress.XtraGrid.GridControl gridControlReport;
@@ -58,11 +47,6 @@ namespace SalesInventorySystem.HOFormsDevEx
 
         private void InitializeComponent()
         {
-            this.pnlHeader = new DevExpress.XtraEditors.PanelControl();
-            this.lblReportTitle = new DevExpress.XtraEditors.LabelControl();
-            this.lblReportSubtitle = new DevExpress.XtraEditors.LabelControl();
-            this.lblTitle = new DevExpress.XtraEditors.LabelControl();
-            this.lblBreadcrumb = new DevExpress.XtraEditors.LabelControl();
             this.pnlTopParams = new DevExpress.XtraEditors.PanelControl();
             this.lblReportTypeCaption = new DevExpress.XtraEditors.LabelControl();
             this.cboReportType = new DevExpress.XtraEditors.ComboBoxEdit();
@@ -83,7 +67,6 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.btnGenerate = new DevExpress.XtraEditors.SimpleButton();
             this.btnExport = new DevExpress.XtraEditors.SimpleButton();
             this.lblStatus = new DevExpress.XtraEditors.LabelControl();
-            this.lblDescription = new DevExpress.XtraEditors.LabelControl();
             this.lblSpName = new DevExpress.XtraEditors.LabelControl();
             this.pnlReportArea = new DevExpress.XtraEditors.PanelControl();
             this.pnlReportGrid = new DevExpress.XtraEditors.PanelControl();
@@ -93,8 +76,8 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.gridControlSummary = new DevExpress.XtraGrid.GridControl();
             this.gridViewSummary = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.lblSummaryCaption = new DevExpress.XtraEditors.LabelControl();
-            ((System.ComponentModel.ISupportInitialize)(this.pnlHeader)).BeginInit();
-            this.pnlHeader.SuspendLayout();
+            this.lblReportTitle = new DevExpress.XtraEditors.LabelControl();
+            this.lblReportSubtitle = new DevExpress.XtraEditors.LabelControl();
             ((System.ComponentModel.ISupportInitialize)(this.pnlTopParams)).BeginInit();
             this.pnlTopParams.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.cboReportType.Properties)).BeginInit();
@@ -122,74 +105,12 @@ namespace SalesInventorySystem.HOFormsDevEx
             ((System.ComponentModel.ISupportInitialize)(this.gridViewSummary)).BeginInit();
             this.SuspendLayout();
             // 
-            // pnlHeader
-            // 
-            this.pnlHeader.Appearance.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(27)))), ((int)(((byte)(32)))), ((int)(((byte)(46)))));
-            this.pnlHeader.Appearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(201)))), ((int)(((byte)(162)))), ((int)(((byte)(39)))));
-            this.pnlHeader.Appearance.Options.UseBackColor = true;
-            this.pnlHeader.Appearance.Options.UseBorderColor = true;
-            this.pnlHeader.Controls.Add(this.lblReportTitle);
-            this.pnlHeader.Controls.Add(this.lblReportSubtitle);
-            this.pnlHeader.Controls.Add(this.lblTitle);
-            this.pnlHeader.Controls.Add(this.lblBreadcrumb);
-            this.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pnlHeader.Location = new System.Drawing.Point(0, 0);
-            this.pnlHeader.Name = "pnlHeader";
-            this.pnlHeader.Size = new System.Drawing.Size(1400, 56);
-            this.pnlHeader.TabIndex = 0;
-            // 
-            // lblReportTitle
-            // 
-            this.lblReportTitle.Appearance.Font = new System.Drawing.Font("Tahoma", 14F, System.Drawing.FontStyle.Bold);
-            this.lblReportTitle.Appearance.ForeColor = System.Drawing.Color.Black;
-            this.lblReportTitle.Appearance.Options.UseFont = true;
-            this.lblReportTitle.Appearance.Options.UseForeColor = true;
-            this.lblReportTitle.Location = new System.Drawing.Point(420, 8);
-            this.lblReportTitle.Name = "lblReportTitle";
-            this.lblReportTitle.Size = new System.Drawing.Size(123, 23);
-            this.lblReportTitle.TabIndex = 0;
-            this.lblReportTitle.Text = "Trial Balance";
-            // 
-            // lblReportSubtitle
-            // 
-            this.lblReportSubtitle.Appearance.Font = new System.Drawing.Font("Tahoma", 8.5F);
-            this.lblReportSubtitle.Appearance.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.lblReportSubtitle.Appearance.Options.UseFont = true;
-            this.lblReportSubtitle.Appearance.Options.UseForeColor = true;
-            this.lblReportSubtitle.Location = new System.Drawing.Point(420, 33);
-            this.lblReportSubtitle.Name = "lblReportSubtitle";
-            this.lblReportSubtitle.Size = new System.Drawing.Size(178, 13);
-            this.lblReportSubtitle.TabIndex = 1;
-            this.lblReportSubtitle.Text = "Select parameters and click Generate";
-            // 
-            // lblTitle
-            // 
-            this.lblTitle.Appearance.Font = new System.Drawing.Font("Tahoma", 13F, System.Drawing.FontStyle.Bold);
-            this.lblTitle.Appearance.ForeColor = System.Drawing.Color.Black;
-            this.lblTitle.Appearance.Options.UseFont = true;
-            this.lblTitle.Appearance.Options.UseForeColor = true;
-            this.lblTitle.Location = new System.Drawing.Point(16, 8);
-            this.lblTitle.Name = "lblTitle";
-            this.lblTitle.Size = new System.Drawing.Size(216, 21);
-            this.lblTitle.TabIndex = 2;
-            this.lblTitle.Text = "JFC ERP  ·  GL Reports V2";
-            // 
-            // lblBreadcrumb
-            // 
-            this.lblBreadcrumb.Appearance.Font = new System.Drawing.Font("Tahoma", 8F);
-            this.lblBreadcrumb.Appearance.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.lblBreadcrumb.Appearance.Options.UseFont = true;
-            this.lblBreadcrumb.Appearance.Options.UseForeColor = true;
-            this.lblBreadcrumb.Location = new System.Drawing.Point(16, 32);
-            this.lblBreadcrumb.Name = "lblBreadcrumb";
-            this.lblBreadcrumb.Size = new System.Drawing.Size(198, 13);
-            this.lblBreadcrumb.TabIndex = 3;
-            this.lblBreadcrumb.Text = "Top parameter bar · full-width report grid";
-            // 
             // pnlTopParams
             // 
             this.pnlTopParams.Appearance.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(34)))), ((int)(((byte)(40)))), ((int)(((byte)(56)))));
             this.pnlTopParams.Appearance.Options.UseBackColor = true;
+            this.pnlTopParams.Controls.Add(this.lblReportTitle);
+            this.pnlTopParams.Controls.Add(this.lblReportSubtitle);
             this.pnlTopParams.Controls.Add(this.lblReportTypeCaption);
             this.pnlTopParams.Controls.Add(this.cboReportType);
             this.pnlTopParams.Controls.Add(this.lblBranchCode);
@@ -209,12 +130,11 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.pnlTopParams.Controls.Add(this.btnGenerate);
             this.pnlTopParams.Controls.Add(this.btnExport);
             this.pnlTopParams.Controls.Add(this.lblStatus);
-            this.pnlTopParams.Controls.Add(this.lblDescription);
             this.pnlTopParams.Controls.Add(this.lblSpName);
             this.pnlTopParams.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pnlTopParams.Location = new System.Drawing.Point(0, 56);
+            this.pnlTopParams.Location = new System.Drawing.Point(0, 0);
             this.pnlTopParams.Name = "pnlTopParams";
-            this.pnlTopParams.Size = new System.Drawing.Size(1400, 140);
+            this.pnlTopParams.Size = new System.Drawing.Size(1398, 107);
             this.pnlTopParams.TabIndex = 1;
             // 
             // lblReportTypeCaption
@@ -340,14 +260,14 @@ namespace SalesInventorySystem.HOFormsDevEx
             // 
             // rgConsolidatedMode
             // 
-            this.rgConsolidatedMode.Location = new System.Drawing.Point(978, 6);
+            this.rgConsolidatedMode.Location = new System.Drawing.Point(256, 47);
             this.rgConsolidatedMode.Name = "rgConsolidatedMode";
             this.rgConsolidatedMode.Properties.Appearance.ForeColor = System.Drawing.Color.Black;
             this.rgConsolidatedMode.Properties.Appearance.Options.UseForeColor = true;
             this.rgConsolidatedMode.Properties.Items.AddRange(new DevExpress.XtraEditors.Controls.RadioGroupItem[] {
             new DevExpress.XtraEditors.Controls.RadioGroupItem("TB", "Trial Balance (as-of date)"),
             new DevExpress.XtraEditors.Controls.RadioGroupItem("IS", "Income Statement (date range)")});
-            this.rgConsolidatedMode.Size = new System.Drawing.Size(367, 41);
+            this.rgConsolidatedMode.Size = new System.Drawing.Size(367, 27);
             this.rgConsolidatedMode.TabIndex = 12;
             this.rgConsolidatedMode.SelectedIndexChanged += new System.EventHandler(this.rgConsolidatedMode_SelectedIndexChanged);
             // 
@@ -358,29 +278,29 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.chkAllBranches.Properties.Appearance.ForeColor = System.Drawing.Color.Black;
             this.chkAllBranches.Properties.Appearance.Options.UseForeColor = true;
             this.chkAllBranches.Properties.Caption = "All Branches";
-            this.chkAllBranches.Size = new System.Drawing.Size(300, 20);
+            this.chkAllBranches.Size = new System.Drawing.Size(86, 20);
             this.chkAllBranches.TabIndex = 13;
             this.chkAllBranches.CheckedChanged += new System.EventHandler(this.chkAllBranches_CheckedChanged);
             // 
             // chkAllAccounts
             // 
-            this.chkAllAccounts.Location = new System.Drawing.Point(326, 54);
+            this.chkAllAccounts.Location = new System.Drawing.Point(14, 76);
             this.chkAllAccounts.Name = "chkAllAccounts";
             this.chkAllAccounts.Properties.Appearance.ForeColor = System.Drawing.Color.Black;
             this.chkAllAccounts.Properties.Appearance.Options.UseForeColor = true;
             this.chkAllAccounts.Properties.Caption = "All Accounts (ignore Account Code filter above)";
-            this.chkAllAccounts.Size = new System.Drawing.Size(300, 20);
+            this.chkAllAccounts.Size = new System.Drawing.Size(261, 20);
             this.chkAllAccounts.TabIndex = 14;
             this.chkAllAccounts.CheckedChanged += new System.EventHandler(this.chkAllAccounts_CheckedChanged);
             // 
             // chkIncludeZeroActivity
             // 
-            this.chkIncludeZeroActivity.Location = new System.Drawing.Point(638, 54);
+            this.chkIncludeZeroActivity.Location = new System.Drawing.Point(281, 76);
             this.chkIncludeZeroActivity.Name = "chkIncludeZeroActivity";
             this.chkIncludeZeroActivity.Properties.Appearance.ForeColor = System.Drawing.Color.Black;
             this.chkIncludeZeroActivity.Properties.Appearance.Options.UseForeColor = true;
             this.chkIncludeZeroActivity.Properties.Caption = "Include accounts with no activity";
-            this.chkIncludeZeroActivity.Size = new System.Drawing.Size(320, 20);
+            this.chkIncludeZeroActivity.Size = new System.Drawing.Size(208, 20);
             this.chkIncludeZeroActivity.TabIndex = 15;
             // 
             // btnGenerate
@@ -391,9 +311,9 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.btnGenerate.Appearance.Options.UseBackColor = true;
             this.btnGenerate.Appearance.Options.UseFont = true;
             this.btnGenerate.Appearance.Options.UseForeColor = true;
-            this.btnGenerate.Location = new System.Drawing.Point(978, 54);
+            this.btnGenerate.Location = new System.Drawing.Point(658, 47);
             this.btnGenerate.Name = "btnGenerate";
-            this.btnGenerate.Size = new System.Drawing.Size(170, 32);
+            this.btnGenerate.Size = new System.Drawing.Size(150, 32);
             this.btnGenerate.TabIndex = 16;
             this.btnGenerate.Text = "▶  Generate Report";
             this.btnGenerate.Click += new System.EventHandler(this.btnGenerate_Click);
@@ -404,9 +324,9 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.btnExport.Appearance.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(235)))));
             this.btnExport.Appearance.Options.UseBackColor = true;
             this.btnExport.Appearance.Options.UseForeColor = true;
-            this.btnExport.Location = new System.Drawing.Point(1154, 54);
+            this.btnExport.Location = new System.Drawing.Point(818, 47);
             this.btnExport.Name = "btnExport";
-            this.btnExport.Size = new System.Drawing.Size(170, 32);
+            this.btnExport.Size = new System.Drawing.Size(150, 32);
             this.btnExport.TabIndex = 17;
             this.btnExport.Text = "⬇  Export (PDF/Excel)";
             this.btnExport.Click += new System.EventHandler(this.btnExport_Click);
@@ -415,23 +335,11 @@ namespace SalesInventorySystem.HOFormsDevEx
             // 
             this.lblStatus.Appearance.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(140)))), ((int)(((byte)(148)))), ((int)(((byte)(165)))));
             this.lblStatus.Appearance.Options.UseForeColor = true;
-            this.lblStatus.Location = new System.Drawing.Point(1154, 90);
+            this.lblStatus.Location = new System.Drawing.Point(834, 83);
             this.lblStatus.Name = "lblStatus";
             this.lblStatus.Size = new System.Drawing.Size(31, 13);
             this.lblStatus.TabIndex = 18;
             this.lblStatus.Text = "Ready";
-            // 
-            // lblDescription
-            // 
-            this.lblDescription.Appearance.Font = new System.Drawing.Font("Tahoma", 8F, System.Drawing.FontStyle.Italic);
-            this.lblDescription.Appearance.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.lblDescription.Appearance.Options.UseFont = true;
-            this.lblDescription.Appearance.Options.UseForeColor = true;
-            this.lblDescription.AutoSizeMode = DevExpress.XtraEditors.LabelAutoSizeMode.None;
-            this.lblDescription.Location = new System.Drawing.Point(14, 96);
-            this.lblDescription.Name = "lblDescription";
-            this.lblDescription.Size = new System.Drawing.Size(1130, 32);
-            this.lblDescription.TabIndex = 19;
             // 
             // lblSpName
             // 
@@ -449,9 +357,9 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.pnlReportArea.Controls.Add(this.pnlReportGrid);
             this.pnlReportArea.Controls.Add(this.pnlSummaryContainer);
             this.pnlReportArea.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnlReportArea.Location = new System.Drawing.Point(0, 196);
+            this.pnlReportArea.Location = new System.Drawing.Point(0, 107);
             this.pnlReportArea.Name = "pnlReportArea";
-            this.pnlReportArea.Size = new System.Drawing.Size(1400, 604);
+            this.pnlReportArea.Size = new System.Drawing.Size(1398, 661);
             this.pnlReportArea.TabIndex = 2;
             // 
             // pnlReportGrid
@@ -460,7 +368,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.pnlReportGrid.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnlReportGrid.Location = new System.Drawing.Point(2, 2);
             this.pnlReportGrid.Name = "pnlReportGrid";
-            this.pnlReportGrid.Size = new System.Drawing.Size(1396, 380);
+            this.pnlReportGrid.Size = new System.Drawing.Size(1394, 437);
             this.pnlReportGrid.TabIndex = 0;
             // 
             // gridControlReport
@@ -469,7 +377,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.gridControlReport.Location = new System.Drawing.Point(2, 2);
             this.gridControlReport.MainView = this.gridViewReport;
             this.gridControlReport.Name = "gridControlReport";
-            this.gridControlReport.Size = new System.Drawing.Size(1392, 376);
+            this.gridControlReport.Size = new System.Drawing.Size(1390, 433);
             this.gridControlReport.TabIndex = 0;
             this.gridControlReport.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewReport});
@@ -487,9 +395,9 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.pnlSummaryContainer.Controls.Add(this.gridControlSummary);
             this.pnlSummaryContainer.Controls.Add(this.lblSummaryCaption);
             this.pnlSummaryContainer.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.pnlSummaryContainer.Location = new System.Drawing.Point(2, 382);
+            this.pnlSummaryContainer.Location = new System.Drawing.Point(2, 439);
             this.pnlSummaryContainer.Name = "pnlSummaryContainer";
-            this.pnlSummaryContainer.Size = new System.Drawing.Size(1396, 220);
+            this.pnlSummaryContainer.Size = new System.Drawing.Size(1394, 220);
             this.pnlSummaryContainer.TabIndex = 1;
             // 
             // gridControlSummary
@@ -498,7 +406,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.gridControlSummary.Location = new System.Drawing.Point(2, 26);
             this.gridControlSummary.MainView = this.gridViewSummary;
             this.gridControlSummary.Name = "gridControlSummary";
-            this.gridControlSummary.Size = new System.Drawing.Size(1392, 192);
+            this.gridControlSummary.Size = new System.Drawing.Size(1390, 192);
             this.gridControlSummary.TabIndex = 1;
             this.gridControlSummary.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewSummary});
@@ -525,19 +433,42 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.lblSummaryCaption.TabIndex = 0;
             this.lblSummaryCaption.Text = "SUMMARY";
             // 
+            // lblReportTitle
+            // 
+            this.lblReportTitle.Appearance.Font = new System.Drawing.Font("Tahoma", 14F, System.Drawing.FontStyle.Bold);
+            this.lblReportTitle.Appearance.ForeColor = System.Drawing.Color.Black;
+            this.lblReportTitle.Appearance.Options.UseFont = true;
+            this.lblReportTitle.Appearance.Options.UseForeColor = true;
+            this.lblReportTitle.Location = new System.Drawing.Point(983, 8);
+            this.lblReportTitle.Name = "lblReportTitle";
+            this.lblReportTitle.Size = new System.Drawing.Size(123, 23);
+            this.lblReportTitle.TabIndex = 21;
+            this.lblReportTitle.Text = "Trial Balance";
+            // 
+            // lblReportSubtitle
+            // 
+            this.lblReportSubtitle.Appearance.Font = new System.Drawing.Font("Tahoma", 8.5F);
+            this.lblReportSubtitle.Appearance.ForeColor = System.Drawing.SystemColors.GrayText;
+            this.lblReportSubtitle.Appearance.Options.UseFont = true;
+            this.lblReportSubtitle.Appearance.Options.UseForeColor = true;
+            this.lblReportSubtitle.Location = new System.Drawing.Point(983, 36);
+            this.lblReportSubtitle.Name = "lblReportSubtitle";
+            this.lblReportSubtitle.Size = new System.Drawing.Size(178, 13);
+            this.lblReportSubtitle.TabIndex = 22;
+            this.lblReportSubtitle.Text = "Select parameters and click Generate";
+            // 
             // AccountingReportsFormV2
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(1398, 768);
             this.Controls.Add(this.pnlReportArea);
             this.Controls.Add(this.pnlTopParams);
-            this.Controls.Add(this.pnlHeader);
             this.Name = "AccountingReportsFormV2";
-            this.Size = new System.Drawing.Size(1400, 800);
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "Financial Report";
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Load += new System.EventHandler(this.AccountingReportsFormV2_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.pnlHeader)).EndInit();
-            this.pnlHeader.ResumeLayout(false);
-            this.pnlHeader.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pnlTopParams)).EndInit();
             this.pnlTopParams.ResumeLayout(false);
             this.pnlTopParams.PerformLayout();
@@ -570,5 +501,8 @@ namespace SalesInventorySystem.HOFormsDevEx
         }
 
         #endregion
+
+        private DevExpress.XtraEditors.LabelControl lblReportTitle;
+        private DevExpress.XtraEditors.LabelControl lblReportSubtitle;
     }
 }
