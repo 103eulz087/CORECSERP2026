@@ -45,7 +45,15 @@ namespace SalesInventorySystem.Orders
             repoQuantity = new RepositoryItemSpinEdit();
             repoQuantity.MinValue = 0;
             repoQuantity.MaxValue = 99999;
-            repoQuantity.IsFloatValue = false;
+            // Quantity must accept decimals -- TransferOrderDetails.Qty is decimal(10,3) and
+            // BuildTransferDetailsTable() already parses this cell with decimal.TryParse, so the
+            // only thing blocking decimal entry was this editor being forced to integers.
+            repoQuantity.IsFloatValue = true;
+            repoQuantity.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+            repoQuantity.DisplayFormat.FormatString = "N3";
+            repoQuantity.EditFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+            repoQuantity.EditFormat.FormatString = "N3";
+            repoQuantity.Increment = 1m;
             gridControl1.RepositoryItems.Add(repoQuantity);
 
 
@@ -410,7 +418,10 @@ namespace SalesInventorySystem.Orders
             if (qtyObj == null || qtyObj == DBNull.Value)
                 return;
 
-            if (decimal.TryParse(qtyObj.ToString(), out decimal qty) && qty > 0)
+            // Same NumberStyles/CultureInfo as BuildTransferDetailsTable's parse of this same
+            // string-typed cell, so the row-highlight and actual save-eligibility checks can't
+            // disagree on what counts as a valid decimal quantity.
+            if (decimal.TryParse(qtyObj.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal qty) && qty > 0)
             {
                 e.Appearance.BackColor = Color.LightGoldenrodYellow;
                 e.Appearance.ForeColor = Color.Black;

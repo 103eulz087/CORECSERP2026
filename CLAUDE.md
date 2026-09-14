@@ -46,6 +46,10 @@ Naming: sp_ for general procs, spu_ for update/posting procs.
 Code-Name display convention is used system-wide for dropdowns/grids (show Code - Name, not just one or the other).
 SP Backup Renaming: add suffix timestamp in sp name for backup before creating new one
 
+**Reporting Quantity/Amount columns must be numeric, both in SQL and in the grid.** Two layers, both required:
+1. SQL side: return Quantity/Amount as real numeric types (`DECIMAL`/`INT`/`FLOAT`), never `FORMAT()`-ed to `VARCHAR`/`NVARCHAR`. A formatted-string column can't be summed by a DevExpress grid footer and won't right-align/parse correctly as a number. (Hit in `funcview_CustomerSalesJournal`/`funcview_CustomerSalesHistoryDetails`, which pre-date this rule and return `FORMAT()`-ed string amounts — left as-is since they're shared with other call sites, but don't copy that pattern into anything new.)
+2. C# grid side: explicitly set `GridColumn.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric` and a `FormatString` on every Quantity/Amount column after binding — `N3` for quantities, `N2` for money. Adding a `Summary`/footer sum is not enough by itself; that only formats the footer total, not the row cells above it (a real gap found and fixed in `Reporting/ConversionReportMasterDetail.cs`, `Reporting/ItemCostingReport.cs`, and `POS/POSSalesReportDevEx.cs`'s Details master-detail grid on 2026-09-07). `Reporting/InventoryReport.cs`, `Reporting/InventoryUnitActivityReport.cs`, and `AccountingDevEx/BankReconFormV2.cs` already do this correctly — match their `FormatNumericColumn`/`FormatCol`-style helper pattern in new report forms.
+
 ## Build & run
 
 - Solution: `SalesInventorySystemGENERALVERSION.sln` → single project `SalesInventorySystem/SalesInventorySystem.csproj`.

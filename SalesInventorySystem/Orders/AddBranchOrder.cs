@@ -343,6 +343,11 @@ namespace SalesInventorySystem
                     else
                     {
                         productcode = pcode?.ToString() ?? "";
+                        if(String.IsNullOrEmpty(productcode))
+                        {
+                            BigAlert.Show("EMPTY","Please Select Product",MessageBoxIcon.Warning);
+                            return;
+                        }
                         if (isBarcodeLong == true)
                         {
                             txtsku.Text = "33333" + productcode + strquantity.Replace(".", "") + Classes.Utilities.sequencePadding(ctr2.ToString());

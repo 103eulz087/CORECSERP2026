@@ -51,9 +51,6 @@
             this.SUMMARY = new System.Windows.Forms.TabPage();
             this.gridControl3 = new DevExpress.XtraGrid.GridControl();
             this.gridView3 = new DevExpress.XtraGrid.Views.Grid.GridView();
-            this.SUMMARYDETAIL = new System.Windows.Forms.TabPage();
-            this.gridControl4 = new DevExpress.XtraGrid.GridControl();
-            this.gridView4 = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.contextMenuStrip2 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.panelControl1 = new DevExpress.XtraEditors.PanelControl();
@@ -61,10 +58,10 @@
             this.panelControl2 = new DevExpress.XtraEditors.PanelControl();
             ((System.ComponentModel.ISupportInitialize)(this.txtbrcode.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.searchLookUpEdit1View)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dateto.Properties.CalendarTimeProperties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dateto.Properties)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.datefrom.Properties.CalendarTimeProperties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dateto.Properties.CalendarTimeProperties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.datefrom.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.datefrom.Properties.CalendarTimeProperties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView1)).BeginInit();
             this.contextMenuStrip1.SuspendLayout();
@@ -76,9 +73,6 @@
             this.SUMMARY.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView3)).BeginInit();
-            this.SUMMARYDETAIL.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.gridControl4)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.gridView4)).BeginInit();
             this.contextMenuStrip2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).BeginInit();
             this.panelControl1.SuspendLayout();
@@ -88,8 +82,7 @@
             // 
             // txtbrcode
             // 
-            this.txtbrcode.Location = new System.Drawing.Point(66, 8);
-            this.txtbrcode.Margin = new System.Windows.Forms.Padding(4);
+            this.txtbrcode.Location = new System.Drawing.Point(57, 6);
             this.txtbrcode.Name = "txtbrcode";
             this.txtbrcode.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtbrcode.Properties.Appearance.Options.UseFont = true;
@@ -97,24 +90,25 @@
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.txtbrcode.Properties.NullText = "";
             this.txtbrcode.Properties.PopupView = this.searchLookUpEdit1View;
-            this.txtbrcode.Size = new System.Drawing.Size(247, 24);
+            this.txtbrcode.Size = new System.Drawing.Size(212, 20);
             this.txtbrcode.TabIndex = 7;
             this.txtbrcode.EditValueChanged += new System.EventHandler(this.txtbrcode_EditValueChanged);
             // 
             // searchLookUpEdit1View
             // 
+            this.searchLookUpEdit1View.DetailHeight = 284;
             this.searchLookUpEdit1View.FocusRectStyle = DevExpress.XtraGrid.Views.Grid.DrawFocusRectStyle.RowFocus;
             this.searchLookUpEdit1View.Name = "searchLookUpEdit1View";
+            this.searchLookUpEdit1View.OptionsEditForm.PopupEditFormWidth = 686;
             this.searchLookUpEdit1View.OptionsSelection.EnableAppearanceFocusedCell = false;
             this.searchLookUpEdit1View.OptionsView.ShowGroupPanel = false;
             // 
             // simpleButton1
             // 
             this.simpleButton1.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.GenerateData_32x32;
-            this.simpleButton1.Location = new System.Drawing.Point(320, 6);
-            this.simpleButton1.Margin = new System.Windows.Forms.Padding(4);
+            this.simpleButton1.Location = new System.Drawing.Point(274, 5);
             this.simpleButton1.Name = "simpleButton1";
-            this.simpleButton1.Size = new System.Drawing.Size(110, 53);
+            this.simpleButton1.Size = new System.Drawing.Size(94, 43);
             this.simpleButton1.TabIndex = 6;
             this.simpleButton1.Text = "Extract";
             this.simpleButton1.Click += new System.EventHandler(this.simpleButton1_Click);
@@ -122,8 +116,7 @@
             // dateto
             // 
             this.dateto.EditValue = null;
-            this.dateto.Location = new System.Drawing.Point(206, 36);
-            this.dateto.Margin = new System.Windows.Forms.Padding(4);
+            this.dateto.Location = new System.Drawing.Point(177, 29);
             this.dateto.Name = "dateto";
             this.dateto.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.dateto.Properties.Appearance.Options.UseFont = true;
@@ -131,14 +124,13 @@
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.dateto.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton()});
-            this.dateto.Size = new System.Drawing.Size(107, 24);
+            this.dateto.Size = new System.Drawing.Size(92, 20);
             this.dateto.TabIndex = 5;
             // 
             // datefrom
             // 
             this.datefrom.EditValue = null;
-            this.datefrom.Location = new System.Drawing.Point(66, 35);
-            this.datefrom.Margin = new System.Windows.Forms.Padding(4);
+            this.datefrom.Location = new System.Drawing.Point(57, 28);
             this.datefrom.Name = "datefrom";
             this.datefrom.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.datefrom.Properties.Appearance.Options.UseFont = true;
@@ -146,17 +138,16 @@
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.datefrom.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton()});
-            this.datefrom.Size = new System.Drawing.Size(107, 24);
+            this.datefrom.Size = new System.Drawing.Size(92, 20);
             this.datefrom.TabIndex = 4;
             // 
             // labelControl3
             // 
             this.labelControl3.Appearance.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelControl3.Appearance.Options.UseFont = true;
-            this.labelControl3.Location = new System.Drawing.Point(179, 38);
-            this.labelControl3.Margin = new System.Windows.Forms.Padding(4);
+            this.labelControl3.Location = new System.Drawing.Point(153, 31);
             this.labelControl3.Name = "labelControl3";
-            this.labelControl3.Size = new System.Drawing.Size(23, 18);
+            this.labelControl3.Size = new System.Drawing.Size(19, 14);
             this.labelControl3.TabIndex = 3;
             this.labelControl3.Text = "To:";
             // 
@@ -164,10 +155,9 @@
             // 
             this.labelControl2.Appearance.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelControl2.Appearance.Options.UseFont = true;
-            this.labelControl2.Location = new System.Drawing.Point(17, 39);
-            this.labelControl2.Margin = new System.Windows.Forms.Padding(4);
+            this.labelControl2.Location = new System.Drawing.Point(15, 32);
             this.labelControl2.Name = "labelControl2";
-            this.labelControl2.Size = new System.Drawing.Size(39, 18);
+            this.labelControl2.Size = new System.Drawing.Size(31, 14);
             this.labelControl2.TabIndex = 2;
             this.labelControl2.Text = "From:";
             // 
@@ -175,22 +165,19 @@
             // 
             this.labelControl1.Appearance.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelControl1.Appearance.Options.UseFont = true;
-            this.labelControl1.Location = new System.Drawing.Point(11, 13);
-            this.labelControl1.Margin = new System.Windows.Forms.Padding(4);
+            this.labelControl1.Location = new System.Drawing.Point(9, 11);
             this.labelControl1.Name = "labelControl1";
-            this.labelControl1.Size = new System.Drawing.Size(50, 18);
+            this.labelControl1.Size = new System.Drawing.Size(41, 14);
             this.labelControl1.TabIndex = 0;
             this.labelControl1.Text = "Branch:";
             // 
             // gridControl1
             // 
             this.gridControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControl1.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4);
-            this.gridControl1.Location = new System.Drawing.Point(4, 4);
+            this.gridControl1.Location = new System.Drawing.Point(3, 3);
             this.gridControl1.MainView = this.gridView1;
-            this.gridControl1.Margin = new System.Windows.Forms.Padding(4);
             this.gridControl1.Name = "gridControl1";
-            this.gridControl1.Size = new System.Drawing.Size(1006, 507);
+            this.gridControl1.Size = new System.Drawing.Size(861, 409);
             this.gridControl1.TabIndex = 1;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1});
@@ -202,10 +189,12 @@
             this.gridView1.Appearance.HeaderPanel.Options.UseFont = true;
             this.gridView1.Appearance.Row.Font = new System.Drawing.Font("Tahoma", 9.25F);
             this.gridView1.Appearance.Row.Options.UseFont = true;
+            this.gridView1.DetailHeight = 284;
             this.gridView1.GridControl = this.gridControl1;
             this.gridView1.Name = "gridView1";
             this.gridView1.OptionsBehavior.Editable = false;
             this.gridView1.OptionsBehavior.ReadOnly = true;
+            this.gridView1.OptionsEditForm.PopupEditFormWidth = 686;
             this.gridView1.OptionsView.ColumnAutoWidth = false;
             this.gridView1.OptionsView.RowAutoHeight = true;
             this.gridView1.ShowingEditor += new System.ComponentModel.CancelEventHandler(this.gridView1_ShowingEditor);
@@ -219,26 +208,26 @@
             this.errorCorrectToolStripMenuItem,
             this.confirmToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(238, 76);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(201, 70);
             // 
             // viewConversionDetailsToolStripMenuItem
             // 
             this.viewConversionDetailsToolStripMenuItem.Name = "viewConversionDetailsToolStripMenuItem";
-            this.viewConversionDetailsToolStripMenuItem.Size = new System.Drawing.Size(237, 24);
+            this.viewConversionDetailsToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
             this.viewConversionDetailsToolStripMenuItem.Text = "View Conversion Details";
             this.viewConversionDetailsToolStripMenuItem.Click += new System.EventHandler(this.viewConversionDetailsToolStripMenuItem_Click);
             // 
             // errorCorrectToolStripMenuItem
             // 
             this.errorCorrectToolStripMenuItem.Name = "errorCorrectToolStripMenuItem";
-            this.errorCorrectToolStripMenuItem.Size = new System.Drawing.Size(237, 24);
+            this.errorCorrectToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
             this.errorCorrectToolStripMenuItem.Text = "RollBack Conversion";
             this.errorCorrectToolStripMenuItem.Click += new System.EventHandler(this.errorCorrectToolStripMenuItem_Click);
             // 
             // confirmToolStripMenuItem
             // 
             this.confirmToolStripMenuItem.Name = "confirmToolStripMenuItem";
-            this.confirmToolStripMenuItem.Size = new System.Drawing.Size(237, 24);
+            this.confirmToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
             this.confirmToolStripMenuItem.Text = "Confirm";
             this.confirmToolStripMenuItem.Click += new System.EventHandler(this.confirmToolStripMenuItem_Click);
             // 
@@ -247,25 +236,22 @@
             this.tabControl1.Controls.Add(this.FORAPPROVAL);
             this.tabControl1.Controls.Add(this.APPROVED);
             this.tabControl1.Controls.Add(this.SUMMARY);
-            this.tabControl1.Controls.Add(this.SUMMARYDETAIL);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControl1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.25F, System.Drawing.FontStyle.Bold);
             this.tabControl1.Location = new System.Drawing.Point(2, 2);
-            this.tabControl1.Margin = new System.Windows.Forms.Padding(4);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(1022, 546);
+            this.tabControl1.Size = new System.Drawing.Size(875, 443);
             this.tabControl1.TabIndex = 4;
             // 
             // FORAPPROVAL
             // 
             this.FORAPPROVAL.Controls.Add(this.gridControl1);
             this.FORAPPROVAL.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.FORAPPROVAL.Location = new System.Drawing.Point(4, 27);
-            this.FORAPPROVAL.Margin = new System.Windows.Forms.Padding(4);
+            this.FORAPPROVAL.Location = new System.Drawing.Point(4, 24);
             this.FORAPPROVAL.Name = "FORAPPROVAL";
-            this.FORAPPROVAL.Padding = new System.Windows.Forms.Padding(4);
-            this.FORAPPROVAL.Size = new System.Drawing.Size(1014, 515);
+            this.FORAPPROVAL.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.FORAPPROVAL.Size = new System.Drawing.Size(867, 415);
             this.FORAPPROVAL.TabIndex = 0;
             this.FORAPPROVAL.Text = "FOR APPROVAL";
             this.FORAPPROVAL.UseVisualStyleBackColor = true;
@@ -274,11 +260,10 @@
             // 
             this.APPROVED.Controls.Add(this.gridControl2);
             this.APPROVED.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.APPROVED.Location = new System.Drawing.Point(4, 27);
-            this.APPROVED.Margin = new System.Windows.Forms.Padding(4);
+            this.APPROVED.Location = new System.Drawing.Point(4, 24);
             this.APPROVED.Name = "APPROVED";
-            this.APPROVED.Padding = new System.Windows.Forms.Padding(4);
-            this.APPROVED.Size = new System.Drawing.Size(1014, 515);
+            this.APPROVED.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.APPROVED.Size = new System.Drawing.Size(867, 415);
             this.APPROVED.TabIndex = 1;
             this.APPROVED.Text = "APPROVED";
             this.APPROVED.UseVisualStyleBackColor = true;
@@ -286,12 +271,10 @@
             // gridControl2
             // 
             this.gridControl2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControl2.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4);
-            this.gridControl2.Location = new System.Drawing.Point(4, 4);
+            this.gridControl2.Location = new System.Drawing.Point(3, 3);
             this.gridControl2.MainView = this.gridView2;
-            this.gridControl2.Margin = new System.Windows.Forms.Padding(4);
             this.gridControl2.Name = "gridControl2";
-            this.gridControl2.Size = new System.Drawing.Size(1006, 507);
+            this.gridControl2.Size = new System.Drawing.Size(861, 409);
             this.gridControl2.TabIndex = 1;
             this.gridControl2.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView2});
@@ -303,10 +286,12 @@
             this.gridView2.Appearance.HeaderPanel.Options.UseFont = true;
             this.gridView2.Appearance.Row.Font = new System.Drawing.Font("Tahoma", 9.25F);
             this.gridView2.Appearance.Row.Options.UseFont = true;
+            this.gridView2.DetailHeight = 284;
             this.gridView2.GridControl = this.gridControl2;
             this.gridView2.Name = "gridView2";
             this.gridView2.OptionsBehavior.Editable = false;
             this.gridView2.OptionsBehavior.ReadOnly = true;
+            this.gridView2.OptionsEditForm.PopupEditFormWidth = 686;
             this.gridView2.OptionsView.ColumnAutoWidth = false;
             this.gridView2.OptionsView.RowAutoHeight = true;
             this.gridView2.DoubleClick += new System.EventHandler(this.gridView2_DoubleClick);
@@ -314,9 +299,10 @@
             // SUMMARY
             // 
             this.SUMMARY.Controls.Add(this.gridControl3);
-            this.SUMMARY.Location = new System.Drawing.Point(4, 27);
+            this.SUMMARY.Location = new System.Drawing.Point(4, 24);
+            this.SUMMARY.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.SUMMARY.Name = "SUMMARY";
-            this.SUMMARY.Size = new System.Drawing.Size(1014, 515);
+            this.SUMMARY.Size = new System.Drawing.Size(867, 415);
             this.SUMMARY.TabIndex = 2;
             this.SUMMARY.Text = "SUMMARY";
             this.SUMMARY.UseVisualStyleBackColor = true;
@@ -324,12 +310,10 @@
             // gridControl3
             // 
             this.gridControl3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControl3.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4);
             this.gridControl3.Location = new System.Drawing.Point(0, 0);
             this.gridControl3.MainView = this.gridView3;
-            this.gridControl3.Margin = new System.Windows.Forms.Padding(4);
             this.gridControl3.Name = "gridControl3";
-            this.gridControl3.Size = new System.Drawing.Size(1014, 515);
+            this.gridControl3.Size = new System.Drawing.Size(867, 415);
             this.gridControl3.TabIndex = 3;
             this.gridControl3.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView3});
@@ -340,8 +324,10 @@
             this.gridView3.Appearance.HeaderPanel.Options.UseFont = true;
             this.gridView3.Appearance.Row.Font = new System.Drawing.Font("Tahoma", 9.25F);
             this.gridView3.Appearance.Row.Options.UseFont = true;
+            this.gridView3.DetailHeight = 284;
             this.gridView3.GridControl = this.gridControl3;
             this.gridView3.Name = "gridView3";
+            this.gridView3.OptionsEditForm.PopupEditFormWidth = 686;
             this.gridView3.OptionsView.ColumnAutoWidth = false;
             this.gridView3.OptionsView.RowAutoHeight = true;
             this.gridView3.OptionsView.ShowFooter = true;
@@ -349,67 +335,18 @@
             this.gridView3.CustomDrawCell += new DevExpress.XtraGrid.Views.Base.RowCellCustomDrawEventHandler(this.gridView3_CustomDrawCell);
             this.gridView3.RowCellStyle += new DevExpress.XtraGrid.Views.Grid.RowCellStyleEventHandler(this.gridView3_RowCellStyle);
             // 
-            // SUMMARYDETAIL
-            // 
-            this.SUMMARYDETAIL.Controls.Add(this.gridControl4);
-            this.SUMMARYDETAIL.Location = new System.Drawing.Point(4, 27);
-            this.SUMMARYDETAIL.Name = "SUMMARYDETAIL";
-            this.SUMMARYDETAIL.Padding = new System.Windows.Forms.Padding(3);
-            this.SUMMARYDETAIL.Size = new System.Drawing.Size(1014, 515);
-            this.SUMMARYDETAIL.TabIndex = 3;
-            this.SUMMARYDETAIL.Text = "SUMMARYDETAIL";
-            this.SUMMARYDETAIL.UseVisualStyleBackColor = true;
-            // 
-            // gridControl4
-            // 
-            this.gridControl4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControl4.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4);
-            this.gridControl4.Location = new System.Drawing.Point(3, 3);
-            this.gridControl4.MainView = this.gridView4;
-            this.gridControl4.Margin = new System.Windows.Forms.Padding(4);
-            this.gridControl4.Name = "gridControl4";
-            this.gridControl4.Size = new System.Drawing.Size(1008, 509);
-            this.gridControl4.TabIndex = 2;
-            this.gridControl4.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
-            this.gridView4});
-            // 
-            // gridView4
-            // 
-            this.gridView4.Appearance.HeaderPanel.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.gridView4.Appearance.HeaderPanel.Options.UseFont = true;
-            this.gridView4.Appearance.Row.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.gridView4.Appearance.Row.Options.UseFont = true;
-            this.gridView4.AppearancePrint.FooterPanel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.gridView4.AppearancePrint.FooterPanel.Options.UseFont = true;
-            this.gridView4.AppearancePrint.GroupFooter.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.gridView4.AppearancePrint.GroupFooter.Options.UseFont = true;
-            this.gridView4.AppearancePrint.GroupRow.Font = new System.Drawing.Font("Tahoma", 8.25F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.gridView4.AppearancePrint.GroupRow.ForeColor = System.Drawing.Color.Maroon;
-            this.gridView4.AppearancePrint.GroupRow.Options.UseFont = true;
-            this.gridView4.AppearancePrint.GroupRow.Options.UseForeColor = true;
-            this.gridView4.AppearancePrint.HeaderPanel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.gridView4.AppearancePrint.HeaderPanel.Options.UseFont = true;
-            this.gridView4.DetailHeight = 431;
-            this.gridView4.GridControl = this.gridControl4;
-            this.gridView4.Name = "gridView4";
-            this.gridView4.OptionsBehavior.Editable = false;
-            this.gridView4.OptionsBehavior.ReadOnly = true;
-            this.gridView4.OptionsView.ColumnAutoWidth = false;
-            this.gridView4.OptionsView.RowAutoHeight = true;
-            this.gridView4.OptionsView.ShowFooter = true;
-            // 
             // contextMenuStrip2
             // 
             this.contextMenuStrip2.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.contextMenuStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripMenuItem1});
             this.contextMenuStrip2.Name = "contextMenuStrip1";
-            this.contextMenuStrip2.Size = new System.Drawing.Size(163, 28);
+            this.contextMenuStrip2.Size = new System.Drawing.Size(142, 26);
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(162, 24);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(141, 22);
             this.toolStripMenuItem1.Text = "Error Correct";
             this.toolStripMenuItem1.Click += new System.EventHandler(this.toolStripMenuItem1_Click);
             // 
@@ -425,18 +362,19 @@
             this.panelControl1.Controls.Add(this.dateto);
             this.panelControl1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelControl1.Location = new System.Drawing.Point(0, 0);
+            this.panelControl1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panelControl1.Name = "panelControl1";
-            this.panelControl1.Size = new System.Drawing.Size(1026, 72);
+            this.panelControl1.Size = new System.Drawing.Size(879, 58);
             this.panelControl1.TabIndex = 8;
             // 
             // btnforapprovalstsexcel
             // 
             this.btnforapprovalstsexcel.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.ExportToExcel_16x16;
             this.btnforapprovalstsexcel.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btnforapprovalstsexcel.Location = new System.Drawing.Point(437, 6);
-            this.btnforapprovalstsexcel.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
+            this.btnforapprovalstsexcel.Location = new System.Drawing.Point(375, 5);
+            this.btnforapprovalstsexcel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnforapprovalstsexcel.Name = "btnforapprovalstsexcel";
-            this.btnforapprovalstsexcel.Size = new System.Drawing.Size(121, 53);
+            this.btnforapprovalstsexcel.Size = new System.Drawing.Size(104, 43);
             this.btnforapprovalstsexcel.TabIndex = 8;
             this.btnforapprovalstsexcel.Text = "Export to Excel";
             this.btnforapprovalstsexcel.Click += new System.EventHandler(this.btnforapprovalstsexcel_Click);
@@ -445,19 +383,19 @@
             // 
             this.panelControl2.Controls.Add(this.tabControl1);
             this.panelControl2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelControl2.Location = new System.Drawing.Point(0, 72);
+            this.panelControl2.Location = new System.Drawing.Point(0, 58);
+            this.panelControl2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panelControl2.Name = "panelControl2";
-            this.panelControl2.Size = new System.Drawing.Size(1026, 550);
+            this.panelControl2.Size = new System.Drawing.Size(879, 447);
             this.panelControl2.TabIndex = 9;
             // 
             // ConversionReports
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1026, 622);
+            this.ClientSize = new System.Drawing.Size(879, 505);
             this.Controls.Add(this.panelControl2);
             this.Controls.Add(this.panelControl1);
-            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "ConversionReports";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "ConversionReports";
@@ -480,9 +418,6 @@
             this.SUMMARY.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.gridControl3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView3)).EndInit();
-            this.SUMMARYDETAIL.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.gridControl4)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.gridView4)).EndInit();
             this.contextMenuStrip2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).EndInit();
             this.panelControl1.ResumeLayout(false);
@@ -520,9 +455,6 @@
         private DevExpress.XtraEditors.PanelControl panelControl2;
         public DevExpress.XtraGrid.GridControl gridControl3;
         public DevExpress.XtraGrid.Views.Grid.GridView gridView3;
-        private System.Windows.Forms.TabPage SUMMARYDETAIL;
-        private DevExpress.XtraGrid.GridControl gridControl4;
-        private DevExpress.XtraGrid.Views.Grid.GridView gridView4;
         private DevExpress.XtraEditors.SimpleButton btnforapprovalstsexcel;
     }
 }

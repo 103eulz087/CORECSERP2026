@@ -52,6 +52,7 @@
             this.txtvatablesale = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.txtpono = new System.Windows.Forms.TextBox();
+            this.txtinvoicedate = new System.Windows.Forms.TextBox();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl4)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView4)).BeginInit();
@@ -62,9 +63,9 @@
             // 
             this.groupBox2.Controls.Add(this.gridControl4);
             this.groupBox2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox2.Location = new System.Drawing.Point(0, 68);
+            this.groupBox2.Location = new System.Drawing.Point(0, 80);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(1167, 540);
+            this.groupBox2.Size = new System.Drawing.Size(1167, 528);
             this.groupBox2.TabIndex = 3;
             this.groupBox2.TabStop = false;
             // 
@@ -74,7 +75,7 @@
             this.gridControl4.Location = new System.Drawing.Point(3, 17);
             this.gridControl4.MainView = this.gridView4;
             this.gridControl4.Name = "gridControl4";
-            this.gridControl4.Size = new System.Drawing.Size(1161, 520);
+            this.gridControl4.Size = new System.Drawing.Size(1161, 508);
             this.gridControl4.TabIndex = 4;
             this.gridControl4.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView4});
@@ -109,6 +110,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.txtinvoicedate);
             this.groupBox1.Controls.Add(this.txtinvoiceno);
             this.groupBox1.Controls.Add(this.txtzeroratedsale);
             this.groupBox1.Controls.Add(this.txtdiscount);
@@ -132,14 +134,14 @@
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Top;
             this.groupBox1.Location = new System.Drawing.Point(0, 0);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(1167, 68);
+            this.groupBox1.Size = new System.Drawing.Size(1167, 80);
             this.groupBox1.TabIndex = 2;
             this.groupBox1.TabStop = false;
             this.groupBox1.Enter += new System.EventHandler(this.groupBox1_Enter);
             // 
             // txtinvoiceno
             // 
-            this.txtinvoiceno.Location = new System.Drawing.Point(213, 38);
+            this.txtinvoiceno.Location = new System.Drawing.Point(211, 43);
             this.txtinvoiceno.Name = "txtinvoiceno";
             this.txtinvoiceno.ReadOnly = true;
             this.txtinvoiceno.Size = new System.Drawing.Size(114, 21);
@@ -189,7 +191,7 @@
             this.simpleButton1.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.simpleButton1.Location = new System.Drawing.Point(6, 11);
             this.simpleButton1.Name = "simpleButton1";
-            this.simpleButton1.Size = new System.Drawing.Size(154, 36);
+            this.simpleButton1.Size = new System.Drawing.Size(154, 51);
             this.simpleButton1.TabIndex = 18;
             this.simpleButton1.Text = "Print";
             this.simpleButton1.Click += new System.EventHandler(this.simpleButton1_Click);
@@ -314,7 +316,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(166, 21);
+            this.label2.Location = new System.Drawing.Point(164, 19);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(36, 13);
             this.label2.TabIndex = 5;
@@ -322,11 +324,20 @@
             // 
             // txtpono
             // 
-            this.txtpono.Location = new System.Drawing.Point(213, 18);
+            this.txtpono.Location = new System.Drawing.Point(211, 16);
             this.txtpono.Name = "txtpono";
             this.txtpono.ReadOnly = true;
             this.txtpono.Size = new System.Drawing.Size(114, 21);
             this.txtpono.TabIndex = 4;
+            // 
+            // txtinvoicedate
+            // 
+            this.txtinvoicedate.Location = new System.Drawing.Point(504, 67);
+            this.txtinvoicedate.Name = "txtinvoicedate";
+            this.txtinvoicedate.ReadOnly = true;
+            this.txtinvoicedate.Size = new System.Drawing.Size(114, 21);
+            this.txtinvoicedate.TabIndex = 24;
+            this.txtinvoicedate.Visible = false;
             // 
             // SalesInvoiceDexEx
             // 
@@ -375,5 +386,6 @@
         public System.Windows.Forms.TextBox txtdiscount;
         public System.Windows.Forms.TextBox txtzeroratedsale;
         public System.Windows.Forms.TextBox txtinvoiceno;
+        public System.Windows.Forms.TextBox txtinvoicedate;
     }
 }

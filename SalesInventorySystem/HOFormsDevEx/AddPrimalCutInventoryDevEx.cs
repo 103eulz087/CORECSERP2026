@@ -209,7 +209,16 @@ namespace SalesInventorySystem.HOFormsDevEx
                 }
                 if (ifexist)
                 {
-                    cost = Database.getSingleQuery("TempCosting", "ItemCode='" + productcode + "' and ShipmentNo='" + txtshipmentno.Text + "'", "CostPerKg"); //get from excel anna uploading
+                    // TempCosting can now hold both a Per Shipment (BatchCode=0, wildcard) row
+                    // and a Per Shipment + Batch Code row for the same item -- prefer this
+                    // batch's own cost if it was set, otherwise fall back to the Per Shipment
+                    // cost. Without this, a bare ShipmentNo+ItemCode lookup would be
+                    // non-deterministic (TOP 1, no ORDER BY) once both rows can exist.
+                    bool batchCosted = Database.checkifExist("SELECT top 1 ItemCode FROM TempCosting WHERE ItemCode='" + productcode + "' and ShipmentNo='" + txtshipmentno.Text + "' and BatchCode='" + txtbatchcode.Text + "'");
+                    if (batchCosted)
+                        cost = Database.getSingleQuery("TempCosting", "ItemCode='" + productcode + "' and ShipmentNo='" + txtshipmentno.Text + "' and BatchCode='" + txtbatchcode.Text + "'", "CostPerKg");
+                    else
+                        cost = Database.getSingleQuery("TempCosting", "ItemCode='" + productcode + "' and ShipmentNo='" + txtshipmentno.Text + "' and BatchCode=0", "CostPerKg"); //get from excel anna uploading
                 }
                 else
                 {

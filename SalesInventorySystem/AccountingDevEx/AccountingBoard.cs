@@ -35,6 +35,7 @@ namespace SalesInventorySystem.AccountingDevEx
         private const string PageManualTicket = "navManualTicket";
         private const string PageBankRecon = "navBankRecon";
         private const string PageReports = "navReports";
+        private const string PageReportsV2 = "navReportsV2";
         private const string PageGLTicketEntries = "navGLTicketEntries";
 
         // ---------------------------------------------------------------
@@ -102,6 +103,12 @@ namespace SalesInventorySystem.AccountingDevEx
                 _accountingReports = new HOFormsDevEx.AccountingReportsForm();
                 _accountingReports.LoadData();
                 return _accountingReports;
+            },
+            [PageReportsV2] = () =>
+            {
+                _accountingReportsV2 = new HOFormsDevEx.AccountingReportsFormV2();
+                _accountingReportsV2.LoadData();
+                return _accountingReportsV2;
             },
             [PageGLTicketEntries] = () =>
             {
@@ -276,6 +283,7 @@ namespace SalesInventorySystem.AccountingDevEx
         private HOFormsDevEx.AccountMasterListDevEx _accountMasterList;
         private HOFormsDevEx.ManualJournalVoucherMultiBranchFrm _manualVoucherMultiBranch;
         private HOFormsDevEx.AccountingReportsForm _accountingReports;
+        private HOFormsDevEx.AccountingReportsFormV2 _accountingReportsV2;
         private AccountingDevEx.TicketInquiryFrm _accountingTicketReports;
         //private Reporting.ViewTicketDevExRep _accountingTicketReports;
         //private HOFormsDevEx.AddExpenseDevExFrm _addExpenseSingleMode;
@@ -308,6 +316,11 @@ namespace SalesInventorySystem.AccountingDevEx
         }
 
         private void menuPaymentList_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void menuReports_Click(object sender, EventArgs e)
         {
 
         }

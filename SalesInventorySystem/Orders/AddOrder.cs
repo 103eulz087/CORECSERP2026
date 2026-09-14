@@ -184,9 +184,21 @@ namespace SalesInventorySystem
         {
             try
             {
+                if (objprodcode == null || objprodcode == DBNull.Value)
+                {
+                    XtraMessageBox.Show("Please re-select the product from the list before adding.");
+                    return;
+                }
+
+                if (objcustkey == null || objcustkey == DBNull.Value)
+                {
+                    XtraMessageBox.Show("Please re-select the customer before adding.");
+                    return;
+                }
+
                 //var row = Database.getMultipleQuery("Customers", "CustomerName='" + txtcustomer.Text + "'", "CustomerID,isActive,CustomerCreditLimit");
                 string custid =  objcustkey.ToString();
-                string remaininglimit = objremaininglimit.ToString();
+                string remaininglimit = objremaininglimit?.ToString() ?? "0";
 
                 //string custid = row["CustomerID"].ToString();
                 //string isactive = row["isActive"].ToString();//Database.getSingleQuery("Customers", "CustomerName='" + txtcustomer.Text + "'", "isActive");//Classes.ClientAccount.getClientID(txtcust.Text);
@@ -399,7 +411,7 @@ namespace SalesInventorySystem
             textEdit1.Text = IDGenerator.getIDNumberSP("sp_GetPurchaseOrderNumber", "PONumber"); //IDGenerator.getPONumber();
 
             txtpname.Enabled = true;
-            Database.displaySearchlookupEdit("SELECT ProductCategory,ProductCode,Description FROM view_Products WHERE BranchCode='" + Login.assignedBranch + "' ", txtpname, "Description", "Description");
+            Database.displaySearchlookupEdit("SELECT ProductCategory,ProductCode,Description FROM view_Products WHERE BranchCode='" + Login.assignedBranch + "' ", txtpname, "Description", "ProductCode");
             populateCustomer(txtcustomer);
             loadMetrics();
         }
@@ -414,7 +426,12 @@ namespace SalesInventorySystem
         void populateCustomer(SearchLookUpEdit edit)
         {
             //Database.displayComboBoxItems("SELECT CustomerName FROM Customers", "CustomerName", txtcustomer);
-            Database.displaySearchlookupEdit("Select * FROM view_CustomerWithCreditLimit", edit, "CustomerName", "CustomerName");
+            // ValueMember was "CustomerName" (same as DisplayMember), so EditValue could never be
+            // used as a real key -- callers had to chase the popup grid's FocusedRowHandle instead
+            // (see txtcustomer_EditValueChanged), which is what caused the intermittent
+            // "Object reference not set to an instance of an object" on Add. Bound to the real
+            // CustomerKey now; DisplayMember (and therefore .Text) is unchanged.
+            Database.displaySearchlookupEdit($"Select * FROM [funcview_CustomerWithCreditLimit]('{Login.assignedBranch}')", edit, "CustomerName", "CustomerKey");
         }
         
         void saveAll()
@@ -426,6 +443,15 @@ namespace SalesInventorySystem
                     if (txtcustomer.Enabled == true && txtcustomer.Text == "")
                     {
                         XtraMessageBox.Show("Customer Field must be Selected!");
+                        return;
+                    }
+
+                    // txtcustomer.Text (the displayed name) can be non-empty while objcustkey is
+                    // still null/stale -- see txtcustomer_EditValueChanged. Catch that here too
+                    // instead of letting objcustkey.ToString() below throw.
+                    if (objcustkey == null || objcustkey == DBNull.Value)
+                    {
+                        XtraMessageBox.Show("Please re-select the customer before submitting.");
                         return;
                     }
                 }
@@ -518,9 +544,20 @@ namespace SalesInventorySystem
             {
                 if (panel1.Visible == true)
                 {
+                    // NOTE: this checks txtcustomer.Text (the main-tab customer field), but the
+                    // @CustomerKey sent below is srvccustid, which comes from txtcustomersservices
+                    // (a separate control on the Services tab). Left as-is rather than silently
+                    // changed -- flagging in case this mismatch is intentional; if not, this check
+                    // should probably read txtcustomersservices.Text instead.
                     if (txtcustomer.Enabled == true && txtcustomer.Text == "")
                     {
                         XtraMessageBox.Show("Customer Field must be Selected!");
+                        return;
+                    }
+
+                    if (srvccustid == null || srvccustid == DBNull.Value)
+                    {
+                        XtraMessageBox.Show("Please re-select the customer before submitting.");
                         return;
                     }
                 }
@@ -550,6 +587,8 @@ namespace SalesInventorySystem
                     com.Parameters.AddWithValue("@BranchCode", Login.assignedBranch);
                     com.Parameters.AddWithValue("@PaymentType", txtpaytypeservices.Text);
                     com.Parameters.AddWithValue("@RequestedBy", Login.Fullname);
+                    com.Parameters.AddWithValue("@EffectivityDate", txteffectivitydateservices.Text);
+                    com.Parameters.AddWithValue("@ControlNo", txtcontrolno.Text);
                     var tvpParam = com.Parameters.AddWithValue("@Lines", lines);
                     tvpParam.SqlDbType = SqlDbType.Structured;
                     tvpParam.TypeName = "dbo.tt_ServiceOrderLines";
@@ -614,7 +653,12 @@ namespace SalesInventorySystem
 
         private void txtpname_EditValueChanged(object sender, EventArgs e)
         {
-            objprodcode = SearchLookUpClass.getSingleValue(txtpname, "ProductCode");
+            // Was: SearchLookUpClass.getSingleValue(txtpname, "ProductCode"), which reads the popup
+            // grid's FocusedRowHandle instead of the control's committed value -- goes stale/null
+            // right after txtpname.Text is cleared (line ~306) or during incremental search, causing
+            // "Object reference not set to an instance of an object" at add2() (was line 197).
+            // ValueMember is now bound to ProductCode (see LoadData()), so EditValue is reliable.
+            objprodcode = txtpname.EditValue;
             txtqty.Focus();
         }
 
@@ -682,6 +726,14 @@ namespace SalesInventorySystem
 
         private void btnsave_Click(object sender, EventArgs e)
         {
+            // objcustkey can be null/stale here (see txtcustomer_EditValueChanged) if the customer
+            // lookup never committed -- guard before .ToString() below throws on Save/F5.
+            if (panel1.Visible == true && (objcustkey == null || objcustkey == DBNull.Value))
+            {
+                XtraMessageBox.Show("Please re-select the customer before saving.");
+                return;
+            }
+
             string creditlimit = Database.getSingleQuery("Customers", "CustomerName='" + txtcustomer.Text + "'", "CustomerCreditLimit");
             //string accountbalance = Database.getSingleQuery("ClientAccounts", "AccountID='" + Customers.getCustAccountID(txtcustomer.Text) + "'", "AccountBalance");
             string accountbalance = Database.getSingleQuery("ClientAccounts", "AccountKey='" + objcustkey.ToString() + "'", "AccountBalance");
@@ -800,10 +852,40 @@ namespace SalesInventorySystem
 
         private void txtcustomer_EditValueChanged(object sender, EventArgs e)
         {
-            objcustkey = SearchLookUpClass.getSingleValue(txtcustomer, "CustomerKey");
-            objcreditmlimit = SearchLookUpClass.getSingleValue(txtcustomer, "CreditLimit");
-            objbalance = SearchLookUpClass.getSingleValue(txtcustomer, "Balance");
-            objremaininglimit = SearchLookUpClass.getSingleValue(txtcustomer, "RemainingLimit");
+            // Was: SearchLookUpClass.getSingleValue(txtcustomer, "..."), which reads the popup
+            // grid's FocusedRowHandle instead of the control's committed value -- desyncs (goes
+            // stale/invalid) during incremental search or right after the form resets the field,
+            // causing "Object reference not set to an instance of an object" wherever objcustkey
+            // is later .ToString()'d in add2()/saveAll(). ValueMember is now bound to CustomerKey
+            // (see populateCustomer()), so EditValue is reliable; the other three fields are looked
+            // up from the already-loaded customer DataTable by that key instead of a focused row.
+            objcustkey = txtcustomer.EditValue;
+            objcreditmlimit = null;
+            objbalance = null;
+            objremaininglimit = null;
+
+            DataRow row = FindLookupRow(txtcustomer, "CustomerKey", objcustkey);
+            if (row != null)
+            {
+                objcreditmlimit = row["CreditLimit"];
+                objbalance = row["Balance"];
+                objremaininglimit = row["RemainingLimit"];
+            }
+        }
+
+        // Looks up a row in a SearchLookUpEdit's own bound DataTable by key column/value --
+        // deterministic, unlike reading the popup grid's FocusedRowHandle (see note above).
+        static DataRow FindLookupRow(SearchLookUpEdit edit, string keyColumn, object keyValue)
+        {
+            if (keyValue == null || keyValue == DBNull.Value)
+                return null;
+
+            if (!(edit.Properties.DataSource is DataTable table))
+                return null;
+
+            string escaped = keyValue.ToString().Replace("'", "''");
+            DataRow[] rows = table.Select($"{keyColumn} = '{escaped}'");
+            return rows.Length > 0 ? rows[0] : null;
         }
 
         void populateServices()
@@ -830,7 +912,7 @@ namespace SalesInventorySystem
         {
 
  
-            if (String.IsNullOrEmpty(txtqtyservices.Text)  || String.IsNullOrEmpty(txtcustomersservices.Text) || String.IsNullOrEmpty(txtpaytypeservices.Text))
+            if (String.IsNullOrEmpty(txtqtyservices.Text)  || String.IsNullOrEmpty(txtcustomersservices.Text) || String.IsNullOrEmpty(txtpaytypeservices.Text) || String.IsNullOrEmpty(txteffectivitydateservices.Text))
             {
                 XtraMessageBox.Show("Fields must not Empty");
             }
@@ -838,7 +920,7 @@ namespace SalesInventorySystem
             else
             {
                 int count = 0;
-                bool checkifexists = Database.checkifExist("SELECT top 1 PONumber FROM PurchaseOrderDetails WHERE PONumber='" + txtposervices.Text + "' AND ProductName='" + txtservices.Text.Trim() + "'");
+                bool checkifexists = Database.checkifExist("SELECT TOP(1) PONumber FROM PurchaseOrderDetails WHERE PONumber='" + txtposervices.Text + "' AND ProductName='" + txtservices.Text.Trim() + "'");
 
                 for (int i = 0; i <= gridViewitem.RowCount - 1; i++)
                 {
@@ -883,13 +965,21 @@ namespace SalesInventorySystem
 
         double getCustBalance()
         {
-            double balance = 0.0;
-            balance = Database.getTotalSummation2("TransactionChargeSales", "CustomerKey='" + Classes.ClientAccount.getClientKey(srvccustid.ToString()) + "' AND PayStatus <> 'FULLYPAID' ", "Balance");
+            if (srvccustid == null || srvccustid == DBNull.Value)
+                return 0.0;
+
+            double balance = Database.getTotalSummation2("TransactionChargeSales", "CustomerKey='" + Classes.ClientAccount.getClientKey(srvccustid.ToString()) + "' AND PayStatus <> 'FULLYPAID' ", "Balance");
             return Math.Round(balance, 2);
         }
 
         private void simpleButton4_Click_1(object sender, EventArgs e)
         {
+            if (srvccustid == null || srvccustid == DBNull.Value)
+            {
+                XtraMessageBox.Show("Please re-select the customer before checking credit limit.");
+                return;
+            }
+
             string creditlimit = Database.getSingleQuery("Customers", "CustomerName='" + txtcustomersservices.Text + "'", "CustomerCreditLimit");
             string accountbalance = getCustBalance().ToString();
             string enableCreditLimit = Database.getSingleQuery("SalesSettings", "EnableCreditLimit is not null", "EnableCreditLimit");
@@ -968,7 +1058,8 @@ namespace SalesInventorySystem
 
         private void txtcustomersservices_EditValueChanged(object sender, EventArgs e)
         {
-            srvccustid = SearchLookUpClass.getSingleValue(txtcustomersservices, "CustomerKey");
+            // Same FocusedRowHandle desync issue as txtcustomer_EditValueChanged -- see its comment.
+            srvccustid = txtcustomersservices.EditValue;
         }
     }
 }

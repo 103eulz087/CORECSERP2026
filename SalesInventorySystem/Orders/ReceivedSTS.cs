@@ -163,6 +163,7 @@ namespace SalesInventorySystem.Orders
         {
             if (e.Button == MouseButtons.Right)
                 contextMenuStripForReceiving.Show(gridControlForReceiving, e.Location);
+            contextMenuStripForReceiving.Items[0].Visible = false;
         }
 
         private void showForReceivingItemsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -181,6 +182,30 @@ namespace SalesInventorySystem.Orders
             {
                 display();
                 HOFormsDevEx.ReceivedSTSBatchMode.isdone = false;
+                askdh.Dispose();
+            }
+        }
+
+        // Parallel entry point: receives against InventoryDeliveryFIFO instead
+        // of DeliveryDetails, so the received item carries the true source-lot
+        // ReferenceCode. Does not touch showForReceivingItemsToolStripMenuItem_Click
+        // above or anything it calls.
+        private void showForReceivingItemsFIFOToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string pono;
+            pono = gridViewForReceiving.GetRowCellValue(gridViewForReceiving.FocusedRowHandle, "PONumber").ToString();
+            HOFormsDevEx.ReceivedSTSBatchModeFIFO askdh = new HOFormsDevEx.ReceivedSTSBatchModeFIFO();
+
+            askdh.txtshipmentno.Text = pono;
+            string query = $"SELECT * FROM dbo.[funcview_InventoryDeliveryFIFOForReceiving]('{pono}') ";
+            HelperFunction.ShowWaitAndDisplayNonAsync(query, askdh.gridControlRcvd, askdh.gridViewRcvd, "Please wait", "Populating data into the database...");
+
+            askdh.gridViewRcvd.Focus();
+            askdh.ShowDialog(this);
+            if (HOFormsDevEx.ReceivedSTSBatchModeFIFO.isdone == true)
+            {
+                display();
+                HOFormsDevEx.ReceivedSTSBatchModeFIFO.isdone = false;
                 askdh.Dispose();
             }
         }

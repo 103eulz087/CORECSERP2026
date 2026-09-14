@@ -384,7 +384,7 @@ namespace SalesInventorySystem
             {
                 string actionlogs = "CANCEL REJECTED REQUEST with PONumber=" + gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "PONumber").ToString() + " ";
                 Database.ExecuteQuery("insert into HistoryLogs values('" + Login.Fullname + "','" + DateTime.Now.ToShortDateString() + "','" + actionlogs + "','" + Login.assignedBranch + "')");
-                Database.ExecuteQuery("Update PurchaseOrderSummary SET Status='REJECTED' Remarks='" + richTextBox1.Text.Trim() + "' WHERE PONumber='" + gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "PONumber").ToString() + "'", "Successfully Executed");
+                Database.ExecuteQuery("Update PurchaseOrderSummary SET Status='REJECTED', Remarks='" + richTextBox1.Text.Trim() + "' WHERE PONumber='" + gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "PONumber").ToString() + "'", "Successfully Executed");
             }
             else
                 return;

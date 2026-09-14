@@ -11,6 +11,7 @@ using DevExpress.XtraEditors;
 using DevExpress.XtraReports.UI;
 using DevExpress.XtraGrid.Views.Grid;
 using System.Data.SqlClient;
+using SalesInventorySystem.Classes;
 
 namespace SalesInventorySystem.Orders
 {
@@ -97,6 +98,7 @@ namespace SalesInventorySystem.Orders
                 try
                 {
                     submitDecision("APPROVED");
+                    BigAlert.Show("APPROVED", "Successfully Approved!..", MessageBoxIcon.Information);
                     isdone = true;
                     this.Close();
                 }
@@ -176,7 +178,7 @@ namespace SalesInventorySystem.Orders
             //gridView1.Columns["ProductCategoryCode"].OptionsColumn.Printable = DevExpress.Utils.DefaultBoolean.False;
             gridView1.Columns["Category"].OptionsColumn.Printable = DevExpress.Utils.DefaultBoolean.False;
             gridView1.Columns["ProductCode"].OptionsColumn.Printable = DevExpress.Utils.DefaultBoolean.False;
-            gridView1.Columns["ProductName"].OptionsColumn.Printable = DevExpress.Utils.DefaultBoolean.False;
+            //gridView1.Columns["ProductName"].OptionsColumn.Printable = DevExpress.Utils.DefaultBoolean.False;
             //gridView1.Columns["Qty"].OptionsColumn.Printable = DevExpress.Utils.DefaultBoolean.False; 
 
             this.gridView1.Columns["PONumber"].Visible = false;

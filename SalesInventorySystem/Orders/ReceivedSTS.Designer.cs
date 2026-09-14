@@ -54,6 +54,7 @@
             this.label7 = new System.Windows.Forms.Label();
             this.contextMenuStripForReceiving = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.showForReceivingItemsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.showForReceivingItemsFIFOToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStripMyRequest = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.tabMain)).BeginInit();
@@ -348,17 +349,25 @@
             // 
             this.contextMenuStripForReceiving.ImageScalingSize = new System.Drawing.Size(32, 32);
             this.contextMenuStripForReceiving.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.showForReceivingItemsToolStripMenuItem});
+            this.showForReceivingItemsToolStripMenuItem,
+            this.showForReceivingItemsFIFOToolStripMenuItem});
             this.contextMenuStripForReceiving.Name = "contextMenuStripForReceiving";
-            this.contextMenuStripForReceiving.Size = new System.Drawing.Size(246, 28);
-            // 
+            this.contextMenuStripForReceiving.Size = new System.Drawing.Size(246, 52);
+            //
             // showForReceivingItemsToolStripMenuItem
-            // 
+            //
             this.showForReceivingItemsToolStripMenuItem.Name = "showForReceivingItemsToolStripMenuItem";
             this.showForReceivingItemsToolStripMenuItem.Size = new System.Drawing.Size(245, 24);
             this.showForReceivingItemsToolStripMenuItem.Text = "Show for Receiving Items";
             this.showForReceivingItemsToolStripMenuItem.Click += new System.EventHandler(this.showForReceivingItemsToolStripMenuItem_Click);
-            // 
+            //
+            // showForReceivingItemsFIFOToolStripMenuItem
+            //
+            this.showForReceivingItemsFIFOToolStripMenuItem.Name = "showForReceivingItemsFIFOToolStripMenuItem";
+            this.showForReceivingItemsFIFOToolStripMenuItem.Size = new System.Drawing.Size(245, 24);
+            this.showForReceivingItemsFIFOToolStripMenuItem.Text = "Show for Receiving Items (Source Ref Code)";
+            this.showForReceivingItemsFIFOToolStripMenuItem.Click += new System.EventHandler(this.showForReceivingItemsFIFOToolStripMenuItem_Click);
+            //
             // contextMenuStripMyRequest
             // 
             this.contextMenuStripMyRequest.ImageScalingSize = new System.Drawing.Size(32, 32);
@@ -432,6 +441,7 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.ContextMenuStrip contextMenuStripForReceiving;
         private System.Windows.Forms.ToolStripMenuItem showForReceivingItemsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem showForReceivingItemsFIFOToolStripMenuItem;
         private System.Windows.Forms.ContextMenuStrip contextMenuStripMyRequest;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
     }

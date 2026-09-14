@@ -36,6 +36,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             new KeyValuePair<string, string>("navManualTicket", "Manual Ticket"),
             new KeyValuePair<string, string>("navBankRecon", "Bank Recon"),
             new KeyValuePair<string, string>("navReports", "Reports"),
+            new KeyValuePair<string, string>("navReportsV2", "Reports V2"),
             new KeyValuePair<string, string>("navGLTicketEntries", "GL Ticket Entries"),
         };
 

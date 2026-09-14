@@ -59,10 +59,10 @@ namespace SalesInventorySystem.Reporting
             con.Open();
             string query = "spr_InventoryUnitActivity";
             SqlCommand com = new SqlCommand(query, con);
-            com.Parameters.AddWithValue("@parmbranchcode",txtbrcode.Text);
-            //com.Parameters.AddWithValue("@parmdatefrom",getDate());
-            //com.Parameters.AddWithValue("@parmdateto", getLastDate());
-            
+            com.Parameters.AddWithValue("@parmbrcode", txtbrcode.Text);
+            com.Parameters.AddWithValue("@parmdatefrom", getDate());
+            com.Parameters.AddWithValue("@parmdateto", getLastDate());
+
             com.CommandType = CommandType.StoredProcedure;
             com.CommandText = query;
             com.ExecuteNonQuery();

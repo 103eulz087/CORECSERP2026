@@ -1051,9 +1051,15 @@ namespace SalesInventorySystem
             //brnchs.Show();
         }
 
+        private void btnCustomersInfoV2_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            OpenMdiForm<HOFormsDevEx.CustomersInfoV2DevEx>();
+        }
+
         private void barButtonItem31_ItemClick(object sender, ItemClickEventArgs e)
         {
-            OpenMdiForm<HOFormsDevEx.CustomersInfoDevEx>();
+            //OpenMdiForm<HOFormsDevEx.CustomersInfoDevEx>();
+            OpenMdiForm<HOFormsDevEx.CustomersInfoV2DevEx>();
             //foreach (Form form in Application.OpenForms)
             //{
             //    //   if (form.GetType() == typeof(HOForms.CustomersFrm))
@@ -1405,7 +1411,7 @@ namespace SalesInventorySystem
             //}
             //InventoryIN pcusatfsmr = new InventoryIN();
             //pcusatfsmr.Show();
-            if(GlobalCache.CompanyName=="ENZO")
+            if(GlobalCache.CompanyName=="ENZO" || GlobalCache.CompanyName == "JFC")
             {
                 foreach (Form form in Application.OpenForms)
                 {
@@ -1417,7 +1423,8 @@ namespace SalesInventorySystem
                 }
                 ReInventoryIn pcusatfsmr = new ReInventoryIn();
                 pcusatfsmr.Show();
-            }else if(GlobalCache.CompanyName == "VROSS")
+            }
+            else if(GlobalCache.CompanyName == "VROSS")
             {
                 OpenMdiForm<POS.POSInventoryIN>();
                 //foreach (Form form in Application.OpenForms)  //LAST USED
@@ -3581,6 +3588,30 @@ namespace SalesInventorySystem
         {
 
             ConversionReports pcusatfsmr = new ConversionReports();
+            pcusatfsmr.Show(this);
+        }
+
+        private void btnInventoryReport_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            Reporting.InventoryReport pcusatfsmr = new Reporting.InventoryReport();
+            pcusatfsmr.Show(this);
+        }
+
+        private void btnConversionReportMasterDetail_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            Reporting.ConversionReportMasterDetail pcusatfsmr = new Reporting.ConversionReportMasterDetail();
+            pcusatfsmr.Show(this);
+        }
+
+        private void btnInventoryUnitActivityReport_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            Reporting.InventoryUnitActivityReport pcusatfsmr = new Reporting.InventoryUnitActivityReport();
+            pcusatfsmr.Show(this);
+        }
+
+        private void btnItemCostingReport_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            Reporting.ItemCostingReport pcusatfsmr = new Reporting.ItemCostingReport();
             pcusatfsmr.Show(this);
         }
 
