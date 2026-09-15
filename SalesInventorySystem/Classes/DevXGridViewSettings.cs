@@ -176,6 +176,42 @@ namespace SalesInventorySystem.Classes
             view.Columns[col].Summary.Add(DevExpress.Data.SummaryItemType.Count, col, "{0}");
             //return view;
         }
+
+        // Standard "totals band" appearance for grid footers/group summaries -- Tahoma 9.75F
+        // Bold, dark-brown text (102,60,0) on a warm cream band (255,244,214). Reference
+        // implementation: POS/POSSalesReportDevEx.cs's SalesTransactionSummary tab (gridView1/
+        // gridView2 constructor wiring). Call once per view (e.g. in the form's constructor or
+        // Load, same as that reference) rather than copying the Font/Color literals into each
+        // new module -- keeps every report/grid's totals band visually identical, and a future
+        // palette change only needs to happen here. See CLAUDE.md's "Grid footer/totals band
+        // styling" convention.
+        public static void ApplyTotalsBandAppearance(GridView view)
+        {
+            Font font = new Font("Tahoma", 9.75F, FontStyle.Bold);
+            Color foreColor = Color.FromArgb(102, 60, 0);
+            Color backColor = Color.FromArgb(255, 244, 214);
+
+            view.Appearance.FooterPanel.Font = font;
+            view.Appearance.FooterPanel.ForeColor = foreColor;
+            view.Appearance.FooterPanel.BackColor = backColor;
+            view.Appearance.FooterPanel.Options.UseFont = true;
+            view.Appearance.FooterPanel.Options.UseForeColor = true;
+            view.Appearance.FooterPanel.Options.UseBackColor = true;
+
+            view.Appearance.GroupFooter.Font = font;
+            view.Appearance.GroupFooter.ForeColor = foreColor;
+            view.Appearance.GroupFooter.BackColor = backColor;
+            view.Appearance.GroupFooter.Options.UseFont = true;
+            view.Appearance.GroupFooter.Options.UseForeColor = true;
+            view.Appearance.GroupFooter.Options.UseBackColor = true;
+
+            view.Appearance.GroupRow.Font = font;
+            view.Appearance.GroupRow.ForeColor = foreColor;
+            view.Appearance.GroupRow.BackColor = backColor;
+            view.Appearance.GroupRow.Options.UseFont = true;
+            view.Appearance.GroupRow.Options.UseForeColor = true;
+            view.Appearance.GroupRow.Options.UseBackColor = true;
+        }
         //private static GridView rowstyle(object sender, DevExpress.XtraGrid.Views.Grid.RowStyleEventArgs e,params string[] str,string highlightedcol)
         //{
         //    GridView view = sender as GridView;

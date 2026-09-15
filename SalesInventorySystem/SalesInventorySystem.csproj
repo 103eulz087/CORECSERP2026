@@ -1015,7 +1015,7 @@
       <DependentUpon>AccountingReportsForm.cs</DependentUpon>
     </Compile>
     <Compile Include="HOFormsDevEx\AccountingReportsFormV2.cs">
-      <SubType>UserControl</SubType>
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="HOFormsDevEx\AccountingReportsFormV2.Designer.cs">
       <DependentUpon>AccountingReportsFormV2.cs</DependentUpon>

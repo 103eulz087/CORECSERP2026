@@ -89,7 +89,7 @@
             this.btnBatchProcess = new DevExpress.XtraBars.BarButtonItem();
             this.btnTickets = new DevExpress.XtraBars.BarButtonItem();
             this.btnGLSummary = new DevExpress.XtraBars.BarButtonItem();
-            this.btnBalanceSheet = new DevExpress.XtraBars.BarButtonItem();
+            this.btnFinanceReport = new DevExpress.XtraBars.BarButtonItem();
             this.btnIncomeStatement = new DevExpress.XtraBars.BarButtonItem();
             this.btnPOSReportReading = new DevExpress.XtraBars.BarButtonItem();
             this.btnReturnInventory = new DevExpress.XtraBars.BarButtonItem();
@@ -402,7 +402,7 @@
             this.btnBatchProcess,
             this.btnTickets,
             this.btnGLSummary,
-            this.btnBalanceSheet,
+            this.btnFinanceReport,
             this.btnIncomeStatement,
             this.btnPOSReportReading,
             this.btnReturnInventory,
@@ -1120,15 +1120,15 @@
             this.btnGLSummary.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
             this.btnGLSummary.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.barButtonItem49_ItemClick);
             // 
-            // btnBalanceSheet
+            // btnFinanceReport
             // 
-            this.btnBalanceSheet.Caption = "Balance Sheet";
-            this.btnBalanceSheet.CategoryGuid = new System.Guid("6ffddb2b-9015-4d97-a4c1-91613e0ef537");
-            this.btnBalanceSheet.Id = 57;
-            this.btnBalanceSheet.ImageOptions.LargeImage = ((System.Drawing.Image)(resources.GetObject("btnBalanceSheet.ImageOptions.LargeImage")));
-            this.btnBalanceSheet.Name = "btnBalanceSheet";
-            this.btnBalanceSheet.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
-            this.btnBalanceSheet.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.barButtonItem50_ItemClick);
+            this.btnFinanceReport.Caption = "Financial Report";
+            this.btnFinanceReport.CategoryGuid = new System.Guid("6ffddb2b-9015-4d97-a4c1-91613e0ef537");
+            this.btnFinanceReport.Id = 57;
+            this.btnFinanceReport.ImageOptions.LargeImage = ((System.Drawing.Image)(resources.GetObject("btnBalanceSheet.ImageOptions.LargeImage")));
+            this.btnFinanceReport.Name = "btnFinanceReport";
+            this.btnFinanceReport.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
+            this.btnFinanceReport.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.barButtonItem50_ItemClick);
             // 
             // btnIncomeStatement
             // 
@@ -2253,7 +2253,6 @@
             this.btnARPayments.Caption = "AR Payments";
             this.btnARPayments.Id = 178;
             this.btnARPayments.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnARPayments.ImageOptions.Image")));
-            this.btnARPayments.ImageOptions.LargeImage = ((System.Drawing.Image)(resources.GetObject("btnARPayments.ImageOptions.LargeImage")));
             this.btnARPayments.Name = "btnARPayments";
             this.btnARPayments.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnARPayments_ItemClick);
             // 
@@ -2709,6 +2708,7 @@
             this.btnBranchInterBranchTransfer.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("btnBranchInterBranchTransfer.ImageOptions.SvgImage")));
             this.btnBranchInterBranchTransfer.Name = "btnBranchInterBranchTransfer";
             this.btnBranchInterBranchTransfer.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
+            this.btnBranchInterBranchTransfer.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnBranchInterBranchTransfer_ItemClick);
             // 
             // btnInventoryConsoReport
             // 
@@ -3105,7 +3105,7 @@
             // 
             this.ribbonPageGroup24.ItemLinks.Add(this.btnTickets);
             this.ribbonPageGroup24.ItemLinks.Add(this.btnGLSummary);
-            this.ribbonPageGroup24.ItemLinks.Add(this.btnBalanceSheet);
+            this.ribbonPageGroup24.ItemLinks.Add(this.btnFinanceReport);
             this.ribbonPageGroup24.ItemLinks.Add(this.btnIncomeStatement);
             this.ribbonPageGroup24.ItemLinks.Add(this.btnAccountingAging);
             this.ribbonPageGroup24.ItemLinks.Add(this.btnCreditMemo);
@@ -3444,7 +3444,7 @@
         private DevExpress.XtraBars.BarButtonItem btnBatchProcess;
         private DevExpress.XtraBars.BarButtonItem btnTickets;
         private DevExpress.XtraBars.BarButtonItem btnGLSummary;
-        private DevExpress.XtraBars.BarButtonItem btnBalanceSheet;
+        private DevExpress.XtraBars.BarButtonItem btnFinanceReport;
         private DevExpress.XtraBars.BarButtonItem btnIncomeStatement;
         private DevExpress.XtraBars.Ribbon.RibbonPageGroup ribbonPageGroup16;
         private DevExpress.XtraBars.BarButtonItem btnPOSReportReading;

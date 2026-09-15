@@ -31,6 +31,13 @@ namespace SalesInventorySystem.AccountingDevEx
             chkPay.AllowGrayed = false;
 
             gridControl2.RepositoryItems.Add(chkPay);
+
+            // Uniform "totals band" styling across the app's report/grid footers -- same
+            // reference appearance as POS/POSSalesReportDevEx.cs's SalesTransactionSummary tab.
+            // See DevXGridViewSettings.ApplyTotalsBandAppearance and CLAUDE.md's "Grid footer/
+            // totals band styling" convention.
+            Classes.DevXGridViewSettings.ApplyTotalsBandAppearance(gridView2);
+            Classes.DevXGridViewSettings.ApplyTotalsBandAppearance(gridViewPaymentDetails);
         }
 
         // ── LOAD ────────────────────────────────────────────────────────
