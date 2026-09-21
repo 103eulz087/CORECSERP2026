@@ -155,7 +155,8 @@ namespace SalesInventorySystem.Classes
 
         public static void ShowFooterTotal(GridView view,string col)
         {
-          
+            if (view.Columns[col] == null) return;   // NEW - avoid NRE when a caller's result shape doesn't include this column
+
             GridGroupSummaryItem ite11 = new GridGroupSummaryItem();
             ite11.FieldName = col;
             ite11.SummaryType = DevExpress.Data.SummaryItemType.Sum;
@@ -163,6 +164,26 @@ namespace SalesInventorySystem.Classes
             view.GroupSummary.Add(ite11);
             view.Columns[col].Summary.Add(DevExpress.Data.SummaryItemType.Sum, col, "{0:n2}");
             //return view;
+        }
+
+        // Sets DisplayFormat (numeric, "n2") on exactly the named columns' row
+        // cells -- NOT the whole view (unlike setGridFormat above, which blindly
+        // formats every non-DateTime column and would corrupt any text/lookup
+        // column in a mixed grid). ShowFooterTotal only formats the footer sum;
+        // per CLAUDE.md's "Reporting Quantity/Amount columns must be numeric"
+        // convention, the row cells need this separately, or a report grid's
+        // Debit/Credit/Amount columns render unformatted even though the
+        // footer total looks right. Call once per view after binding (same
+        // timing as ShowFooterTotal). Missing/absent columns are skipped, not
+        // an error, so this is safe to call against a result shape that varies.
+        public static void FormatNumericColumns(GridView view, params string[] columnNames)
+        {
+            foreach (var col in columnNames)
+            {
+                if (view.Columns[col] == null) continue;
+                view.Columns[col].DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+                view.Columns[col].DisplayFormat.FormatString = "n2";
+            }
         }
 
         public static void ShowFooterCountTotal(GridView view, string col)

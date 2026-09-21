@@ -85,69 +85,77 @@
             this.grpSearch.Controls.Add(this.btnSearch);
             this.grpSearch.Dock = System.Windows.Forms.DockStyle.Top;
             this.grpSearch.Location = new System.Drawing.Point(0, 0);
+            this.grpSearch.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.grpSearch.Name = "grpSearch";
-            this.grpSearch.Size = new System.Drawing.Size(950, 95);
+            this.grpSearch.Size = new System.Drawing.Size(814, 77);
             this.grpSearch.TabIndex = 2;
             this.grpSearch.Text = "Search — Ticket Number or Reference Number";
             // 
             // lblSearchTerm
             // 
-            this.lblSearchTerm.Location = new System.Drawing.Point(16, 50);
+            this.lblSearchTerm.Location = new System.Drawing.Point(14, 41);
+            this.lblSearchTerm.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.lblSearchTerm.Name = "lblSearchTerm";
-            this.lblSearchTerm.Size = new System.Drawing.Size(45, 16);
+            this.lblSearchTerm.Size = new System.Drawing.Size(37, 13);
             this.lblSearchTerm.TabIndex = 0;
             this.lblSearchTerm.Text = "Search:";
             // 
             // txtSearchTerm
             // 
-            this.txtSearchTerm.Location = new System.Drawing.Point(90, 47);
+            this.txtSearchTerm.Location = new System.Drawing.Point(77, 38);
+            this.txtSearchTerm.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.txtSearchTerm.Name = "txtSearchTerm";
             this.txtSearchTerm.Properties.NullText = "Ticket # or Reference #...";
-            this.txtSearchTerm.Size = new System.Drawing.Size(260, 22);
+            this.txtSearchTerm.Size = new System.Drawing.Size(223, 20);
             this.txtSearchTerm.TabIndex = 1;
             this.txtSearchTerm.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TxtSearchTerm_KeyDown);
             // 
             // lblDateFrom
             // 
-            this.lblDateFrom.Location = new System.Drawing.Point(370, 50);
+            this.lblDateFrom.Location = new System.Drawing.Point(317, 41);
+            this.lblDateFrom.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.lblDateFrom.Name = "lblDateFrom";
-            this.lblDateFrom.Size = new System.Drawing.Size(35, 16);
+            this.lblDateFrom.Size = new System.Drawing.Size(28, 13);
             this.lblDateFrom.TabIndex = 2;
             this.lblDateFrom.Text = "From:";
             // 
             // txtDateFrom
             // 
             this.txtDateFrom.EditValue = new System.DateTime(2026, 7, 29, 0, 0, 0, 0);
-            this.txtDateFrom.Location = new System.Drawing.Point(410, 47);
+            this.txtDateFrom.Location = new System.Drawing.Point(351, 38);
+            this.txtDateFrom.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.txtDateFrom.Name = "txtDateFrom";
             this.txtDateFrom.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.txtDateFrom.Size = new System.Drawing.Size(120, 22);
+            this.txtDateFrom.Size = new System.Drawing.Size(103, 20);
             this.txtDateFrom.TabIndex = 3;
             // 
             // lblDateTo
             // 
-            this.lblDateTo.Location = new System.Drawing.Point(545, 50);
+            this.lblDateTo.Location = new System.Drawing.Point(467, 41);
+            this.lblDateTo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.lblDateTo.Name = "lblDateTo";
-            this.lblDateTo.Size = new System.Drawing.Size(20, 16);
+            this.lblDateTo.Size = new System.Drawing.Size(16, 13);
             this.lblDateTo.TabIndex = 4;
             this.lblDateTo.Text = "To:";
             // 
             // txtDateTo
             // 
             this.txtDateTo.EditValue = new System.DateTime(2026, 7, 29, 0, 0, 0, 0);
-            this.txtDateTo.Location = new System.Drawing.Point(570, 47);
+            this.txtDateTo.Location = new System.Drawing.Point(489, 38);
+            this.txtDateTo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.txtDateTo.Name = "txtDateTo";
             this.txtDateTo.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.txtDateTo.Size = new System.Drawing.Size(120, 22);
+            this.txtDateTo.Size = new System.Drawing.Size(103, 20);
             this.txtDateTo.TabIndex = 5;
             // 
             // btnSearch
             // 
-            this.btnSearch.Location = new System.Drawing.Point(696, 45);
+            this.btnSearch.Location = new System.Drawing.Point(597, 37);
+            this.btnSearch.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btnSearch.Name = "btnSearch";
-            this.btnSearch.Size = new System.Drawing.Size(110, 26);
+            this.btnSearch.Size = new System.Drawing.Size(94, 21);
             this.btnSearch.TabIndex = 6;
             this.btnSearch.Text = "Search";
             this.btnSearch.Click += new System.EventHandler(this.BtnSearch_Click);
@@ -157,9 +165,10 @@
             this.grpResults.Controls.Add(this.gridControlResults);
             this.grpResults.Controls.Add(this.btnViewDetails);
             this.grpResults.Dock = System.Windows.Forms.DockStyle.Top;
-            this.grpResults.Location = new System.Drawing.Point(0, 95);
+            this.grpResults.Location = new System.Drawing.Point(0, 77);
+            this.grpResults.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.grpResults.Name = "grpResults";
-            this.grpResults.Size = new System.Drawing.Size(950, 240);
+            this.grpResults.Size = new System.Drawing.Size(814, 239);
             this.grpResults.TabIndex = 1;
             this.grpResults.Text = "Matching Tickets (each row is ONE ticket, regardless of how many branches it touc" +
     "hed)";
@@ -167,27 +176,32 @@
             // gridControlResults
             // 
             this.gridControlResults.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControlResults.Location = new System.Drawing.Point(2, 28);
+            this.gridControlResults.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.gridControlResults.Location = new System.Drawing.Point(2, 23);
             this.gridControlResults.MainView = this.gridViewResults;
+            this.gridControlResults.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.gridControlResults.Name = "gridControlResults";
-            this.gridControlResults.Size = new System.Drawing.Size(946, 210);
+            this.gridControlResults.Size = new System.Drawing.Size(810, 214);
             this.gridControlResults.TabIndex = 0;
             this.gridControlResults.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewResults});
             // 
             // gridViewResults
             // 
+            this.gridViewResults.DetailHeight = 284;
             this.gridViewResults.GridControl = this.gridControlResults;
             this.gridViewResults.Name = "gridViewResults";
             this.gridViewResults.OptionsBehavior.Editable = false;
+            this.gridViewResults.OptionsEditForm.PopupEditFormWidth = 686;
             this.gridViewResults.OptionsView.ShowGroupPanel = false;
             this.gridViewResults.DoubleClick += new System.EventHandler(this.GridViewResults_DoubleClick);
             // 
             // btnViewDetails
             // 
-            this.btnViewDetails.Location = new System.Drawing.Point(16, 205);
+            this.btnViewDetails.Location = new System.Drawing.Point(14, 167);
+            this.btnViewDetails.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btnViewDetails.Name = "btnViewDetails";
-            this.btnViewDetails.Size = new System.Drawing.Size(130, 28);
+            this.btnViewDetails.Size = new System.Drawing.Size(111, 23);
             this.btnViewDetails.TabIndex = 1;
             this.btnViewDetails.Text = "View Details";
             this.btnViewDetails.Click += new System.EventHandler(this.BtnViewDetails_Click);
@@ -197,19 +211,22 @@
             this.grpDetails.Controls.Add(this.gridControlDetails);
             this.grpDetails.Controls.Add(this.lblTicketHeader);
             this.grpDetails.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.grpDetails.Location = new System.Drawing.Point(0, 335);
+            this.grpDetails.Location = new System.Drawing.Point(0, 316);
+            this.grpDetails.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.grpDetails.Name = "grpDetails";
-            this.grpDetails.Size = new System.Drawing.Size(950, 365);
+            this.grpDetails.Size = new System.Drawing.Size(814, 253);
             this.grpDetails.TabIndex = 0;
             this.grpDetails.Text = "Ticket Detail — every leg, across every branch it touched";
             // 
             // gridControlDetails
             // 
             this.gridControlDetails.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControlDetails.Location = new System.Drawing.Point(2, 78);
+            this.gridControlDetails.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.gridControlDetails.Location = new System.Drawing.Point(2, 64);
             this.gridControlDetails.MainView = this.gridViewDetails;
+            this.gridControlDetails.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.gridControlDetails.Name = "gridControlDetails";
-            this.gridControlDetails.Size = new System.Drawing.Size(946, 285);
+            this.gridControlDetails.Size = new System.Drawing.Size(810, 187);
             this.gridControlDetails.TabIndex = 0;
             this.gridControlDetails.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewDetails});
@@ -222,6 +239,7 @@
             this.colDetailAccountTitle,
             this.colDetailDebit,
             this.colDetailCredit});
+            this.gridViewDetails.DetailHeight = 284;
             this.gridViewDetails.GridControl = this.gridControlDetails;
             this.gridViewDetails.GroupCount = 1;
             this.gridViewDetails.GroupSummary.AddRange(new DevExpress.XtraGrid.GridSummaryItem[] {
@@ -229,6 +247,7 @@
             new DevExpress.XtraGrid.GridGroupSummaryItem(DevExpress.Data.SummaryItemType.Sum, "Credit", this.colDetailCredit, "Branch Credit: {0:n2}")});
             this.gridViewDetails.Name = "gridViewDetails";
             this.gridViewDetails.OptionsBehavior.Editable = false;
+            this.gridViewDetails.OptionsEditForm.PopupEditFormWidth = 686;
             this.gridViewDetails.OptionsView.ShowFooter = true;
             this.gridViewDetails.OptionsView.ShowGroupPanel = false;
             this.gridViewDetails.SortInfo.AddRange(new DevExpress.XtraGrid.Columns.GridColumnSortInfo[] {
@@ -238,50 +257,59 @@
             // 
             this.colDetailBranchCode.Caption = "Branch";
             this.colDetailBranchCode.FieldName = "BranchCode";
+            this.colDetailBranchCode.MinWidth = 17;
             this.colDetailBranchCode.Name = "colDetailBranchCode";
             this.colDetailBranchCode.Visible = true;
             this.colDetailBranchCode.VisibleIndex = 0;
-            this.colDetailBranchCode.Width = 100;
+            this.colDetailBranchCode.Width = 86;
             // 
             // colDetailAccountCode
             // 
             this.colDetailAccountCode.Caption = "Account Code";
             this.colDetailAccountCode.FieldName = "AccountCode";
+            this.colDetailAccountCode.MinWidth = 17;
             this.colDetailAccountCode.Name = "colDetailAccountCode";
             this.colDetailAccountCode.Visible = true;
             this.colDetailAccountCode.VisibleIndex = 0;
-            this.colDetailAccountCode.Width = 150;
+            this.colDetailAccountCode.Width = 129;
             // 
             // colDetailAccountTitle
             // 
             this.colDetailAccountTitle.Caption = "Account Title";
             this.colDetailAccountTitle.FieldName = "AccountTitle";
+            this.colDetailAccountTitle.MinWidth = 17;
             this.colDetailAccountTitle.Name = "colDetailAccountTitle";
             this.colDetailAccountTitle.Visible = true;
             this.colDetailAccountTitle.VisibleIndex = 1;
-            this.colDetailAccountTitle.Width = 260;
+            this.colDetailAccountTitle.Width = 223;
             // 
             // colDetailDebit
             // 
             this.colDetailDebit.Caption = "Debit";
+            this.colDetailDebit.DisplayFormat.FormatString = "n2";
+            this.colDetailDebit.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
             this.colDetailDebit.FieldName = "Debit";
+            this.colDetailDebit.MinWidth = 17;
             this.colDetailDebit.Name = "colDetailDebit";
             this.colDetailDebit.Summary.AddRange(new DevExpress.XtraGrid.GridSummaryItem[] {
             new DevExpress.XtraGrid.GridColumnSummaryItem(DevExpress.Data.SummaryItemType.Sum, "Debit", "{0:n2}")});
             this.colDetailDebit.Visible = true;
             this.colDetailDebit.VisibleIndex = 2;
-            this.colDetailDebit.Width = 140;
+            this.colDetailDebit.Width = 120;
             // 
             // colDetailCredit
             // 
             this.colDetailCredit.Caption = "Credit";
+            this.colDetailCredit.DisplayFormat.FormatString = "n2";
+            this.colDetailCredit.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
             this.colDetailCredit.FieldName = "Credit";
+            this.colDetailCredit.MinWidth = 17;
             this.colDetailCredit.Name = "colDetailCredit";
             this.colDetailCredit.Summary.AddRange(new DevExpress.XtraGrid.GridSummaryItem[] {
             new DevExpress.XtraGrid.GridColumnSummaryItem(DevExpress.Data.SummaryItemType.Sum, "Credit", "{0:n2}")});
             this.colDetailCredit.Visible = true;
             this.colDetailCredit.VisibleIndex = 3;
-            this.colDetailCredit.Width = 140;
+            this.colDetailCredit.Width = 120;
             // 
             // lblTicketHeader
             // 
@@ -289,21 +317,23 @@
             this.lblTicketHeader.Appearance.Options.UseFont = true;
             this.lblTicketHeader.AutoSizeMode = DevExpress.XtraEditors.LabelAutoSizeMode.None;
             this.lblTicketHeader.Dock = System.Windows.Forms.DockStyle.Top;
-            this.lblTicketHeader.Location = new System.Drawing.Point(2, 28);
+            this.lblTicketHeader.Location = new System.Drawing.Point(2, 23);
+            this.lblTicketHeader.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.lblTicketHeader.Name = "lblTicketHeader";
-            this.lblTicketHeader.Padding = new System.Windows.Forms.Padding(8);
-            this.lblTicketHeader.Size = new System.Drawing.Size(946, 50);
+            this.lblTicketHeader.Padding = new System.Windows.Forms.Padding(7, 6, 7, 6);
+            this.lblTicketHeader.Size = new System.Drawing.Size(810, 41);
             this.lblTicketHeader.TabIndex = 1;
             // 
             // TicketInquiryFrm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.grpDetails);
             this.Controls.Add(this.grpResults);
             this.Controls.Add(this.grpSearch);
+            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "TicketInquiryFrm";
-            this.Size = new System.Drawing.Size(950, 700);
+            this.Size = new System.Drawing.Size(814, 569);
             this.Load += new System.EventHandler(this.TicketInquiryFrm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.grpSearch)).EndInit();
             this.grpSearch.ResumeLayout(false);

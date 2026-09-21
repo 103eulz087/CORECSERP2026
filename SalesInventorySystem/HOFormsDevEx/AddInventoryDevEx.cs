@@ -15,6 +15,7 @@ using DevExpress.XtraGrid.Views.Grid;
 using DevExpress.XtraGrid.Columns;
 using DevExpress.XtraGrid;
 using SalesInventorySystem.Classes;
+using DevExpress.Printing.Native.PrintEditor;
 
 namespace SalesInventorySystem.HOFormsDevEx
 {
@@ -579,13 +580,63 @@ namespace SalesInventorySystem.HOFormsDevEx
 
             new ReportPrintTool(rpt).Print();
         }
+        private void PrintQrJFC(string barcodeValue)
+        {
+            var rpt = new Barcode.BarcodePrintingJFC();
+
+            rpt.DataSource = null;
+            rpt.DataMember = "";
+
+            rpt.lblFmeName.Text = "THOMAS FOODS / EST.883";
+            rpt.lblCountryOrigin.Text = "AUSTRALIA";
+            rpt.lblBrandName.Text = "THOMAS FOODS";
+            rpt.lblSiNo.Text = "323810";
+            rpt.lblProductionDate.Text = txtinvoicedate.Text;
+            rpt.lblExpiryDate.Text = txtduedate.Text;
+            rpt.lblSpsNo.Text = "ICDABAIQ201252639014";
+            rpt.lblVqmilcNo.Text = "183113022-(CSP)";
+            rpt.lblImporterName.Text = "JUDPHILAN FOODS CORP.";
+
+            rpt.lblProductName.Text = productname.ToString().Trim();
+            rpt.lblWeight.Text = txtweight.Text.Trim();
+            rpt.xrBarCode1.Text = barcodeValue.Trim();
+            rpt.lblPoNo.Text = txtshipmentno.Text.Trim();
+            rpt.lblPltNo.Text = txtpalletno.Text.Trim();
+
+            //rpt.xrshipno.Text = txtshipmentno.Text.Trim();
+            //rpt.xrpalletno.Text = txtpalletno.Text.Trim();
+            //rpt.lblmanufdate.Text = DateTime.Now.ToShortDateString();
+            //rpt.lblprodtype.Text = productname.ToString().Trim();
+            //rpt.xrsku.Text = productcode.ToString();
+            //rpt.lbltotalkilos.Text = txtweight.Text.Trim();
+            //rpt.lblxpirydate.Text = txtduedate.Text;//DateTime.Now.AddYears(1).ToShortDateString();
+
+            
+
+            //// KEY: force QR payload
+            //rpt.xrBarCode2.AutoModule = false;                 // override designer
+            //rpt.xrBarCode2.Text = barcodeValue.Trim();
+
+            rpt.CreateDocument();
+            rpt.ShowRibbonPreviewDialog();
+            new ReportPrintTool(rpt).Print();
+            //new ReportPrintTool(rpt).
+        }
 
         private void simpleButton5_Click(object sender, EventArgs e)
         {
             // Minimal changes here. Passing strings to XR labels is fine, 
             // just ensure txtbarcode.Text is fully generated and trimmed.
-
-            PrintQr(txtbarcode.Text);
+            if (GlobalCache.CompanyName == "JFC")
+            {
+                PrintQrJFC(txtbarcode.Text);
+            }
+            else
+            {
+                PrintQr(txtbarcode.Text);
+            }
+           
+           
         }
 
         private void checkBox3_CheckedChanged(object sender, EventArgs e)

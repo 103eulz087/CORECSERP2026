@@ -433,6 +433,15 @@ namespace SalesInventorySystem.AccountingDevEx
                     tvpParam.TypeName = "dbo.ExpenseDetailType";
                     tvpParam.Value = dt;
 
+                    // Was previously never sent -- the PO link picked here during Edit
+                    // was silently dropped and the linked shipment's cost never got
+                    // updated. sp_EditSingleExpense now only honors this when the
+                    // record wasn't already linked before this edit (see
+                    // SQL/2026-09-14_EditSingleExpense_POCostLinkFix.sql); otherwise it
+                    // throws before reaching this repost.
+                    cmd.Parameters.Add("@ShipmentNo", SqlDbType.VarChar, 10).Value = _shipmentNo == null ? "" : _shipmentNo.ToString();
+                    cmd.Parameters.Add("@isLinkedToPO", SqlDbType.Bit).Value = chkLinkToPO.Checked ? 1 : 0;
+
                     con.Open();
                     string message = "Expense updated successfully.";
                     using (var rdr = cmd.ExecuteReader())
@@ -516,6 +525,16 @@ namespace SalesInventorySystem.AccountingDevEx
                 if (gridViewPosted.Columns["SupplierID"] != null) gridViewPosted.Columns["SupplierID"].Visible = false;
                 if (gridViewPosted.Columns["BranchCode"] != null) gridViewPosted.Columns["BranchCode"].Visible = false;
 
+                // sp_GetPostedSingleExpenses now returns these as DECIMAL (was FORMAT()-ed
+                // VARCHAR, which sorted alphabetically instead of by value -- CLAUDE.md
+                // numeric-column convention).
+                foreach (string col in new[] { "Amount", "Balance", "AmountPaid" })
+                {
+                    if (gridViewPosted.Columns[col] == null) continue;
+                    gridViewPosted.Columns[col].DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+                    gridViewPosted.Columns[col].DisplayFormat.FormatString = "N2";
+                }
+
                 gridControlPostedDetails.DataSource = null;
                 btnViewDetails.Enabled = false;
                 btnCopyToNew.Enabled = false;
@@ -584,6 +603,12 @@ namespace SalesInventorySystem.AccountingDevEx
                         gridControlPostedDetails.DataSource = ds.Tables.Count > 1 ? ds.Tables[1] : null;
                     }
                 }
+                // NEW: Debit/Credit come back as real DECIMAL from
+                // sp_GetSingleExpenseDetails, but the grid rendered them
+                // unformatted — CLAUDE.md's "Reporting Quantity/Amount
+                // columns must be numeric" convention needs this set on
+                // the row cells too, not just a footer summary.
+                Classes.DevXGridViewSettings.FormatNumericColumns(gridViewPostedDetails, "Debit", "Credit");
                 gridViewPostedDetails.BestFitColumns();
             }
             catch (SqlException ex)

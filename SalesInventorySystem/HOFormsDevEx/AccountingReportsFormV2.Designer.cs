@@ -48,6 +48,8 @@ namespace SalesInventorySystem.HOFormsDevEx
         private void InitializeComponent()
         {
             this.pnlTopParams = new DevExpress.XtraEditors.PanelControl();
+            this.lblReportTitle = new DevExpress.XtraEditors.LabelControl();
+            this.lblReportSubtitle = new DevExpress.XtraEditors.LabelControl();
             this.lblReportTypeCaption = new DevExpress.XtraEditors.LabelControl();
             this.cboReportType = new DevExpress.XtraEditors.ComboBoxEdit();
             this.lblBranchCode = new DevExpress.XtraEditors.LabelControl();
@@ -76,8 +78,6 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.gridControlSummary = new DevExpress.XtraGrid.GridControl();
             this.gridViewSummary = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.lblSummaryCaption = new DevExpress.XtraEditors.LabelControl();
-            this.lblReportTitle = new DevExpress.XtraEditors.LabelControl();
-            this.lblReportSubtitle = new DevExpress.XtraEditors.LabelControl();
             ((System.ComponentModel.ISupportInitialize)(this.pnlTopParams)).BeginInit();
             this.pnlTopParams.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.cboReportType.Properties)).BeginInit();
@@ -136,6 +136,30 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.pnlTopParams.Name = "pnlTopParams";
             this.pnlTopParams.Size = new System.Drawing.Size(1398, 107);
             this.pnlTopParams.TabIndex = 1;
+            // 
+            // lblReportTitle
+            // 
+            this.lblReportTitle.Appearance.Font = new System.Drawing.Font("Tahoma", 14F, System.Drawing.FontStyle.Bold);
+            this.lblReportTitle.Appearance.ForeColor = System.Drawing.Color.Black;
+            this.lblReportTitle.Appearance.Options.UseFont = true;
+            this.lblReportTitle.Appearance.Options.UseForeColor = true;
+            this.lblReportTitle.Location = new System.Drawing.Point(983, 8);
+            this.lblReportTitle.Name = "lblReportTitle";
+            this.lblReportTitle.Size = new System.Drawing.Size(123, 23);
+            this.lblReportTitle.TabIndex = 21;
+            this.lblReportTitle.Text = "Trial Balance";
+            // 
+            // lblReportSubtitle
+            // 
+            this.lblReportSubtitle.Appearance.Font = new System.Drawing.Font("Tahoma", 8.5F);
+            this.lblReportSubtitle.Appearance.ForeColor = System.Drawing.SystemColors.GrayText;
+            this.lblReportSubtitle.Appearance.Options.UseFont = true;
+            this.lblReportSubtitle.Appearance.Options.UseForeColor = true;
+            this.lblReportSubtitle.Location = new System.Drawing.Point(983, 36);
+            this.lblReportSubtitle.Name = "lblReportSubtitle";
+            this.lblReportSubtitle.Size = new System.Drawing.Size(178, 13);
+            this.lblReportSubtitle.TabIndex = 22;
+            this.lblReportSubtitle.Text = "Select parameters and click Generate";
             // 
             // lblReportTypeCaption
             // 
@@ -432,30 +456,6 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.lblSummaryCaption.Size = new System.Drawing.Size(57, 24);
             this.lblSummaryCaption.TabIndex = 0;
             this.lblSummaryCaption.Text = "SUMMARY";
-            // 
-            // lblReportTitle
-            // 
-            this.lblReportTitle.Appearance.Font = new System.Drawing.Font("Tahoma", 14F, System.Drawing.FontStyle.Bold);
-            this.lblReportTitle.Appearance.ForeColor = System.Drawing.Color.Black;
-            this.lblReportTitle.Appearance.Options.UseFont = true;
-            this.lblReportTitle.Appearance.Options.UseForeColor = true;
-            this.lblReportTitle.Location = new System.Drawing.Point(983, 8);
-            this.lblReportTitle.Name = "lblReportTitle";
-            this.lblReportTitle.Size = new System.Drawing.Size(123, 23);
-            this.lblReportTitle.TabIndex = 21;
-            this.lblReportTitle.Text = "Trial Balance";
-            // 
-            // lblReportSubtitle
-            // 
-            this.lblReportSubtitle.Appearance.Font = new System.Drawing.Font("Tahoma", 8.5F);
-            this.lblReportSubtitle.Appearance.ForeColor = System.Drawing.SystemColors.GrayText;
-            this.lblReportSubtitle.Appearance.Options.UseFont = true;
-            this.lblReportSubtitle.Appearance.Options.UseForeColor = true;
-            this.lblReportSubtitle.Location = new System.Drawing.Point(983, 36);
-            this.lblReportSubtitle.Name = "lblReportSubtitle";
-            this.lblReportSubtitle.Size = new System.Drawing.Size(178, 13);
-            this.lblReportSubtitle.TabIndex = 22;
-            this.lblReportSubtitle.Text = "Select parameters and click Generate";
             // 
             // AccountingReportsFormV2
             // 

@@ -61,7 +61,9 @@ namespace SalesInventorySystem.HOFormsDevEx
             // bound column type supports fractional values; every other column is unchanged.
             if (GlobalCache.CompanyName=="JFC")
             {
-                Database.display("SELECT ProductCode,Barcode,ProductName,Cost,CAST(Quantity AS DECIMAL(10,2)) AS Quantity,Units,ReferenceCode,AvailableQty FROM func_viewPurchaseOrderJFC('" + Login.assignedBranch + "','" + suppkey + "')", gridControl1, gridView1);
+                //Database.display("SELECT ProductCode,Barcode,ProductName,Cost,CAST(Quantity AS DECIMAL(10,2)) AS Quantity,Units,ReferenceCode,AvailableQty FROM func_viewPurchaseOrderJFC('" + Login.assignedBranch + "','" + suppkey + "')", gridControl1, gridView1);
+                Database.display("SELECT ProductCode,Description as ProductName,CAST(0 AS DECIMAL(10,2)) as Cost,CAST(0 AS DECIMAL(10,2)) AS Quantity,'kg' as Units,' ' as ReferenceCode " +
+                    "FROM Products WHERE BranchCode='" + Login.assignedBranch + "' ", gridControl1, gridView1);
             }
             else
             {

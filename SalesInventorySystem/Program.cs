@@ -1,10 +1,11 @@
 
+using DevExpress.LookAndFeel;
+using DevExpress.Skins;
 using System;
+using System.Drawing;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
-using DevExpress.LookAndFeel;
-using DevExpress.Skins;
 
 namespace SalesInventorySystem
 {
@@ -31,6 +32,7 @@ namespace SalesInventorySystem
             DevExpress.UserSkins.BonusSkins.Register();
             //UserLookAndFeel.Default.SetSkinStyle(SkinStyle.);
             UserLookAndFeel.Default.SetSkinStyle(SkinStyle.WXICompact);
+             
 
             // 1. Load your global cache first!
             GlobalCache.InitializeCompanyData();

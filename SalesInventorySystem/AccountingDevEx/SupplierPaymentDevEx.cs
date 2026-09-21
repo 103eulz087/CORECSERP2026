@@ -548,9 +548,9 @@ namespace SalesInventorySystem.AccountingDevEx
 
                 cmd.Parameters.Add("@parmcheckno", SqlDbType.VarChar, 50).Value =
                     radCheckVoucher.Checked ? (object)txtcheckno.Text.Trim() : DBNull.Value;
-                cmd.Parameters.Add("@parmcheckdate", SqlDbType.Date).Value =
-                    radCheckVoucher.Checked && !string.IsNullOrWhiteSpace(txtcheckdate.Text)
-                        ? (object)DateTime.Parse(txtcheckdate.Text) : DBNull.Value;
+                cmd.Parameters.Add("@parmcheckdate", SqlDbType.Date).Value = txtcheckdate.Text.Trim();
+                    //radCheckVoucher.Checked && !string.IsNullOrWhiteSpace(txtcheckdate.Text)
+                    //    ? (object)DateTime.Parse(txtcheckdate.Text) : DBNull.Value;
                 cmd.Parameters.Add("@parmcontrolno", SqlDbType.VarChar, 50).Value = txtctrlno.Text.Trim();
                  
                 cmd.Parameters.Add("@parmcheckremarks", SqlDbType.VarChar, 2000).Value = txtremakrs.Text.Trim();
@@ -620,6 +620,7 @@ namespace SalesInventorySystem.AccountingDevEx
                 cmd.Parameters.Add("@parmisexpense", SqlDbType.Bit).Value = radioButtonExpense.Checked;
 
                 var table = new DataTable();
+                bool loadedOk = false;
                 try
                 {
                     Cursor.Current = Cursors.WaitCursor;
@@ -632,6 +633,7 @@ namespace SalesInventorySystem.AccountingDevEx
                     gridControlMaster.DataSource = table;
                     gridViewMaster.BestFitColumns();
                     FormatGridColumns();
+                    loadedOk = true;
                 }
                 catch (SqlException ex)
                 {
@@ -644,14 +646,23 @@ namespace SalesInventorySystem.AccountingDevEx
                     UseWaitCursor = false;
                     Cursor.Current = Cursors.Default;
                 }
-            }
-            gridViewMaster.Columns[0].Visible = false;
 
-            gridViewMaster.Columns["ShipmentNo"].Visible = false;
-            gridViewMaster.Columns["BranchCode"].Visible = false;
-            gridViewMaster.Columns["ReferenceNo"].Visible = false;
-            gridViewMaster.Columns["BatchReferenceID"].Visible = false;
-            gridViewMaster.Columns["ReturnAllowances"].Visible = false;
+                // NEW - the SP failed or returned no columns: nothing below is safe to touch.
+                // Previously this ran unconditionally and NullReferenceException'd on
+                // gridViewMaster.Columns["..."] whenever Fill() threw or the result set
+                // didn't carry one of these column names (e.g. Expense vs Purchase shape).
+                if (!loadedOk || gridViewMaster.Columns.Count == 0)
+                    return;
+            }
+
+            if (gridViewMaster.Columns.Count > 0)
+                gridViewMaster.Columns[0].Visible = false;
+
+            if (gridViewMaster.Columns["ShipmentNo"] != null) gridViewMaster.Columns["ShipmentNo"].Visible = false;
+            if (gridViewMaster.Columns["BranchCode"] != null) gridViewMaster.Columns["BranchCode"].Visible = false;
+            if (gridViewMaster.Columns["ReferenceNo"] != null) gridViewMaster.Columns["ReferenceNo"].Visible = false;
+            if (gridViewMaster.Columns["BatchReferenceID"] != null) gridViewMaster.Columns["BatchReferenceID"].Visible = false;
+            if (gridViewMaster.Columns["ReturnAllowances"] != null) gridViewMaster.Columns["ReturnAllowances"].Visible = false;
             Classes.DevXGridViewSettings.ShowFooterTotal(gridViewMaster, "ActualCost");
 
             if (radioButtonPurchase.Checked == true)
@@ -664,20 +675,36 @@ namespace SalesInventorySystem.AccountingDevEx
             else
             {
             }
-        }   
+        }
         // Helper method to handle DevExpress UI formatting
         private void FormatGridColumns()
         {
-            if (gridViewMaster.Columns["ActualCost"] != null)
-            {
-                gridViewMaster.Columns["ActualCost"].DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
-                gridViewMaster.Columns["ActualCost"].DisplayFormat.FormatString = "n2";
-            }
+            FormatNumericColumn(gridViewMaster.Columns["ActualCost"]);
+            FormatNumericColumn(gridViewMaster.Columns["Balance"]);
 
-            if (gridViewMaster.Columns["Balance"] != null)
+            // NEW - AmountPaid, EWTAmount, DiscountAmount, ReturnAllowances are
+            // auto-generated (typed as decimal in the DataTable) but previously had no
+            // DisplayFormat/ColumnEdit set, so the grid rendered/edited them as plain
+            // text and only the footer sum (ShowFooterTotal) looked numeric.
+            // Row cells still stored the underlying decimal correctly, but reused
+            // repAmount (the same numeric SpinEdit already used for gridViewLines'
+            // "Amount" column) so the in-cell editor is numeric too, not free text.
+            FormatNumericColumn(gridViewMaster.Columns["AmountPaid"], repAmount);
+            FormatNumericColumn(gridViewMaster.Columns["EWTAmount"], repAmount);
+            FormatNumericColumn(gridViewMaster.Columns["DiscountAmount"], repAmount);
+            FormatNumericColumn(gridViewMaster.Columns["ReturnAllowances"], repAmount);
+        }
+
+        private void FormatNumericColumn(DevExpress.XtraGrid.Columns.GridColumn col, DevExpress.XtraEditors.Repository.RepositoryItem edit = null)
+        {
+            if (col == null) return;
+
+            col.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+            col.DisplayFormat.FormatString = "n2";
+
+            if (edit != null)
             {
-                gridViewMaster.Columns["Balance"].DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
-                gridViewMaster.Columns["Balance"].DisplayFormat.FormatString = "n2";
+                col.ColumnEdit = edit;
             }
         }
         
