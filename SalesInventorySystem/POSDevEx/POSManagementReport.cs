@@ -81,7 +81,7 @@ namespace SalesInventorySystem.POSDevEx
             con.Open();
             try
             {
-                string query = "sp_ReplicateSales";
+                string query = "sp_ReplicateSalesBatch";
                 SqlCommand com = new SqlCommand(query, con);
                 com.Parameters.AddWithValue("@brcode", txtbranch.Text);
                 // sp_ReplicateSales now takes a @FromDate/@ToDate range (see

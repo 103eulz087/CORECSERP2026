@@ -1093,15 +1093,22 @@ namespace SalesInventorySystem
 
         private void barButtonItem33_ItemClick(object sender, ItemClickEventArgs e)
         {
+            // CHANGED 2026-09-17: routed to the new AccountingDevEx.
+            // ChartOfAccountsDevEx (parameterized CRUD via
+            // spu_UpsertChartOfAccount/spu_DeleteChartOfAccount)
+            // instead of the legacy Accounting.COA, which built its
+            // INSERT/UPDATE via raw string-concatenated textbox values.
+            // Legacy COA.cs is left in place (not deleted) in case
+            // anything else still references it.
             foreach (Form form in Application.OpenForms)
             {
-                if (form.GetType() == typeof(Accounting.COA))
+                if (form.GetType() == typeof(AccountingDevEx.ChartOfAccountsDevEx))
                 {
                     form.Activate();
                     return;
                 }
             }
-            Accounting.COA coacct = new Accounting.COA();
+            AccountingDevEx.ChartOfAccountsDevEx coacct = new AccountingDevEx.ChartOfAccountsDevEx();
             coacct.Show();
         }
 

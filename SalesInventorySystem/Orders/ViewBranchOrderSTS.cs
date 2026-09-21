@@ -541,7 +541,7 @@ namespace SalesInventorySystem.Orders
             ponumber = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "PONumber").ToString();
             //devno = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "PONumber").ToString();
 
-            bool fExst = Database.checkifExist("SELECT 1 FROM DeliverySummary WHERE PONumber='" + ponumber + "'");
+            bool fExst = Database.checkifExist("SELECT TOP(1) 1 FROM DeliverySummary WHERE PONumber='" + ponumber + "'");
             //bool fExst = Database.checkifExist("SELECT 1 FROM DeliveryDetails WHERE PONumber='" + ViewBranchOrderSTS.ponumber + "'");
             string getID = Database.getSingleData("DeliverySummary", "PONumber", ponumber, "DeliveryNo");
             if (fExst)

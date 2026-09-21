@@ -60,6 +60,14 @@ namespace SalesInventorySystem.AccountingDevEx
             Classes.DevXGridViewSettings.ShowFooterTotal(gridView2, "OffsetAmount");
             Classes.DevXGridViewSettings.ShowFooterTotal(gridView2, "ServicesAmount");
 
+            // NEW: ShowFooterTotal above only formats the footer sum, not the row
+            // cells above it (CLAUDE.md's "Reporting Quantity/Amount columns must
+            // be numeric" convention) -- splist_ARAccounts returns all of these as
+            // real decimal(12,2) columns, but the grid rendered them unformatted.
+            Classes.DevXGridViewSettings.FormatNumericColumns(gridView2,
+                "InvoiceAmount", "Balance", "AmountPaid", "OverPay",
+                "EWTAmount", "DiscountAmount", "OffsetAmount", "ServicesAmount");
+
             gridView2.OptionsBehavior.EditorShowMode = DevExpress.Utils.EditorShowMode.MouseDown;
             gridView2.OptionsBehavior.ImmediateUpdateRowPosition = true;
             gridView2.Columns["Pay"].ColumnEdit = chkPay;
@@ -93,7 +101,7 @@ namespace SalesInventorySystem.AccountingDevEx
 
         void populateCustname()
         {
-            Database.displaySearchlookupEdit("SELECT CustomerKey,CustomerName FROM view_Customers", txtcustname, "CustomerName", "CustomerName");
+            Database.displaySearchlookupEdit("SELECT BranchName,CustomerKey,CustomerName FROM view_Customers", txtcustname, "CustomerName", "CustomerName");
         }
         // ── DISPLAY ─────────────────────────────────────────────────────
         void display()

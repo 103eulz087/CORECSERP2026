@@ -431,6 +431,12 @@
     <Compile Include="AccountingDevEx\ViewCheckVoucherDevEx.Designer.cs">
       <DependentUpon>ViewCheckVoucherDevEx.cs</DependentUpon>
     </Compile>
+    <Compile Include="AccountingDevEx\ChartOfAccountsDevEx.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AccountingDevEx\ChartOfAccountsDevEx.Designer.cs">
+      <DependentUpon>ChartOfAccountsDevEx.cs</DependentUpon>
+    </Compile>
     <Compile Include="AccountingDevEx\VoucheringManualFrm.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -592,6 +598,12 @@
     </Compile>
     <Compile Include="Barcode\AssetTagBarcode.Designer.cs">
       <DependentUpon>AssetTagBarcode.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Barcode\BarcodePrintingJFC.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Barcode\BarcodePrintingJFC.Designer.cs">
+      <DependentUpon>BarcodePrintingJFC.cs</DependentUpon>
     </Compile>
     <Compile Include="Barcode\BarcodePrinting.cs">
       <SubType>Component</SubType>
@@ -3681,6 +3693,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Barcode\AssetTagBarcode.resx">
       <DependentUpon>AssetTagBarcode.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Barcode\BarcodePrintingJFC.resx">
+      <DependentUpon>BarcodePrintingJFC.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Barcode\BarcodePrinting.resx">
       <DependentUpon>BarcodePrinting.cs</DependentUpon>

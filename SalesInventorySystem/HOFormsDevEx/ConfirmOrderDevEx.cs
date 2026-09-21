@@ -21,6 +21,13 @@ namespace SalesInventorySystem.HOFormsDevEx
         public ConfirmOrderDevEx()
         {
             InitializeComponent();
+
+            // Uniform "totals band" styling across the app's report/grid footers -- same
+            // reference appearance as POS/POSSalesReportDevEx.cs's SalesTransactionSummary tab.
+            // See DevXGridViewSettings.ApplyTotalsBandAppearance and CLAUDE.md's "Grid footer/
+            // totals band styling" convention.
+            Classes.DevXGridViewSettings.ApplyTotalsBandAppearance(gridView2);
+            Classes.DevXGridViewSettings.ApplyTotalsBandAppearance(gridViewChargesSum);
         }
 
         private void simpleButton2_Click(object sender, EventArgs e)

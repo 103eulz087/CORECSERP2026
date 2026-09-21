@@ -8,18 +8,53 @@ using DevExpress.XtraGrid.Views.Grid;
 namespace SalesInventorySystem.AccountingDevEx
 {
     /// <summary>
-    /// Vouchering — Manual (no mapping). User builds the FULL compound
-    /// GL entry themselves in one shared grid for the whole voucher —
-    /// no EWTAmount/DiscountAmount/Variance columns, nothing auto-
-    /// derived. The only enforced link: SUM(checked invoices' amount)
-    /// must equal SUM(GL entry's Debit lines on an AP-Trade account,
-    /// 20101/20102/20103).
+    /// Vouchering — Manual, with auto AP-Trade/Variance legs. Checking
+    /// an invoice to pay no longer needs a matching AP-Trade line typed
+    /// into the GL grid — Amount to Apply and Variance each auto-post
+    /// their OWN two-leg pair directly (see
+    /// SQL/2026-09-15_VoucheringManual_AutoAPTradeLegs.sql):
+    ///   Amount-To-Apply: Debit AP-Trade / Credit Credit-GLCode, both = AmountToApply
+    ///   Variance (loss): Debit 60323 / Credit AP-Trade, both = Variance
+    ///   Variance (gain): Debit AP-Trade / Credit 60323, both = -Variance
+    /// AP-Trade account is resolved server-side per payment method via
+    /// dbo.JournalEntryMapping (Mnemonic='VOUCHER-MANUAL-APTRADE',
+    /// ConditionFlag='PURCHASE'->20101, 'EXPENSE'->20103 fallback when
+    /// ExpenseSummary.PayableAccountCode isn't set) — this form has no
+    /// say in which account gets used. All auto legs tag BranchCode as
+    /// the voucher's PAYING branch (cboBranch/@parmbranch), never the
+    /// invoice's own branch.
+    ///
+    /// This module is Telegraphic-only in practice — the Check/Cash
+    /// radio buttons are hidden (Designer: Visible=false) and
+    /// Telegraphic defaults checked; their code paths still exist
+    /// (dead but harmless) since Copy-to-New reads the type off old
+    /// historical vouchers that may predate this restriction.
+    ///
+    /// The GL grid below (gridViewGL) is independent of the invoices —
+    /// pure free-form manual entry (e.g. a cash advance: just a single
+    /// Debit "Advances to Supplier" line, no invoice attached). When NO
+    /// invoices are checked, the grid does NOT need to self-balance —
+    /// whatever it nets to auto-posts as the offsetting leg against the
+    /// selected Credit GLCode (see SQL/2026-09-16_VoucheringManual_
+    /// ResidualAutoPost.sql), same as SupplierPaymentDevEx.cs. When
+    /// invoices ARE being paid, the grid must balance on its own (no
+    /// AP-Trade line required there — Amount to Apply/Variance already
+    /// auto-post their own AP-Trade legs against Credit GLCode, so a
+    /// second unbalanced residual would double up on that account). It
+    /// is NOT mandatory — paying an invoice with zero manual GL lines is
+    /// valid and posts fine. Checking Pay always
+    /// fully settles the invoice's Balance; Variance is purely the
+    /// difference between the actual cash (AmountToApply, editable) and
+    /// Balance — this module does not support a deliberate partial
+    /// payment of a single invoice.
     ///
     /// Reuses your existing splist_Accounts SP for the invoice list
     /// (same one the original SupplierPaymentDevEx uses) — assumed
     /// stable in shape; only SequenceNumber/BatchReferenceID/
     /// BranchCode/InvoiceNo/InvoiceDate/ActualCost/Balance are read
-    /// from it, everything EWT/Discount/Variance-related is ignored.
+    /// from it, everything EWT/Discount-related is ignored. Variance
+    /// is this module's OWN client-side-computed column, not read
+    /// from splist_Accounts.
     /// </summary>
     public partial class VoucheringManualFrm : DevExpress.XtraEditors.XtraUserControl
     {
@@ -27,6 +62,7 @@ namespace SalesInventorySystem.AccountingDevEx
         private DataTable _glTable;
         private bool _dataLoaded = false;
         private string _selectedPostedRefNo;
+        private bool _isRecalculating = false;   // guards AmountToApply/Variance cascade in GridViewInvoices_CellValueChanged
         public VoucheringManualFrm()
         {
             InitializeComponent();
@@ -241,17 +277,23 @@ namespace SalesInventorySystem.AccountingDevEx
                     new SqlDataAdapter(cmd).Fill(table);
 
                     // Client-side columns this module actually needs —
-                    // NO EWTAmount/DiscountAmount/OffsetAmount/Variance
+                    // NO EWTAmount/DiscountAmount/OffsetAmount. Variance
+                    // IS used here (unlike the mapping-driven module) —
+                    // it's the FX difference between Amount to Apply and
+                    // Balance, always reset fresh on load, never trusted
+                    // from whatever splist_Accounts happens to return.
                     if (!table.Columns.Contains("Pay")) table.Columns.Add("Pay", typeof(bool));
                     if (!table.Columns.Contains("AmountToApply")) table.Columns.Add("AmountToApply", typeof(decimal));
-                    foreach (DataRow row in table.Rows) row["AmountToApply"] = 0m;
+                    if (!table.Columns.Contains("Variance")) table.Columns.Add("Variance", typeof(decimal));
+                    foreach (DataRow row in table.Rows) { row["AmountToApply"] = 0m; row["Variance"] = 0m; }
 
                     _invoicesTable = table;
                     gridControlInvoices.DataSource = _invoicesTable;
                 }
 
-                gridViewInvoices.BestFitColumns();
                 HideUnusedInvoiceColumns();
+                FormatInvoiceColumns();
+                gridViewInvoices.BestFitColumns();   // after formatting, so Variance's caption/n2 format is sized in
             }
             catch (SqlException ex)
             {
@@ -263,10 +305,26 @@ namespace SalesInventorySystem.AccountingDevEx
         {
             // Hide whatever splist_Accounts still returns for the
             // old mapping-driven module's columns — this one doesn't
-            // use them at all.
-            string[] hide = { "EWTAmount", "DiscountAmount", "OffsetAmount", "ReturnAllowances", "Variance", "AmountPaid", "ShipmentNo", "Type" };
+            // use them at all. Variance is NOT hidden — it's this
+            // module's own FX-variance column (Amount to Apply minus
+            // Balance), not the mapping-driven module's field.
+            string[] hide = { "EWTAmount", "DiscountAmount", "OffsetAmount", "ReturnAllowances", "AmountPaid", "ShipmentNo", "Type" };
             foreach (var name in hide)
                 if (gridViewInvoices.Columns[name] != null) gridViewInvoices.Columns[name].Visible = false;
+        }
+
+        private void FormatInvoiceColumns()
+        {
+            // Variance is derived (Amount to Apply - Balance), never
+            // typed directly — read-only, numeric-formatted.
+            var varianceCol = gridViewInvoices.Columns["Variance"];
+            if (varianceCol != null)
+            {
+                varianceCol.Caption = "Variance (FX)";
+                varianceCol.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+                varianceCol.DisplayFormat.FormatString = "n2";
+                varianceCol.OptionsColumn.AllowEdit = false;
+            }
         }
 
         private void GridViewInvoices_CustomRowCellEdit(object sender, CustomRowCellEditEventArgs e)
@@ -277,17 +335,55 @@ namespace SalesInventorySystem.AccountingDevEx
 
         private void GridViewInvoices_CellValueChanged(object sender, DevExpress.XtraGrid.Views.Base.CellValueChangedEventArgs e)
         {
+            if (_isRecalculating) return;   // suppress cascading SetRowCellValue re-entrancy
+
             if (e.Column.FieldName == "Pay")
             {
                 bool isChecked = ToBool(e.Value);
-                if (isChecked)
+                _isRecalculating = true;
+                try
                 {
-                    decimal balance = ToDecimal(gridViewInvoices.GetRowCellValue(e.RowHandle, "Balance"));
-                    gridViewInvoices.SetRowCellValue(e.RowHandle, "AmountToApply", balance);
+                    // Checking Pay always fully settles the invoice —
+                    // Amount to Apply defaults to Balance and Variance
+                    // resets to 0 until the user edits Amount to Apply
+                    // to reflect the actual (FX-converted) cash figure.
+                    if (isChecked)
+                    {
+                        decimal balance = ToDecimal(gridViewInvoices.GetRowCellValue(e.RowHandle, "Balance"));
+                        gridViewInvoices.SetRowCellValue(e.RowHandle, "AmountToApply", balance);
+                    }
+                    else
+                    {
+                        gridViewInvoices.SetRowCellValue(e.RowHandle, "AmountToApply", 0m);
+                    }
+                    gridViewInvoices.SetRowCellValue(e.RowHandle, "Variance", 0m);
                 }
-                else
+                finally
                 {
-                    gridViewInvoices.SetRowCellValue(e.RowHandle, "AmountToApply", 0m);
+                    _isRecalculating = false;
+                }
+
+                UpdateTieStatus();
+                return;
+            }
+
+            if (e.Column.FieldName == "AmountToApply" && ToBool(gridViewInvoices.GetRowCellValue(e.RowHandle, "Pay")))
+            {
+                // Variance = the difference between what's actually
+                // being paid and the invoice's recorded Balance — this
+                // is always FX movement (USD-invoiced supplier,
+                // converted at today's rate vs. the invoice's booking
+                // rate), since the invoice is still being paid in full.
+                decimal balance = ToDecimal(gridViewInvoices.GetRowCellValue(e.RowHandle, "Balance"));
+                decimal amountToApply = ToDecimal(e.Value);
+                _isRecalculating = true;
+                try
+                {
+                    gridViewInvoices.SetRowCellValue(e.RowHandle, "Variance", amountToApply - balance);
+                }
+                finally
+                {
+                    _isRecalculating = false;
                 }
             }
 
@@ -343,68 +439,76 @@ namespace SalesInventorySystem.AccountingDevEx
                 e.Appearance.BackColor = System.Drawing.Color.LightCoral;
         }
 
-        // ── Live tie-check ───────────────────────────────────────
-        private static readonly string[] APTradeAccounts = { "20101", "20102", "20103" };
-
+        // ── Live status ──────────────────────────────────────────
         private void UpdateTieStatus()
         {
-            decimal totalAmountToApply = 0;
+            // NEW: no more AP-Trade tie-check — Amount to Apply and
+            // Variance each auto-post their own AP-Trade leg now (see
+            // sp_PostVoucherManual). This is just a preview of what
+            // will auto-post, for the user's own sanity check before
+            // hitting Post.
+            decimal totalAmountToApply = 0, totalVariance = 0;
             if (gridViewInvoices.GridControl != null && _invoicesTable != null)
                 for (int i = 0; i < gridViewInvoices.RowCount; i++)
                     if (ToBool(gridViewInvoices.GetRowCellValue(i, "Pay")))
+                    {
                         totalAmountToApply += ToDecimal(gridViewInvoices.GetRowCellValue(i, "AmountToApply"));
+                        totalVariance += ToDecimal(gridViewInvoices.GetRowCellValue(i, "Variance"));
+                    }
 
-            decimal apTradeDebit = 0, totalDebit = 0, totalCredit = 0;
-            for (int i = 0; i < gridViewGL.RowCount; i++)
+            if (totalAmountToApply <= 0)
             {
-                string acct = gridViewGL.GetRowCellValue(i, "AccountCode")?.ToString();
-                decimal debit = ToDecimal(gridViewGL.GetRowCellValue(i, "Debit"));
-                decimal credit = ToDecimal(gridViewGL.GetRowCellValue(i, "Credit"));
-                totalDebit += debit;
-                totalCredit += credit;
-                if (Array.IndexOf(APTradeAccounts, acct) >= 0) apTradeDebit += debit;
-            }
-
-            // This tie-check is unchanged — still the critical link
-            // between "what's being paid" and "what AP-Trade extinguishes"
-            if (apTradeDebit == totalAmountToApply && totalAmountToApply > 0)
-            {
-                lblTieStatus.Text = $"Invoices total {totalAmountToApply:N2} — matches AP-Trade debit {apTradeDebit:N2}. ✓";
-                lblTieStatus.Appearance.ForeColor = System.Drawing.Color.SeaGreen;
+                lblTieStatus.Text = "No invoices checked — nothing will auto-post for AP-Trade/Cash/FX.";
+                lblTieStatus.Appearance.ForeColor = System.Drawing.Color.Gray;
             }
             else
             {
-                lblTieStatus.Text = $"Invoices total {totalAmountToApply:N2} — AP-Trade debit (20101/20102/20103) is {apTradeDebit:N2}. These must match.";
-                lblTieStatus.Appearance.ForeColor = System.Drawing.Color.DarkOrange;
+                string fxPart = totalVariance == 0 ? ""
+                    : totalVariance > 0
+                        ? $" + FX loss {totalVariance:N2} (Debit 60323 / Credit AP-Trade)"
+                        : $" + FX gain {-totalVariance:N2} (Debit AP-Trade / Credit 60323)";
+                lblTieStatus.Text = $"Auto-posts: Debit AP-Trade / Credit Credit-GLCode {totalAmountToApply:N2}{fxPart}.";
+                lblTieStatus.Appearance.ForeColor = System.Drawing.Color.SeaGreen;
             }
 
-            // NEW: the grid no longer needs Debit == Credit on its own —
-            // whatever's left over (Debit total − Credit total) is the
-            // cash amount that auto-posts to Credit GLCode. Only flag a
-            // problem if the residual is negative (credits exceed debits
-            // — nothing to credit against Cash, the entry is backwards)
-            // or zero when the grid actually has content (no cash
-            // movement at all, unusual for a payment voucher).
-            decimal residualCash = totalDebit - totalCredit;
+            // CHANGED 2026-09-16: when no invoices are checked, the
+            // manual GL grid no longer needs to self-balance — any
+            // leftover Debit/Credit difference auto-posts to the
+            // selected Credit GLCode (e.g. a lone "Advances to
+            // Supplier" Debit line, no invoice attached). When invoices
+            // ARE checked, the grid still must balance on its own —
+            // Amount to Apply/Variance already auto-post their own
+            // AP-Trade legs against Credit GLCode there.
+            decimal totalDebit = 0, totalCredit = 0;
+            for (int i = 0; i < gridViewGL.RowCount; i++)
+            {
+                totalDebit += ToDecimal(gridViewGL.GetRowCellValue(i, "Debit"));
+                totalCredit += ToDecimal(gridViewGL.GetRowCellValue(i, "Credit"));
+            }
+            decimal glDiff = totalDebit - totalCredit;
+            bool payingInvoices = totalAmountToApply > 0;
 
             if (totalDebit == 0 && totalCredit == 0)
             {
                 lblBalanceStatus.Text = "";
                 lblBalanceStatus.Visible = false;
             }
-            else if (residualCash < 0)
+            else if (glDiff != 0 && payingInvoices)
             {
-                lblBalanceStatus.Text = $"GL entry's Credit total exceeds Debit total by {Math.Abs(residualCash):N2} — check your entries.";
+                lblBalanceStatus.Text = $"Manual GL entry is out of balance: Debit {totalDebit:N2} vs Credit {totalCredit:N2} — when paying invoices it must balance on its own (Amount to Apply/Variance already auto-post their own AP-Trade legs).";
+                lblBalanceStatus.Appearance.ForeColor = System.Drawing.Color.DarkOrange;
                 lblBalanceStatus.Visible = true;
             }
-            else if (residualCash == 0)
+            else if (glDiff != 0)
             {
-                lblBalanceStatus.Text = "No residual cash — Debit and Credit in the grid already balance, so nothing would post to Credit GLCode.";
+                string side = glDiff > 0 ? "Credit" : "Debit";
+                lblBalanceStatus.Text = $"Manual GL entry: Debit {totalDebit:N2} vs Credit {totalCredit:N2} — residual {Math.Abs(glDiff):N2} auto-posts as a {side} to the selected Credit GLCode.";
+                lblBalanceStatus.Appearance.ForeColor = System.Drawing.Color.SeaGreen;
                 lblBalanceStatus.Visible = true;
             }
             else
             {
-                lblBalanceStatus.Text = $"Residual cash to Credit GLCode: {residualCash:N2}";
+                lblBalanceStatus.Text = $"Manual GL entry balances: Debit {totalDebit:N2} = Credit {totalCredit:N2}. ✓";
                 lblBalanceStatus.Appearance.ForeColor = System.Drawing.Color.SeaGreen;
                 lblBalanceStatus.Visible = true;
             }
@@ -435,6 +539,7 @@ namespace SalesInventorySystem.AccountingDevEx
             dt.Columns.Add("SequenceReferenceNumber", typeof(string));
             dt.Columns.Add("BatchReferenceID", typeof(long));
             dt.Columns.Add("AmountPaid", typeof(decimal));
+            dt.Columns.Add("Variance", typeof(decimal));   // NEW — must stay LAST, matches dbo.VoucherManualInvoiceTVP_v2's column order
 
             for (int i = 0; i < gridViewInvoices.RowCount; i++)
             {
@@ -442,6 +547,8 @@ namespace SalesInventorySystem.AccountingDevEx
 
                 decimal amt = ToDecimal(gridViewInvoices.GetRowCellValue(i, "AmountToApply"));
                 if (amt <= 0) continue;
+
+                decimal variance = ToDecimal(gridViewInvoices.GetRowCellValue(i, "Variance"));
 
                 string branch = gridViewInvoices.GetRowCellValue(i, "BranchCode")?.ToString() ?? cboBranch.EditValue?.ToString();
                 string invoiceNo = gridViewInvoices.GetRowCellValue(i, "InvoiceNo")?.ToString();
@@ -453,7 +560,7 @@ namespace SalesInventorySystem.AccountingDevEx
                     branch, invoiceNo,
                     seqRefObj == null || seqRefObj == DBNull.Value ? (object)DBNull.Value : seqRefObj.ToString(),
                     batchRefObj == null || batchRefObj == DBNull.Value ? (object)DBNull.Value : Convert.ToInt64(batchRefObj),
-                    amt);
+                    amt, variance);
             }
             return dt;
         }
@@ -506,6 +613,31 @@ namespace SalesInventorySystem.AccountingDevEx
             // Invoices are OPTIONAL — this module also supports pure
             // GL-to-GL fund transfers (Cash to Cash, no invoice paid)
             var invLines = BuildInvoiceLinesTVP();
+
+            // NEW: a checked invoice with Amount to Apply left/cleared
+            // to 0 would otherwise be silently dropped by
+            // BuildInvoiceLinesTVP()'s `if (amt <= 0) continue;` — the
+            // row still shows checked (green) with whatever stale
+            // Variance was last computed, but never actually posts.
+            // Catch it explicitly instead of a silent no-op, for every
+            // voucher type (this isn't specific to the Check/Cash
+            // overpayment guard below, which only fires for those two
+            // types).
+            for (int i = 0; i < gridViewInvoices.RowCount; i++)
+            {
+                if (!ToBool(gridViewInvoices.GetRowCellValue(i, "Pay"))) continue;
+
+                decimal amt = ToDecimal(gridViewInvoices.GetRowCellValue(i, "AmountToApply"));
+                if (amt <= 0)
+                {
+                    string invNo = gridViewInvoices.GetRowCellValue(i, "InvoiceNo")?.ToString();
+                    XtraMessageBox.Show(
+                        $"Invoice {invNo} is checked but Amount to Apply is {amt:N2}.\nUncheck it or enter a positive amount.",
+                        "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return false;
+                }
+            }
+
             // NEW: block overpayment for Check/Cash — Telegraphic is
             // exempt since the excess can be booked via the manual GL
             // entry (bank charges, FX differences, etc.)
@@ -528,44 +660,71 @@ namespace SalesInventorySystem.AccountingDevEx
                         return false;
                     }
                 }
+
+                // NEW: Variance only makes sense for Telegraphic (FX
+                // movement on a USD-invoiced supplier) — a Check/Cash
+                // voucher is always same-currency, so a nonzero
+                // Variance here would post a spurious FX gain/loss.
+                // Also enforced server-side (sp_PostVoucherManual THROW 58022).
+                for (int i = 0; i < gridViewInvoices.RowCount; i++)
+                {
+                    if (!ToBool(gridViewInvoices.GetRowCellValue(i, "Pay"))) continue;
+
+                    decimal variance = ToDecimal(gridViewInvoices.GetRowCellValue(i, "Variance"));
+                    string invNo = gridViewInvoices.GetRowCellValue(i, "InvoiceNo")?.ToString();
+
+                    if (variance != 0)
+                    {
+                        XtraMessageBox.Show(
+                            $"Invoice {invNo}: Amount to Apply must equal Balance exactly for Check/Cash vouchers (Variance {variance:N2}).\nUse Telegraphic for a payment with an FX difference.",
+                            "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return false;
+                    }
+                }
             }
             var glLines = BuildGLLinesTVP();
-            if (glLines.Rows.Count == 0)
+
+            // NEW: invoices alone are enough now (their own auto legs
+            // fully balance the ticket) — only block a truly empty
+            // voucher (no invoices AND no manual GL lines).
+            if (invLines.Rows.Count == 0 && glLines.Rows.Count == 0)
             {
-                XtraMessageBox.Show("The GL entry needs at least one line.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                XtraMessageBox.Show("Nothing to post — check at least one invoice or add at least one manual GL line.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
 
-            if (cboCreditGLCode.EditValue == null)
+            decimal totalDebit = 0, totalCredit = 0;
+            foreach (DataRow r in glLines.Rows)
+            {
+                totalDebit += Convert.ToDecimal(r["Debit"]);
+                totalCredit += Convert.ToDecimal(r["Credit"]);
+            }
+            bool glNeedsResidual = glLines.Rows.Count > 0 && totalDebit != totalCredit;
+
+            // CHANGED 2026-09-16: Credit GLCode is required whenever it
+            // will actually be used — either invoices are being paid
+            // (Amount-To-Apply auto leg), or the manual GL grid doesn't
+            // balance on its own and needs its residual auto-posted
+            // there (e.g. a lone "Advances to Supplier" Debit line, no
+            // invoice attached — see SQL/2026-09-16_VoucheringManual_
+            // ResidualAutoPost.sql).
+            if ((invLines.Rows.Count > 0 || glNeedsResidual) && cboCreditGLCode.EditValue == null)
             {
                 XtraMessageBox.Show("Select a Credit GLCode.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
 
-            decimal totalDebit = 0, totalCredit = 0, apTradeDebit = 0, totalApplied = 0;
-            foreach (DataRow r in glLines.Rows)
-            {
-                decimal d = Convert.ToDecimal(r["Debit"]), c = Convert.ToDecimal(r["Credit"]);
-                totalDebit += d; totalCredit += c;
-                if (Array.IndexOf(APTradeAccounts, r["AccountCode"].ToString()) >= 0) apTradeDebit += d;
-            }
-            foreach (DataRow r in invLines.Rows) totalApplied += Convert.ToDecimal(r["AmountPaid"]);
-
-            if (apTradeDebit != totalApplied)
+            // CHANGED 2026-09-16: the manual GL grid only needs to
+            // balance on its own when invoices ARE being paid — Amount
+            // to Apply/Variance already auto-post their own AP-Trade
+            // legs against Credit GLCode there, so a second unbalanced
+            // residual would double up on that account. With no
+            // invoices, an unbalanced grid is fine — its residual
+            // auto-posts to Credit GLCode instead.
+            if (invLines.Rows.Count > 0 && glNeedsResidual)
             {
                 XtraMessageBox.Show(
-                    $"The GL entry's AP-Trade debit total ({apTradeDebit:N2}) does not match the sum of invoice amounts ({totalApplied:N2}).",
-                    "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return false;
-            }
-
-            decimal residualCash = totalDebit - totalCredit;
-            if (residualCash <= 0)
-            {
-                XtraMessageBox.Show(
-                    residualCash < 0
-                        ? $"GL entry's Credit total exceeds Debit total by {Math.Abs(residualCash):N2} — check your entries."
-                        : "No residual cash — nothing would post to Credit GLCode.",
+                    $"The manual GL entry is out of balance: Debit {totalDebit:N2} vs Credit {totalCredit:N2}.\nWhen paying invoices, it must balance on its own — Amount to Apply/Variance already auto-post their own AP-Trade legs.",
                     "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
@@ -610,11 +769,14 @@ namespace SalesInventorySystem.AccountingDevEx
                     cmd.Parameters.Add("@parmremarks", SqlDbType.VarChar, 2000).Value = txtRemarks.Text.Trim();
                     cmd.Parameters.Add("@parmpreparedby", SqlDbType.VarChar, 50).Value = Login.Fullname;
                     cmd.Parameters.Add("@parmbranch", SqlDbType.VarChar, 5).Value = cboBranch.EditValue.ToString();
-                    cmd.Parameters.Add("@parmcreditglcode", SqlDbType.VarChar, 20).Value = cboCreditGLCode.EditValue.ToString();
+                    // NEW: Credit GLCode is now optional (only required/used
+                    // when paying invoices — enforced in ValidateForm()).
+                    cmd.Parameters.Add("@parmcreditglcode", SqlDbType.VarChar, 20).Value =
+                        cboCreditGLCode.EditValue != null ? (object)cboCreditGLCode.EditValue.ToString() : DBNull.Value;
 
                     var invParam = cmd.Parameters.AddWithValue("@InvoiceLines", invLines);
                     invParam.SqlDbType = SqlDbType.Structured;
-                    invParam.TypeName = "dbo.VoucherManualInvoiceTVP";
+                    invParam.TypeName = "dbo.VoucherManualInvoiceTVP_v2";
 
                     var glParam = cmd.Parameters.AddWithValue("@GLLines", glLines);
                     glParam.SqlDbType = SqlDbType.Structured;
@@ -743,6 +905,34 @@ namespace SalesInventorySystem.AccountingDevEx
             try
             {
                 var result = FetchPostedDetails(_selectedPostedRefNo);
+
+                // CHANGED 2026-09-16: an invoice-driven voucher's
+                // "glLines" (sp_GetVoucherManualDetails) is the
+                // COMPOUNDED, already-netted TicketDetails — it can't
+                // tell an auto-generated AP-Trade/Variance/Credit-
+                // GLCode leg apart from a manually-typed one. Copying
+                // those into a fresh Reference No. and posting as-is
+                // (invoices left unchecked, the default after Copy)
+                // debits AP-Trade in the GL with nothing removed from
+                // APAccounts/ExpenseSummary or recorded in
+                // APPaymentDetails/SupplierLedger - a phantom posting
+                // the duplicate-post guard (THROW 58020) can't catch
+                // since it's keyed on ReferenceNumber, which is new
+                // here. A warning dialog alone didn't prevent this, so
+                // block it outright. A pure no-invoice voucher (its
+                // only possible auto-leg is the residual against
+                // Credit GLCode) stays safe to copy - it just becomes
+                // a self-balanced manual entry in the copy.
+                if (result.invoices.Rows.Count > 0)
+                {
+                    XtraMessageBox.Show(
+                        $"{_selectedPostedRefNo} paid one or more invoices — its GL entry includes auto-generated AP-Trade/Variance/Credit-GLCode legs that can't be told apart from manually-typed lines.\n\n" +
+                        "Copying those into a new voucher risks a phantom AP-Trade posting (nothing removed from the invoice's Balance) or a double-post if invoices are re-checked.\n\n" +
+                        "To repeat a similar payment, start a new entry, select the supplier/invoices to pay, and add any extra manual GL lines (e.g. a cash advance) fresh.",
+                        "Cannot Copy — Invoice-Paid Voucher", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
                 glLines = result.glLines;
             }
             catch (SqlException ex)
@@ -797,15 +987,18 @@ namespace SalesInventorySystem.AccountingDevEx
             UpdateTieStatus();
             tabMain.SelectedTabPage = tabNewVoucher;
 
-            // IMPORTANT: flags the double-credit risk explicitly rather
-            // than letting it happen silently — see note above this file
+            // CHANGED 2026-09-16: an invoice-driven voucher is now
+            // blocked above before reaching here, so this only ever
+            // copies a pure no-invoice voucher's lines — including its
+            // auto residual leg against Credit GLCode (see SQL/2026-09-
+            // 16_VoucheringManual_ResidualAutoPost.sql), which is safe
+            // to copy as-is (it just becomes a self-balanced manual
+            // entry; there's no invoice-driven auto-leg to double-post
+            // here).
             XtraMessageBox.Show(
                 $"Copied {glLines.Rows.Count} GL line(s) from {_selectedPostedRefNo}.\n\n" +
-                "IMPORTANT: this includes the original voucher's Credit GLCode leg as a regular line. " +
-                "Since posting will auto-generate a NEW Credit GLCode leg for whatever residual remains, " +
-                "review the copied lines and remove the old cash-credit line before posting, or you may " +
-                "double-credit the cash account.\n\nA new Reference No. was assigned — no invoices were copied.",
-                "Copied — Review Before Posting", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                "A new Reference No. was assigned. Review the amounts before posting.",
+                "Copied — Review Before Posting", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }

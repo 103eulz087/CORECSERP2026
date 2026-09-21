@@ -500,12 +500,12 @@
             // txtamounttopay
             // 
             this.txtamounttopay.AutoSize = true;
-            this.txtamounttopay.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtamounttopay.Font = new System.Drawing.Font("Tahoma", 11F, System.Drawing.FontStyle.Bold);
             this.txtamounttopay.ForeColor = System.Drawing.Color.Red;
-            this.txtamounttopay.Location = new System.Drawing.Point(118, 128);
+            this.txtamounttopay.Location = new System.Drawing.Point(118, 124);
             this.txtamounttopay.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.txtamounttopay.Name = "txtamounttopay";
-            this.txtamounttopay.Size = new System.Drawing.Size(35, 14);
+            this.txtamounttopay.Size = new System.Drawing.Size(43, 18);
             this.txtamounttopay.TabIndex = 460;
             this.txtamounttopay.Text = "0.00";
             // 
@@ -739,7 +739,7 @@
             // 
             this.gridViewMaster.Appearance.HeaderPanel.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.gridViewMaster.Appearance.HeaderPanel.Options.UseFont = true;
-            this.gridViewMaster.Appearance.Row.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.gridViewMaster.Appearance.Row.Font = new System.Drawing.Font("Tahoma", 10.75F);
             this.gridViewMaster.Appearance.Row.Options.UseFont = true;
             this.gridViewMaster.DetailHeight = 431;
             this.gridViewMaster.GridControl = this.gridControlMaster;
@@ -890,7 +890,7 @@
             this.xtraTabPage2.Controls.Add(this.panelControl6);
             this.xtraTabPage2.Controls.Add(this.panelControl7);
             this.xtraTabPage2.Name = "xtraTabPage2";
-            this.xtraTabPage2.Size = new System.Drawing.Size(1097, 756);
+            this.xtraTabPage2.Size = new System.Drawing.Size(1097, 846);
             this.xtraTabPage2.Text = "EXPENSE ENTRIES";
             // 
             // panelControl6
@@ -899,7 +899,7 @@
             this.panelControl6.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelControl6.Location = new System.Drawing.Point(0, 46);
             this.panelControl6.Name = "panelControl6";
-            this.panelControl6.Size = new System.Drawing.Size(1097, 710);
+            this.panelControl6.Size = new System.Drawing.Size(1097, 800);
             this.panelControl6.TabIndex = 1;
             // 
             // gridControlLines
@@ -914,7 +914,7 @@
             this.repAmount,
             this.repParticulars,
             this.repBranchLine});
-            this.gridControlLines.Size = new System.Drawing.Size(1093, 706);
+            this.gridControlLines.Size = new System.Drawing.Size(1093, 796);
             this.gridControlLines.TabIndex = 1;
             this.gridControlLines.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewLines});

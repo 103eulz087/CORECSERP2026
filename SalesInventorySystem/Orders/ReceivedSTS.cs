@@ -162,8 +162,20 @@ namespace SalesInventorySystem.Orders
         private void gridControlForReceiving_MouseUp(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
-                contextMenuStripForReceiving.Show(gridControlForReceiving, e.Location);
-            contextMenuStripForReceiving.Items[0].Visible = false;
+            {
+                if(GlobalCache.CompanyName=="JFC")
+                {
+                    contextMenuStripForReceiving.Show(gridControlForReceiving, e.Location);
+                    contextMenuStripForReceiving.Items[0].Visible = false;
+                }
+                else
+                {
+                    contextMenuStripForReceiving.Show(gridControlForReceiving, e.Location);
+                    contextMenuStripForReceiving.Items[0].Visible = true;
+                    contextMenuStripForReceiving.Items[1].Visible = false;
+                }
+            }
+               
         }
 
         private void showForReceivingItemsToolStripMenuItem_Click(object sender, EventArgs e)

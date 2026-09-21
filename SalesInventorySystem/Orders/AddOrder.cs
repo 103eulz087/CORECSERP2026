@@ -725,19 +725,18 @@ namespace SalesInventorySystem
              
             else
             {
+                // Removed dead PurchaseOrderDetails.PONumber existence trap: textEdit1.Text here
+                // is always the peeked (sp_PeekPurchaseOrderNumber), not-yet-allocated PONumber --
+                // rows for it are only inserted at Save via sp_AddSalesOrderRequest, and this form
+                // has no "reopen an existing PONumber" flow, so it can never already be in the
+                // table. Also fixes a duplicate-add bug: add2() used to run once inside the
+                // if/else below AND unconditionally again after it, double-adding every line.
                 int count = 0;
-                bool checkifexists = Database.checkifExist("SELECT TOP(1) PONumber FROM PurchaseOrderDetails WHERE PONumber='" + textEdit1.Text + "' AND ProductName='" + txtpname.Text.Trim() + "'");
-
                 for (int i = 0; i <= gridView1.RowCount - 1; i++)
                 {
                     if (gridView1.GetRowCellValue(i, "ProductName").ToString() == txtpname.Text.Trim())
                     {
-                        //gridView1.SetRowCellValue(gridView1.FocusedRowHandle, "Qty", Convert.ToDouble(gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "Qty").ToString()) + Convert.ToDouble(spinEdit1.Text));
                         count = 1;
-                    }
-                    else
-                    {
-                        count += 0;
                     }
                 }
                 if (count > 0)
@@ -745,23 +744,9 @@ namespace SalesInventorySystem
                     XtraMessageBox.Show("Product Already Exist");
                     return;
                 }
-                if (checkifexists)
-                {
-                    bool ok = HelperFunction.ConfirmDialog("Product is Already Exist!. Are you Sure you want to Continue?", "Product Exists");
-                    if (ok)
-                    {
-                        add2();
-                        // display();
-                    }
-                }
-
-                else
-                {
-                    add2();
-                    // display();
-                }
+                add2();
             }
-            txteffectivedate.Enabled = false;
+            txteffectivedate.Enabled = true;
             gridView1.MoveLast();
         }
 

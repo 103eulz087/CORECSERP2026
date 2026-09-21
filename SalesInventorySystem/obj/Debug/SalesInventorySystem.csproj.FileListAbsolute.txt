@@ -1881,3 +1881,8 @@ D:\GITHUB\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.HOFo
 D:\GITHUB\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.HOFormsDevEx.StockOutPerBarcodeDetails.resources
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.HOFormsDevEx.ConversionPerBarcodeFinalize.resources
 D:\GITHUB\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.HOFormsDevEx.ConversionPerBarcodeFinalize.resources
+D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.HOFormsDevEx.AccountingReportsFormV2.resources
+D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.HOFormsDevEx.CustomersInfoV2DevEx.resources
+D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.Reporting.InventoryReport.resources
+D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.exe.config
+D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.Barcode.BarcodePrintingJFC.resources

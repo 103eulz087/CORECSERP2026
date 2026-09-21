@@ -495,7 +495,7 @@
             this.grpGLEntry.Name = "grpGLEntry";
             this.grpGLEntry.Size = new System.Drawing.Size(996, 384);
             this.grpGLEntry.TabIndex = 0;
-            this.grpGLEntry.Text = "Compound GL Entry (manual — no mapping, covers ALL checked invoices together)";
+            this.grpGLEntry.Text = "Additional GL Entry (manual, free-form — e.g. cash advances; AP-Trade/Cash/FX for checked invoices now auto-post separately)";
             // 
             // gridControlGL
             // 

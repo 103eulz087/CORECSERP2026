@@ -277,7 +277,7 @@ namespace SalesInventorySystem.POSDevEx
         private async Task ReplicateRangeAsync(string branchCode, DateTime fromDate, DateTime toDate, string machineUsed)
         {
             using (SqlConnection con = Database.getConnection())
-            using (SqlCommand cmd = new SqlCommand("dbo.sp_ReplicateSales", con))
+            using (SqlCommand cmd = new SqlCommand("dbo.sp_ReplicateSalesBatch", con))
             {
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.Add("@brcode", SqlDbType.Char, 3).Value = branchCode;
