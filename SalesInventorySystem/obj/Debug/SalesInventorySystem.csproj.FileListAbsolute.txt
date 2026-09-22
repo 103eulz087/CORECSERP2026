@@ -727,7 +727,6 @@ D:\GITHUB\CORECSERP2026\SalesInventorySystem\bin\Debug\DevExpress.DataAccess.v26
 D:\GITHUB\CORECSERP2026\SalesInventorySystem\bin\Debug\DevExpress.XtraDiagram.v26.1.xml
 D:\GITHUB\CORECSERP2026\SalesInventorySystem\bin\Debug\DevExpress.Diagram.v26.1.Core.xml
 D:\GITHUB\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.csproj.AssemblyReference.cache
-D:\GITHUB\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.exe.config
 D:\GITHUB\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.AccountingDevEx.AccountingBoard.resources
 D:\GITHUB\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.AccountingDevEx.AddExpenseDevExFrm.resources
 D:\GITHUB\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.AccountingDevEx.BalanceSheetAccountDetails.resources
@@ -1886,3 +1885,12 @@ D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.HO
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.Reporting.InventoryReport.resources
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.exe.config
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.Barcode.BarcodePrintingJFC.resources
+D:\GITHUB\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.Barcode.BarcodePrintingJFC.resources
+D:\GITHUB\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.HOFormsDevEx.AccountingReportsFormV2.resources
+D:\GITHUB\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.HOFormsDevEx.CustomersInfoV2DevEx.resources
+D:\GITHUB\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.Reporting.InventoryReport.resources
+C:\Program Files\KMSpico\temp\claude\D--GITHUB-CORECSERP2026\3f810a14-d5b6-4465-82a2-afce5b8e96d4\scratchpad\buildout\app.config
+C:\Program Files\KMSpico\temp\claude\D--GITHUB-CORECSERP2026\3f810a14-d5b6-4465-82a2-afce5b8e96d4\scratchpad\buildout\SalesInventorySystem.exe.config
+C:\Program Files\KMSpico\temp\claude\D--GITHUB-CORECSERP2026\3f810a14-d5b6-4465-82a2-afce5b8e96d4\scratchpad\buildout\SalesInventorySystem.exe
+C:\Program Files\KMSpico\temp\claude\D--GITHUB-CORECSERP2026\3f810a14-d5b6-4465-82a2-afce5b8e96d4\scratchpad\buildout\SalesInventorySystem.pdb
+D:\GITHUB\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.exe.config

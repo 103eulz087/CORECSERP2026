@@ -168,7 +168,7 @@
             this.grpResults.Location = new System.Drawing.Point(0, 77);
             this.grpResults.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.grpResults.Name = "grpResults";
-            this.grpResults.Size = new System.Drawing.Size(814, 239);
+            this.grpResults.Size = new System.Drawing.Size(814, 251);
             this.grpResults.TabIndex = 1;
             this.grpResults.Text = "Matching Tickets (each row is ONE ticket, regardless of how many branches it touc" +
     "hed)";
@@ -181,7 +181,7 @@
             this.gridControlResults.MainView = this.gridViewResults;
             this.gridControlResults.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.gridControlResults.Name = "gridControlResults";
-            this.gridControlResults.Size = new System.Drawing.Size(810, 214);
+            this.gridControlResults.Size = new System.Drawing.Size(810, 226);
             this.gridControlResults.TabIndex = 0;
             this.gridControlResults.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewResults});
@@ -211,10 +211,10 @@
             this.grpDetails.Controls.Add(this.gridControlDetails);
             this.grpDetails.Controls.Add(this.lblTicketHeader);
             this.grpDetails.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.grpDetails.Location = new System.Drawing.Point(0, 316);
+            this.grpDetails.Location = new System.Drawing.Point(0, 328);
             this.grpDetails.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.grpDetails.Name = "grpDetails";
-            this.grpDetails.Size = new System.Drawing.Size(814, 253);
+            this.grpDetails.Size = new System.Drawing.Size(814, 241);
             this.grpDetails.TabIndex = 0;
             this.grpDetails.Text = "Ticket Detail — every leg, across every branch it touched";
             // 
@@ -226,7 +226,7 @@
             this.gridControlDetails.MainView = this.gridViewDetails;
             this.gridControlDetails.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.gridControlDetails.Name = "gridControlDetails";
-            this.gridControlDetails.Size = new System.Drawing.Size(810, 187);
+            this.gridControlDetails.Size = new System.Drawing.Size(810, 175);
             this.gridControlDetails.TabIndex = 0;
             this.gridControlDetails.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewDetails});

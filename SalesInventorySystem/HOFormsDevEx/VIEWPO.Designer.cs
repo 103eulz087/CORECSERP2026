@@ -99,6 +99,7 @@
             this.gridViewConfirmedServices = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.contextMenuStripForConfirmationProducts = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItemFinalizeCost = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStripForConfirmationServices = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStripApproved = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -934,14 +935,22 @@
             // 
             this.contextMenuStripForConfirmationProducts.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.contextMenuStripForConfirmationProducts.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripMenuItemFinalizeCost,
             this.toolStripMenuItem2});
             this.contextMenuStripForConfirmationProducts.Name = "contextMenuStrip1";
-            this.contextMenuStripForConfirmationProducts.Size = new System.Drawing.Size(152, 26);
-            // 
+            this.contextMenuStripForConfirmationProducts.Size = new System.Drawing.Size(220, 48);
+            //
+            // toolStripMenuItemFinalizeCost
+            //
+            this.toolStripMenuItemFinalizeCost.Name = "toolStripMenuItemFinalizeCost";
+            this.toolStripMenuItemFinalizeCost.Size = new System.Drawing.Size(219, 22);
+            this.toolStripMenuItemFinalizeCost.Text = "Confirm and Finalize Cost";
+            this.toolStripMenuItemFinalizeCost.Click += new System.EventHandler(this.toolStripMenuItemFinalizeCost_Click);
+            //
             // toolStripMenuItem2
-            // 
+            //
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(151, 22);
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(219, 22);
             this.toolStripMenuItem2.Text = "Confirm Order";
             this.toolStripMenuItem2.Click += new System.EventHandler(this.toolStripMenuItem2_Click);
             // 
@@ -1081,6 +1090,7 @@
         private DevExpress.XtraGrid.Views.Grid.GridView gridViewConfirmedServices;
         private System.Windows.Forms.ContextMenuStrip contextMenuStripForConfirmationProducts;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem2;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemFinalizeCost;
         private System.Windows.Forms.ContextMenuStrip contextMenuStripForConfirmationServices;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem3;
         private System.Windows.Forms.ToolStripMenuItem editPurchaseOrderToolStripMenuItem;
