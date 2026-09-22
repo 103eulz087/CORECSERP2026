@@ -42,11 +42,15 @@ namespace SalesInventorySystem.AccountingDevEx
     /// auto-post their own AP-Trade legs against Credit GLCode, so a
     /// second unbalanced residual would double up on that account). It
     /// is NOT mandatory — paying an invoice with zero manual GL lines is
-    /// valid and posts fine. Checking Pay always
-    /// fully settles the invoice's Balance; Variance is purely the
-    /// difference between the actual cash (AmountToApply, editable) and
-    /// Balance — this module does not support a deliberate partial
-    /// payment of a single invoice.
+    /// valid and posts fine. Checking Pay defaults Amount to Apply to the
+    /// invoice's Balance; editing Amount to Apply auto-fills Variance
+    /// with the difference (an FX gain/loss, the invoice still settles
+    /// in full). To pay only PART of an invoice, lower Amount to Apply
+    /// and then set Variance to 0 — the row turns amber, the invoice is
+    /// reduced by Amount to Apply only (status PARTIAL) and no FX leg
+    /// posts (SQL/2026-09-21_VoucheringManual_PartialPayment.sql).
+    /// Variance is editable ONLY to 0 (any other typed value reverts to
+    /// the computed one); partial + FX on the same row isn't supported.
     ///
     /// Reuses your existing splist_Accounts SP for the invoice list
     /// (same one the original SupplierPaymentDevEx uses) — assumed
@@ -183,6 +187,11 @@ namespace SalesInventorySystem.AccountingDevEx
             txtReferenceNo.Text = IDGenerator.getIDNumberSP("sp_GetReferenceNumber", "ReferenceNumber");
             txtVoucherDate.DateTime = DateTime.Today;
 
+            // The invoice grid holds Balances as of the last Load Invoices —
+            // after a post (esp. a partial, where the invoice stays open)
+            // they're stale, so drop them; the user reloads for the next entry.
+            ClearInvoiceGrid();
+
             _glTable = new DataTable();
             _glTable.Columns.Add("AccountCode", typeof(string));
             _glTable.Columns.Add("Debit", typeof(decimal));
@@ -194,6 +203,14 @@ namespace SalesInventorySystem.AccountingDevEx
 
             RadVoucherType_CheckedChanged(null, null);
             UpdateTieStatus();
+        }
+
+        // Drops the loaded invoices (and their Balances) — used after a post
+        // and when copying a posted voucher into a new entry.
+        private void ClearInvoiceGrid()
+        {
+            _invoicesTable = null;
+            gridControlInvoices.DataSource = null;
         }
 
         private void BindBranchLookup()
@@ -231,6 +248,8 @@ namespace SalesInventorySystem.AccountingDevEx
             repGLAccountCode.DataSource = dt;
             repGLAccountCode.DisplayMember = "DisplayText";
             repGLAccountCode.ValueMember = "AccountCode";
+            // Known Bug Pattern #2: without this, free text bypasses ValueMember.
+            repGLAccountCode.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;
         }
 
         private DataTable GetDataTable(string sql)
@@ -315,22 +334,48 @@ namespace SalesInventorySystem.AccountingDevEx
 
         private void FormatInvoiceColumns()
         {
-            // Variance is derived (Amount to Apply - Balance), never
-            // typed directly — read-only, numeric-formatted.
+            // Variance is derived (Amount to Apply - Balance). The only
+            // manual edit allowed is setting it to 0 to mark a partial
+            // payment — GridViewInvoices_CellValueChanged reverts any
+            // other typed value to the computed one.
             var varianceCol = gridViewInvoices.Columns["Variance"];
             if (varianceCol != null)
             {
                 varianceCol.Caption = "Variance (FX)";
+                varianceCol.ToolTip = "Auto-filled as Amount to Apply - Balance (FX gain/loss). Set to 0 to pay this invoice only partially.";
                 varianceCol.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
                 varianceCol.DisplayFormat.FormatString = "n2";
-                varianceCol.OptionsColumn.AllowEdit = false;
+                varianceCol.OptionsColumn.AllowEdit = true;
             }
+
+            // Let a cleared Variance cell commit as null (instead of 0) so
+            // GridViewInvoices_CellValueChanged can tell "cleared" apart from
+            // a deliberate 0 = partial and snap it back.
+            repInvAmount.AllowNullInput = DevExpress.Utils.DefaultBoolean.True;
+
+            // Everything else splist_Accounts returns (Balance, InvoiceNo,
+            // ...) is reference data — only Pay / Amount to Apply / Variance
+            // are user-editable. Balance in particular feeds Variance,
+            // IsPartialRow and the ExpectedBalance sent to the SP.
+            foreach (DevExpress.XtraGrid.Columns.GridColumn col in gridViewInvoices.Columns)
+                col.OptionsColumn.AllowEdit = col.FieldName == "Pay" || col.FieldName == "AmountToApply" || col.FieldName == "Variance";
         }
 
         private void GridViewInvoices_CustomRowCellEdit(object sender, CustomRowCellEditEventArgs e)
         {
             if (e.Column.FieldName == "Pay") e.RepositoryItem = repPay;
-            if (e.Column.FieldName == "AmountToApply") e.RepositoryItem = repInvAmount;
+            if (e.Column.FieldName == "AmountToApply" || e.Column.FieldName == "Variance") e.RepositoryItem = repInvAmount;
+        }
+
+        // A checked row whose Variance was zeroed while Amount to Apply is
+        // still below Balance = a deliberate partial payment.
+        private bool IsPartialRow(int rowHandle)
+        {
+            if (!ToBool(gridViewInvoices.GetRowCellValue(rowHandle, "Pay"))) return false;
+            decimal amt = ToDecimal(gridViewInvoices.GetRowCellValue(rowHandle, "AmountToApply"));
+            decimal balance = ToDecimal(gridViewInvoices.GetRowCellValue(rowHandle, "Balance"));
+            decimal variance = ToDecimal(gridViewInvoices.GetRowCellValue(rowHandle, "Variance"));
+            return amt > 0 && Math.Round(variance, 2) == 0 && Math.Round(amt, 2) < Math.Round(balance, 2);
         }
 
         private void GridViewInvoices_CellValueChanged(object sender, DevExpress.XtraGrid.Views.Base.CellValueChangedEventArgs e)
@@ -367,6 +412,39 @@ namespace SalesInventorySystem.AccountingDevEx
                 return;
             }
 
+            if (e.Column.FieldName == "Variance")
+            {
+                // Only 0 (= partial payment) may be typed — anything else
+                // snaps back to the computed FX variance, so Variance can't
+                // be used to fudge an arbitrary gain/loss. Unchecked rows
+                // just stay at 0.
+                decimal balanceV = ToDecimal(gridViewInvoices.GetRowCellValue(e.RowHandle, "Balance"));
+                decimal amtV = ToDecimal(gridViewInvoices.GetRowCellValue(e.RowHandle, "AmountToApply"));
+                decimal entered = ToDecimal(e.Value);
+                bool paying = ToBool(gridViewInvoices.GetRowCellValue(e.RowHandle, "Pay"));
+                decimal allowed = paying ? amtV - balanceV : 0m;
+
+                // Snap back to the computed value when: the cell was
+                // cleared (blank must not silently mean "partial"), a value
+                // other than 0/computed was typed, or 0 was typed while
+                // Amount to Apply is ABOVE Balance (0 only means "partial"
+                // when there is something left over to leave open).
+                bool blank = e.Value == null || e.Value == DBNull.Value;
+                entered = Math.Round(entered, 2);
+                allowed = Math.Round(allowed, 2);
+                bool zeroButOverBalance = paying && entered == 0 && Math.Round(amtV, 2) > Math.Round(balanceV, 2);
+
+                if (blank || zeroButOverBalance || (entered != 0 && entered != allowed))
+                {
+                    _isRecalculating = true;
+                    try { gridViewInvoices.SetRowCellValue(e.RowHandle, "Variance", allowed); }
+                    finally { _isRecalculating = false; }
+                }
+
+                UpdateTieStatus();
+                return;
+            }
+
             if (e.Column.FieldName == "AmountToApply" && ToBool(gridViewInvoices.GetRowCellValue(e.RowHandle, "Pay")))
             {
                 // Variance = the difference between what's actually
@@ -379,7 +457,7 @@ namespace SalesInventorySystem.AccountingDevEx
                 _isRecalculating = true;
                 try
                 {
-                    gridViewInvoices.SetRowCellValue(e.RowHandle, "Variance", amountToApply - balance);
+                    gridViewInvoices.SetRowCellValue(e.RowHandle, "Variance", Math.Round(amountToApply - balance, 2));
                 }
                 finally
                 {
@@ -393,7 +471,9 @@ namespace SalesInventorySystem.AccountingDevEx
         private void GridViewInvoices_RowCellStyle(object sender, RowCellStyleEventArgs e)
         {
             bool isChecked = ToBool(gridViewInvoices.GetRowCellValue(e.RowHandle, "Pay"));
-            if (isChecked) e.Appearance.BackColor = System.Drawing.Color.LightGreen;
+            if (isChecked) e.Appearance.BackColor = IsPartialRow(e.RowHandle)
+                ? System.Drawing.Color.Gold          // partial payment — invoice stays open
+                : System.Drawing.Color.LightGreen;
         }
 
         // ── GL Entry ─────────────────────────────────────────────
@@ -448,12 +528,20 @@ namespace SalesInventorySystem.AccountingDevEx
             // will auto-post, for the user's own sanity check before
             // hitting Post.
             decimal totalAmountToApply = 0, totalVariance = 0;
+            var partialNotes = new System.Collections.Generic.List<string>();
             if (gridViewInvoices.GridControl != null && _invoicesTable != null)
                 for (int i = 0; i < gridViewInvoices.RowCount; i++)
                     if (ToBool(gridViewInvoices.GetRowCellValue(i, "Pay")))
                     {
                         totalAmountToApply += ToDecimal(gridViewInvoices.GetRowCellValue(i, "AmountToApply"));
                         totalVariance += ToDecimal(gridViewInvoices.GetRowCellValue(i, "Variance"));
+
+                        if (IsPartialRow(i))
+                        {
+                            decimal pAmt = ToDecimal(gridViewInvoices.GetRowCellValue(i, "AmountToApply"));
+                            decimal pBal = ToDecimal(gridViewInvoices.GetRowCellValue(i, "Balance"));
+                            partialNotes.Add($"{gridViewInvoices.GetRowCellValue(i, "InvoiceNo")}: paying {pAmt:N2}, {pBal - pAmt:N2} stays open");
+                        }
                     }
 
             if (totalAmountToApply <= 0)
@@ -467,8 +555,12 @@ namespace SalesInventorySystem.AccountingDevEx
                     : totalVariance > 0
                         ? $" + FX loss {totalVariance:N2} (Debit 60323 / Credit AP-Trade)"
                         : $" + FX gain {-totalVariance:N2} (Debit AP-Trade / Credit 60323)";
-                lblTieStatus.Text = $"Auto-posts: Debit AP-Trade / Credit Credit-GLCode {totalAmountToApply:N2}{fxPart}.";
-                lblTieStatus.Appearance.ForeColor = System.Drawing.Color.SeaGreen;
+                string partialPart = partialNotes.Count == 0 ? ""
+                    : " PARTIAL — " + string.Join("; ", partialNotes) + ".";
+                lblTieStatus.Text = $"Auto-posts: Debit AP-Trade / Credit Credit-GLCode {totalAmountToApply:N2}{fxPart}.{partialPart}";
+                lblTieStatus.Appearance.ForeColor = partialNotes.Count == 0
+                    ? System.Drawing.Color.SeaGreen
+                    : System.Drawing.Color.DarkGoldenrod;
             }
 
             // CHANGED 2026-09-16: when no invoices are checked, the
@@ -539,7 +631,8 @@ namespace SalesInventorySystem.AccountingDevEx
             dt.Columns.Add("SequenceReferenceNumber", typeof(string));
             dt.Columns.Add("BatchReferenceID", typeof(long));
             dt.Columns.Add("AmountPaid", typeof(decimal));
-            dt.Columns.Add("Variance", typeof(decimal));   // NEW — must stay LAST, matches dbo.VoucherManualInvoiceTVP_v2's column order
+            dt.Columns.Add("Variance", typeof(decimal));
+            dt.Columns.Add("ExpectedBalance", typeof(decimal));   // NEW — must stay LAST, matches dbo.VoucherManualInvoiceTVP_v3's column order
 
             for (int i = 0; i < gridViewInvoices.RowCount; i++)
             {
@@ -560,7 +653,11 @@ namespace SalesInventorySystem.AccountingDevEx
                     branch, invoiceNo,
                     seqRefObj == null || seqRefObj == DBNull.Value ? (object)DBNull.Value : seqRefObj.ToString(),
                     batchRefObj == null || batchRefObj == DBNull.Value ? (object)DBNull.Value : Convert.ToInt64(batchRefObj),
-                    amt, variance);
+                    amt, variance,
+                    // The Balance this grid row was loaded with — the SP
+                    // rejects the post if the invoice's live Balance differs
+                    // (stale grid), which is what makes a partial safe.
+                    ToDecimal(gridViewInvoices.GetRowCellValue(i, "Balance")));
             }
             return dt;
         }
@@ -633,6 +730,27 @@ namespace SalesInventorySystem.AccountingDevEx
                     string invNo = gridViewInvoices.GetRowCellValue(i, "InvoiceNo")?.ToString();
                     XtraMessageBox.Show(
                         $"Invoice {invNo} is checked but Amount to Apply is {amt:N2}.\nUncheck it or enter a positive amount.",
+                        "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return false;
+                }
+            }
+
+            // NEW 2026-09-21: Variance may be zeroed to mark a partial
+            // payment, but zero Variance with Amount to Apply ABOVE Balance
+            // is an unexplained overpayment — reject it (also enforced
+            // server-side, sp_PostVoucherManual THROW 58030).
+            for (int i = 0; i < gridViewInvoices.RowCount; i++)
+            {
+                if (!ToBool(gridViewInvoices.GetRowCellValue(i, "Pay"))) continue;
+
+                decimal amt = ToDecimal(gridViewInvoices.GetRowCellValue(i, "AmountToApply"));
+                decimal balance = ToDecimal(gridViewInvoices.GetRowCellValue(i, "Balance"));
+                decimal variance = ToDecimal(gridViewInvoices.GetRowCellValue(i, "Variance"));
+                if (Math.Round(variance, 2) == 0 && Math.Round(amt, 2) > Math.Round(balance, 2))
+                {
+                    string invNo = gridViewInvoices.GetRowCellValue(i, "InvoiceNo")?.ToString();
+                    XtraMessageBox.Show(
+                        $"Invoice {invNo}: Amount to Apply ({amt:N2}) is above its Balance ({balance:N2}) with Variance 0.\nFor a partial payment lower Amount to Apply; for an FX difference leave Variance as computed.",
                         "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return false;
                 }
@@ -776,7 +894,7 @@ namespace SalesInventorySystem.AccountingDevEx
 
                     var invParam = cmd.Parameters.AddWithValue("@InvoiceLines", invLines);
                     invParam.SqlDbType = SqlDbType.Structured;
-                    invParam.TypeName = "dbo.VoucherManualInvoiceTVP_v2";
+                    invParam.TypeName = "dbo.VoucherManualInvoiceTVP_v3";
 
                     var glParam = cmd.Parameters.AddWithValue("@GLLines", glLines);
                     glParam.SqlDbType = SqlDbType.Structured;
@@ -971,6 +1089,7 @@ namespace SalesInventorySystem.AccountingDevEx
             // not re-paying the same invoices) — adjust the reset call
             // to whatever your actual "start new entry" method is named
             txtReferenceNo.Text = IDGenerator.getIDNumberSP("sp_GetReferenceNumber", "ReferenceNumber");
+            ClearInvoiceGrid();   // don't let previously loaded/checked rows (and their stale Balances) ride into the copy
             _glTable.Rows.Clear();
 
             foreach (DataRow src in glLines.Rows)

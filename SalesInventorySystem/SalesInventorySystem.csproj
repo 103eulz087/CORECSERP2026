@@ -1818,6 +1818,12 @@
     <Compile Include="HOFormsDevEx\ViewNonTradeOrdersDevEx.Designer.cs">
       <DependentUpon>ViewNonTradeOrdersDevEx.cs</DependentUpon>
     </Compile>
+    <Compile Include="HOFormsDevEx\POFinalizeCostFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HOFormsDevEx\POFinalizeCostFrm.Designer.cs">
+      <DependentUpon>POFinalizeCostFrm.cs</DependentUpon>
+    </Compile>
     <Compile Include="HOFormsDevEx\VIEWPODETAILSUpdateCost.cs">
       <SubType>Form</SubType>
     </Compile>

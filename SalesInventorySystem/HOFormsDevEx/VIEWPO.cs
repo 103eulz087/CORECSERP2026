@@ -22,6 +22,7 @@ namespace SalesInventorySystem.HOFormsDevEx
         public VIEWPO()
         {
             InitializeComponent();
+            contextMenuStripForConfirmationProducts.Opening += contextMenuStripForConfirmationProducts_Opening;
         }
 
         //void getDateApart(DateTime today,DateTime oneMonthAgo)
@@ -332,12 +333,58 @@ namespace SalesInventorySystem.HOFormsDevEx
         private void gridControlProductForConfirmation_MouseUp(object sender, MouseEventArgs e)
         {
             if (e.Button == System.Windows.Forms.MouseButtons.Right)
+            {
+                // Act on the row that was actually right-clicked, not whichever
+                // row happened to be focused - both menu items post against
+                // the focused row.
+                var hit = gridViewProductForConfirmation.CalcHitInfo(e.Location);
+                if (hit.InRow || hit.InRowCell)
+                    gridViewProductForConfirmation.FocusedRowHandle = hit.RowHandle;
+
                 contextMenuStripForConfirmationProducts.Show(gridControlProductForConfirmation, e.Location);
+            }
+        }
+
+        private string FocusedConfirmationStatus()
+        {
+            int row = gridViewProductForConfirmation.FocusedRowHandle;
+            if (row < 0) return "";
+            return gridViewProductForConfirmation.GetRowCellValue(row, "Status")?.ToString() ?? "";
+        }
+
+        // "Confirm and Finalize Cost" applies to POs still FOR CONFIRMATION;
+        // "Confirm Order" (the AP step) applies only after the cost is final,
+        // i.e. once the PO is RECEIVED.
+        private void contextMenuStripForConfirmationProducts_Opening(object sender, CancelEventArgs e)
+        {
+            string status = FocusedConfirmationStatus();
+            toolStripMenuItemFinalizeCost.Enabled = status == "FOR CONFIRMATION";
+            toolStripMenuItem2.Enabled = status == "RECEIVED";
+        }
+
+        private void toolStripMenuItemFinalizeCost_Click(object sender, EventArgs e)
+        {
+            int row = gridViewProductForConfirmation.FocusedRowHandle;
+            if (row < 0) return;
+
+            string shipmentno = gridViewProductForConfirmation.GetRowCellValue(row, "ShipmentNo")?.ToString();
+            string supplierid = gridViewProductForConfirmation.GetRowCellValue(row, "SupplierID")?.ToString();
+            if (string.IsNullOrWhiteSpace(shipmentno) || string.IsNullOrWhiteSpace(supplierid)) return;
+
+            string suppliername = Database.getSingleQuery("Supplier", "SupplierID='" + supplierid + "'", "SupplierName");
+
+            using (var frm = new POFinalizeCostFrm(shipmentno, supplierid, suppliername))
+            {
+                if (!frm.LoadData()) return;   // nothing to finalize (already told the user why)
+
+                if (frm.ShowDialog(this) == DialogResult.OK)
+                    btnForConfirmProd.PerformClick();   // status is now RECEIVED - refresh the tab
+            }
         }
 
         private void toolStripMenuItem2_Click(object sender, EventArgs e)
         {
-            displayItems();  
+            displayItems();
         }
 
         void displayItems()
@@ -567,6 +614,36 @@ namespace SalesInventorySystem.HOFormsDevEx
             }, grid, view);
         }
 
+        // Same as LoadPOByStatus, for a tab that lists more than one status.
+        private void LoadPOByStatuses(
+                            string[] statuses,
+                            DateTimePicker fromPicker,
+                            DateTimePicker toPicker,
+                            DevExpress.XtraGrid.GridControl grid,
+                            DevExpress.XtraGrid.Views.Grid.GridView view)
+        {
+            DateTime fromDate = fromPicker.Value.Date;
+            DateTime toDateExclusive = toPicker.Value.Date.AddDays(1);
+
+            string inList = string.Join(", ", statuses.Select((s, i) => "@status" + i));
+            string sql = $@"
+                        SELECT *
+                        FROM view_POSUMMARYREP
+                        WHERE Status IN ({inList})
+                          AND OrderType = 'P'
+                          AND DateOrder >= @fromDate
+                          AND DateOrder <  @toDateExclusive
+                        ORDER BY ShipmentNo DESC";
+
+            LoadGrid(sql, cmd =>
+            {
+                for (int i = 0; i < statuses.Length; i++)
+                    cmd.Parameters.Add("@status" + i, SqlDbType.VarChar, 30).Value = statuses[i];
+                cmd.Parameters.Add("@fromDate", SqlDbType.DateTime).Value = fromDate;
+                cmd.Parameters.Add("@toDateExclusive", SqlDbType.DateTime).Value = toDateExclusive;
+            }, grid, view);
+        }
+
         private void btnForApprovalProd_Click(object sender, EventArgs e)
         {
 
@@ -591,7 +668,10 @@ namespace SalesInventorySystem.HOFormsDevEx
         private void btnForConfirmProd_Click(object sender, EventArgs e)
         {
 
-            LoadPOByStatus("FOR CONFIRMATION", dateFromForConfirmProd, dateToForConfirmProd,
+            // FOR CONFIRMATION (cost to finalize) and RECEIVED (cost final, AP step
+            // pending) both live on this tab; the context menu enables the right
+            // action per row status.
+            LoadPOByStatuses(new[] { "FOR CONFIRMATION", "RECEIVED" }, dateFromForConfirmProd, dateToForConfirmProd,
                     gridControlProductForConfirmation, gridViewProductForConfirmation);
 
             //Database.display($"SELECT * FROM view_POSUMMARYREP WHERE Status='FOR CONFIRMATION' And OrderType='P' AND CAST(DateOrder as date) between '{dateFromForConfirmProd.Text}' and '{dateToForConfirmProd.Text}'  ORDER BY ShipmentNo DESC", gridControlProductForConfirmation, gridViewProductForConfirmation);
