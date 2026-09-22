@@ -514,6 +514,7 @@ namespace SalesInventorySystem.AccountingDevEx
                     cmd.Parameters.Add("@BranchCode", SqlDbType.VarChar, 5).Value =
                         chkAllBranches.Checked || cboFilterBranch.EditValue == null
                             ? (object)DBNull.Value : cboFilterBranch.EditValue.ToString();
+                    cmd.Parameters.Add("@POLinkedOnly", SqlDbType.Bit).Value = chkPOLinkedOnly.Checked;
 
                     var dt = new DataTable();
                     con.Open();
@@ -524,6 +525,7 @@ namespace SalesInventorySystem.AccountingDevEx
                 gridViewPosted.BestFitColumns();
                 if (gridViewPosted.Columns["SupplierID"] != null) gridViewPosted.Columns["SupplierID"].Visible = false;
                 if (gridViewPosted.Columns["BranchCode"] != null) gridViewPosted.Columns["BranchCode"].Visible = false;
+                if (gridViewPosted.Columns["ShipmentNo"] != null) gridViewPosted.Columns["ShipmentNo"].Caption = "Linked PO";
 
                 // sp_GetPostedSingleExpenses now returns these as DECIMAL (was FORMAT()-ed
                 // VARCHAR, which sorted alphabetically instead of by value -- CLAUDE.md
@@ -539,6 +541,7 @@ namespace SalesInventorySystem.AccountingDevEx
                 btnViewDetails.Enabled = false;
                 btnCopyToNew.Enabled = false;
                 btnEdit.Enabled = false;
+                btnViewPODetails.Enabled = false;
                 _selectedPostedRefNo = null;
             }
             catch (SqlException ex)
@@ -559,18 +562,19 @@ namespace SalesInventorySystem.AccountingDevEx
                 _selectedPostedInvoiceNo = gridViewPosted.GetFocusedRowCellValue("InvoiceNo")?.ToString();
                 _selectedPostedSupplierId = gridViewPosted.GetFocusedRowCellValue("SupplierID")?.ToString();
 
-                // AmountPaid/ShipmentNo aren't columns on the LIST grid
-                // (sp_GetPostedSingleExpenses), only on the DETAILS query —
-                // Edit's real eligibility check happens in BtnEdit_Click
-                // itself via sp_GetSingleExpenseDetails' BlockedReason.
-                // Enable optimistically here; the click handler is the
-                // actual gate.
+                // AmountPaid isn't a column on the LIST grid (sp_GetPostedSingleExpenses),
+                // only on the DETAILS query — Edit's real eligibility check happens in
+                // BtnEdit_Click itself via sp_GetSingleExpenseDetails' BlockedReason.
+                // Enable optimistically here; the click handler is the actual gate.
                 btnEdit.Enabled = true;
+                string shipmentNo = gridViewPosted.GetFocusedRowCellValue("ShipmentNo")?.ToString();
+                btnViewPODetails.Enabled = !string.IsNullOrWhiteSpace(shipmentNo);
             }
             else
             {
                 _selectedPostedRefNo = _selectedPostedInvoiceNo = _selectedPostedSupplierId = null;
                 btnEdit.Enabled = false;
+                btnViewPODetails.Enabled = false;
             }
         }
 
@@ -580,6 +584,39 @@ namespace SalesInventorySystem.AccountingDevEx
         }
 
         private void BtnViewDetails_Click(object sender, EventArgs e) => LoadSelectedDetails();
+
+        // Right-click doesn't move the focused row in a DevExpress GridView by
+        // default -- without this, the context menu would act on whatever row
+        // was last left-clicked instead of the one under the cursor.
+        private void GridViewPosted_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Right) return;
+            var hit = gridViewPosted.CalcHitInfo(e.Location);
+            if (hit.InRow || hit.InRowCell)
+                gridViewPosted.FocusedRowHandle = hit.RowHandle;
+        }
+
+        private void CmsPosted_Opening(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            miViewPODetails.Enabled = btnViewPODetails.Enabled;
+        }
+
+        private void BtnViewPODetails_Click(object sender, EventArgs e)
+        {
+            if (gridViewPosted.FocusedRowHandle < 0) return;
+
+            string shipmentNo = gridViewPosted.GetFocusedRowCellValue("ShipmentNo")?.ToString();
+            string supplierId = gridViewPosted.GetFocusedRowCellValue("SupplierID")?.ToString();
+
+            if (string.IsNullOrWhiteSpace(shipmentNo))
+            {
+                XtraMessageBox.Show("This expense is not linked to a Purchase Order.", "Not Linked", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            using (var frm = new ViewLinkedPODetailsFrm(shipmentNo, supplierId))
+                frm.ShowDialog(this);
+        }
 
         private void LoadSelectedDetails()
         {

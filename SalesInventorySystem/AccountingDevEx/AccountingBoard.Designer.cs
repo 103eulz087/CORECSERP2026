@@ -34,8 +34,6 @@ namespace SalesInventorySystem.AccountingDevEx
 
         private AccordionControlElement menuManualTicket;
         private AccordionControlElement menuBankRecon;
-        private AccordionControlElement menuReports;
-        private AccordionControlElement menuReportsV2;
         private AccordionControlElement menuGLTicketEntries;
 
         protected override void Dispose(bool disposing)
@@ -64,8 +62,6 @@ namespace SalesInventorySystem.AccountingDevEx
             this.menuExpenseBatch = new DevExpress.XtraBars.Navigation.AccordionControlElement();
             this.menuManualTicket = new DevExpress.XtraBars.Navigation.AccordionControlElement();
             this.menuBankRecon = new DevExpress.XtraBars.Navigation.AccordionControlElement();
-            this.menuReports = new DevExpress.XtraBars.Navigation.AccordionControlElement();
-            this.menuReportsV2 = new DevExpress.XtraBars.Navigation.AccordionControlElement();
             this.menuGLTicketEntries = new DevExpress.XtraBars.Navigation.AccordionControlElement();
             ((System.ComponentModel.ISupportInitialize)(this.fluentDesignFormControl1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.accordionControl1)).BeginInit();
@@ -100,8 +96,6 @@ namespace SalesInventorySystem.AccountingDevEx
             this.groupExpense,
             this.menuManualTicket,
             this.menuBankRecon,
-            this.menuReports,
-            this.menuReportsV2,
             this.menuGLTicketEntries});
             this.accordionControl1.Location = new System.Drawing.Point(0, 31);
             this.accordionControl1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
@@ -202,21 +196,6 @@ namespace SalesInventorySystem.AccountingDevEx
             this.menuBankRecon.Text = "Bank Recon";
             this.menuBankRecon.Click += new System.EventHandler(this.menuBankRecon_Click);
             // 
-            // menuReports
-            // 
-            this.menuReports.Name = "menuReports";
-            this.menuReports.Style = DevExpress.XtraBars.Navigation.ElementStyle.Item;
-            this.menuReports.Tag = "navReports";
-            this.menuReports.Text = "Reports";
-            this.menuReports.Click += new System.EventHandler(this.menuReports_Click);
-            //
-            // menuReportsV2
-            //
-            this.menuReportsV2.Name = "menuReportsV2";
-            this.menuReportsV2.Style = DevExpress.XtraBars.Navigation.ElementStyle.Item;
-            this.menuReportsV2.Tag = "navReportsV2";
-            this.menuReportsV2.Text = "Reports V2";
-            //
             // menuGLTicketEntries
             // 
             this.menuGLTicketEntries.Name = "menuGLTicketEntries";

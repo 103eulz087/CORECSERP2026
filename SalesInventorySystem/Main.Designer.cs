@@ -325,6 +325,7 @@
             this.barButtonItem103 = new DevExpress.XtraBars.BarButtonItem();
             this.barButtonItem1 = new DevExpress.XtraBars.BarButtonItem();
             this.barButtonItem5 = new DevExpress.XtraBars.BarButtonItem();
+            this.btnCostingReconReport = new DevExpress.XtraBars.BarButtonItem();
             ((System.ComponentModel.ISupportInitialize)(this.ribbonControl)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.popupMenuTickets)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.popupMenuInvTransfer)).BeginInit();
@@ -584,10 +585,11 @@
             this.btnSummaryInventoryConso,
             this.btnSupplierDebitCreditMemo,
             this.btnAccountingBoard,
-            this.barbtnPOSAutomation});
+            this.barbtnPOSAutomation,
+            this.btnCostingReconReport});
             this.ribbonControl.Location = new System.Drawing.Point(0, 0);
             this.ribbonControl.Margin = new System.Windows.Forms.Padding(0, 3, 0, 3);
-            this.ribbonControl.MaxItemId = 238;
+            this.ribbonControl.MaxItemId = 239;
             this.ribbonControl.Name = "ribbonControl";
             this.ribbonControl.OptionsMenuMinWidth = 283;
             this.ribbonControl.PageHeaderItemLinks.Add(this.barStaticItem2);
@@ -1125,7 +1127,7 @@
             this.btnFinanceReport.Caption = "Financial Report";
             this.btnFinanceReport.CategoryGuid = new System.Guid("6ffddb2b-9015-4d97-a4c1-91613e0ef537");
             this.btnFinanceReport.Id = 57;
-            this.btnFinanceReport.ImageOptions.LargeImage = ((System.Drawing.Image)(resources.GetObject("btnBalanceSheet.ImageOptions.LargeImage")));
+            this.btnFinanceReport.ImageOptions.LargeImage = ((System.Drawing.Image)(resources.GetObject("btnFinanceReport.ImageOptions.LargeImage")));
             this.btnFinanceReport.Name = "btnFinanceReport";
             this.btnFinanceReport.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
             this.btnFinanceReport.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.barButtonItem50_ItemClick);
@@ -3135,6 +3137,7 @@
             this.ribbonPageGroup11.ItemLinks.Add(this.btnConversionReportMasterDetail);
             this.ribbonPageGroup11.ItemLinks.Add(this.btnInventoryUnitActivityReport);
             this.ribbonPageGroup11.ItemLinks.Add(this.btnItemCostingReport);
+            this.ribbonPageGroup11.ItemLinks.Add(this.btnCostingReconReport);
             this.ribbonPageGroup11.Name = "ribbonPageGroup11";
             this.ribbonPageGroup11.Text = "INVENTORY REPORTS";
             // 
@@ -3341,6 +3344,15 @@
             this.barButtonItem5.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("barButtonItem5.ImageOptions.Image")));
             this.barButtonItem5.Name = "barButtonItem5";
             this.barButtonItem5.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
+            // 
+            // btnCostingReconReport
+            // 
+            this.btnCostingReconReport.Caption = "Costing Recon Summary";
+            this.btnCostingReconReport.Id = 238;
+            this.btnCostingReconReport.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnCostingReconReport.ImageOptions.Image")));
+            this.btnCostingReconReport.ImageOptions.LargeImage = ((System.Drawing.Image)(resources.GetObject("btnCostingReconReport.ImageOptions.LargeImage")));
+            this.btnCostingReconReport.Name = "btnCostingReconReport";
+            this.btnCostingReconReport.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnCostingReconReport_ItemClick);
             // 
             // Main
             // 
@@ -3681,5 +3693,6 @@
         private DevExpress.XtraBars.BarButtonItem btnAccountingBoard;
         private DevExpress.XtraBars.PopupMenu popupMenuTickets;
         private DevExpress.XtraBars.BarButtonItem barbtnPOSAutomation;
+        private DevExpress.XtraBars.BarButtonItem btnCostingReconReport;
     }
 }

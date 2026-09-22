@@ -71,21 +71,26 @@
         private DevExpress.XtraEditors.LabelControl lblFilterBranch;
         private DevExpress.XtraEditors.CheckEdit chkAllBranches;
         private DevExpress.XtraEditors.LookUpEdit cboFilterBranch;
+        private DevExpress.XtraEditors.CheckEdit chkPOLinkedOnly;
         private DevExpress.XtraEditors.SimpleButton btnRefreshPosted;
 
         private DevExpress.XtraGrid.GridControl gridControlPosted;
         private DevExpress.XtraGrid.Views.Grid.GridView gridViewPosted;
+        private System.Windows.Forms.ContextMenuStrip cmsPosted;
+        private System.Windows.Forms.ToolStripMenuItem miViewPODetails;
 
         private DevExpress.XtraEditors.PanelControl pnlPostedButtons;
         private DevExpress.XtraEditors.SimpleButton btnViewDetails;
         private DevExpress.XtraEditors.SimpleButton btnCopyToNew;
         private DevExpress.XtraEditors.SimpleButton btnEdit;
+        private DevExpress.XtraEditors.SimpleButton btnViewPODetails;
 
         private DevExpress.XtraGrid.GridControl gridControlPostedDetails;
         private DevExpress.XtraGrid.Views.Grid.GridView gridViewPostedDetails;
 
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.tabMain = new DevExpress.XtraTab.XtraTabControl();
             this.tabEntry = new DevExpress.XtraTab.XtraTabPage();
             this.grpLines = new DevExpress.XtraEditors.GroupControl();
@@ -138,9 +143,12 @@
             this.gridViewPostedDetails = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.pnlPostedButtons = new DevExpress.XtraEditors.PanelControl();
             this.btnViewDetails = new DevExpress.XtraEditors.SimpleButton();
+            this.btnViewPODetails = new DevExpress.XtraEditors.SimpleButton();
             this.btnCopyToNew = new DevExpress.XtraEditors.SimpleButton();
             this.btnEdit = new DevExpress.XtraEditors.SimpleButton();
             this.gridControlPosted = new DevExpress.XtraGrid.GridControl();
+            this.cmsPosted = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.miViewPODetails = new System.Windows.Forms.ToolStripMenuItem();
             this.gridViewPosted = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.pnlPostedFilter = new DevExpress.XtraEditors.PanelControl();
             this.lblDateFrom = new DevExpress.XtraEditors.LabelControl();
@@ -150,6 +158,7 @@
             this.lblFilterBranch = new DevExpress.XtraEditors.LabelControl();
             this.cboFilterBranch = new DevExpress.XtraEditors.LookUpEdit();
             this.chkAllBranches = new DevExpress.XtraEditors.CheckEdit();
+            this.chkPOLinkedOnly = new DevExpress.XtraEditors.CheckEdit();
             this.btnRefreshPosted = new DevExpress.XtraEditors.SimpleButton();
             this.btnNewEntry = new DevExpress.XtraEditors.SimpleButton();
             ((System.ComponentModel.ISupportInitialize)(this.tabMain)).BeginInit();
@@ -189,6 +198,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.pnlPostedButtons)).BeginInit();
             this.pnlPostedButtons.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridControlPosted)).BeginInit();
+            this.cmsPosted.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridViewPosted)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pnlPostedFilter)).BeginInit();
             this.pnlPostedFilter.SuspendLayout();
@@ -198,6 +208,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.txtDateTo.Properties.CalendarTimeProperties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.cboFilterBranch.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chkAllBranches.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chkPOLinkedOnly.Properties)).BeginInit();
             this.SuspendLayout();
             // 
             // tabMain
@@ -206,7 +217,7 @@
             this.tabMain.Location = new System.Drawing.Point(0, 0);
             this.tabMain.Name = "tabMain";
             this.tabMain.SelectedTabPage = this.tabEntry;
-            this.tabMain.Size = new System.Drawing.Size(938, 790);
+            this.tabMain.Size = new System.Drawing.Size(1024, 768);
             this.tabMain.TabIndex = 0;
             this.tabMain.TabPages.AddRange(new DevExpress.XtraTab.XtraTabPage[] {
             this.tabEntry,
@@ -220,7 +231,7 @@
             this.tabEntry.Controls.Add(this.panelControl1);
             this.tabEntry.Controls.Add(this.grpHeader);
             this.tabEntry.Name = "tabEntry";
-            this.tabEntry.Size = new System.Drawing.Size(936, 760);
+            this.tabEntry.Size = new System.Drawing.Size(936, 765);
             this.tabEntry.Text = "Post Expense";
             // 
             // grpLines
@@ -230,14 +241,14 @@
             this.grpLines.Dock = System.Windows.Forms.DockStyle.Fill;
             this.grpLines.Location = new System.Drawing.Point(0, 322);
             this.grpLines.Name = "grpLines";
-            this.grpLines.Size = new System.Drawing.Size(936, 339);
+            this.grpLines.Size = new System.Drawing.Size(936, 344);
             this.grpLines.TabIndex = 0;
             this.grpLines.Text = "GL Entries";
             // 
             // gridControlLines
             // 
             this.gridControlLines.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControlLines.Location = new System.Drawing.Point(2, 28);
+            this.gridControlLines.Location = new System.Drawing.Point(2, 23);
             this.gridControlLines.MainView = this.gridViewLines;
             this.gridControlLines.Name = "gridControlLines";
             this.gridControlLines.RepositoryItems.AddRange(new DevExpress.XtraEditors.Repository.RepositoryItem[] {
@@ -245,7 +256,7 @@
             this.repDebit,
             this.repCredit,
             this.repParticulars});
-            this.gridControlLines.Size = new System.Drawing.Size(932, 309);
+            this.gridControlLines.Size = new System.Drawing.Size(932, 319);
             this.gridControlLines.TabIndex = 0;
             this.gridControlLines.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewLines});
@@ -374,7 +385,7 @@
             this.panelControl2.Controls.Add(this.lblTotalCreditCaption);
             this.panelControl2.Controls.Add(this.lblTotalCredit);
             this.panelControl2.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panelControl2.Location = new System.Drawing.Point(0, 661);
+            this.panelControl2.Location = new System.Drawing.Point(0, 666);
             this.panelControl2.Name = "panelControl2";
             this.panelControl2.Size = new System.Drawing.Size(936, 42);
             this.panelControl2.TabIndex = 4;
@@ -392,7 +403,7 @@
             // 
             this.lblTotalDebitCaption.Location = new System.Drawing.Point(239, 11);
             this.lblTotalDebitCaption.Name = "lblTotalDebitCaption";
-            this.lblTotalDebitCaption.Size = new System.Drawing.Size(67, 16);
+            this.lblTotalDebitCaption.Size = new System.Drawing.Size(56, 13);
             this.lblTotalDebitCaption.TabIndex = 3;
             this.lblTotalDebitCaption.Text = "Total Debit:";
             // 
@@ -402,7 +413,7 @@
             this.lblTotalDebit.Appearance.Options.UseFont = true;
             this.lblTotalDebit.Location = new System.Drawing.Point(319, 11);
             this.lblTotalDebit.Name = "lblTotalDebit";
-            this.lblTotalDebit.Size = new System.Drawing.Size(35, 18);
+            this.lblTotalDebit.Size = new System.Drawing.Size(28, 14);
             this.lblTotalDebit.TabIndex = 4;
             this.lblTotalDebit.Text = "0.00";
             // 
@@ -419,7 +430,7 @@
             // 
             this.lblTotalCreditCaption.Location = new System.Drawing.Point(419, 11);
             this.lblTotalCreditCaption.Name = "lblTotalCreditCaption";
-            this.lblTotalCreditCaption.Size = new System.Drawing.Size(72, 16);
+            this.lblTotalCreditCaption.Size = new System.Drawing.Size(60, 13);
             this.lblTotalCreditCaption.TabIndex = 5;
             this.lblTotalCreditCaption.Text = "Total Credit:";
             // 
@@ -429,7 +440,7 @@
             this.lblTotalCredit.Appearance.Options.UseFont = true;
             this.lblTotalCredit.Location = new System.Drawing.Point(499, 11);
             this.lblTotalCredit.Name = "lblTotalCredit";
-            this.lblTotalCredit.Size = new System.Drawing.Size(35, 18);
+            this.lblTotalCredit.Size = new System.Drawing.Size(28, 14);
             this.lblTotalCredit.TabIndex = 6;
             this.lblTotalCredit.Text = "0.00";
             // 
@@ -437,7 +448,7 @@
             // 
             this.panelControl1.Controls.Add(this.btnSubmit);
             this.panelControl1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panelControl1.Location = new System.Drawing.Point(0, 703);
+            this.panelControl1.Location = new System.Drawing.Point(0, 708);
             this.panelControl1.Name = "panelControl1";
             this.panelControl1.Size = new System.Drawing.Size(936, 57);
             this.panelControl1.TabIndex = 3;
@@ -484,7 +495,7 @@
             // 
             this.labelControl1.Location = new System.Drawing.Point(306, 69);
             this.labelControl1.Name = "labelControl1";
-            this.labelControl1.Size = new System.Drawing.Size(69, 16);
+            this.labelControl1.Size = new System.Drawing.Size(58, 13);
             this.labelControl1.TabIndex = 17;
             this.labelControl1.Text = "Ticket Date:";
             // 
@@ -492,7 +503,7 @@
             // 
             this.lblReferenceNo.Location = new System.Drawing.Point(16, 34);
             this.lblReferenceNo.Name = "lblReferenceNo";
-            this.lblReferenceNo.Size = new System.Drawing.Size(86, 16);
+            this.lblReferenceNo.Size = new System.Drawing.Size(74, 13);
             this.lblReferenceNo.TabIndex = 0;
             this.lblReferenceNo.Text = "Reference No.:";
             // 
@@ -501,14 +512,14 @@
             this.txtReferenceNo.Location = new System.Drawing.Point(150, 31);
             this.txtReferenceNo.Name = "txtReferenceNo";
             this.txtReferenceNo.Properties.ReadOnly = true;
-            this.txtReferenceNo.Size = new System.Drawing.Size(150, 22);
+            this.txtReferenceNo.Size = new System.Drawing.Size(150, 20);
             this.txtReferenceNo.TabIndex = 1;
             // 
             // lblTicketNo
             // 
             this.lblTicketNo.Location = new System.Drawing.Point(16, 69);
             this.lblTicketNo.Name = "lblTicketNo";
-            this.lblTicketNo.Size = new System.Drawing.Size(62, 16);
+            this.lblTicketNo.Size = new System.Drawing.Size(52, 13);
             this.lblTicketNo.TabIndex = 2;
             this.lblTicketNo.Text = "Ticket No.:";
             // 
@@ -517,14 +528,14 @@
             this.txtTicketNo.Location = new System.Drawing.Point(150, 66);
             this.txtTicketNo.Name = "txtTicketNo";
             this.txtTicketNo.Properties.ReadOnly = true;
-            this.txtTicketNo.Size = new System.Drawing.Size(150, 22);
+            this.txtTicketNo.Size = new System.Drawing.Size(150, 20);
             this.txtTicketNo.TabIndex = 3;
             // 
             // lblBranch
             // 
             this.lblBranch.Location = new System.Drawing.Point(16, 105);
             this.lblBranch.Name = "lblBranch";
-            this.lblBranch.Size = new System.Drawing.Size(44, 16);
+            this.lblBranch.Size = new System.Drawing.Size(37, 13);
             this.lblBranch.TabIndex = 4;
             this.lblBranch.Text = "Branch:";
             // 
@@ -533,7 +544,7 @@
             this.cboBranch.Location = new System.Drawing.Point(150, 102);
             this.cboBranch.Name = "cboBranch";
             this.cboBranch.Properties.PopupView = this.gridViewBranchPopup;
-            this.cboBranch.Size = new System.Drawing.Size(300, 22);
+            this.cboBranch.Size = new System.Drawing.Size(300, 20);
             this.cboBranch.TabIndex = 5;
             // 
             // gridViewBranchPopup
@@ -547,7 +558,7 @@
             // 
             this.lblSupplier.Location = new System.Drawing.Point(16, 141);
             this.lblSupplier.Name = "lblSupplier";
-            this.lblSupplier.Size = new System.Drawing.Size(106, 16);
+            this.lblSupplier.Size = new System.Drawing.Size(86, 13);
             this.lblSupplier.TabIndex = 6;
             this.lblSupplier.Text = "Vendor / Supplier:";
             // 
@@ -556,7 +567,7 @@
             this.cboSupplier.Location = new System.Drawing.Point(150, 138);
             this.cboSupplier.Name = "cboSupplier";
             this.cboSupplier.Properties.PopupView = this.gridViewSupplierPopup;
-            this.cboSupplier.Size = new System.Drawing.Size(494, 22);
+            this.cboSupplier.Size = new System.Drawing.Size(494, 20);
             this.cboSupplier.TabIndex = 7;
             this.cboSupplier.EditValueChanged += new System.EventHandler(this.CboSupplier_EditValueChanged);
             // 
@@ -571,7 +582,7 @@
             // 
             this.lblInvoiceNo.Location = new System.Drawing.Point(16, 177);
             this.lblInvoiceNo.Name = "lblInvoiceNo";
-            this.lblInvoiceNo.Size = new System.Drawing.Size(68, 16);
+            this.lblInvoiceNo.Size = new System.Drawing.Size(59, 13);
             this.lblInvoiceNo.TabIndex = 8;
             this.lblInvoiceNo.Text = "Invoice No.:";
             // 
@@ -579,14 +590,14 @@
             // 
             this.txtInvoiceNo.Location = new System.Drawing.Point(150, 174);
             this.txtInvoiceNo.Name = "txtInvoiceNo";
-            this.txtInvoiceNo.Size = new System.Drawing.Size(300, 22);
+            this.txtInvoiceNo.Size = new System.Drawing.Size(300, 20);
             this.txtInvoiceNo.TabIndex = 9;
             // 
             // lblExpenseDate
             // 
             this.lblExpenseDate.Location = new System.Drawing.Point(534, 141);
             this.lblExpenseDate.Name = "lblExpenseDate";
-            this.lblExpenseDate.Size = new System.Drawing.Size(82, 16);
+            this.lblExpenseDate.Size = new System.Drawing.Size(71, 13);
             this.lblExpenseDate.TabIndex = 10;
             this.lblExpenseDate.Text = "Expense Date:";
             // 
@@ -595,7 +606,7 @@
             this.txtExpenseDate.EditValue = new System.DateTime(2026, 7, 22, 0, 0, 0, 0);
             this.txtExpenseDate.Location = new System.Drawing.Point(384, 66);
             this.txtExpenseDate.Name = "txtExpenseDate";
-            this.txtExpenseDate.Size = new System.Drawing.Size(150, 22);
+            this.txtExpenseDate.Size = new System.Drawing.Size(150, 20);
             this.txtExpenseDate.TabIndex = 11;
             // 
             // chkLinkToPO
@@ -603,7 +614,7 @@
             this.chkLinkToPO.Location = new System.Drawing.Point(16, 212);
             this.chkLinkToPO.Name = "chkLinkToPO";
             this.chkLinkToPO.Properties.Caption = "Link to PO";
-            this.chkLinkToPO.Size = new System.Drawing.Size(100, 24);
+            this.chkLinkToPO.Size = new System.Drawing.Size(100, 20);
             this.chkLinkToPO.TabIndex = 12;
             this.chkLinkToPO.CheckedChanged += new System.EventHandler(this.ChkLinkToPO_CheckedChanged);
             // 
@@ -613,7 +624,7 @@
             this.cboPO.Location = new System.Drawing.Point(150, 210);
             this.cboPO.Name = "cboPO";
             this.cboPO.Properties.PopupView = this.gridViewPOPopup;
-            this.cboPO.Size = new System.Drawing.Size(494, 22);
+            this.cboPO.Size = new System.Drawing.Size(494, 20);
             this.cboPO.TabIndex = 13;
             this.cboPO.EditValueChanged += new System.EventHandler(this.cboPO_EditValueChanged);
             // 
@@ -628,7 +639,7 @@
             // 
             this.lblRemarks.Location = new System.Drawing.Point(16, 250);
             this.lblRemarks.Name = "lblRemarks";
-            this.lblRemarks.Size = new System.Drawing.Size(128, 16);
+            this.lblRemarks.Size = new System.Drawing.Size(105, 13);
             this.lblRemarks.TabIndex = 14;
             this.lblRemarks.Text = "Remarks / Particulars:";
             // 
@@ -659,16 +670,16 @@
             this.tabPosted.Controls.Add(this.gridControlPosted);
             this.tabPosted.Controls.Add(this.pnlPostedFilter);
             this.tabPosted.Name = "tabPosted";
-            this.tabPosted.Size = new System.Drawing.Size(936, 760);
+            this.tabPosted.Size = new System.Drawing.Size(1022, 743);
             this.tabPosted.Text = "Posted Expenses";
             // 
             // gridControlPostedDetails
             // 
             this.gridControlPostedDetails.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControlPostedDetails.Location = new System.Drawing.Point(0, 430);
+            this.gridControlPostedDetails.Location = new System.Drawing.Point(0, 474);
             this.gridControlPostedDetails.MainView = this.gridViewPostedDetails;
             this.gridControlPostedDetails.Name = "gridControlPostedDetails";
-            this.gridControlPostedDetails.Size = new System.Drawing.Size(936, 330);
+            this.gridControlPostedDetails.Size = new System.Drawing.Size(1022, 269);
             this.gridControlPostedDetails.TabIndex = 0;
             this.gridControlPostedDetails.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewPostedDetails});
@@ -683,12 +694,13 @@
             // pnlPostedButtons
             // 
             this.pnlPostedButtons.Controls.Add(this.btnViewDetails);
+            this.pnlPostedButtons.Controls.Add(this.btnViewPODetails);
             this.pnlPostedButtons.Controls.Add(this.btnCopyToNew);
             this.pnlPostedButtons.Controls.Add(this.btnEdit);
             this.pnlPostedButtons.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pnlPostedButtons.Location = new System.Drawing.Point(0, 384);
+            this.pnlPostedButtons.Location = new System.Drawing.Point(0, 428);
             this.pnlPostedButtons.Name = "pnlPostedButtons";
-            this.pnlPostedButtons.Size = new System.Drawing.Size(936, 46);
+            this.pnlPostedButtons.Size = new System.Drawing.Size(1022, 46);
             this.pnlPostedButtons.TabIndex = 1;
             // 
             // btnViewDetails
@@ -700,6 +712,18 @@
             this.btnViewDetails.TabIndex = 0;
             this.btnViewDetails.Text = "View Details";
             this.btnViewDetails.Click += new System.EventHandler(this.BtnViewDetails_Click);
+            // 
+            // btnViewPODetails
+            // 
+            this.btnViewPODetails.Appearance.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(255)))), ((int)(((byte)(220)))));
+            this.btnViewPODetails.Appearance.Options.UseBackColor = true;
+            this.btnViewPODetails.Enabled = false;
+            this.btnViewPODetails.Location = new System.Drawing.Point(420, 9);
+            this.btnViewPODetails.Name = "btnViewPODetails";
+            this.btnViewPODetails.Size = new System.Drawing.Size(150, 28);
+            this.btnViewPODetails.TabIndex = 3;
+            this.btnViewPODetails.Text = "View PO Details";
+            this.btnViewPODetails.Click += new System.EventHandler(this.BtnViewPODetails_Click);
             // 
             // btnCopyToNew
             // 
@@ -727,14 +751,30 @@
             // 
             // gridControlPosted
             // 
+            this.gridControlPosted.ContextMenuStrip = this.cmsPosted;
             this.gridControlPosted.Dock = System.Windows.Forms.DockStyle.Top;
             this.gridControlPosted.Location = new System.Drawing.Point(0, 59);
             this.gridControlPosted.MainView = this.gridViewPosted;
             this.gridControlPosted.Name = "gridControlPosted";
-            this.gridControlPosted.Size = new System.Drawing.Size(936, 325);
+            this.gridControlPosted.Size = new System.Drawing.Size(1022, 369);
             this.gridControlPosted.TabIndex = 2;
             this.gridControlPosted.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewPosted});
+            // 
+            // cmsPosted
+            // 
+            this.cmsPosted.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.miViewPODetails});
+            this.cmsPosted.Name = "cmsPosted";
+            this.cmsPosted.Size = new System.Drawing.Size(157, 26);
+            this.cmsPosted.Opening += new System.ComponentModel.CancelEventHandler(this.CmsPosted_Opening);
+            // 
+            // miViewPODetails
+            // 
+            this.miViewPODetails.Name = "miViewPODetails";
+            this.miViewPODetails.Size = new System.Drawing.Size(156, 22);
+            this.miViewPODetails.Text = "View PO Details";
+            this.miViewPODetails.Click += new System.EventHandler(this.BtnViewPODetails_Click);
             // 
             // gridViewPosted
             // 
@@ -743,6 +783,7 @@
             this.gridViewPosted.OptionsBehavior.Editable = false;
             this.gridViewPosted.OptionsView.ShowGroupPanel = false;
             this.gridViewPosted.FocusedRowChanged += new DevExpress.XtraGrid.Views.Base.FocusedRowChangedEventHandler(this.GridViewPosted_FocusedRowChanged);
+            this.gridViewPosted.MouseDown += new System.Windows.Forms.MouseEventHandler(this.GridViewPosted_MouseDown);
             this.gridViewPosted.DoubleClick += new System.EventHandler(this.GridViewPosted_DoubleClick);
             // 
             // pnlPostedFilter
@@ -754,18 +795,19 @@
             this.pnlPostedFilter.Controls.Add(this.lblFilterBranch);
             this.pnlPostedFilter.Controls.Add(this.cboFilterBranch);
             this.pnlPostedFilter.Controls.Add(this.chkAllBranches);
+            this.pnlPostedFilter.Controls.Add(this.chkPOLinkedOnly);
             this.pnlPostedFilter.Controls.Add(this.btnRefreshPosted);
             this.pnlPostedFilter.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlPostedFilter.Location = new System.Drawing.Point(0, 0);
             this.pnlPostedFilter.Name = "pnlPostedFilter";
-            this.pnlPostedFilter.Size = new System.Drawing.Size(936, 59);
+            this.pnlPostedFilter.Size = new System.Drawing.Size(1022, 59);
             this.pnlPostedFilter.TabIndex = 3;
             // 
             // lblDateFrom
             // 
             this.lblDateFrom.Location = new System.Drawing.Point(12, 21);
             this.lblDateFrom.Name = "lblDateFrom";
-            this.lblDateFrom.Size = new System.Drawing.Size(35, 16);
+            this.lblDateFrom.Size = new System.Drawing.Size(28, 13);
             this.lblDateFrom.TabIndex = 0;
             this.lblDateFrom.Text = "From:";
             // 
@@ -774,14 +816,14 @@
             this.txtDateFrom.EditValue = new System.DateTime(2026, 7, 22, 0, 0, 0, 0);
             this.txtDateFrom.Location = new System.Drawing.Point(58, 16);
             this.txtDateFrom.Name = "txtDateFrom";
-            this.txtDateFrom.Size = new System.Drawing.Size(120, 22);
+            this.txtDateFrom.Size = new System.Drawing.Size(120, 20);
             this.txtDateFrom.TabIndex = 1;
             // 
             // lblDateTo
             // 
             this.lblDateTo.Location = new System.Drawing.Point(190, 21);
             this.lblDateTo.Name = "lblDateTo";
-            this.lblDateTo.Size = new System.Drawing.Size(20, 16);
+            this.lblDateTo.Size = new System.Drawing.Size(16, 13);
             this.lblDateTo.TabIndex = 2;
             this.lblDateTo.Text = "To:";
             // 
@@ -790,14 +832,14 @@
             this.txtDateTo.EditValue = new System.DateTime(2026, 7, 22, 0, 0, 0, 0);
             this.txtDateTo.Location = new System.Drawing.Point(214, 16);
             this.txtDateTo.Name = "txtDateTo";
-            this.txtDateTo.Size = new System.Drawing.Size(120, 22);
+            this.txtDateTo.Size = new System.Drawing.Size(120, 20);
             this.txtDateTo.TabIndex = 3;
             // 
             // lblFilterBranch
             // 
             this.lblFilterBranch.Location = new System.Drawing.Point(346, 21);
             this.lblFilterBranch.Name = "lblFilterBranch";
-            this.lblFilterBranch.Size = new System.Drawing.Size(44, 16);
+            this.lblFilterBranch.Size = new System.Drawing.Size(37, 13);
             this.lblFilterBranch.TabIndex = 4;
             this.lblFilterBranch.Text = "Branch:";
             // 
@@ -805,7 +847,7 @@
             // 
             this.cboFilterBranch.Location = new System.Drawing.Point(394, 16);
             this.cboFilterBranch.Name = "cboFilterBranch";
-            this.cboFilterBranch.Size = new System.Drawing.Size(160, 22);
+            this.cboFilterBranch.Size = new System.Drawing.Size(160, 20);
             this.cboFilterBranch.TabIndex = 5;
             // 
             // chkAllBranches
@@ -813,13 +855,21 @@
             this.chkAllBranches.Location = new System.Drawing.Point(566, 18);
             this.chkAllBranches.Name = "chkAllBranches";
             this.chkAllBranches.Properties.Caption = "All Branches";
-            this.chkAllBranches.Size = new System.Drawing.Size(110, 24);
+            this.chkAllBranches.Size = new System.Drawing.Size(110, 20);
             this.chkAllBranches.TabIndex = 6;
             this.chkAllBranches.CheckedChanged += new System.EventHandler(this.ChkAllBranches_CheckedChanged);
             // 
+            // chkPOLinkedOnly
+            // 
+            this.chkPOLinkedOnly.Location = new System.Drawing.Point(692, 18);
+            this.chkPOLinkedOnly.Name = "chkPOLinkedOnly";
+            this.chkPOLinkedOnly.Properties.Caption = "PO-Linked Only";
+            this.chkPOLinkedOnly.Size = new System.Drawing.Size(130, 20);
+            this.chkPOLinkedOnly.TabIndex = 8;
+            // 
             // btnRefreshPosted
             // 
-            this.btnRefreshPosted.Location = new System.Drawing.Point(692, 12);
+            this.btnRefreshPosted.Location = new System.Drawing.Point(830, 12);
             this.btnRefreshPosted.Name = "btnRefreshPosted";
             this.btnRefreshPosted.Size = new System.Drawing.Size(100, 30);
             this.btnRefreshPosted.TabIndex = 7;
@@ -838,7 +888,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
             this.Controls.Add(this.tabMain);
             this.Name = "AddExpenseDevExFrm";
-            this.Size = new System.Drawing.Size(938, 790);
+            this.Size = new System.Drawing.Size(1024, 768);
             this.Load += new System.EventHandler(this.AddExpenseDevExFrm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.tabMain)).EndInit();
             this.tabMain.ResumeLayout(false);
@@ -879,6 +929,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.pnlPostedButtons)).EndInit();
             this.pnlPostedButtons.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.gridControlPosted)).EndInit();
+            this.cmsPosted.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.gridViewPosted)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pnlPostedFilter)).EndInit();
             this.pnlPostedFilter.ResumeLayout(false);
@@ -889,6 +940,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.txtDateTo.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.cboFilterBranch.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.chkAllBranches.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chkPOLinkedOnly.Properties)).EndInit();
             this.ResumeLayout(false);
 
         }

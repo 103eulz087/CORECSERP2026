@@ -3689,6 +3689,11 @@ namespace SalesInventorySystem
 
         }
 
+        private void btnCostingReconReport_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            OpenMdiForm<Reporting.ItemCostingReconReport>();
+        }
+
         private void Main_FormClosing(object sender, FormClosingEventArgs e)
         {
             //bool confirm = HelperFunction.ConfirmDialog("Are you want to close the Main Window?", "Close Main Window");

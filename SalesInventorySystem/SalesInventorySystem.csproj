@@ -329,6 +329,9 @@
     <Compile Include="AccountingDevEx\AddExpenseDevExFrm.Designer.cs">
       <DependentUpon>AddExpenseDevExFrm.cs</DependentUpon>
     </Compile>
+    <Compile Include="AccountingDevEx\ViewLinkedPODetailsFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="AccountingDevEx\BalanceSheetAccountDetails.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -3229,6 +3232,12 @@
     </Compile>
     <Compile Include="Reporting\ItemCostingReport.Designer.cs">
       <DependentUpon>ItemCostingReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reporting\ItemCostingReconReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Reporting\ItemCostingReconReport.Designer.cs">
+      <DependentUpon>ItemCostingReconReport.cs</DependentUpon>
     </Compile>
     <Compile Include="Reporting\CounterReceiptDevEx.cs">
       <SubType>Form</SubType>

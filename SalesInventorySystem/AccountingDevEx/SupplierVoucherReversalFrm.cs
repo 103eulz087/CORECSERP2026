@@ -73,6 +73,17 @@ namespace SalesInventorySystem.AccountingDevEx
                 if (gridViewVouchers.Columns["PaymentMethod"] != null)
                     gridViewVouchers.Columns["PaymentMethod"].Visible = false;
 
+                // Same captions used in the View Details popup header below,
+                // so the list and the popup describe the same fields the same way.
+                if (gridViewVouchers.Columns["PhysicalRef"] != null)
+                    gridViewVouchers.Columns["PhysicalRef"].Caption = "Control No.";
+                if (gridViewVouchers.Columns["VoucherID"] != null)
+                    gridViewVouchers.Columns["VoucherID"].Caption = "Voucher ID";
+                if (gridViewVouchers.Columns["VoucherDate"] != null)
+                    gridViewVouchers.Columns["VoucherDate"].Caption = "Voucher Date";
+                if (gridViewVouchers.Columns["PhysicalVoucherType"] != null)
+                    gridViewVouchers.Columns["PhysicalVoucherType"].Caption = "Voucher Type";
+
                 btnReverse.Enabled = false;
             }
             catch (SqlException ex)
@@ -163,6 +174,11 @@ namespace SalesInventorySystem.AccountingDevEx
             //Close();
         }
 
+        private string GetFocusedCellString(string fieldName) =>
+            gridViewVouchers.Columns[fieldName] != null
+                ? gridViewVouchers.GetFocusedRowCellValue(fieldName)?.ToString()
+                : null;
+
         private DataTable GetDataTable(string sql)
         {
             var dt = new DataTable();
@@ -204,6 +220,21 @@ namespace SalesInventorySystem.AccountingDevEx
             bool hasInvoiceLeg = Convert.ToBoolean(gridViewVouchers.GetFocusedRowCellValue("HasInvoiceLeg") ?? false);
             bool hasManualLeg = Convert.ToBoolean(gridViewVouchers.GetFocusedRowCellValue("HasManualLeg") ?? false);
 
+            // NEW -- same identifying info SupplierPaymentDevEx.cs shows at
+            // entry time (Control No., Voucher ID, Voucher Date, Voucher
+            // Type), so the "View Details" popup reads as familiar/consistent
+            // with the payment screen instead of just Reference/Paid To/Amount.
+            // Guarded the same way LoadVouchers() guards its caption lookups --
+            // sp_GetReversibleSupplierVouchers always returns these columns
+            // today, but a future shape change shouldn't NullReferenceException here.
+            string voucherId = GetFocusedCellString("VoucherID");
+            string physicalRef = GetFocusedCellString("PhysicalRef");
+            string voucherType = GetFocusedCellString("PhysicalVoucherType");
+            string paymentMethod = GetFocusedCellString("PaymentMethod");
+            object voucherDateVal = gridViewVouchers.Columns["VoucherDate"] != null
+                ? gridViewVouchers.GetFocusedRowCellValue("VoucherDate") : null;
+            string voucherDate = voucherDateVal is DateTime dt ? dt.ToString("MM/dd/yyyy") : voucherDateVal?.ToString() ?? "";
+
             if (string.IsNullOrEmpty(referenceNo)) return;
 
             DataTable invoiceLegs, glLegs;
@@ -233,15 +264,17 @@ namespace SalesInventorySystem.AccountingDevEx
                 return;
             }
 
-            ShowVoucherDetailsPopup(referenceNo, paidTo, amount, hasInvoiceLeg, hasManualLeg, invoiceLegs, glLegs);
+            ShowVoucherDetailsPopup(referenceNo, voucherId, paidTo, amount, physicalRef, voucherDate,
+                voucherType, paymentMethod, hasInvoiceLeg, hasManualLeg, invoiceLegs, glLegs);
         }
-        private void ShowVoucherDetailsPopup(string referenceNo, string paidTo, decimal amount,
+        private void ShowVoucherDetailsPopup(string referenceNo, string voucherId, string paidTo, decimal amount,
+            string physicalRef, string voucherDate, string voucherType, string paymentMethod,
             bool hasInvoiceLeg, bool hasManualLeg, DataTable invoiceLegs, DataTable glLegs)
         {
             using (var popup = new XtraForm())
             {
                 popup.Text = $"Voucher Detail — {referenceNo}";
-                popup.Size = new Size(820, 520);
+                popup.Size = new Size(820, 600);
                 popup.StartPosition = FormStartPosition.CenterParent;
                 popup.MinimizeBox = false;
                 popup.MaximizeBox = true;
@@ -251,14 +284,40 @@ namespace SalesInventorySystem.AccountingDevEx
                     : hasManualLeg ? "Manual/advance entries only"
                     : "(no leg flags set)";
 
-                var lblHeader = new LabelControl
+                // NEW -- labeled field pairs instead of one inline text blob,
+                // matching SupplierPaymentDevEx.cs's GroupControl/label-value
+                // arrangement so this popup reads as familiar/consistent with
+                // the payment entry screen it mirrors.
+                var grpHeader = new GroupControl { Text = "Voucher", Dock = DockStyle.Top, Height = 155 };
+
+                LabelControl MakeCaption(string text, int x, int y) =>
+                    new LabelControl { Text = text, Location = new Point(x, y), AutoSizeMode = DevExpress.XtraEditors.LabelAutoSizeMode.None, Size = new Size(90, 16) };
+                LabelControl MakeValue(string text, int x, int y) =>
+                    new LabelControl
+                    {
+                        Text = text ?? "",
+                        Location = new Point(x, y),
+                        AutoSizeMode = DevExpress.XtraEditors.LabelAutoSizeMode.None,
+                        Size = new Size(220, 16),
+                        Appearance = { Font = new Font("Tahoma", 8.25F, FontStyle.Bold), Options = { UseFont = true } }
+                    };
+
+                grpHeader.Controls.AddRange(new Control[]
                 {
-                    Dock = DockStyle.Top,
-                    AutoSizeMode = DevExpress.XtraEditors.LabelAutoSizeMode.None,
-                    Height = 50,
-                    Padding = new Padding(10),
-                    Text = $"Reference No.: {referenceNo}   |   Paid To: {paidTo}   |   Amount: {amount:N2}   |   Contains: {legDescription}"
-                };
+                    MakeCaption("Reference No.:", 16, 30), MakeValue(referenceNo, 130, 30),
+                    MakeCaption("Voucher ID:", 400, 30), MakeValue(voucherId, 500, 30),
+
+                    MakeCaption("Paid To:", 16, 52), MakeValue(paidTo, 130, 52),
+                    MakeCaption("Amount:", 400, 52), MakeValue(amount.ToString("N2"), 500, 52),
+
+                    MakeCaption("Check No.:", 16, 74), MakeValue(physicalRef, 130, 74),
+                    MakeCaption("Voucher Date:", 400, 74), MakeValue(voucherDate, 500, 74),
+
+                    MakeCaption("Voucher Type:", 16, 96), MakeValue(voucherType, 130, 96),
+                    MakeCaption("Pay Method:", 400, 96), MakeValue(paymentMethod, 500, 96),
+
+                    MakeCaption("Contains:", 16, 118), MakeValue(legDescription, 130, 118)
+                });
 
                 var tabs = new DevExpress.XtraTab.XtraTabControl { Dock = DockStyle.Fill };
 
@@ -268,10 +327,39 @@ namespace SalesInventorySystem.AccountingDevEx
                     var gridInv = new DevExpress.XtraGrid.GridControl { Dock = DockStyle.Fill };
                     var viewInv = new GridView(gridInv);
                     gridInv.MainView = viewInv;
-                    gridInv.ViewCollection.Add(viewInv);
                     viewInv.OptionsBehavior.Editable = false;
                     viewInv.OptionsView.ShowGroupPanel = false;
+                    viewInv.OptionsView.ShowFooter = true;
                     gridInv.DataSource = invoiceLegs;
+                    viewInv.PopulateColumns();
+
+                    // NEW -- captions/formatting matching SupplierPaymentDevEx.cs's
+                    // INVOICES tab, so a posted voucher's leg detail reads the
+                    // same way the payment screen presented it at entry time.
+                    if (viewInv.Columns["InvoiceNo"] != null) viewInv.Columns["InvoiceNo"].Caption = "Invoice No.";
+                    // "Branch Code", not "Branch" -- sp_GetSupplierVoucherDetails
+                    // returns the raw code with no Branches join, so a friendlier
+                    // caption would misleadingly imply a name is shown.
+                    if (viewInv.Columns["BranchCode"] != null) viewInv.Columns["BranchCode"].Caption = "Branch Code";
+                    if (viewInv.Columns["InvoiceDate"] != null) viewInv.Columns["InvoiceDate"].Caption = "Invoice Date";
+                    if (viewInv.Columns["PaymentType"] != null) viewInv.Columns["PaymentType"].Caption = "Type";
+                    if (viewInv.Columns["TicketNumber"] != null) viewInv.Columns["TicketNumber"].Caption = "Ticket No.";
+                    if (viewInv.Columns["PaymentMethod"] != null) viewInv.Columns["PaymentMethod"].Visible = false; // already shown in the header above
+
+                    if (viewInv.Columns["Amount"] != null)
+                    {
+                        // Captioned "Amount Paid" rather than "Invoice Amount" --
+                        // APPaymentDetails only ever stores what was actually paid
+                        // on this leg (net cash for PURCHASE, gross for EXPENSE),
+                        // never the invoice's original balance; renaming it to
+                        // "Invoice Amount" would misrepresent what this number is.
+                        viewInv.Columns["Amount"].Caption = "Amount Paid";
+                        viewInv.Columns["Amount"].DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+                        viewInv.Columns["Amount"].DisplayFormat.FormatString = "N2";
+                        viewInv.Columns["Amount"].Summary.Add(DevExpress.Data.SummaryItemType.Sum, "Amount", "{0:n2}");
+                    }
+
+                    viewInv.BestFitColumns();
                     tabInv.Controls.Add(gridInv);
                     tabs.TabPages.Add(tabInv);
                 }
@@ -298,15 +386,8 @@ namespace SalesInventorySystem.AccountingDevEx
                 btnClose.Click += (s, e) => popup.Close();
 
                 popup.Controls.Add(tabs);
-                popup.Controls.Add(lblHeader);
+                popup.Controls.Add(grpHeader);
                 popup.Controls.Add(btnClose);
-
-                if (invoiceLegs.Rows.Count > 0)
-                {
-                    var viewInv = ((DevExpress.XtraGrid.GridControl)((DevExpress.XtraTab.XtraTabPage)tabs.TabPages[0]).Controls[0]).MainView as GridView;
-                    viewInv?.PopulateColumns();
-                    viewInv?.BestFitColumns();
-                }
 
                 popup.ShowDialog(this);
             }

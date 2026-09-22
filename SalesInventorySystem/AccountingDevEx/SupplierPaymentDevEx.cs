@@ -121,9 +121,34 @@ namespace SalesInventorySystem.AccountingDevEx
                     lastCheckNo = result.ToString();
             }
 
+            // If there is no previous check number, start from a sensible default
             if (string.IsNullOrEmpty(lastCheckNo))
                 return "100000000";
 
+            // Try to parse the last check number as a long, increment and return.
+            // If parsing fails (non-numeric content), attempt to extract the first
+            // numeric sequence and increment that. If everything fails, return the
+            // original value unchanged.
+            if (long.TryParse(lastCheckNo, System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out long n))
+            {
+                return (n + 1).ToString();
+            }
+
+            try
+            {
+                // fallback: extract consecutive digits from the string
+                var m = System.Text.RegularExpressions.Regex.Match(lastCheckNo, "\\d+");
+                if (m.Success && long.TryParse(m.Value, out long extracted))
+                {
+                    return (extracted + 1).ToString();
+                }
+            }
+            catch
+            {
+                // ignore and fall through
+            }
+
+            // couldn't increment — return the raw value as a last resort
             return lastCheckNo;
         }
 
