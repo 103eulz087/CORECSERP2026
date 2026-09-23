@@ -466,14 +466,40 @@ namespace SalesInventorySystem.AccountingDevEx
                     gridControlPosted.DataSource = dt;
                 }
 
-                gridViewPosted.BestFitColumns();
                 if (gridViewPosted.Columns["SupplierID"] != null) gridViewPosted.Columns["SupplierID"].Visible = false;
 
+                // Amount/Balance/AmountPaid are now real DECIMAL from
+                // sp_GetPostedExpenseManualMultiBranch (was FORMAT()-ed
+                // VARCHAR) -- numeric display + right-align.
+                foreach (string col in new[] { "Amount", "Balance", "AmountPaid" })
+                {
+                    if (gridViewPosted.Columns[col] == null) continue;
+                    gridViewPosted.Columns[col].DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+                    gridViewPosted.Columns[col].DisplayFormat.FormatString = "N2";
+                    gridViewPosted.Columns[col].AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+                    gridViewPosted.Columns[col].AppearanceCell.Options.UseTextOptions = true;
+                }
+
+                // ExpenseDate is a DateTime-typed column but renders via
+                // plain ToString() without this -- reads as a raw text
+                // field rather than a date field.
+                if (gridViewPosted.Columns["ExpenseDate"] != null)
+                {
+                    gridViewPosted.Columns["ExpenseDate"].DisplayFormat.FormatType = DevExpress.Utils.FormatType.DateTime;
+                    gridViewPosted.Columns["ExpenseDate"].DisplayFormat.FormatString = "MM/dd/yyyy";
+                }
+
+                gridViewPosted.BestFitColumns();
+
                 gridControlPostedDetails.DataSource = null;
-                btnViewDetails.Enabled = false;
-                btnCopyToNew.Enabled = false;
-                btnEditVoucher.Enabled = false;
-                _selectedPostedRefNo = null;
+                // NEW -- was previously hardcoded to false/null here, which
+                // silently undid whatever FocusedRowChanged had already set
+                // moments earlier when binding DataSource auto-focused row 0.
+                // That auto-focus highlighted the first row but left View
+                // Details/Copy to New Entry disabled until the user clicked
+                // away and back. Re-sync from the actual focused row instead
+                // of blindly resetting.
+                SyncPostedButtonState();
             }
             catch (SqlException ex)
             {
@@ -482,6 +508,11 @@ namespace SalesInventorySystem.AccountingDevEx
         }
 
         private void GridViewPosted_FocusedRowChanged(object sender, DevExpress.XtraGrid.Views.Base.FocusedRowChangedEventArgs e)
+        {
+            SyncPostedButtonState();
+        }
+
+        private void SyncPostedButtonState()
         {
             bool has = gridViewPosted.FocusedRowHandle >= 0;
             btnViewDetails.Enabled = has;
@@ -537,6 +568,19 @@ namespace SalesInventorySystem.AccountingDevEx
             {
                 var (header, lines) = FetchDetails();
                 gridControlPostedDetails.DataSource = lines;
+
+                // Debit/Credit are already real DECIMAL from
+                // sp_GetExpenseManualMultiBranchDetails -- just needs the
+                // grid-side numeric display + right-align.
+                foreach (string col in new[] { "Debit", "Credit" })
+                {
+                    if (gridViewPostedDetails.Columns[col] == null) continue;
+                    gridViewPostedDetails.Columns[col].DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+                    gridViewPostedDetails.Columns[col].DisplayFormat.FormatString = "N2";
+                    gridViewPostedDetails.Columns[col].AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+                    gridViewPostedDetails.Columns[col].AppearanceCell.Options.UseTextOptions = true;
+                }
+
                 gridViewPostedDetails.BestFitColumns();
             }
             catch (SqlException ex)

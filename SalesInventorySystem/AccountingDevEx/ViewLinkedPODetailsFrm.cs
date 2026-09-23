@@ -151,14 +151,24 @@ namespace SalesInventorySystem.AccountingDevEx
                 gridControlLines.DataSource = dt;
             }
 
-            gridViewLines.BestFitColumns();
-
             if (gridViewLines.Columns["Quantity"] != null)
             {
                 gridViewLines.Columns["Quantity"].DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
                 gridViewLines.Columns["Quantity"].DisplayFormat.FormatString = "N3";
             }
             Classes.DevXGridViewSettings.FormatNumericColumns(gridViewLines, "Cost", "TotalCost");
+
+            // Right-align -- FormatNumericColumns/DisplayFormat only sets how
+            // the value is formatted, not its alignment; a DevExpress
+            // GridColumn doesn't auto-right-align numeric-formatted cells.
+            foreach (string col in new[] { "Quantity", "Cost", "TotalCost" })
+            {
+                if (gridViewLines.Columns[col] == null) continue;
+                gridViewLines.Columns[col].AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+                gridViewLines.Columns[col].AppearanceCell.Options.UseTextOptions = true;
+            }
+
+            gridViewLines.BestFitColumns();
         }
     }
 }

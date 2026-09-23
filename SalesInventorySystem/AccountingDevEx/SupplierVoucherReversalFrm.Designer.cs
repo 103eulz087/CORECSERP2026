@@ -111,8 +111,10 @@
             this.txtDateFrom.Location = new System.Drawing.Point(448, 14);
             this.txtDateFrom.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtDateFrom.Name = "txtDateFrom";
-            this.txtDateFrom.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            this.txtDateFrom.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.txtDateFrom.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton()});
             this.txtDateFrom.Size = new System.Drawing.Size(128, 22);
             this.txtDateFrom.TabIndex = 3;
             // 
@@ -131,8 +133,10 @@
             this.txtDateTo.Location = new System.Drawing.Point(618, 14);
             this.txtDateTo.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtDateTo.Name = "txtDateTo";
-            this.txtDateTo.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            this.txtDateTo.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.txtDateTo.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton()});
             this.txtDateTo.Size = new System.Drawing.Size(128, 22);
             this.txtDateTo.TabIndex = 5;
             // 

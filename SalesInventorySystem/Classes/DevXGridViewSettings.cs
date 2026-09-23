@@ -157,6 +157,19 @@ namespace SalesInventorySystem.Classes
         {
             if (view.Columns[col] == null) return;   // NEW - avoid NRE when a caller's result shape doesn't include this column
 
+            // NEW - de-dup before adding. GridColumnSummaryItemCollection/
+            // GridGroupSummaryItemCollection.Add() has no built-in de-dup, so
+            // calling this a second time for the same column (e.g. every
+            // LoadXxx()/Refresh a caller re-runs after rebinding) stacked a
+            // duplicate Sum item each time -- the footer cell then showed the
+            // same total repeated/growing on every refresh instead of once.
+            view.Columns[col].Summary.Clear();
+            for (int i = view.GroupSummary.Count - 1; i >= 0; i--)
+            {
+                if (view.GroupSummary[i].FieldName == col && view.GroupSummary[i].SummaryType == DevExpress.Data.SummaryItemType.Sum)
+                    view.GroupSummary.RemoveAt(i);
+            }
+
             GridGroupSummaryItem ite11 = new GridGroupSummaryItem();
             ite11.FieldName = col;
             ite11.SummaryType = DevExpress.Data.SummaryItemType.Sum;

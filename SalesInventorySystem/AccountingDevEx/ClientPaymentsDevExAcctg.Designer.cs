@@ -99,6 +99,8 @@
             this.label20 = new System.Windows.Forms.Label();
             this.label19 = new System.Windows.Forms.Label();
             this.label18 = new System.Windows.Forms.Label();
+            this.lblAvailableCreditCaption = new System.Windows.Forms.Label();
+            this.lblAvailableCredit = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label16 = new System.Windows.Forms.Label();
             this.lblcrno = new System.Windows.Forms.Label();
@@ -619,6 +621,8 @@
             this.groupBox1.Controls.Add(this.label20);
             this.groupBox1.Controls.Add(this.label19);
             this.groupBox1.Controls.Add(this.label18);
+            this.groupBox1.Controls.Add(this.lblAvailableCreditCaption);
+            this.groupBox1.Controls.Add(this.lblAvailableCredit);
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.label16);
             this.groupBox1.Controls.Add(this.lblcrno);
@@ -989,6 +993,30 @@
             this.label18.Size = new System.Drawing.Size(83, 16);
             this.label18.TabIndex = 455;
             this.label18.Text = "Customer ID:";
+            // 
+            // lblAvailableCreditCaption
+            // 
+            this.lblAvailableCreditCaption.AutoSize = true;
+            this.lblAvailableCreditCaption.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblAvailableCreditCaption.Location = new System.Drawing.Point(230, 35);
+            this.lblAvailableCreditCaption.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.lblAvailableCreditCaption.Name = "lblAvailableCreditCaption";
+            this.lblAvailableCreditCaption.Size = new System.Drawing.Size(101, 16);
+            this.lblAvailableCreditCaption.TabIndex = 4540;
+            this.lblAvailableCreditCaption.Text = "Available Credit:";
+            // 
+            // lblAvailableCredit
+            // 
+            this.lblAvailableCredit.AutoEllipsis = true;
+            this.lblAvailableCredit.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblAvailableCredit.ForeColor = System.Drawing.Color.DarkGreen;
+            this.lblAvailableCredit.Location = new System.Drawing.Point(340, 35);
+            this.lblAvailableCredit.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.lblAvailableCredit.Name = "lblAvailableCredit";
+            this.lblAvailableCredit.Size = new System.Drawing.Size(118, 16);
+            this.lblAvailableCredit.TabIndex = 4541;
+            this.lblAvailableCredit.Text = "0.00";
+            this.lblAvailableCredit.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // label2
             // 
@@ -1462,7 +1490,7 @@
             this.panel2.Location = new System.Drawing.Point(0, 0);
             this.panel2.Margin = new System.Windows.Forms.Padding(2);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(1488, 781);
+            this.panel2.Size = new System.Drawing.Size(1190, 625);
             this.panel2.TabIndex = 1;
             // 
             // groupControl2
@@ -1470,10 +1498,10 @@
             this.groupControl2.Controls.Add(this.gridControlPaymentDetails);
             this.groupControl2.Controls.Add(this.gridControl1);
             this.groupControl2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupControl2.Location = new System.Drawing.Point(0, 105);
+            this.groupControl2.Location = new System.Drawing.Point(0, 84);
             this.groupControl2.Margin = new System.Windows.Forms.Padding(2);
             this.groupControl2.Name = "groupControl2";
-            this.groupControl2.Size = new System.Drawing.Size(1488, 676);
+            this.groupControl2.Size = new System.Drawing.Size(1190, 541);
             this.groupControl2.TabIndex = 1;
             // 
             // groupControl1
@@ -1490,7 +1518,7 @@
             this.groupControl1.Location = new System.Drawing.Point(0, 0);
             this.groupControl1.Margin = new System.Windows.Forms.Padding(2);
             this.groupControl1.Name = "groupControl1";
-            this.groupControl1.Size = new System.Drawing.Size(1488, 105);
+            this.groupControl1.Size = new System.Drawing.Size(1190, 84);
             this.groupControl1.TabIndex = 0;
             // 
             // simpleButton5
@@ -1815,6 +1843,8 @@
         private System.Windows.Forms.ToolStripMenuItem showSalesItemsToolStripMenuItem;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label18;
+        public System.Windows.Forms.Label lblAvailableCreditCaption;
+        public System.Windows.Forms.Label lblAvailableCredit;
         private System.Windows.Forms.Label label20;
         private System.Windows.Forms.Label label19;
         private DevExpress.XtraEditors.SimpleButton simpleButton4;

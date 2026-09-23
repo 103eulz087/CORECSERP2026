@@ -84,6 +84,13 @@ namespace SalesInventorySystem.AccountingDevEx
                 if (gridViewVouchers.Columns["PhysicalVoucherType"] != null)
                     gridViewVouchers.Columns["PhysicalVoucherType"].Caption = "Voucher Type";
 
+                // Amount is now a real DECIMAL from sp_GetReversibleSupplierVouchers
+                // (was FORMAT()-ed VARCHAR) -- numeric DisplayFormat right-aligns it
+                // and lets it sort by value; footer sum needs ShowFooter turned on.
+                gridViewVouchers.OptionsView.ShowFooter = true;
+                Classes.DevXGridViewSettings.FormatNumericColumns(gridViewVouchers, "Amount");
+                Classes.DevXGridViewSettings.ShowFooterTotal(gridViewVouchers, "Amount");
+
                 btnReverse.Enabled = false;
             }
             catch (SqlException ex)
@@ -336,12 +343,25 @@ namespace SalesInventorySystem.AccountingDevEx
                     // NEW -- captions/formatting matching SupplierPaymentDevEx.cs's
                     // INVOICES tab, so a posted voucher's leg detail reads the
                     // same way the payment screen presented it at entry time.
-                    if (viewInv.Columns["InvoiceNo"] != null) viewInv.Columns["InvoiceNo"].Caption = "Invoice No.";
+                    if (viewInv.Columns["InvoiceNo"] != null)
+                    {
+                        viewInv.Columns["InvoiceNo"].Caption = "Invoice No.";
+                        // Footer count -- how many invoice legs make up this voucher.
+                        viewInv.Columns["InvoiceNo"].Summary.Add(DevExpress.Data.SummaryItemType.Count, "InvoiceNo", "Count: {0}");
+                    }
                     // "Branch Code", not "Branch" -- sp_GetSupplierVoucherDetails
                     // returns the raw code with no Branches join, so a friendlier
                     // caption would misleadingly imply a name is shown.
                     if (viewInv.Columns["BranchCode"] != null) viewInv.Columns["BranchCode"].Caption = "Branch Code";
-                    if (viewInv.Columns["InvoiceDate"] != null) viewInv.Columns["InvoiceDate"].Caption = "Invoice Date";
+                    if (viewInv.Columns["InvoiceDate"] != null)
+                    {
+                        // Explicit DateTime FormatType -- PopulateColumns() alone
+                        // renders a DateTime-typed column via plain ToString()
+                        // (e.g. "7/31/2026 12:00:00 AM"), not a clean date.
+                        viewInv.Columns["InvoiceDate"].Caption = "Invoice Date";
+                        viewInv.Columns["InvoiceDate"].DisplayFormat.FormatType = DevExpress.Utils.FormatType.DateTime;
+                        viewInv.Columns["InvoiceDate"].DisplayFormat.FormatString = "MM/dd/yyyy";
+                    }
                     if (viewInv.Columns["PaymentType"] != null) viewInv.Columns["PaymentType"].Caption = "Type";
                     if (viewInv.Columns["TicketNumber"] != null) viewInv.Columns["TicketNumber"].Caption = "Ticket No.";
                     if (viewInv.Columns["PaymentMethod"] != null) viewInv.Columns["PaymentMethod"].Visible = false; // already shown in the header above
@@ -356,6 +376,8 @@ namespace SalesInventorySystem.AccountingDevEx
                         viewInv.Columns["Amount"].Caption = "Amount Paid";
                         viewInv.Columns["Amount"].DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
                         viewInv.Columns["Amount"].DisplayFormat.FormatString = "N2";
+                        viewInv.Columns["Amount"].AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+                        viewInv.Columns["Amount"].AppearanceCell.Options.UseTextOptions = true;
                         viewInv.Columns["Amount"].Summary.Add(DevExpress.Data.SummaryItemType.Sum, "Amount", "{0:n2}");
                     }
 

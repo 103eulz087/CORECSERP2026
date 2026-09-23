@@ -606,6 +606,11 @@
             this.txtExpenseDate.EditValue = new System.DateTime(2026, 7, 22, 0, 0, 0, 0);
             this.txtExpenseDate.Location = new System.Drawing.Point(384, 66);
             this.txtExpenseDate.Name = "txtExpenseDate";
+            // Missing calendar dropdown button -- without this a DateEdit
+            // renders with no visible way to open the calendar picker,
+            // reading as a plain textbox despite being a real DateEdit.
+            this.txtExpenseDate.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.txtExpenseDate.Size = new System.Drawing.Size(150, 20);
             this.txtExpenseDate.TabIndex = 11;
             // 
@@ -816,6 +821,8 @@
             this.txtDateFrom.EditValue = new System.DateTime(2026, 7, 22, 0, 0, 0, 0);
             this.txtDateFrom.Location = new System.Drawing.Point(58, 16);
             this.txtDateFrom.Name = "txtDateFrom";
+            this.txtDateFrom.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.txtDateFrom.Size = new System.Drawing.Size(120, 20);
             this.txtDateFrom.TabIndex = 1;
             // 
@@ -832,6 +839,8 @@
             this.txtDateTo.EditValue = new System.DateTime(2026, 7, 22, 0, 0, 0, 0);
             this.txtDateTo.Location = new System.Drawing.Point(214, 16);
             this.txtDateTo.Name = "txtDateTo";
+            this.txtDateTo.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.txtDateTo.Size = new System.Drawing.Size(120, 20);
             this.txtDateTo.TabIndex = 3;
             // 

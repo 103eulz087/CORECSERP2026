@@ -1,6 +1,6 @@
-Version=221
+Version=225
 Filename=updated.zip
 Launcher=SalesInventorySystem.exe
 VersionCheckerUrl=https://check-uploader.uat-ph.com/Nzc0Njk4NjY0
 DownloadUrlFormat=https://file-uploader.uat-ph.com/Nzc0Njk4NjY0/file.zip 
-DownloadUrl=https://file-uploader.uat-ph.com/Nzc0Njk4NjY0/file-v221.zip 
+DownloadUrl=https://file-uploader.uat-ph.com/Nzc0Njk4NjY0/file-v225.zip 

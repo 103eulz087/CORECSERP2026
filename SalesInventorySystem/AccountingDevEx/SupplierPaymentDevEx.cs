@@ -41,7 +41,6 @@ namespace SalesInventorySystem.AccountingDevEx
             public decimal ReturnAllowances { get; set; }
 
             public decimal Variance { get; set; }   // NEW
-            public decimal OffsetAmount { get; set; }
             public string DiscountAccountCode { get; set; }   // NEW — null/blank = use default '508'
             public string Description { get; set; }
         }
@@ -231,7 +230,6 @@ namespace SalesInventorySystem.AccountingDevEx
                     DiscountAmount = Convert.ToDecimal(gridViewMaster.GetRowCellValue(i, "DiscountAmount") ?? 0m),
                     EWTAmount = Convert.ToDecimal(gridViewMaster.GetRowCellValue(i, "EWTAmount") ?? 0m),
                     ReturnAllowances = Convert.ToDecimal(gridViewMaster.GetRowCellValue(i, "ReturnAllowances") ?? 0m),
-                    OffsetAmount = Convert.ToDecimal(gridViewMaster.GetRowCellValue(i, "OffsetAmount") ?? 0m),
                     Variance = Convert.ToDecimal(gridViewMaster.GetRowCellValue(i, "Variance") ?? 0m),   // NEW
                     DiscountAccountCode = Convert.ToString(gridViewMaster.GetRowCellValue(i, "DiscountAccountCode") ?? ""),
                     Description = Convert.ToString(gridViewMaster.GetRowCellValue(i, "Description") ?? "")
@@ -240,6 +238,16 @@ namespace SalesInventorySystem.AccountingDevEx
 
             return lines;
         }
+        // Single source of truth for "Gross" (Amount Paid + EWT + Discount +
+        // Offset - Variance), so the in-grid warning and the pre-submit gate
+        // can't drift apart. Variance is always 0 today (splist_Accounts
+        // hardcodes it; InitializeRowPayment/ResetRowPayment force the cell
+        // back to 0m), but the commented-out RecalculateRowVariance
+        // scaffolding elsewhere in this file shows it's meant to go live --
+        // this keeps every caller consistent when it does.
+        private static decimal ComputeGross(decimal amountPaid, decimal ewt, decimal discount, decimal offset, decimal variance)
+            => amountPaid + ewt + discount + offset - variance;
+
         private static decimal SafeToDecimal(object value)
         {
             if (value == null || value == DBNull.Value) return 0m;
@@ -483,8 +491,45 @@ namespace SalesInventorySystem.AccountingDevEx
             }
 
             if (hasDebitLines && !ValidateDebitLines()) return;
+            if (hasInvoices && !ValidateInvoiceLines()) return;
 
             PostCombinedVoucher(lines, hasInvoices, hasDebitLines);
+        }
+
+        // NEW - client-side mirror of sp_AddPaymentSupplierCompound_V2's
+        // overpayment guard (THROW 60502/60503/60504), so a bad row is
+        // caught here with a clear message instead of only via a
+        // SqlException after a full round-trip. The SP is still the real
+        // guard (see SQL/2026-09-22_SupplierPayment_OverpaymentGuard.sql) --
+        // this is purely fail-fast UX, not a substitute for it.
+        // Iterates grid rows directly (not the already-built PaymentLine
+        // list) so the offending row can be focused/flagged via
+        // ShowRowError, same as the in-grid AmountPaid check.
+        private bool ValidateInvoiceLines()
+        {
+            for (int i = 0; i < gridViewMaster.RowCount; i++)
+            {
+                if (!ToBool(gridViewMaster.GetRowCellValue(i, "Pay"))) continue;
+
+                string invoiceNo = gridViewMaster.GetRowCellValue(i, "InvoiceNo")?.ToString() ?? "";
+                decimal balance = ToDecimal(gridViewMaster.GetRowCellValue(i, "Balance"));
+                decimal amountPaid = ToDecimal(gridViewMaster.GetRowCellValue(i, "AmountPaid"));
+                decimal ewt = ToDecimal(gridViewMaster.GetRowCellValue(i, "EWTAmount"));
+                decimal discount = ToDecimal(gridViewMaster.GetRowCellValue(i, "DiscountAmount"));
+                decimal offset = ToDecimal(gridViewMaster.GetRowCellValue(i, "ReturnAllowances"));
+                decimal variance = ToDecimal(gridViewMaster.GetRowCellValue(i, "Variance"));
+                decimal gross = ComputeGross(amountPaid, ewt, discount, offset, variance);
+
+                if (Math.Round(gross - balance, 2) > 0)
+                {
+                    ShowRowError(i, $"Amount Paid ({gross:N2} incl. EWT/Discount/Offset) exceeds Balance ({balance:N2}).");
+                    XtraMessageBox.Show(
+                        $"Invoice {invoiceNo}: the amount being settled ({gross:N2}) exceeds its Balance ({balance:N2}).\nLower Amount Paid (or the EWT/Discount/Offset lines) so it does not exceed Balance.",
+                        "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return false;
+                }
+            }
+            return true;
         }
         
         private bool ValidateDebitLines()
@@ -929,6 +974,31 @@ namespace SalesInventorySystem.AccountingDevEx
             else if (col == "AmountPaid")
             {
                 //RecalculateRowVariance(e.RowHandle);   // NEW - back-solve Variance
+
+                // NEW - AmountPaid is directly editable and, unlike the
+                // EWT/Discount/Offset path above (which always recomputes
+                // AmountPaid = Balance - deductions, so Gross can never
+                // exceed Balance by construction), had no check at all here.
+                // A typed-in overpayment used to post fine and then corrupt
+                // Balance on reversal (sp_AddPaymentSupplierCompound_V2 floors
+                // Balance at 0 instead of rejecting it, then the reversal SP
+                // adds the full paid amount back on top of that floor,
+                // landing on the paid amount instead of the true original
+                // Balance). The SP now rejects this server-side too (THROW
+                // 60502/60503/60504) -- this is the earlier, in-grid warning.
+                decimal balance = ToDecimal(gridViewMaster.GetRowCellValue(e.RowHandle, "Balance"));
+                decimal ewt = ToDecimal(gridViewMaster.GetRowCellValue(e.RowHandle, "EWTAmount"));
+                decimal discount = ToDecimal(gridViewMaster.GetRowCellValue(e.RowHandle, "DiscountAmount"));
+                decimal offset = ToDecimal(gridViewMaster.GetRowCellValue(e.RowHandle, "ReturnAllowances"));
+                decimal amountPaid = ToDecimal(gridViewMaster.GetRowCellValue(e.RowHandle, "AmountPaid"));
+                decimal variance = ToDecimal(gridViewMaster.GetRowCellValue(e.RowHandle, "Variance"));
+                decimal gross = ComputeGross(amountPaid, ewt, discount, offset, variance);
+
+                if (Math.Round(gross - balance, 2) > 0)
+                    ShowRowError(e.RowHandle, $"Amount Paid ({gross:N2} incl. EWT/Discount/Offset) exceeds Balance ({balance:N2}).");
+                else
+                    gridViewMaster.ClearColumnErrors();
+
                 UpdateTotalAmountToPay();
             }
 

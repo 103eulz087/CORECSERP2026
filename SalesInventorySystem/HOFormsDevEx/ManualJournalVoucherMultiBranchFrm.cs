@@ -65,6 +65,18 @@ namespace SalesInventorySystem.HOFormsDevEx
             AddLine();
 
             UpdateTotals();
+
+            // Exit edit mode every time this runs -- callers are Load,
+            // Close, successful Post/Save, and Copy-to-New, and ALL of them
+            // mean "the form is back to a blank New Entry state" even when
+            // entered from BtnEditVoucher_Click. Without this, Close (or a
+            // successful Save Changes) left _isEditMode/btnPost.Text/
+            // lblEditNotice stuck on "Save Changes" and the user had to
+            // close and reopen the whole form to get back to "Post".
+            _isEditMode = false;
+            btnPost.Text = "Post";
+            lblEditNotice.Visible = false;
+            lblEditNotice.Text = "";
         }
 
         // Combined "Code-Name" display text, computed in SQL so it's a
@@ -416,12 +428,43 @@ namespace SalesInventorySystem.HOFormsDevEx
                 }
 
 
+                // TotalAmount is now a real DECIMAL from
+                // sp_GetPostedManualJournalVouchers (was FORMAT()-ed
+                // VARCHAR) -- numeric display + right-align.
+                if (gridViewPosted.Columns["TotalAmount"] != null)
+                {
+                    gridViewPosted.Columns["TotalAmount"].DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+                    gridViewPosted.Columns["TotalAmount"].DisplayFormat.FormatString = "N2";
+                    gridViewPosted.Columns["TotalAmount"].AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+                    gridViewPosted.Columns["TotalAmount"].AppearanceCell.Options.UseTextOptions = true;
+                }
+                if (gridViewPosted.Columns["BranchCount"] != null)
+                {
+                    gridViewPosted.Columns["BranchCount"].AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+                    gridViewPosted.Columns["BranchCount"].AppearanceCell.Options.UseTextOptions = true;
+                }
+
+                // VoucherDate is a DateTime-typed column but renders via
+                // plain ToString() without this -- reads as a raw text
+                // field rather than a date field.
+                if (gridViewPosted.Columns["VoucherDate"] != null)
+                {
+                    gridViewPosted.Columns["VoucherDate"].DisplayFormat.FormatType = DevExpress.Utils.FormatType.DateTime;
+                    gridViewPosted.Columns["VoucherDate"].DisplayFormat.FormatString = "MM/dd/yyyy";
+                }
+
                 gridViewPosted.BestFitColumns();
                 gridControlPostedDetails.DataSource = null;
-                btnViewDetails.Enabled = false;
-                btnCopyToNew.Enabled = true;
-                btnEditVoucher.Enabled = false;
-                _selectedPostedRefNo = null;
+
+                // Binding DataSource above auto-focuses row 0, which already
+                // fires GridViewPosted_FocusedRowChanged and correctly
+                // enables the buttons for that row -- hardcoding
+                // Enabled=false/null here afterwards silently overwrote
+                // that correct state back to disabled, so the first row
+                // looked focused but ViewDetails/CopyToNew/EditVoucher
+                // stayed disabled until the user clicked away and back.
+                // Re-sync from the actual FocusedRowHandle instead.
+                SyncPostedButtonState();
             }
             catch (SqlException ex)
             {
@@ -506,6 +549,11 @@ namespace SalesInventorySystem.HOFormsDevEx
         }
         private void GridViewPosted_FocusedRowChanged(object sender, DevExpress.XtraGrid.Views.Base.FocusedRowChangedEventArgs e)
         {
+            SyncPostedButtonState();
+        }
+
+        private void SyncPostedButtonState()
+        {
             bool has = gridViewPosted.FocusedRowHandle >= 0;
             btnViewDetails.Enabled = has;
             btnCopyToNew.Enabled = has;
@@ -540,6 +588,22 @@ namespace SalesInventorySystem.HOFormsDevEx
                     new SqlDataAdapter(cmd).Fill(dt);
                     gridControlPostedDetails.DataSource = dt;
                 }
+
+                // Debit/Credit are now real DECIMAL from
+                // sp_GetManualJournalVoucherDetails (was FORMAT()-ed
+                // VARCHAR) -- numeric display, right-align, and footer sum
+                // of each. ShowFooterTotal de-dupes internally, so it's
+                // safe to call again on every View Details click.
+                Classes.DevXGridViewSettings.FormatNumericColumns(gridViewPostedDetails, "Debit", "Credit");
+                foreach (var col in new[] { "Debit", "Credit" })
+                {
+                    if (gridViewPostedDetails.Columns[col] == null) continue;
+                    gridViewPostedDetails.Columns[col].AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+                    gridViewPostedDetails.Columns[col].AppearanceCell.Options.UseTextOptions = true;
+                    Classes.DevXGridViewSettings.ShowFooterTotal(gridViewPostedDetails, col);
+                }
+                gridViewPostedDetails.OptionsView.ShowFooter = true;
+
                 gridViewPostedDetails.BestFitColumns();
             }
             catch (SqlException ex)

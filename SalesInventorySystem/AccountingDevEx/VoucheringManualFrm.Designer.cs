@@ -285,8 +285,10 @@
             this.txtVoucherDate.EditValue = new System.DateTime(2026, 7, 23, 0, 0, 0, 0);
             this.txtVoucherDate.Location = new System.Drawing.Point(492, 36);
             this.txtVoucherDate.Name = "txtVoucherDate";
-            this.txtVoucherDate.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            this.txtVoucherDate.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.txtVoucherDate.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton()});
             this.txtVoucherDate.Size = new System.Drawing.Size(150, 20);
             this.txtVoucherDate.TabIndex = 3;
             // 

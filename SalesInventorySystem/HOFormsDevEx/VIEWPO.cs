@@ -571,6 +571,7 @@ namespace SalesInventorySystem.HOFormsDevEx
                     Database.display(cmd, grid, view);
                 }
 
+                FormatPOSummaryNumericColumns(view);
                 view.Focus();
                 this.Activate();  // ✅ KEEP FORM FRONT
             }
@@ -585,6 +586,31 @@ namespace SalesInventorySystem.HOFormsDevEx
                 Cursor.Current = Cursors.Default;
             }
 
+        }
+
+        // TotalItems/TotalQty/TotalCost/TotalActualCost -- view_POSUMMARYREP
+        // now returns these as real DECIMAL (TotalQty/TotalCost/TotalActualCost
+        // were FORMAT()-ed NVARCHAR; see SQL/2026-09-23c_view_POSUMMARYREP_NumericColumns.sql).
+        // Shared by all four Products tabs (FOR APPROVAL/APPROVED/FOR
+        // CONFIRMATION/CONFIRMED) since they all funnel through LoadGrid.
+        private void FormatPOSummaryNumericColumns(DevExpress.XtraGrid.Views.Grid.GridView view)
+        {
+            void FormatCol(string field, string formatString)
+            {
+                var col = view.Columns[field];
+                if (col == null) return;
+                col.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+                col.DisplayFormat.FormatString = formatString;
+                col.AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+                col.AppearanceCell.Options.UseTextOptions = true;
+            }
+
+            FormatCol("TotalItems", "N0");
+            FormatCol("TotalQty", "N3");
+            FormatCol("TotalCost", "N2");
+            FormatCol("TotalActualCost", "N2");
+
+            view.BestFitColumns();
         }
 
         private void LoadPOByStatus(

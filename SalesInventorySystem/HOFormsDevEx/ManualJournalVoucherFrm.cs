@@ -333,6 +333,31 @@ namespace SalesInventorySystem.HOFormsDevEx
                     gridControlPosted.DataSource = dt;
                 }
 
+                // TotalAmount is now a real DECIMAL from
+                // sp_GetPostedManualJournalVouchers (was FORMAT()-ed
+                // VARCHAR) -- numeric display + right-align.
+                if (gridViewPosted.Columns["TotalAmount"] != null)
+                {
+                    gridViewPosted.Columns["TotalAmount"].DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+                    gridViewPosted.Columns["TotalAmount"].DisplayFormat.FormatString = "N2";
+                    gridViewPosted.Columns["TotalAmount"].AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+                    gridViewPosted.Columns["TotalAmount"].AppearanceCell.Options.UseTextOptions = true;
+                }
+                if (gridViewPosted.Columns["BranchCount"] != null)
+                {
+                    gridViewPosted.Columns["BranchCount"].AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+                    gridViewPosted.Columns["BranchCount"].AppearanceCell.Options.UseTextOptions = true;
+                }
+
+                // VoucherDate is a DateTime-typed column but renders via
+                // plain ToString() without this -- reads as a raw text
+                // field rather than a date field.
+                if (gridViewPosted.Columns["VoucherDate"] != null)
+                {
+                    gridViewPosted.Columns["VoucherDate"].DisplayFormat.FormatType = DevExpress.Utils.FormatType.DateTime;
+                    gridViewPosted.Columns["VoucherDate"].DisplayFormat.FormatString = "MM/dd/yyyy";
+                }
+
                 gridViewPosted.BestFitColumns();
                 gridControlPostedDetails.DataSource = null;
                 btnViewDetails.Enabled = false;

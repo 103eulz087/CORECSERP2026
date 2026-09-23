@@ -132,7 +132,7 @@
             this.checkBox1.Location = new System.Drawing.Point(558, 40);
             this.checkBox1.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(178, 20);
+            this.checkBox1.Size = new System.Drawing.Size(150, 17);
             this.checkBox1.TabIndex = 462;
             this.checkBox1.Text = "include Cancelled Checks?";
             this.checkBox1.UseVisualStyleBackColor = true;
@@ -163,7 +163,7 @@
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.dateto.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.dateto.Size = new System.Drawing.Size(161, 24);
+            this.dateto.Size = new System.Drawing.Size(161, 20);
             this.dateto.TabIndex = 3;
             // 
             // datefrom
@@ -178,7 +178,7 @@
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.datefrom.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.datefrom.Size = new System.Drawing.Size(154, 24);
+            this.datefrom.Size = new System.Drawing.Size(154, 20);
             this.datefrom.TabIndex = 2;
             // 
             // labelControl2
@@ -188,7 +188,7 @@
             this.labelControl2.Location = new System.Drawing.Point(237, 41);
             this.labelControl2.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.labelControl2.Name = "labelControl2";
-            this.labelControl2.Size = new System.Drawing.Size(23, 18);
+            this.labelControl2.Size = new System.Drawing.Size(19, 14);
             this.labelControl2.TabIndex = 1;
             this.labelControl2.Text = "To:";
             // 
@@ -199,7 +199,7 @@
             this.labelControl1.Location = new System.Drawing.Point(26, 41);
             this.labelControl1.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.labelControl1.Name = "labelControl1";
-            this.labelControl1.Size = new System.Drawing.Size(39, 18);
+            this.labelControl1.Size = new System.Drawing.Size(31, 14);
             this.labelControl1.TabIndex = 0;
             this.labelControl1.Text = "From:";
             // 
@@ -211,7 +211,7 @@
             this.panelControl1.Location = new System.Drawing.Point(0, 0);
             this.panelControl1.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.panelControl1.Name = "panelControl1";
-            this.panelControl1.Size = new System.Drawing.Size(1130, 650);
+            this.panelControl1.Size = new System.Drawing.Size(1130, 655);
             this.panelControl1.TabIndex = 1;
             // 
             // gridControl1
@@ -222,7 +222,7 @@
             this.gridControl1.MainView = this.gridView1;
             this.gridControl1.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.gridControl1.Name = "gridControl1";
-            this.gridControl1.Size = new System.Drawing.Size(1126, 565);
+            this.gridControl1.Size = new System.Drawing.Size(1126, 570);
             this.gridControl1.TabIndex = 2;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1});
@@ -260,13 +260,13 @@
             this.errorCorrecToolStripMenuItem,
             this.liquidateToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(167, 82);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(146, 82);
             // 
             // viewDetailsToolStripMenuItem
             // 
             this.viewDetailsToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("viewDetailsToolStripMenuItem.Image")));
             this.viewDetailsToolStripMenuItem.Name = "viewDetailsToolStripMenuItem";
-            this.viewDetailsToolStripMenuItem.Size = new System.Drawing.Size(166, 26);
+            this.viewDetailsToolStripMenuItem.Size = new System.Drawing.Size(145, 26);
             this.viewDetailsToolStripMenuItem.Text = "View Details";
             this.viewDetailsToolStripMenuItem.Click += new System.EventHandler(this.viewDetailsToolStripMenuItem_Click);
             // 
@@ -274,7 +274,7 @@
             // 
             this.errorCorrecToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("errorCorrecToolStripMenuItem.Image")));
             this.errorCorrecToolStripMenuItem.Name = "errorCorrecToolStripMenuItem";
-            this.errorCorrecToolStripMenuItem.Size = new System.Drawing.Size(166, 26);
+            this.errorCorrecToolStripMenuItem.Size = new System.Drawing.Size(145, 26);
             this.errorCorrecToolStripMenuItem.Text = "Error Correct";
             this.errorCorrecToolStripMenuItem.Click += new System.EventHandler(this.errorCorrecToolStripMenuItem_Click);
             // 
@@ -282,7 +282,7 @@
             // 
             this.liquidateToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("liquidateToolStripMenuItem.Image")));
             this.liquidateToolStripMenuItem.Name = "liquidateToolStripMenuItem";
-            this.liquidateToolStripMenuItem.Size = new System.Drawing.Size(166, 26);
+            this.liquidateToolStripMenuItem.Size = new System.Drawing.Size(145, 26);
             this.liquidateToolStripMenuItem.Text = "Liquidate";
             this.liquidateToolStripMenuItem.Click += new System.EventHandler(this.liquidateToolStripMenuItem_Click);
             // 
@@ -303,14 +303,14 @@
             // 
             this.xtraTabPage1.Controls.Add(this.panelControl1);
             this.xtraTabPage1.Name = "xtraTabPage1";
-            this.xtraTabPage1.Size = new System.Drawing.Size(1130, 650);
+            this.xtraTabPage1.Size = new System.Drawing.Size(1130, 655);
             this.xtraTabPage1.Text = "CHECK VOUCHER";
             // 
             // xtraTabPage2
             // 
             this.xtraTabPage2.Controls.Add(this.panelControl2);
             this.xtraTabPage2.Name = "xtraTabPage2";
-            this.xtraTabPage2.Size = new System.Drawing.Size(1130, 650);
+            this.xtraTabPage2.Size = new System.Drawing.Size(1130, 655);
             this.xtraTabPage2.Text = "CASH VOUCHER";
             // 
             // panelControl2
@@ -321,18 +321,18 @@
             this.panelControl2.Location = new System.Drawing.Point(0, 0);
             this.panelControl2.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.panelControl2.Name = "panelControl2";
-            this.panelControl2.Size = new System.Drawing.Size(1413, 813);
+            this.panelControl2.Size = new System.Drawing.Size(904, 524);
             this.panelControl2.TabIndex = 2;
             // 
             // gridControlCashVoucher
             // 
             this.gridControlCashVoucher.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gridControlCashVoucher.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
-            this.gridControlCashVoucher.Location = new System.Drawing.Point(2, 103);
+            this.gridControlCashVoucher.Location = new System.Drawing.Point(2, 83);
             this.gridControlCashVoucher.MainView = this.gridViewCashVoucher;
             this.gridControlCashVoucher.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.gridControlCashVoucher.Name = "gridControlCashVoucher";
-            this.gridControlCashVoucher.Size = new System.Drawing.Size(1409, 708);
+            this.gridControlCashVoucher.Size = new System.Drawing.Size(900, 439);
             this.gridControlCashVoucher.TabIndex = 4;
             this.gridControlCashVoucher.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewCashVoucher});
@@ -373,7 +373,7 @@
             this.groupControl2.Location = new System.Drawing.Point(2, 2);
             this.groupControl2.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.groupControl2.Name = "groupControl2";
-            this.groupControl2.Size = new System.Drawing.Size(1409, 101);
+            this.groupControl2.Size = new System.Drawing.Size(900, 81);
             this.groupControl2.TabIndex = 3;
             // 
             // chckboxCashVoucher
@@ -382,7 +382,7 @@
             this.chckboxCashVoucher.Location = new System.Drawing.Point(558, 40);
             this.chckboxCashVoucher.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.chckboxCashVoucher.Name = "chckboxCashVoucher";
-            this.chckboxCashVoucher.Size = new System.Drawing.Size(178, 20);
+            this.chckboxCashVoucher.Size = new System.Drawing.Size(150, 17);
             this.chckboxCashVoucher.TabIndex = 463;
             this.chckboxCashVoucher.Text = "include Cancelled Checks?";
             this.chckboxCashVoucher.UseVisualStyleBackColor = true;
@@ -412,7 +412,7 @@
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.dateToCashVoucher.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.dateToCashVoucher.Size = new System.Drawing.Size(161, 24);
+            this.dateToCashVoucher.Size = new System.Drawing.Size(161, 20);
             this.dateToCashVoucher.TabIndex = 3;
             // 
             // dateFromCashVoucher
@@ -427,7 +427,7 @@
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.dateFromCashVoucher.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.dateFromCashVoucher.Size = new System.Drawing.Size(154, 24);
+            this.dateFromCashVoucher.Size = new System.Drawing.Size(154, 20);
             this.dateFromCashVoucher.TabIndex = 2;
             // 
             // labelControl3
@@ -437,7 +437,7 @@
             this.labelControl3.Location = new System.Drawing.Point(237, 41);
             this.labelControl3.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.labelControl3.Name = "labelControl3";
-            this.labelControl3.Size = new System.Drawing.Size(23, 18);
+            this.labelControl3.Size = new System.Drawing.Size(19, 14);
             this.labelControl3.TabIndex = 1;
             this.labelControl3.Text = "To:";
             // 
@@ -448,7 +448,7 @@
             this.labelControl4.Location = new System.Drawing.Point(26, 41);
             this.labelControl4.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.labelControl4.Name = "labelControl4";
-            this.labelControl4.Size = new System.Drawing.Size(39, 18);
+            this.labelControl4.Size = new System.Drawing.Size(31, 14);
             this.labelControl4.TabIndex = 0;
             this.labelControl4.Text = "From:";
             // 
@@ -457,18 +457,18 @@
             this.xtraTabPage3.Controls.Add(this.gridControlTelegraphic);
             this.xtraTabPage3.Controls.Add(this.groupControl3);
             this.xtraTabPage3.Name = "xtraTabPage3";
-            this.xtraTabPage3.Size = new System.Drawing.Size(1130, 650);
+            this.xtraTabPage3.Size = new System.Drawing.Size(1130, 655);
             this.xtraTabPage3.Text = "TELEGRAPHIC";
             // 
             // gridControlTelegraphic
             // 
             this.gridControlTelegraphic.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gridControlTelegraphic.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
-            this.gridControlTelegraphic.Location = new System.Drawing.Point(0, 101);
+            this.gridControlTelegraphic.Location = new System.Drawing.Point(0, 65);
             this.gridControlTelegraphic.MainView = this.gridViewTelegraphic;
             this.gridControlTelegraphic.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.gridControlTelegraphic.Name = "gridControlTelegraphic";
-            this.gridControlTelegraphic.Size = new System.Drawing.Size(1413, 711);
+            this.gridControlTelegraphic.Size = new System.Drawing.Size(904, 459);
             this.gridControlTelegraphic.TabIndex = 6;
             this.gridControlTelegraphic.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewTelegraphic});
@@ -508,7 +508,7 @@
             this.groupControl3.Location = new System.Drawing.Point(0, 0);
             this.groupControl3.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.groupControl3.Name = "groupControl3";
-            this.groupControl3.Size = new System.Drawing.Size(1413, 81);
+            this.groupControl3.Size = new System.Drawing.Size(904, 81);
             this.groupControl3.TabIndex = 5;
             // 
             // chckboxTelegraphic
@@ -517,7 +517,7 @@
             this.chckboxTelegraphic.Location = new System.Drawing.Point(558, 40);
             this.chckboxTelegraphic.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.chckboxTelegraphic.Name = "chckboxTelegraphic";
-            this.chckboxTelegraphic.Size = new System.Drawing.Size(178, 20);
+            this.chckboxTelegraphic.Size = new System.Drawing.Size(150, 17);
             this.chckboxTelegraphic.TabIndex = 463;
             this.chckboxTelegraphic.Text = "include Cancelled Checks?";
             this.chckboxTelegraphic.UseVisualStyleBackColor = true;
@@ -547,7 +547,7 @@
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.dateToTelegraphic.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.dateToTelegraphic.Size = new System.Drawing.Size(161, 24);
+            this.dateToTelegraphic.Size = new System.Drawing.Size(161, 20);
             this.dateToTelegraphic.TabIndex = 3;
             // 
             // dateFromTelegraphic
@@ -562,7 +562,7 @@
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.dateFromTelegraphic.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.dateFromTelegraphic.Size = new System.Drawing.Size(154, 24);
+            this.dateFromTelegraphic.Size = new System.Drawing.Size(154, 20);
             this.dateFromTelegraphic.TabIndex = 2;
             // 
             // labelControl5
@@ -572,7 +572,7 @@
             this.labelControl5.Location = new System.Drawing.Point(237, 41);
             this.labelControl5.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.labelControl5.Name = "labelControl5";
-            this.labelControl5.Size = new System.Drawing.Size(23, 18);
+            this.labelControl5.Size = new System.Drawing.Size(19, 14);
             this.labelControl5.TabIndex = 1;
             this.labelControl5.Text = "To:";
             // 
@@ -583,7 +583,7 @@
             this.labelControl6.Location = new System.Drawing.Point(26, 41);
             this.labelControl6.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.labelControl6.Name = "labelControl6";
-            this.labelControl6.Size = new System.Drawing.Size(39, 18);
+            this.labelControl6.Size = new System.Drawing.Size(31, 14);
             this.labelControl6.TabIndex = 0;
             this.labelControl6.Text = "From:";
             // 
@@ -594,13 +594,13 @@
             this.toolStripMenuItem1,
             this.toolStripMenuItem2});
             this.contextMenuStripCashVoucher.Name = "contextMenuStrip1";
-            this.contextMenuStripCashVoucher.Size = new System.Drawing.Size(167, 56);
+            this.contextMenuStripCashVoucher.Size = new System.Drawing.Size(146, 56);
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripMenuItem1.Image")));
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(166, 26);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(145, 26);
             this.toolStripMenuItem1.Text = "View Details";
             this.toolStripMenuItem1.Click += new System.EventHandler(this.toolStripMenuItem1_Click);
             // 
@@ -608,7 +608,7 @@
             // 
             this.toolStripMenuItem2.Image = ((System.Drawing.Image)(resources.GetObject("toolStripMenuItem2.Image")));
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(166, 26);
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(145, 26);
             this.toolStripMenuItem2.Text = "Error Correct";
             this.toolStripMenuItem2.Click += new System.EventHandler(this.toolStripMenuItem2_Click);
             // 
@@ -619,13 +619,13 @@
             this.toolStripMenuItem3,
             this.toolStripMenuItem4});
             this.contextMenuStripTelegraphic.Name = "contextMenuStrip1";
-            this.contextMenuStripTelegraphic.Size = new System.Drawing.Size(167, 56);
+            this.contextMenuStripTelegraphic.Size = new System.Drawing.Size(146, 56);
             // 
             // toolStripMenuItem3
             // 
             this.toolStripMenuItem3.Image = ((System.Drawing.Image)(resources.GetObject("toolStripMenuItem3.Image")));
             this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-            this.toolStripMenuItem3.Size = new System.Drawing.Size(166, 26);
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(145, 26);
             this.toolStripMenuItem3.Text = "View Details";
             this.toolStripMenuItem3.Click += new System.EventHandler(this.toolStripMenuItem3_Click);
             // 
@@ -633,7 +633,7 @@
             // 
             this.toolStripMenuItem4.Image = ((System.Drawing.Image)(resources.GetObject("toolStripMenuItem4.Image")));
             this.toolStripMenuItem4.Name = "toolStripMenuItem4";
-            this.toolStripMenuItem4.Size = new System.Drawing.Size(166, 26);
+            this.toolStripMenuItem4.Size = new System.Drawing.Size(145, 26);
             this.toolStripMenuItem4.Text = "Error Correct";
             this.toolStripMenuItem4.Click += new System.EventHandler(this.toolStripMenuItem4_Click);
             // 

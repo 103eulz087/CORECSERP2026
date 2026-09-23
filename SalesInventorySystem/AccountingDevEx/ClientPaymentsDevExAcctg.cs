@@ -49,6 +49,7 @@ namespace SalesInventorySystem.AccountingDevEx
             populateRepositorySearchLookUp();
             populateCOA();
             display();
+            RefreshAvailableCredit();
 
             Classes.DevXGridViewSettings.ShowFooterTotal(gridView2, "InvoiceAmount");
             Classes.DevXGridViewSettings.ShowFooterTotal(gridView2, "Balance");
@@ -102,6 +103,44 @@ namespace SalesInventorySystem.AccountingDevEx
         void populateCustname()
         {
             Database.displaySearchlookupEdit("SELECT BranchName,CustomerKey,CustomerName FROM view_Customers", txtcustname, "CustomerName", "CustomerName");
+        }
+
+        // ── AVAILABLE CREDIT (unapplied OverPay balance) ───────────────────
+        // See SQL/2026-09-23_CustomerOverpaymentCredit.sql -- OverPay now
+        // credits a real liability account (20115) instead of Other Income,
+        // and this surfaces the running balance so the user knows there's
+        // credit to apply via OffsetAmount before typing a payment in blind.
+        void RefreshAvailableCredit()
+        {
+            if (string.IsNullOrWhiteSpace(custkey))
+            {
+                lblAvailableCredit.Text = "0.00";
+                return;
+            }
+
+            try
+            {
+                using (SqlConnection con = Database.getConnection())
+                using (SqlCommand cmd = new SqlCommand("sp_GetCustomerAvailableCredit", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add("@CustomerKey", SqlDbType.Char, 8).Value = custkey;
+
+                    con.Open();
+                    object result = cmd.ExecuteScalar();
+                    decimal credit = (result == null || result == DBNull.Value) ? 0m : Convert.ToDecimal(result);
+                    lblAvailableCredit.Text = credit.ToString("N2");
+                    lblAvailableCredit.ForeColor = credit > 0 ? Color.DarkGreen : Color.Gray;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Non-critical display field -- a failed lookup (SqlException,
+                // or a bad cast if the SP ever returns something unexpected)
+                // shouldn't block the rest of Load/EditValueChanged/ResetEntry.
+                System.Diagnostics.Debug.WriteLine("RefreshAvailableCredit failed: " + ex.Message);
+                lblAvailableCredit.Text = "N/A";
+            }
         }
         // ── DISPLAY ─────────────────────────────────────────────────────
         void display()
@@ -719,6 +758,7 @@ namespace SalesInventorySystem.AccountingDevEx
             txtdatedeponline.EditValue = null;
 
             display();
+            RefreshAvailableCredit();
             LoadPostedClientPayments();
         }
 
@@ -1142,6 +1182,7 @@ namespace SalesInventorySystem.AccountingDevEx
             {
                 xtraTabControl1.SelectedTabPage = xtraTabPage1;
                 display();
+                RefreshAvailableCredit();
                 PrefillEntryFromReversedPayment(header.Rows[0], lines);
                 LoadPostedClientPayments();
 
@@ -1376,6 +1417,7 @@ namespace SalesInventorySystem.AccountingDevEx
             custkey = txtcustid.Text;
             groupControl1.Text = custkey;
             display();
+            RefreshAvailableCredit();
             if (xtraTabControl1.SelectedTabPage == xtraTabPage2)
                 LoadPostedClientPayments();
         }

@@ -81,11 +81,18 @@ namespace SalesInventorySystem.AccountingDevEx
             this.lblPostedDateFrom.Location = new System.Drawing.Point(12, 18);
             this.txtPostedDateFrom.Location = new System.Drawing.Point(58, 13);
             this.txtPostedDateFrom.Size = new System.Drawing.Size(120, 20);
+            // Missing calendar dropdown button -- without this a DateEdit
+            // renders with no visible way to open the calendar picker,
+            // reading as a plain textbox despite being a real DateEdit.
+            this.txtPostedDateFrom.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+                new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo) });
 
             this.lblPostedDateTo.Text = "To:";
             this.lblPostedDateTo.Location = new System.Drawing.Point(190, 18);
             this.txtPostedDateTo.Location = new System.Drawing.Point(214, 13);
             this.txtPostedDateTo.Size = new System.Drawing.Size(120, 20);
+            this.txtPostedDateTo.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+                new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo) });
 
             this.btnRefreshPosted.Text = "Refresh";
             this.btnRefreshPosted.Location = new System.Drawing.Point(346, 9);
@@ -946,13 +953,42 @@ namespace SalesInventorySystem.AccountingDevEx
                     gridControlPosted.DataSource = dt;
                 }
 
-                gridViewPosted.BestFitColumns();
                 if (gridViewPosted.Columns["SupplierID"] != null) gridViewPosted.Columns["SupplierID"].Visible = false;
 
+                // Amount is already a native MONEY value from
+                // sp_GetPostedVouchersManual (not FORMAT()-ed) -- just needs
+                // the grid-side numeric display + right-align, same as the
+                // sibling Posted Expenses/Posted Vouchers grids elsewhere.
+                if (gridViewPosted.Columns["Amount"] != null)
+                {
+                    gridViewPosted.Columns["Amount"].DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+                    gridViewPosted.Columns["Amount"].DisplayFormat.FormatString = "N2";
+                    gridViewPosted.Columns["Amount"].AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+                    gridViewPosted.Columns["Amount"].AppearanceCell.Options.UseTextOptions = true;
+                }
+
+                // VoucherDate is a DateTime-typed column but PopulateColumns()
+                // (invoked implicitly by binding) doesn't set a DateTime
+                // DisplayFormat on its own -- without this it renders via
+                // plain ToString() (e.g. "7/31/2026 12:00:00 AM"), reading
+                // as a raw text field rather than a date field.
+                if (gridViewPosted.Columns["VoucherDate"] != null)
+                {
+                    gridViewPosted.Columns["VoucherDate"].DisplayFormat.FormatType = DevExpress.Utils.FormatType.DateTime;
+                    gridViewPosted.Columns["VoucherDate"].DisplayFormat.FormatString = "MM/dd/yyyy";
+                }
+
+                gridViewPosted.BestFitColumns();
+
                 gridControlPostedDetails.DataSource = null;
-                btnViewPostedDetails.Enabled = false;
-                btnCopyPostedToNew.Enabled = false;
-                _selectedPostedRefNo = null;
+                // NEW -- was previously hardcoded to false/null here, which
+                // silently undid whatever FocusedRowChanged had already set
+                // moments earlier when binding DataSource auto-focused row 0.
+                // That auto-focus highlighted the first row but left
+                // View Details/Copy to New Entry disabled until the user
+                // clicked away and back. Re-sync from the actual focused row
+                // instead of blindly resetting.
+                SyncPostedButtonState();
             }
             catch (SqlException ex)
             {
@@ -961,6 +997,11 @@ namespace SalesInventorySystem.AccountingDevEx
         }
 
         private void GridViewPosted_FocusedRowChanged(object sender, DevExpress.XtraGrid.Views.Base.FocusedRowChangedEventArgs e)
+        {
+            SyncPostedButtonState();
+        }
+
+        private void SyncPostedButtonState()
         {
             bool has = gridViewPosted.FocusedRowHandle >= 0;
             btnViewPostedDetails.Enabled = has;
@@ -1007,6 +1048,19 @@ namespace SalesInventorySystem.AccountingDevEx
                 // detail to see at a glance; swap to `invoices` if you'd
                 // rather default to the invoice list instead
                 gridControlPostedDetails.DataSource = glLines;
+
+                // Debit/Credit are already real DECIMAL from
+                // sp_GetVoucherManualDetails's GL result set -- just needs
+                // the grid-side numeric display + right-align.
+                foreach (string col in new[] { "Debit", "Credit" })
+                {
+                    if (gridViewPostedDetails.Columns[col] == null) continue;
+                    gridViewPostedDetails.Columns[col].DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+                    gridViewPostedDetails.Columns[col].DisplayFormat.FormatString = "N2";
+                    gridViewPostedDetails.Columns[col].AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+                    gridViewPostedDetails.Columns[col].AppearanceCell.Options.UseTextOptions = true;
+                }
+
                 gridViewPostedDetails.BestFitColumns();
             }
             catch (SqlException ex)

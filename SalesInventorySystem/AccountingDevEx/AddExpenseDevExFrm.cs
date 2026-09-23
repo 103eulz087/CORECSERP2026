@@ -537,12 +537,24 @@ namespace SalesInventorySystem.AccountingDevEx
                     gridViewPosted.Columns[col].DisplayFormat.FormatString = "N2";
                 }
 
+                // ExpenseDate is a DateTime-typed column but renders via plain
+                // ToString() (e.g. "7/31/2026 12:00:00 AM") without this --
+                // reads as a raw text field rather than a date field.
+                if (gridViewPosted.Columns["ExpenseDate"] != null)
+                {
+                    gridViewPosted.Columns["ExpenseDate"].DisplayFormat.FormatType = DevExpress.Utils.FormatType.DateTime;
+                    gridViewPosted.Columns["ExpenseDate"].DisplayFormat.FormatString = "MM/dd/yyyy";
+                }
+
                 gridControlPostedDetails.DataSource = null;
-                btnViewDetails.Enabled = false;
-                btnCopyToNew.Enabled = false;
-                btnEdit.Enabled = false;
-                btnViewPODetails.Enabled = false;
-                _selectedPostedRefNo = null;
+                // NEW -- was previously hardcoded to false/null here, which
+                // silently undid whatever FocusedRowChanged had already set
+                // moments earlier when binding DataSource auto-focused row 0.
+                // That auto-focus highlighted the first row but left View
+                // Details/Copy to New Entry disabled until the user clicked
+                // away and back. Re-sync from the actual focused row instead
+                // of blindly resetting.
+                SyncPostedButtonState();
             }
             catch (SqlException ex)
             {
@@ -551,6 +563,11 @@ namespace SalesInventorySystem.AccountingDevEx
         }
 
         private void GridViewPosted_FocusedRowChanged(object sender, DevExpress.XtraGrid.Views.Base.FocusedRowChangedEventArgs e)
+        {
+            SyncPostedButtonState();
+        }
+
+        private void SyncPostedButtonState()
         {
             bool has = gridViewPosted.FocusedRowHandle >= 0;
             btnViewDetails.Enabled = has;

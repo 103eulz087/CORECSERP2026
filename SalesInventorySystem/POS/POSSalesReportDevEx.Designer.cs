@@ -78,12 +78,6 @@
             this.radsalesjournal = new System.Windows.Forms.RadioButton();
             this.radcashreceipts = new System.Windows.Forms.RadioButton();
             this.labelDateFilterType = new System.Windows.Forms.Label();
-            // Own container, not a direct sibling of radcashreceipts/radsalesjournal -- plain
-            // WinForms RadioButtons auto-group with every other RadioButton sharing the same
-            // immediate parent container, so without this wrapper, picking "Invoice Date" here
-            // would also silently uncheck "Cash Receipts"/"Sales Journal" above. A DevExpress
-            // PanelControl (not a plain Panel) so it picks up the active skin's background
-            // instead of rendering as a mismatched flat-gray box against panelControl6.
             this.panelDateFilterType = new DevExpress.XtraEditors.PanelControl();
             this.radDateFilterPayment = new System.Windows.Forms.RadioButton();
             this.radDateFilterInvoice = new System.Windows.Forms.RadioButton();
@@ -124,6 +118,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView6)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.panelDateFilterType)).BeginInit();
+            this.panelDateFilterType.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.xtraTabControl1)).BeginInit();
             this.xtraTabControl1.SuspendLayout();
             this.xtraTabPage1.SuspendLayout();
@@ -143,8 +139,6 @@
             this.panelControl7.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl6)).BeginInit();
             this.panelControl6.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.panelDateFilterType)).BeginInit();
-            this.panelDateFilterType.SuspendLayout();
             this.SuspendLayout();
             // 
             // gridControl2
@@ -155,7 +149,7 @@
             this.gridControl2.MainView = this.gridView2;
             this.gridControl2.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.gridControl2.Name = "gridControl2";
-            this.gridControl2.Size = new System.Drawing.Size(960, 398);
+            this.gridControl2.Size = new System.Drawing.Size(960, 422);
             this.gridControl2.TabIndex = 5;
             this.gridControl2.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView2,
@@ -229,9 +223,9 @@
             this.chkViewAsMasterDetail.TabIndex = 452;
             this.chkViewAsMasterDetail.Text = "View as Master-Detail";
             this.chkViewAsMasterDetail.UseVisualStyleBackColor = true;
-            //
+            // 
             // btnCollapseAllGroups
-            //
+            // 
             this.btnCollapseAllGroups.Location = new System.Drawing.Point(630, 15);
             this.btnCollapseAllGroups.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.btnCollapseAllGroups.Name = "btnCollapseAllGroups";
@@ -239,9 +233,9 @@
             this.btnCollapseAllGroups.TabIndex = 456;
             this.btnCollapseAllGroups.Text = "Collapse All";
             this.btnCollapseAllGroups.Click += new System.EventHandler(this.btnCollapseAllGroups_Click);
-            //
+            // 
             // btnExpandAllGroups
-            //
+            // 
             this.btnExpandAllGroups.Location = new System.Drawing.Point(725, 15);
             this.btnExpandAllGroups.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.btnExpandAllGroups.Name = "btnExpandAllGroups";
@@ -249,7 +243,7 @@
             this.btnExpandAllGroups.TabIndex = 457;
             this.btnExpandAllGroups.Text = "Expand All";
             this.btnExpandAllGroups.Click += new System.EventHandler(this.btnExpandAllGroups_Click);
-            //
+            // 
             // btnforapprovalstsexcel
             // 
             this.btnforapprovalstsexcel.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.ExportToExcel_16x16;
@@ -753,7 +747,7 @@
             this.gridControl1.MainView = this.gridView1;
             this.gridControl1.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.gridControl1.Name = "gridControl1";
-            this.gridControl1.Size = new System.Drawing.Size(960, 445);
+            this.gridControl1.Size = new System.Drawing.Size(960, 439);
             this.gridControl1.TabIndex = 5;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1,
@@ -808,21 +802,20 @@
             this.radcashreceipts.Text = "Cash Receipts";
             this.radcashreceipts.UseVisualStyleBackColor = true;
             this.radcashreceipts.CheckedChanged += new System.EventHandler(this.radReportType_CheckedChanged);
-            //
+            // 
             // labelDateFilterType
-            //
+            // 
             this.labelDateFilterType.AutoSize = true;
             this.labelDateFilterType.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelDateFilterType.Location = new System.Drawing.Point(330, 49);
             this.labelDateFilterType.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.labelDateFilterType.Name = "labelDateFilterType";
-            this.labelDateFilterType.Size = new System.Drawing.Size(63, 14);
+            this.labelDateFilterType.Size = new System.Drawing.Size(67, 14);
             this.labelDateFilterType.TabIndex = 453;
             this.labelDateFilterType.Text = "Date Filter:";
-            //
+            // 
             // panelDateFilterType
-            //
-            this.panelDateFilterType.Appearance.Options.UseBackColor = false;
+            // 
             this.panelDateFilterType.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
             this.panelDateFilterType.Controls.Add(this.radDateFilterPayment);
             this.panelDateFilterType.Controls.Add(this.radDateFilterInvoice);
@@ -831,31 +824,31 @@
             this.panelDateFilterType.Name = "panelDateFilterType";
             this.panelDateFilterType.Size = new System.Drawing.Size(220, 22);
             this.panelDateFilterType.TabIndex = 454;
-            //
+            // 
             // radDateFilterPayment
-            //
+            // 
             this.radDateFilterPayment.AutoSize = true;
             this.radDateFilterPayment.Checked = true;
             this.radDateFilterPayment.Location = new System.Drawing.Point(3, 3);
             this.radDateFilterPayment.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.radDateFilterPayment.Name = "radDateFilterPayment";
-            this.radDateFilterPayment.Size = new System.Drawing.Size(97, 17);
+            this.radDateFilterPayment.Size = new System.Drawing.Size(93, 17);
             this.radDateFilterPayment.TabIndex = 0;
             this.radDateFilterPayment.TabStop = true;
             this.radDateFilterPayment.Text = "Payment Date";
             this.radDateFilterPayment.UseVisualStyleBackColor = true;
-            //
+            // 
             // radDateFilterInvoice
-            //
+            // 
             this.radDateFilterInvoice.AutoSize = true;
             this.radDateFilterInvoice.Location = new System.Drawing.Point(113, 3);
             this.radDateFilterInvoice.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.radDateFilterInvoice.Name = "radDateFilterInvoice";
-            this.radDateFilterInvoice.Size = new System.Drawing.Size(89, 17);
+            this.radDateFilterInvoice.Size = new System.Drawing.Size(86, 17);
             this.radDateFilterInvoice.TabIndex = 1;
             this.radDateFilterInvoice.Text = "Invoice Date";
             this.radDateFilterInvoice.UseVisualStyleBackColor = true;
-            //
+            // 
             // simpleButton1
             // 
             this.simpleButton1.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.ExportToExcel_16x16;
@@ -977,10 +970,10 @@
             // 
             this.panelControl5.Controls.Add(this.gridControl2);
             this.panelControl5.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelControl5.Location = new System.Drawing.Point(2, 123);
+            this.panelControl5.Location = new System.Drawing.Point(2, 99);
             this.panelControl5.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panelControl5.Name = "panelControl5";
-            this.panelControl5.Size = new System.Drawing.Size(964, 402);
+            this.panelControl5.Size = new System.Drawing.Size(964, 426);
             this.panelControl5.TabIndex = 1;
             // 
             // panelControl4
@@ -1003,7 +996,7 @@
             this.panelControl4.Location = new System.Drawing.Point(2, 2);
             this.panelControl4.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panelControl4.Name = "panelControl4";
-            this.panelControl4.Size = new System.Drawing.Size(964, 121);
+            this.panelControl4.Size = new System.Drawing.Size(964, 97);
             this.panelControl4.TabIndex = 0;
             // 
             // xtraTabPage2
@@ -1029,10 +1022,10 @@
             // 
             this.panelControl7.Controls.Add(this.gridControl1);
             this.panelControl7.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelControl7.Location = new System.Drawing.Point(2, 76);
+            this.panelControl7.Location = new System.Drawing.Point(2, 82);
             this.panelControl7.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panelControl7.Name = "panelControl7";
-            this.panelControl7.Size = new System.Drawing.Size(964, 449);
+            this.panelControl7.Size = new System.Drawing.Size(964, 443);
             this.panelControl7.TabIndex = 1;
             // 
             // panelControl6
@@ -1051,7 +1044,7 @@
             this.panelControl6.Location = new System.Drawing.Point(2, 2);
             this.panelControl6.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panelControl6.Name = "panelControl6";
-            this.panelControl6.Size = new System.Drawing.Size(964, 74);
+            this.panelControl6.Size = new System.Drawing.Size(964, 80);
             this.panelControl6.TabIndex = 0;
             // 
             // POSSalesReportDevEx
@@ -1088,6 +1081,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView6)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.panelDateFilterType)).EndInit();
+            this.panelDateFilterType.ResumeLayout(false);
+            this.panelDateFilterType.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.xtraTabControl1)).EndInit();
             this.xtraTabControl1.ResumeLayout(false);
             this.xtraTabPage1.ResumeLayout(false);
@@ -1106,9 +1102,6 @@
             this.panelControl2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.panelControl7)).EndInit();
             this.panelControl7.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.panelDateFilterType)).EndInit();
-            this.panelDateFilterType.ResumeLayout(false);
-            this.panelDateFilterType.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl6)).EndInit();
             this.panelControl6.ResumeLayout(false);
             this.panelControl6.PerformLayout();
