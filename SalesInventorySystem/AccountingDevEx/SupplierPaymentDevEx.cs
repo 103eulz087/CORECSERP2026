@@ -1015,7 +1015,7 @@ namespace SalesInventorySystem.AccountingDevEx
 
         private void gridViewMaster_CustomRowCellEdit(object sender, DevExpress.XtraGrid.Views.Grid.CustomRowCellEditEventArgs e)
         {
-            if (e.Column.FieldName == "Pay")//test
+            if (e.Column.FieldName == "Pay")
                 e.RepositoryItem = repositoryItemCheckEditStat;
             if (e.Column.FieldName == "DiscountAccountCode")   
                 e.RepositoryItem = repDiscountAccount;
