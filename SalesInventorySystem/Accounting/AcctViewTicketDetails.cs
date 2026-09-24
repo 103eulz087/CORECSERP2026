@@ -31,6 +31,7 @@ namespace SalesInventorySystem.Accounting
         private void button1_Click(object sender, EventArgs e)
         {
             int cord = dataGridView1.CurrentCellAddress.Y;
+            string str = "";
             //if (Convert.ToBoolean(Login.isChecker)==true)
             //{
             //    Database.ExecuteQuery("UPDATE TempTicketMaster SET DateOutChecker='" + DateTime.Now.ToString() + "', CheckerStatus='Approved' WHERE TicketNumber='" + dataGridView1.Rows[cord].Cells[3].Value.ToString() + "' ", "Successfully Checked!");

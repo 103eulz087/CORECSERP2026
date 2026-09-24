@@ -231,7 +231,7 @@
             this.txtctrlno.Name = "txtctrlno";
             this.txtctrlno.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F);
             this.txtctrlno.Properties.Appearance.Options.UseFont = true;
-            this.txtctrlno.Size = new System.Drawing.Size(140, 20);
+            this.txtctrlno.Size = new System.Drawing.Size(140, 24);
             this.txtctrlno.TabIndex = 474;
             // 
             // labelControl14
@@ -241,7 +241,7 @@
             this.labelControl14.Location = new System.Drawing.Point(434, 99);
             this.labelControl14.Margin = new System.Windows.Forms.Padding(2, 5, 2, 5);
             this.labelControl14.Name = "labelControl14";
-            this.labelControl14.Size = new System.Drawing.Size(66, 14);
+            this.labelControl14.Size = new System.Drawing.Size(78, 18);
             this.labelControl14.TabIndex = 6;
             this.labelControl14.Text = "Control No.:";
             // 
@@ -252,7 +252,7 @@
             this.labelControl11.Location = new System.Drawing.Point(17, 10);
             this.labelControl11.Margin = new System.Windows.Forms.Padding(2, 5, 2, 5);
             this.labelControl11.Name = "labelControl11";
-            this.labelControl11.Size = new System.Drawing.Size(84, 14);
+            this.labelControl11.Size = new System.Drawing.Size(102, 18);
             this.labelControl11.TabIndex = 469;
             this.labelControl11.Text = "Payment Type:";
             // 
@@ -263,7 +263,7 @@
             this.labelControl6.Location = new System.Drawing.Point(420, 125);
             this.labelControl6.Margin = new System.Windows.Forms.Padding(2, 5, 2, 5);
             this.labelControl6.Name = "labelControl6";
-            this.labelControl6.Size = new System.Drawing.Size(80, 14);
+            this.labelControl6.Size = new System.Drawing.Size(94, 18);
             this.labelControl6.TabIndex = 5;
             this.labelControl6.Text = "Voucher Date:";
             this.labelControl6.Click += new System.EventHandler(this.labelControl6_Click);
@@ -275,7 +275,7 @@
             this.searchLookUpSupplier.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.searchLookUpSupplier.Properties.PopupView = this.searchLookUpEdit2View;
-            this.searchLookUpSupplier.Size = new System.Drawing.Size(238, 20);
+            this.searchLookUpSupplier.Size = new System.Drawing.Size(238, 22);
             this.searchLookUpSupplier.TabIndex = 476;
             this.searchLookUpSupplier.EditValueChanged += new System.EventHandler(this.searchLookUpSupplier_EditValueChanged);
             // 
@@ -298,7 +298,7 @@
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.txtcheckdate.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.txtcheckdate.Size = new System.Drawing.Size(244, 20);
+            this.txtcheckdate.Size = new System.Drawing.Size(244, 24);
             this.txtcheckdate.TabIndex = 457;
             // 
             // labelControl1
@@ -308,7 +308,7 @@
             this.labelControl1.Location = new System.Drawing.Point(18, 75);
             this.labelControl1.Margin = new System.Windows.Forms.Padding(2, 5, 2, 5);
             this.labelControl1.Name = "labelControl1";
-            this.labelControl1.Size = new System.Drawing.Size(63, 14);
+            this.labelControl1.Size = new System.Drawing.Size(75, 18);
             this.labelControl1.TabIndex = 0;
             this.labelControl1.Text = "Supplier ID:";
             // 
@@ -319,7 +319,7 @@
             this.labelControl2.Location = new System.Drawing.Point(17, 99);
             this.labelControl2.Margin = new System.Windows.Forms.Padding(2, 5, 2, 5);
             this.labelControl2.Name = "labelControl2";
-            this.labelControl2.Size = new System.Drawing.Size(82, 14);
+            this.labelControl2.Size = new System.Drawing.Size(98, 18);
             this.labelControl2.TabIndex = 1;
             this.labelControl2.Text = "Supplier Name:";
             // 
@@ -340,7 +340,7 @@
             this.radCashVoucher.Location = new System.Drawing.Point(5, 4);
             this.radCashVoucher.Margin = new System.Windows.Forms.Padding(2);
             this.radCashVoucher.Name = "radCashVoucher";
-            this.radCashVoucher.Size = new System.Drawing.Size(91, 17);
+            this.radCashVoucher.Size = new System.Drawing.Size(107, 20);
             this.radCashVoucher.TabIndex = 470;
             this.radCashVoucher.Text = "Cash Voucher";
             this.radCashVoucher.UseVisualStyleBackColor = true;
@@ -353,7 +353,7 @@
             this.radCheckVoucher.Location = new System.Drawing.Point(142, 4);
             this.radCheckVoucher.Margin = new System.Windows.Forms.Padding(2);
             this.radCheckVoucher.Name = "radCheckVoucher";
-            this.radCheckVoucher.Size = new System.Drawing.Size(96, 17);
+            this.radCheckVoucher.Size = new System.Drawing.Size(113, 20);
             this.radCheckVoucher.TabIndex = 471;
             this.radCheckVoucher.TabStop = true;
             this.radCheckVoucher.Text = "Check Voucher";
@@ -366,7 +366,7 @@
             this.radtelegraphic.Location = new System.Drawing.Point(289, 4);
             this.radtelegraphic.Margin = new System.Windows.Forms.Padding(2);
             this.radtelegraphic.Name = "radtelegraphic";
-            this.radtelegraphic.Size = new System.Drawing.Size(80, 17);
+            this.radtelegraphic.Size = new System.Drawing.Size(95, 20);
             this.radtelegraphic.TabIndex = 473;
             this.radtelegraphic.Text = "Telegraphic";
             this.radtelegraphic.UseVisualStyleBackColor = true;
@@ -380,7 +380,7 @@
             this.labelControl3.Location = new System.Drawing.Point(18, 128);
             this.labelControl3.Margin = new System.Windows.Forms.Padding(2, 5, 2, 5);
             this.labelControl3.Name = "labelControl3";
-            this.labelControl3.Size = new System.Drawing.Size(48, 14);
+            this.labelControl3.Size = new System.Drawing.Size(56, 18);
             this.labelControl3.TabIndex = 2;
             this.labelControl3.Text = "Amount:";
             // 
@@ -405,7 +405,7 @@
             this.txtcheckcoding.Name = "txtcheckcoding";
             this.txtcheckcoding.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F);
             this.txtcheckcoding.Properties.Appearance.Options.UseFont = true;
-            this.txtcheckcoding.Size = new System.Drawing.Size(140, 20);
+            this.txtcheckcoding.Size = new System.Drawing.Size(140, 24);
             this.txtcheckcoding.TabIndex = 474;
             // 
             // txtlastchecknum
@@ -416,7 +416,7 @@
             this.txtlastchecknum.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F);
             this.txtlastchecknum.Properties.Appearance.Options.UseFont = true;
             this.txtlastchecknum.Properties.ReadOnly = true;
-            this.txtlastchecknum.Size = new System.Drawing.Size(241, 20);
+            this.txtlastchecknum.Size = new System.Drawing.Size(241, 24);
             this.txtlastchecknum.TabIndex = 473;
             this.txtlastchecknum.Visible = false;
             // 
@@ -427,7 +427,7 @@
             this.labelControl5.Location = new System.Drawing.Point(2, 6);
             this.labelControl5.Margin = new System.Windows.Forms.Padding(2, 5, 2, 5);
             this.labelControl5.Name = "labelControl5";
-            this.labelControl5.Size = new System.Drawing.Size(126, 14);
+            this.labelControl5.Size = new System.Drawing.Size(152, 18);
             this.labelControl5.TabIndex = 4;
             this.labelControl5.Text = "Last Cheque No. Used:";
             this.labelControl5.Visible = false;
@@ -439,7 +439,7 @@
             this.labelControl7.Location = new System.Drawing.Point(70, 30);
             this.labelControl7.Margin = new System.Windows.Forms.Padding(2, 5, 2, 5);
             this.labelControl7.Name = "labelControl7";
-            this.labelControl7.Size = new System.Drawing.Size(69, 14);
+            this.labelControl7.Size = new System.Drawing.Size(82, 18);
             this.labelControl7.TabIndex = 6;
             this.labelControl7.Text = "Cheque No.:";
             // 
@@ -450,7 +450,7 @@
             this.txtcheckno.Name = "txtcheckno";
             this.txtcheckno.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F);
             this.txtcheckno.Properties.Appearance.Options.UseFont = true;
-            this.txtcheckno.Size = new System.Drawing.Size(94, 20);
+            this.txtcheckno.Size = new System.Drawing.Size(94, 24);
             this.txtcheckno.TabIndex = 467;
             // 
             // labelControl4
@@ -460,7 +460,7 @@
             this.labelControl4.Location = new System.Drawing.Point(17, 186);
             this.labelControl4.Margin = new System.Windows.Forms.Padding(2, 5, 2, 5);
             this.labelControl4.Name = "labelControl4";
-            this.labelControl4.Size = new System.Drawing.Size(49, 14);
+            this.labelControl4.Size = new System.Drawing.Size(62, 18);
             this.labelControl4.TabIndex = 3;
             this.labelControl4.Text = "Remarks:";
             // 
@@ -471,7 +471,7 @@
             this.labelControl8.Location = new System.Drawing.Point(420, 152);
             this.labelControl8.Margin = new System.Windows.Forms.Padding(2, 5, 2, 5);
             this.labelControl8.Name = "labelControl8";
-            this.labelControl8.Size = new System.Drawing.Size(82, 14);
+            this.labelControl8.Size = new System.Drawing.Size(97, 18);
             this.labelControl8.TabIndex = 7;
             this.labelControl8.Text = "Credit GLCode:";
             // 
@@ -493,7 +493,7 @@
             this.txtsupplierid.Location = new System.Drawing.Point(118, 75);
             this.txtsupplierid.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.txtsupplierid.Name = "txtsupplierid";
-            this.txtsupplierid.Size = new System.Drawing.Size(84, 14);
+            this.txtsupplierid.Size = new System.Drawing.Size(105, 18);
             this.txtsupplierid.TabIndex = 459;
             this.txtsupplierid.Text = "[Supplier Id]";
             // 
@@ -505,7 +505,7 @@
             this.txtamounttopay.Location = new System.Drawing.Point(118, 124);
             this.txtamounttopay.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.txtamounttopay.Name = "txtamounttopay";
-            this.txtamounttopay.Size = new System.Drawing.Size(43, 18);
+            this.txtamounttopay.Size = new System.Drawing.Size(52, 23);
             this.txtamounttopay.TabIndex = 460;
             this.txtamounttopay.Text = "0.00";
             // 
@@ -534,7 +534,7 @@
             this.searchLookUpEdit1.Properties.NullText = "";
             this.searchLookUpEdit1.Properties.PopupView = this.gridview;
             this.searchLookUpEdit1.Properties.ValueMember = "SupplierName";
-            this.searchLookUpEdit1.Size = new System.Drawing.Size(244, 20);
+            this.searchLookUpEdit1.Size = new System.Drawing.Size(244, 24);
             this.searchLookUpEdit1.TabIndex = 461;
             // 
             // gridview
@@ -565,7 +565,7 @@
             this.checkforliquidation.Location = new System.Drawing.Point(16, 210);
             this.checkforliquidation.Margin = new System.Windows.Forms.Padding(2, 5, 2, 5);
             this.checkforliquidation.Name = "checkforliquidation";
-            this.checkforliquidation.Size = new System.Drawing.Size(101, 17);
+            this.checkforliquidation.Size = new System.Drawing.Size(132, 21);
             this.checkforliquidation.TabIndex = 463;
             this.checkforliquidation.Text = "For Liquidation?";
             this.checkforliquidation.UseVisualStyleBackColor = true;
@@ -589,7 +589,7 @@
             this.radioButtonExpense.Location = new System.Drawing.Point(107, 15);
             this.radioButtonExpense.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.radioButtonExpense.Name = "radioButtonExpense";
-            this.radioButtonExpense.Size = new System.Drawing.Size(66, 17);
+            this.radioButtonExpense.Size = new System.Drawing.Size(75, 20);
             this.radioButtonExpense.TabIndex = 453;
             this.radioButtonExpense.Text = "Expense";
             this.radioButtonExpense.UseVisualStyleBackColor = true;
@@ -602,7 +602,7 @@
             this.radioButtonPurchase.Location = new System.Drawing.Point(6, 15);
             this.radioButtonPurchase.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.radioButtonPurchase.Name = "radioButtonPurchase";
-            this.radioButtonPurchase.Size = new System.Drawing.Size(69, 17);
+            this.radioButtonPurchase.Size = new System.Drawing.Size(80, 20);
             this.radioButtonPurchase.TabIndex = 452;
             this.radioButtonPurchase.TabStop = true;
             this.radioButtonPurchase.Text = "Purchase";
@@ -699,7 +699,7 @@
             this.xtraTabPage1.Controls.Add(this.panelControl5);
             this.xtraTabPage1.Controls.Add(this.panelControl10);
             this.xtraTabPage1.Name = "xtraTabPage1";
-            this.xtraTabPage1.Size = new System.Drawing.Size(1097, 846);
+            this.xtraTabPage1.Size = new System.Drawing.Size(1097, 841);
             this.xtraTabPage1.Text = "INVOICES";
             // 
             // panelControl5
@@ -708,7 +708,7 @@
             this.panelControl5.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelControl5.Location = new System.Drawing.Point(0, 46);
             this.panelControl5.Name = "panelControl5";
-            this.panelControl5.Size = new System.Drawing.Size(1097, 800);
+            this.panelControl5.Size = new System.Drawing.Size(1097, 795);
             this.panelControl5.TabIndex = 0;
             // 
             // gridControlMaster
@@ -729,7 +729,7 @@
             this.repositoryItemSearchLookUpEditdiscountglcode,
             this.repDiscountAccount,
             this.repositoryItemSearchLookUpEditoffsetCreditGLCode});
-            this.gridControlMaster.Size = new System.Drawing.Size(1093, 796);
+            this.gridControlMaster.Size = new System.Drawing.Size(1093, 791);
             this.gridControlMaster.TabIndex = 8;
             this.gridControlMaster.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewMaster});
@@ -890,7 +890,7 @@
             this.xtraTabPage2.Controls.Add(this.panelControl6);
             this.xtraTabPage2.Controls.Add(this.panelControl7);
             this.xtraTabPage2.Name = "xtraTabPage2";
-            this.xtraTabPage2.Size = new System.Drawing.Size(1097, 846);
+            this.xtraTabPage2.Size = new System.Drawing.Size(1097, 841);
             this.xtraTabPage2.Text = "EXPENSE ENTRIES";
             // 
             // panelControl6
@@ -899,7 +899,7 @@
             this.panelControl6.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelControl6.Location = new System.Drawing.Point(0, 46);
             this.panelControl6.Name = "panelControl6";
-            this.panelControl6.Size = new System.Drawing.Size(1097, 800);
+            this.panelControl6.Size = new System.Drawing.Size(1097, 795);
             this.panelControl6.TabIndex = 1;
             // 
             // gridControlLines
@@ -914,7 +914,7 @@
             this.repAmount,
             this.repParticulars,
             this.repBranchLine});
-            this.gridControlLines.Size = new System.Drawing.Size(1093, 796);
+            this.gridControlLines.Size = new System.Drawing.Size(1093, 791);
             this.gridControlLines.TabIndex = 1;
             this.gridControlLines.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewLines});
@@ -1052,7 +1052,7 @@
             // 
             this.lblTotalCaption.Location = new System.Drawing.Point(792, 14);
             this.lblTotalCaption.Name = "lblTotalCaption";
-            this.lblTotalCaption.Size = new System.Drawing.Size(28, 13);
+            this.lblTotalCaption.Size = new System.Drawing.Size(34, 16);
             this.lblTotalCaption.TabIndex = 15;
             this.lblTotalCaption.Text = "Total:";
             // 
@@ -1062,7 +1062,7 @@
             this.lblTotal.Appearance.Options.UseFont = true;
             this.lblTotal.Location = new System.Drawing.Point(850, 14);
             this.lblTotal.Name = "lblTotal";
-            this.lblTotal.Size = new System.Drawing.Size(28, 16);
+            this.lblTotal.Size = new System.Drawing.Size(35, 19);
             this.lblTotal.TabIndex = 16;
             this.lblTotal.Text = "0.00";
             // 
@@ -1103,19 +1103,19 @@
             this.removeToolStripMenuItem,
             this.closeAllButThisToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(142, 48);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(163, 52);
             // 
             // removeToolStripMenuItem
             // 
             this.removeToolStripMenuItem.Name = "removeToolStripMenuItem";
-            this.removeToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
+            this.removeToolStripMenuItem.Size = new System.Drawing.Size(162, 24);
             this.removeToolStripMenuItem.Text = "Error Correct";
             this.removeToolStripMenuItem.Click += new System.EventHandler(this.removeToolStripMenuItem_Click);
             // 
             // closeAllButThisToolStripMenuItem
             // 
             this.closeAllButThisToolStripMenuItem.Name = "closeAllButThisToolStripMenuItem";
-            this.closeAllButThisToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
+            this.closeAllButThisToolStripMenuItem.Size = new System.Drawing.Size(162, 24);
             // 
             // contextMenuStrip2
             // 
@@ -1123,12 +1123,12 @@
             this.contextMenuStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripMenuItem1});
             this.contextMenuStrip2.Name = "contextMenuStrip1";
-            this.contextMenuStrip2.Size = new System.Drawing.Size(178, 26);
+            this.contextMenuStrip2.Size = new System.Drawing.Size(208, 28);
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(177, 22);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(207, 24);
             this.toolStripMenuItem1.Text = "Exclude this Invoice";
             // 
             // contextMenuStrip3
@@ -1137,12 +1137,12 @@
             this.contextMenuStrip3.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripMenuItem2});
             this.contextMenuStrip3.Name = "contextMenuStrip1";
-            this.contextMenuStrip3.Size = new System.Drawing.Size(178, 26);
+            this.contextMenuStrip3.Size = new System.Drawing.Size(208, 28);
             // 
             // toolStripMenuItem2
             // 
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(177, 22);
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(207, 24);
             this.toolStripMenuItem2.Text = "Exclude this Invoice";
             // 
             // contextMenuStrip4
@@ -1151,12 +1151,12 @@
             this.contextMenuStrip4.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripMenuItem3});
             this.contextMenuStrip4.Name = "contextMenuStrip1";
-            this.contextMenuStrip4.Size = new System.Drawing.Size(178, 26);
+            this.contextMenuStrip4.Size = new System.Drawing.Size(208, 28);
             // 
             // toolStripMenuItem3
             // 
             this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-            this.toolStripMenuItem3.Size = new System.Drawing.Size(177, 22);
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(207, 24);
             this.toolStripMenuItem3.Text = "Exclude this Invoice";
             // 
             // contextMenuShowInvoices
@@ -1165,12 +1165,12 @@
             this.contextMenuShowInvoices.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.showInvoiceDetailsToolStripMenuItem});
             this.contextMenuShowInvoices.Name = "contextMenuShowInvoices";
-            this.contextMenuShowInvoices.Size = new System.Drawing.Size(183, 26);
+            this.contextMenuShowInvoices.Size = new System.Drawing.Size(216, 28);
             // 
             // showInvoiceDetailsToolStripMenuItem
             // 
             this.showInvoiceDetailsToolStripMenuItem.Name = "showInvoiceDetailsToolStripMenuItem";
-            this.showInvoiceDetailsToolStripMenuItem.Size = new System.Drawing.Size(182, 22);
+            this.showInvoiceDetailsToolStripMenuItem.Size = new System.Drawing.Size(215, 24);
             this.showInvoiceDetailsToolStripMenuItem.Text = "Show Invoice Details";
             this.showInvoiceDetailsToolStripMenuItem.Click += new System.EventHandler(this.showInvoiceDetailsToolStripMenuItem_Click);
             // 
