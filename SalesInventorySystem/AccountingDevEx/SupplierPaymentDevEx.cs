@@ -1017,7 +1017,7 @@ namespace SalesInventorySystem.AccountingDevEx
         {
             if (e.Column.FieldName == "Pay")
                 e.RepositoryItem = repositoryItemCheckEditStat;
-            if (e.Column.FieldName == "DiscountAccountCode")   // NEW
+            if (e.Column.FieldName == "DiscountAccountCode")   
                 e.RepositoryItem = repDiscountAccount;
         }
 
