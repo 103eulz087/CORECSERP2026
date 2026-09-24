@@ -56,6 +56,7 @@ namespace SalesInventorySystem.AccountingDevEx
             Classes.DevXGridViewSettings.ShowFooterTotal(gridView2, "AmountPaid");
             //Classes.DevXGridViewSettings.ShowFooterTotal(gridView2, "AdvancePayment");
             Classes.DevXGridViewSettings.ShowFooterTotal(gridView2, "OverPay");
+            Classes.DevXGridViewSettings.ShowFooterTotal(gridView2, "OverPayIncome");
             Classes.DevXGridViewSettings.ShowFooterTotal(gridView2, "EWTAmount");
             Classes.DevXGridViewSettings.ShowFooterTotal(gridView2, "DiscountAmount");
             Classes.DevXGridViewSettings.ShowFooterTotal(gridView2, "OffsetAmount");
@@ -66,7 +67,7 @@ namespace SalesInventorySystem.AccountingDevEx
             // be numeric" convention) -- splist_ARAccounts returns all of these as
             // real decimal(12,2) columns, but the grid rendered them unformatted.
             Classes.DevXGridViewSettings.FormatNumericColumns(gridView2,
-                "InvoiceAmount", "Balance", "AmountPaid", "OverPay",
+                "InvoiceAmount", "Balance", "AmountPaid", "OverPay", "OverPayIncome",
                 "EWTAmount", "DiscountAmount", "OffsetAmount", "ServicesAmount");
 
             gridView2.OptionsBehavior.EditorShowMode = DevExpress.Utils.EditorShowMode.MouseDown;
@@ -158,7 +159,7 @@ namespace SalesInventorySystem.AccountingDevEx
 
                 // Unlock editable columns (SP returns them as read-only by default)
                 //string[] editableColumns = { "Pay", "AmountPaid", "EWTAmount", "DiscountAmount", "OffsetAmount", "AdvancePayment" };
-                string[] editableColumns = { "Pay", "AmountPaid", "EWTAmount", "DiscountAmount", "OffsetAmount", "OverPay", "ServicesAmount" };
+                string[] editableColumns = { "Pay", "AmountPaid", "EWTAmount", "DiscountAmount", "OffsetAmount", "OverPay", "OverPayIncome", "ServicesAmount" };
                 foreach (string col in editableColumns)
                     if (table.Columns.Contains(col))
                         table.Columns[col].ReadOnly = false;
@@ -257,6 +258,7 @@ namespace SalesInventorySystem.AccountingDevEx
                     gridView2.SetRowCellValue(row, "DiscountAmount", 0);
                     gridView2.SetRowCellValue(row, "OffsetAmount", 0);
                     gridView2.SetRowCellValue(row, "OverPay", 0);
+                    gridView2.SetRowCellValue(row, "OverPayIncome", 0);
                     gridView2.SetRowCellValue(row, "ServicesAmount", 0);
                     gridView2.SetRowCellValue(row, "AmountPaid", balance);
                 }
@@ -266,6 +268,7 @@ namespace SalesInventorySystem.AccountingDevEx
                     gridView2.SetRowCellValue(row, "DiscountAmount", 0);
                     gridView2.SetRowCellValue(row, "OffsetAmount", 0);
                     gridView2.SetRowCellValue(row, "OverPay", 0);
+                    gridView2.SetRowCellValue(row, "OverPayIncome", 0);
                     gridView2.SetRowCellValue(row, "ServicesAmount", 0);
                     gridView2.SetRowCellValue(row, "AmountPaid", 0);
                 }
@@ -276,6 +279,7 @@ namespace SalesInventorySystem.AccountingDevEx
             if (e.Column.FieldName == "EWTAmount" ||
                 e.Column.FieldName == "DiscountAmount" ||
                 e.Column.FieldName == "OverPay" ||
+                e.Column.FieldName == "OverPayIncome" ||
                 e.Column.FieldName == "OffsetAmount" ||
                 e.Column.FieldName == "ServicesAmount")
             {
@@ -286,6 +290,7 @@ namespace SalesInventorySystem.AccountingDevEx
                 e.Column.FieldName == "DiscountAmount" ||
                 e.Column.FieldName == "OffsetAmount" ||
                 e.Column.FieldName == "OverPay" ||
+                e.Column.FieldName == "OverPayIncome" ||
                 e.Column.FieldName == "ServicesAmount" ||
                 e.Column.FieldName == "AmountPaid")
             {
@@ -306,12 +311,15 @@ namespace SalesInventorySystem.AccountingDevEx
             double discount = Convert.ToDouble(gridView2.GetRowCellValue(row, "DiscountAmount") ?? 0);
             double offset = Convert.ToDouble(gridView2.GetRowCellValue(row, "OffsetAmount") ?? 0);
             double overpay = Convert.ToDouble(gridView2.GetRowCellValue(row, "OverPay") ?? 0);
+            double overpayIncome = Convert.ToDouble(gridView2.GetRowCellValue(row, "OverPayIncome") ?? 0);
             double servicesAmount = Convert.ToDouble(gridView2.GetRowCellValue(row, "ServicesAmount") ?? 0);
 
             // ServicesAmount (e.g. cutting fee) is ADDITIVE -- an extra charge
             // billed to the client on top of the invoice balance, unlike
-            // EWT/Discount/Offset which are deducted from it.
-            double netPayment = (balance - ewt - discount - offset) + overpay + servicesAmount;
+            // EWT/Discount/Offset which are deducted from it. OverPayIncome
+            // behaves exactly like OverPay here -- both are excess cash
+            // received; they only differ in which GL account absorbs it.
+            double netPayment = (balance - ewt - discount - offset) + overpay + overpayIncome + servicesAmount;
             if (netPayment < 0) netPayment = 0;
 
             double current = Convert.ToDouble(gridView2.GetRowCellValue(row, "AmountPaid") ?? 0);
@@ -426,10 +434,11 @@ namespace SalesInventorySystem.AccountingDevEx
             double discount = Convert.ToDouble(view.GetRowCellValue(e.RowHandle, "DiscountAmount") ?? 0);
             double offset = Convert.ToDouble(view.GetRowCellValue(e.RowHandle, "OffsetAmount") ?? 0);
             double overpay = Convert.ToDouble(view.GetRowCellValue(e.RowHandle, "OverPay") ?? 0);
+            double overpayIncome = Convert.ToDouble(view.GetRowCellValue(e.RowHandle, "OverPayIncome") ?? 0);
             double servicesAmount = Convert.ToDouble(view.GetRowCellValue(e.RowHandle, "ServicesAmount") ?? 0);
             double amtPaid = Convert.ToDouble(view.GetRowCellValue(e.RowHandle, "AmountPaid") ?? 0);
 
-            double expectedNet = balance - ewt - discount - offset + overpay + servicesAmount;
+            double expectedNet = balance - ewt - discount - offset + overpay + overpayIncome + servicesAmount;
 
             if ((ewt + discount + offset) > balance || amtPaid < 0)
             {
@@ -554,8 +563,9 @@ namespace SalesInventorySystem.AccountingDevEx
             double totalBalance = 0;
             double totalAmtPaid = 0;
             double totalOverpay = 0;
+            double totalOverpayIncome = 0;
             double totalServicesAmount = 0;
-            double totalDeductions = 0; // EWT + Discount + Offset + OverPay, across checked rows
+            double totalDeductions = 0; // EWT + Discount + Offset + OverPay + OverPayIncome, across checked rows
             double advncepymentval = 0;
             bool isSales = false;
             bool isCharge = false;
@@ -565,25 +575,41 @@ namespace SalesInventorySystem.AccountingDevEx
                 bool isPay = gridView2.GetRowCellValue(i, "Pay").ToString() == "True";
                 if (!isPay) continue;
 
+                double rowOverpay = Convert.ToDouble(gridView2.GetRowCellValue(i, "OverPay") ?? 0);
+                double rowOverpayIncome = Convert.ToDouble(gridView2.GetRowCellValue(i, "OverPayIncome") ?? 0);
+                double rowOffset = Convert.ToDouble(gridView2.GetRowCellValue(i, "OffsetAmount") ?? 0);
+
                 ctr++;
                 totalBalance += Convert.ToDouble(gridView2.GetRowCellValue(i, "Balance") ?? 0);
                 totalAmtPaid += Convert.ToDouble(gridView2.GetRowCellValue(i, "AmountPaid") ?? 0);
-                totalOverpay += Convert.ToDouble(gridView2.GetRowCellValue(i, "OverPay") ?? 0);
+                totalOverpay += rowOverpay;
+                totalOverpayIncome += rowOverpayIncome;
                 totalServicesAmount += Convert.ToDouble(gridView2.GetRowCellValue(i, "ServicesAmount") ?? 0);
                 advncepymentval += Convert.ToDouble(gridView2.GetRowCellValue(i, "AmountPaid") ?? 0);
                 totalDeductions +=
                     Convert.ToDouble(gridView2.GetRowCellValue(i, "EWTAmount") ?? 0) +
                     Convert.ToDouble(gridView2.GetRowCellValue(i, "DiscountAmount") ?? 0) +
-                    Convert.ToDouble(gridView2.GetRowCellValue(i, "OffsetAmount") ?? 0) +
-                    Convert.ToDouble(gridView2.GetRowCellValue(i, "OverPay") ?? 0);
+                    rowOffset + rowOverpay + rowOverpayIncome;
 
                 string invType = gridView2.GetRowCellValue(i, "InvoiceType")?.ToString();
                 if (invType == "SALES") isSales = true;
                 if (invType == "CHARGE") isCharge = true;
 
                 //if (Convert.ToDouble(gridView2.GetRowCellValue(i, "AdvancePayment") ?? 0) > 0)
-                if (Convert.ToDouble(gridView2.GetRowCellValue(i, "OverPay") ?? 0) > 0)
+                if (rowOverpay > 0 || rowOverpayIncome > 0)
                     advpymntctr++;
+
+                // Client-side mirror of sp_AddPaymentClient's structural
+                // Offset/Overpay/OverPayIncome mutual-exclusivity guard --
+                // catch it here with a clear per-row message instead of
+                // letting it round-trip to the server first.
+                if ((rowOffset > 0 ? 1 : 0) + (rowOverpay > 0 ? 1 : 0) + (rowOverpayIncome > 0 ? 1 : 0) > 1)
+                {
+                    XtraMessageBox.Show(
+                        $"Row for invoice {gridView2.GetRowCellValue(i, "InvoiceNo")}: Offset, OverPay, and OverPayIncome cannot be combined on the same invoice - choose only one.",
+                        "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
             }
 
             if (ctr == 0)
@@ -643,7 +669,7 @@ namespace SalesInventorySystem.AccountingDevEx
 
             if (advpymntctr > 1)
             {
-                XtraMessageBox.Show("OverPay must be assigned to only one invoice.");
+                XtraMessageBox.Show("OverPay/OverPayIncome must be assigned to only one invoice.");
                 return;
             }
             if (isSales && isCharge)
@@ -656,14 +682,16 @@ namespace SalesInventorySystem.AccountingDevEx
             //    XtraMessageBox.Show("Total Amount Paid exceeds available savings balance.");
             //    return;
             //}
-            // OverPay is deliberate excess cash, and ServicesAmount is an
+            // OverPay/OverPayIncome are both deliberate excess cash (they're
+            // mutually exclusive per row, but summed together here since
+            // either one raises the same ceiling), and ServicesAmount is an
             // additive charge billed on top of the invoice (e.g. a cutting
             // fee) - AmountPaid is expected to exceed Balance by exactly
-            // their combined total, so both must be added to the allowed
+            // their combined total, so all must be added to the allowed
             // ceiling here instead of being treated as an error.
-            if (totalAmtPaid > totalBalance + totalOverpay + totalServicesAmount)
+            if (totalAmtPaid > totalBalance + totalOverpay + totalOverpayIncome + totalServicesAmount)
             {
-                XtraMessageBox.Show("Total Amount Paid cannot exceed Total Balance plus Overpay plus Services Amount.");
+                XtraMessageBox.Show("Total Amount Paid cannot exceed Total Balance plus Overpay/OverPayIncome plus Services Amount.");
                 return;
             }
 
@@ -903,6 +931,7 @@ namespace SalesInventorySystem.AccountingDevEx
                 decimal discount = Convert.ToDecimal(gridView2.GetRowCellValue(i, "DiscountAmount") ?? 0);
                 decimal offset = Convert.ToDecimal(gridView2.GetRowCellValue(i, "OffsetAmount") ?? 0);
                 decimal overpay = Convert.ToDecimal(gridView2.GetRowCellValue(i, "OverPay") ?? 0);
+                decimal overpayIncome = Convert.ToDecimal(gridView2.GetRowCellValue(i, "OverPayIncome") ?? 0);
                 decimal servicesAmount = Convert.ToDecimal(gridView2.GetRowCellValue(i, "ServicesAmount") ?? 0);
                 decimal amountPaid = Convert.ToDecimal(gridView2.GetRowCellValue(i, "AmountPaid") ?? 0);
 
@@ -911,12 +940,12 @@ namespace SalesInventorySystem.AccountingDevEx
                 // can legitimately be less than Balance for a genuine partial
                 // payment (no EWT/Discount/Offset, just paying less than owed).
                 // Reconstruct it as net cash + deductions withheld/applied,
-                // minus OverPay and ServicesAmount since RecalculateRow() already
-                // baked both +overpay and +servicesAmount into AmountPaid
-                // (balance - ewt - discount - offset + overpay + servicesAmount) -
-                // without subtracting them back out here, both would double
-                // count into gross.
-                decimal gross = amountPaid + ewt + discount + offset - overpay - servicesAmount;
+                // minus OverPay/OverPayIncome and ServicesAmount since
+                // RecalculateRow() already baked +overpay, +overpayIncome, and
+                // +servicesAmount into AmountPaid (balance - ewt - discount -
+                // offset + overpay + overpayIncome + servicesAmount) - without
+                // subtracting them back out here, they'd double count into gross.
+                decimal gross = amountPaid + ewt + discount + offset - overpay - overpayIncome - servicesAmount;
 
                 // INVOICE PAYMENT: always insert using the gross amount
                 if (gross > 0)
@@ -933,6 +962,9 @@ namespace SalesInventorySystem.AccountingDevEx
 
                 if (overpay > 0)
                     InsertDetail(con, tran, paymentHeaderId, orderNo, invoiceNo, transDate, overpay, "OVERPAY");
+
+                if (overpayIncome > 0)
+                    InsertDetail(con, tran, paymentHeaderId, orderNo, invoiceNo, transDate, overpayIncome, "OVERPAYINCOME");
 
                 if (servicesAmount > 0)
                     InsertDetail(con, tran, paymentHeaderId, orderNo, invoiceNo, transDate, servicesAmount, "SERVICES");
@@ -1235,14 +1267,14 @@ namespace SalesInventorySystem.AccountingDevEx
             }
 
             // CellValueChanged is unhooked for this loop - gridView2's handler
-            // resets EWT/Discount/Offset/OverPay to 0 and AmountPaid=Balance
-            // the moment Pay flips true, then RecalculateRow recomputes
-            // AmountPaid again after each subsequent SetRowCellValue. Letting
-            // that cascade run mid-loop only produced the right end result by
-            // accident of field ordering; writing all values first and
-            // recalculating once after is the same approach RecalculateRow's
-            // own comment already documents as necessary in this DevExpress
-            // version.
+            // resets EWT/Discount/Offset/OverPay/OverPayIncome to 0 and
+            // AmountPaid=Balance the moment Pay flips true, then
+            // RecalculateRow recomputes AmountPaid again after each
+            // subsequent SetRowCellValue. Letting that cascade run mid-loop
+            // only produced the right end result by accident of field
+            // ordering; writing all values first and recalculating once
+            // after is the same approach RecalculateRow's own comment
+            // already documents as necessary in this DevExpress version.
             gridView2.CellValueChanged -= gridView2_CellValueChanged;
             var notFound = new List<string>();
             try
@@ -1262,6 +1294,7 @@ namespace SalesInventorySystem.AccountingDevEx
                     gridView2.SetRowCellValue(rowHandle, "DiscountAmount", DBNullToDecimal(line["DiscountAmount"]));
                     gridView2.SetRowCellValue(rowHandle, "OffsetAmount", DBNullToDecimal(line["OffsetAmount"]));
                     gridView2.SetRowCellValue(rowHandle, "OverPay", DBNullToDecimal(line["OverPay"]));
+                    gridView2.SetRowCellValue(rowHandle, "OverPayIncome", DBNullToDecimal(line["OverPayIncome"]));
                     gridView2.SetRowCellValue(rowHandle, "ServicesAmount", DBNullToDecimal(line["ServicesAmount"]));
                     gridView2.SetRowCellValue(rowHandle, "AmountPaid", DBNullToDecimal(line["SuggestedAmountPaid"]));
                 }
