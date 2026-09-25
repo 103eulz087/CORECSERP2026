@@ -109,6 +109,8 @@
             this.panelControl7 = new DevExpress.XtraEditors.PanelControl();
             this.lblTotalCaption = new DevExpress.XtraEditors.LabelControl();
             this.lblTotal = new DevExpress.XtraEditors.LabelControl();
+            this.lblAvailableCreditCaption = new DevExpress.XtraEditors.LabelControl();
+            this.lblAvailableCredit = new DevExpress.XtraEditors.LabelControl();
             this.btnAddLine = new DevExpress.XtraEditors.SimpleButton();
             this.btnRemoveLine = new DevExpress.XtraEditors.SimpleButton();
             this.lblBalanceStatus = new DevExpress.XtraEditors.LabelControl();
@@ -214,6 +216,8 @@
             this.panelControl8.Controls.Add(this.txtremakrs);
             this.panelControl8.Controls.Add(this.txtsupplierid);
             this.panelControl8.Controls.Add(this.txtamounttopay);
+            this.panelControl8.Controls.Add(this.lblAvailableCreditCaption);
+            this.panelControl8.Controls.Add(this.lblAvailableCredit);
             this.panelControl8.Controls.Add(this.btnprint);
             this.panelControl8.Controls.Add(this.searchLookUpEdit1);
             this.panelControl8.Controls.Add(this.btnadd);
@@ -508,6 +512,29 @@
             this.txtamounttopay.Size = new System.Drawing.Size(52, 23);
             this.txtamounttopay.TabIndex = 460;
             this.txtamounttopay.Text = "0.00";
+            //
+            // lblAvailableCreditCaption
+            //
+            this.lblAvailableCreditCaption.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F);
+            this.lblAvailableCreditCaption.Appearance.Options.UseFont = true;
+            this.lblAvailableCreditCaption.Location = new System.Drawing.Point(240, 128);
+            this.lblAvailableCreditCaption.Margin = new System.Windows.Forms.Padding(2, 5, 2, 5);
+            this.lblAvailableCreditCaption.Name = "lblAvailableCreditCaption";
+            this.lblAvailableCreditCaption.Size = new System.Drawing.Size(70, 18);
+            this.lblAvailableCreditCaption.TabIndex = 480;
+            this.lblAvailableCreditCaption.Text = "Adv. Credit:";
+            this.lblAvailableCreditCaption.ToolTip = "Unapplied supplier overpayment credit (OverPay minus Advance Applied)";
+            //
+            // lblAvailableCredit
+            //
+            this.lblAvailableCredit.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F, System.Drawing.FontStyle.Bold);
+            this.lblAvailableCredit.Appearance.Options.UseFont = true;
+            this.lblAvailableCredit.Location = new System.Drawing.Point(312, 128);
+            this.lblAvailableCredit.Margin = new System.Windows.Forms.Padding(2, 5, 2, 5);
+            this.lblAvailableCredit.Name = "lblAvailableCredit";
+            this.lblAvailableCredit.Size = new System.Drawing.Size(28, 18);
+            this.lblAvailableCredit.TabIndex = 481;
+            this.lblAvailableCredit.Text = "0.00";
             // 
             // btnprint
             // 
@@ -1347,6 +1374,8 @@
         private DevExpress.XtraGrid.Columns.GridColumn colDiscountAccountCode; // NEW — popup grid
         private DevExpress.XtraEditors.LabelControl lblTotalCaption;
         private DevExpress.XtraEditors.LabelControl lblTotal;
+        private DevExpress.XtraEditors.LabelControl lblAvailableCreditCaption;
+        private DevExpress.XtraEditors.LabelControl lblAvailableCredit;
         private DevExpress.XtraEditors.PanelControl panelControl8;
         private DevExpress.XtraEditors.PanelControl panelControl10;
         private DevExpress.Utils.Layout.TablePanel tablePanel3;

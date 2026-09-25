@@ -43,7 +43,20 @@ namespace SalesInventorySystem.AccountingDevEx
             public decimal Variance { get; set; }   // NEW
             public string DiscountAccountCode { get; set; }   // NEW — null/blank = use default '508'
             public string Description { get; set; }
+
+            // 2026-09-24 - PURCHASE-only overpayment/advance columns, sent via
+            // dbo.AP_PaymentLineExtraTVP (see SQL/2026-09-24_SupplierPayment_OverpaymentCredit.sql)
+            public decimal OverPay { get; set; }          // excess cash -> supplier advance credit (101030208)
+            public decimal OverPayExpense { get; set; }   // excess cash -> written off (60339), not carried forward
+            public decimal AdvanceApplied { get; set; }   // prior OverPay credit consumed instead of cash
         }
+
+        // Grid-only columns added client-side in populate() for PURCHASE mode
+        // (splist_Accounts doesn't return them - it's shared with Expense mode).
+        private const string ColOverPay = "OverPay";
+        private const string ColOverPayExpense = "OverPayExpense";
+        private const string ColAdvanceApplied = "AdvanceApplied";
+        private decimal _availableCredit = 0m;
         private bool _isRecalculating = false;
         private int _loadedYear = 0;
         private int _loadedMonth = 0;
@@ -232,7 +245,10 @@ namespace SalesInventorySystem.AccountingDevEx
                     ReturnAllowances = Convert.ToDecimal(gridViewMaster.GetRowCellValue(i, "ReturnAllowances") ?? 0m),
                     Variance = Convert.ToDecimal(gridViewMaster.GetRowCellValue(i, "Variance") ?? 0m),   // NEW
                     DiscountAccountCode = Convert.ToString(gridViewMaster.GetRowCellValue(i, "DiscountAccountCode") ?? ""),
-                    Description = Convert.ToString(gridViewMaster.GetRowCellValue(i, "Description") ?? "")
+                    Description = Convert.ToString(gridViewMaster.GetRowCellValue(i, "Description") ?? ""),
+                    OverPay = ToDecimal(gridViewMaster.GetRowCellValue(i, ColOverPay)),
+                    OverPayExpense = ToDecimal(gridViewMaster.GetRowCellValue(i, ColOverPayExpense)),
+                    AdvanceApplied = ToDecimal(gridViewMaster.GetRowCellValue(i, ColAdvanceApplied))
                 });
             }
 
@@ -245,8 +261,32 @@ namespace SalesInventorySystem.AccountingDevEx
         // back to 0m), but the commented-out RecalculateRowVariance
         // scaffolding elsewhere in this file shows it's meant to go live --
         // this keeps every caller consistent when it does.
-        private static decimal ComputeGross(decimal amountPaid, decimal ewt, decimal discount, decimal offset, decimal variance)
-            => amountPaid + ewt + discount + offset - variance;
+        // 2026-09-24: + AdvanceApplied - OverPay - OverPayExpense, matching
+        // sp_AddPaymentSupplierCompound_V2's PURCHASE @pGross exactly (all
+        // three are 0 in Expense mode, where the columns don't exist).
+        private static decimal ComputeGross(decimal amountPaid, decimal ewt, decimal discount, decimal offset, decimal variance,
+                                            decimal overPay = 0m, decimal overPayExpense = 0m, decimal advanceApplied = 0m)
+            => amountPaid + ewt + discount + offset + advanceApplied - variance - overPay - overPayExpense;
+
+        // Reads the row's settlement figures once, so every caller computes
+        // Gross from the same columns.
+        private decimal ComputeRowGross(int rowHandle)
+            => ComputeGross(
+                ToDecimal(gridViewMaster.GetRowCellValue(rowHandle, "AmountPaid")),
+                ToDecimal(gridViewMaster.GetRowCellValue(rowHandle, "EWTAmount")),
+                ToDecimal(gridViewMaster.GetRowCellValue(rowHandle, "DiscountAmount")),
+                ToDecimal(gridViewMaster.GetRowCellValue(rowHandle, "ReturnAllowances")),
+                ToDecimal(gridViewMaster.GetRowCellValue(rowHandle, "Variance")),
+                ToDecimal(gridViewMaster.GetRowCellValue(rowHandle, ColOverPay)),
+                ToDecimal(gridViewMaster.GetRowCellValue(rowHandle, ColOverPayExpense)),
+                ToDecimal(gridViewMaster.GetRowCellValue(rowHandle, ColAdvanceApplied)));
+
+        // No-op when the column isn't in the current grid (Expense mode).
+        private void SetCellIfExists(int rowHandle, string fieldName, object value)
+        {
+            if (gridViewMaster.Columns[fieldName] != null)
+                gridViewMaster.SetRowCellValue(rowHandle, fieldName, value);
+        }
 
         private static decimal SafeToDecimal(object value)
         {
@@ -507,24 +547,80 @@ namespace SalesInventorySystem.AccountingDevEx
         // ShowRowError, same as the in-grid AmountPaid check.
         private bool ValidateInvoiceLines()
         {
+            int overPayInvoiceCount = 0;
+            decimal totalAdvanceApplied = 0m;
+
             for (int i = 0; i < gridViewMaster.RowCount; i++)
             {
                 if (!ToBool(gridViewMaster.GetRowCellValue(i, "Pay"))) continue;
 
                 string invoiceNo = gridViewMaster.GetRowCellValue(i, "InvoiceNo")?.ToString() ?? "";
                 decimal balance = ToDecimal(gridViewMaster.GetRowCellValue(i, "Balance"));
-                decimal amountPaid = ToDecimal(gridViewMaster.GetRowCellValue(i, "AmountPaid"));
-                decimal ewt = ToDecimal(gridViewMaster.GetRowCellValue(i, "EWTAmount"));
-                decimal discount = ToDecimal(gridViewMaster.GetRowCellValue(i, "DiscountAmount"));
-                decimal offset = ToDecimal(gridViewMaster.GetRowCellValue(i, "ReturnAllowances"));
-                decimal variance = ToDecimal(gridViewMaster.GetRowCellValue(i, "Variance"));
-                decimal gross = ComputeGross(amountPaid, ewt, discount, offset, variance);
+                decimal gross = ComputeRowGross(i);
+                decimal overPay = ToDecimal(gridViewMaster.GetRowCellValue(i, ColOverPay));
+                decimal overPayExpense = ToDecimal(gridViewMaster.GetRowCellValue(i, ColOverPayExpense));
+                decimal advanceApplied = ToDecimal(gridViewMaster.GetRowCellValue(i, ColAdvanceApplied));
+
+
+                if (overPay < 0 || overPayExpense < 0 || advanceApplied < 0)
+                {
+                    ShowRowError(i, "OverPay / Advance Applied cannot be negative.", overPay < 0 ? ColOverPay : overPayExpense < 0 ? ColOverPayExpense : ColAdvanceApplied);
+                    XtraMessageBox.Show($"Invoice {invoiceNo}: OverPay, OverPay (Expense), and Advance Applied cannot be negative.",
+                        "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return false;
+                }
+
+                // Mirrors THROW 60512 - each variant posts a different GL mnemonic.
+                int variants = (overPay > 0 ? 1 : 0) + (overPayExpense > 0 ? 1 : 0) + (advanceApplied > 0 ? 1 : 0);
+                if (variants > 1)
+                {
+                    ShowRowError(i, "Choose only one of OverPay / OverPay (Expense) / Advance Applied.", advanceApplied > 0 ? ColAdvanceApplied : ColOverPayExpense);
+                    XtraMessageBox.Show($"Invoice {invoiceNo}: OverPay, OverPay (Expense), and Advance Applied cannot be combined on the same invoice - choose only one.",
+                        "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return false;
+                }
 
                 if (Math.Round(gross - balance, 2) > 0)
                 {
                     ShowRowError(i, $"Amount Paid ({gross:N2} incl. EWT/Discount/Offset) exceeds Balance ({balance:N2}).");
                     XtraMessageBox.Show(
-                        $"Invoice {invoiceNo}: the amount being settled ({gross:N2}) exceeds its Balance ({balance:N2}).\nLower Amount Paid (or the EWT/Discount/Offset lines) so it does not exceed Balance.",
+                        $"Invoice {invoiceNo}: the amount being settled ({gross:N2}) exceeds its Balance ({balance:N2}).\nLower Amount Paid, or put the excess in the OverPay (Credit) or OverPay (Expense) column.",
+                        "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return false;
+                }
+
+                // Mirrors THROW 60515 - an "overpayment" on a partially paid
+                // invoice is really unpaid balance and must stay on the invoice.
+                if ((overPay > 0 || overPayExpense > 0) && Math.Round(balance - gross, 2) != 0)
+                {
+                    ShowRowError(i, "OverPay is only allowed when the invoice is fully settled.", overPay > 0 ? ColOverPay : ColOverPayExpense);
+                    XtraMessageBox.Show(
+                        $"Invoice {invoiceNo}: OverPay is only allowed when the invoice is fully settled (Balance {balance:N2}, settled {gross:N2}).",
+                        "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return false;
+                }
+
+                if (overPay > 0 || overPayExpense > 0) overPayInvoiceCount++;
+                totalAdvanceApplied += advanceApplied;
+            }
+
+            // Mirrors THROW 60513 - same one-invoice rule as the AR side.
+            if (overPayInvoiceCount > 1)
+            {
+                XtraMessageBox.Show("OverPay / OverPay (Expense) must be assigned to only one invoice per voucher.",
+                    "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+
+            // Fail-fast only - re-fetched fresh here rather than trusting the
+            // label, and the SP re-derives it again under a lock (THROW 60514).
+            if (totalAdvanceApplied > 0)
+            {
+                RefreshAvailableCredit();
+                if (totalAdvanceApplied > _availableCredit)
+                {
+                    XtraMessageBox.Show(
+                        $"Advance Applied ({totalAdvanceApplied:N2}) exceeds this supplier's available advance credit ({_availableCredit:N2}).",
                         "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return false;
                 }
@@ -603,6 +699,7 @@ namespace SalesInventorySystem.AccountingDevEx
 
             var invoiceLinesTvp = BuildPaymentLinesTVP(hasInvoices ? lines : new List<PaymentLine>());
             var manualLinesTvp = BuildManualDebitLinesTVP(); // empty-but-correctly-shaped if hasDebitLines is false
+            var lineExtrasTvp = BuildPaymentLineExtrasTVP(hasInvoices ? lines : new List<PaymentLine>());
 
             using (var con = Database.getConnection())
             using (var cmd = new SqlCommand("sp_PostSupplierPaymentWithManualLines", con))
@@ -642,6 +739,10 @@ namespace SalesInventorySystem.AccountingDevEx
                 manParam.SqlDbType = SqlDbType.Structured;
                 manParam.TypeName = "dbo.ManualVoucherDebitLineTVP";
 
+                var extrasParam = cmd.Parameters.AddWithValue("@InvoiceLineExtras", lineExtrasTvp);
+                extrasParam.SqlDbType = SqlDbType.Structured;
+                extrasParam.TypeName = "dbo.AP_PaymentLineExtraTVP";
+
                 try
                 {
                     con.Open();
@@ -653,6 +754,7 @@ namespace SalesInventorySystem.AccountingDevEx
                     BigAlert.Show("SUCCESS", message, MessageBoxIcon.Information);
 
                     populate();
+                    RefreshAvailableCredit();
 
                     txtctrlno.Text = "";
                      
@@ -697,6 +799,19 @@ namespace SalesInventorySystem.AccountingDevEx
                     UseWaitCursor = true;
                     con.Open();
                     new SqlDataAdapter(cmd).Fill(table);
+
+                    // 2026-09-24 - overpayment/advance columns, added client-side
+                    // rather than in splist_Accounts (also feeds VoucheringManualFrm
+                    // and HOFormsDevEx/SupplierPaymentDevEx, which would display them).
+                    // 2026-09-24c/25 - Purchase and every Expense invoice (SINGLE and
+                    // multi-branch). Multi-branch rules (booked on the head-office
+                    // ticket) are enforced by sp_AddPaymentSupplierCompound_V2 (60522).
+                    foreach (string extraCol in new[] { ColOverPay, ColOverPayExpense, ColAdvanceApplied })
+                        if (!table.Columns.Contains(extraCol))
+                            table.Columns.Add(new DataColumn(extraCol, typeof(decimal)) { DefaultValue = 0m });
+                    foreach (DataRow r in table.Rows)
+                        foreach (string extraCol in new[] { ColOverPay, ColOverPayExpense, ColAdvanceApplied })
+                            if (r[extraCol] == DBNull.Value) r[extraCol] = 0m;
 
                     gridControlMaster.BeginUpdate();
                     gridViewMaster.Columns.Clear();
@@ -745,6 +860,15 @@ namespace SalesInventorySystem.AccountingDevEx
             else
             {
             }
+
+            // Overpayment/advance columns - both modes since 2026-09-24c.
+            Classes.DevXGridViewSettings.ShowFooterTotal(gridViewMaster, ColOverPay);
+            Classes.DevXGridViewSettings.ShowFooterTotal(gridViewMaster, ColOverPayExpense);
+            Classes.DevXGridViewSettings.ShowFooterTotal(gridViewMaster, ColAdvanceApplied);
+            if (gridViewMaster.Columns[ColOverPay] != null) gridViewMaster.Columns[ColOverPay].Caption = "OverPay (Credit)";
+            if (gridViewMaster.Columns[ColOverPayExpense] != null) gridViewMaster.Columns[ColOverPayExpense].Caption = "OverPay (Expense)";
+            if (gridViewMaster.Columns[ColAdvanceApplied] != null) gridViewMaster.Columns[ColAdvanceApplied].Caption = "Advance Applied";
+            gridViewMaster.BestFitColumns();   // re-fit: captions above are longer than the field names populate() sized for
         }
         // Helper method to handle DevExpress UI formatting
         private void FormatGridColumns()
@@ -763,6 +887,9 @@ namespace SalesInventorySystem.AccountingDevEx
             FormatNumericColumn(gridViewMaster.Columns["EWTAmount"], repAmount);
             FormatNumericColumn(gridViewMaster.Columns["DiscountAmount"], repAmount);
             FormatNumericColumn(gridViewMaster.Columns["ReturnAllowances"], repAmount);
+            FormatNumericColumn(gridViewMaster.Columns[ColOverPay], repAmount);
+            FormatNumericColumn(gridViewMaster.Columns[ColOverPayExpense], repAmount);
+            FormatNumericColumn(gridViewMaster.Columns[ColAdvanceApplied], repAmount);
         }
 
         private void FormatNumericColumn(DevExpress.XtraGrid.Columns.GridColumn col, DevExpress.XtraEditors.Repository.RepositoryItem edit = null)
@@ -812,10 +939,69 @@ namespace SalesInventorySystem.AccountingDevEx
                     ln.Variance,                 // NEW - appended last
                     string.IsNullOrWhiteSpace(ln.DiscountAccountCode) ? (object)DBNull.Value : ln.DiscountAccountCode   // NEW
                 );
-              
+
 
             }
             return dt;
+        }
+
+        // dbo.AP_PaymentLineExtraTVP - one row per invoice line that actually
+        // carries an OverPay / OverPayExpense / AdvanceApplied amount, keyed
+        // by the same InvoiceNo + SequenceReferenceNumber the main TVP sends
+        // (SequenceNumber stringified the same way BuildPaymentLinesTVP does).
+        private DataTable BuildPaymentLineExtrasTVP(List<PaymentLine> lines)
+        {
+            var dt = new DataTable();
+            dt.Columns.Add("InvoiceNo", typeof(string));
+            dt.Columns.Add("SequenceReferenceNumber", typeof(string));
+            dt.Columns.Add("OverPay", typeof(decimal));
+            dt.Columns.Add("OverPayExpense", typeof(decimal));
+            dt.Columns.Add("AdvanceApplied", typeof(decimal));
+
+            foreach (var ln in lines)
+            {
+                if (ln.OverPay == 0m && ln.OverPayExpense == 0m && ln.AdvanceApplied == 0m) continue;
+                dt.Rows.Add(ln.InvoiceNo, ln.SequenceNumber.ToString(), ln.OverPay, ln.OverPayExpense, ln.AdvanceApplied);
+            }
+            return dt;
+        }
+
+        // ── AVAILABLE ADVANCE CREDIT (unapplied supplier OverPay) ──────────
+        // Mirrors ClientPaymentsDevExAcctg.RefreshAvailableCredit(). Display /
+        // fail-fast only - sp_AddPaymentSupplierCompound_V2 re-derives it
+        // under a per-supplier lock before accepting any Advance Applied.
+        void RefreshAvailableCredit()
+        {
+            _availableCredit = 0m;
+            string supplierId = txtsupplierid.Text.Trim();
+            if (string.IsNullOrWhiteSpace(supplierId) || supplierId == "[Supplier Id]")
+            {
+                lblAvailableCredit.Text = "0.00";
+                lblAvailableCredit.ForeColor = Color.Gray;
+                return;
+            }
+
+            try
+            {
+                using (SqlConnection con = Database.getConnection())
+                using (SqlCommand cmd = new SqlCommand("sp_GetSupplierAvailableCredit", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add("@SupplierID", SqlDbType.VarChar, 50).Value = supplierId;
+
+                    con.Open();
+                    object result = cmd.ExecuteScalar();
+                    _availableCredit = (result == null || result == DBNull.Value) ? 0m : Convert.ToDecimal(result);
+                    lblAvailableCredit.Text = _availableCredit.ToString("N2");
+                    lblAvailableCredit.ForeColor = _availableCredit > 0 ? Color.DarkGreen : Color.Gray;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Non-critical display field - don't block supplier selection.
+                System.Diagnostics.Debug.WriteLine("RefreshAvailableCredit failed: " + ex.Message);
+                lblAvailableCredit.Text = "N/A";
+            }
         }
         private static bool ToBool(object value)
         {
@@ -879,6 +1065,9 @@ namespace SalesInventorySystem.AccountingDevEx
                 gridViewMaster.SetRowCellValue(rowHandle, "EWTAmount", 0m);
                 gridViewMaster.SetRowCellValue(rowHandle, "ReturnAllowances", 0m);
                 gridViewMaster.SetRowCellValue(rowHandle, "Variance", 0m);   // NEW
+                SetCellIfExists(rowHandle, ColOverPay, 0m);
+                SetCellIfExists(rowHandle, ColOverPayExpense, 0m);
+                SetCellIfExists(rowHandle, ColAdvanceApplied, 0m);
             }
             finally
             {
@@ -897,6 +1086,9 @@ namespace SalesInventorySystem.AccountingDevEx
                 gridViewMaster.SetRowCellValue(rowHandle, "DiscountAmount", 0m);
                 gridViewMaster.SetRowCellValue(rowHandle, "ReturnAllowances", 0m);
                 gridViewMaster.SetRowCellValue(rowHandle, "Variance", 0m);   // NEW
+                SetCellIfExists(rowHandle, ColOverPay, 0m);
+                SetCellIfExists(rowHandle, ColOverPayExpense, 0m);
+                SetCellIfExists(rowHandle, ColAdvanceApplied, 0m);
 
                 // AmountPaid starts as full balance (no variance assumed until
                 // the user actually types a different actual-cash figure)
@@ -914,8 +1106,12 @@ namespace SalesInventorySystem.AccountingDevEx
             decimal discount = ToDecimal(gridViewMaster.GetRowCellValue(rowHandle, "DiscountAmount"));
             decimal offset = ToDecimal(gridViewMaster.GetRowCellValue(rowHandle, "ReturnAllowances"));
             //decimal variance = ToDecimal(gridViewMaster.GetRowCellValue(rowHandle, "Variance"));   // NEW
+            decimal overPay = ToDecimal(gridViewMaster.GetRowCellValue(rowHandle, ColOverPay));
+            decimal overPayExpense = ToDecimal(gridViewMaster.GetRowCellValue(rowHandle, ColOverPayExpense));
+            decimal advanceApplied = ToDecimal(gridViewMaster.GetRowCellValue(rowHandle, ColAdvanceApplied));
 
-            decimal totalDeduction = ewt + discount + offset;
+            // Advance Applied settles the invoice like any other non-cash deduction.
+            decimal totalDeduction = ewt + discount + offset + advanceApplied;
 
             if (totalDeduction > balance)
             {
@@ -924,8 +1120,9 @@ namespace SalesInventorySystem.AccountingDevEx
             }
 
             // Variance adjusts the expected cash outlay - positive means MORE
-            // cash goes out (FX Loss), negative means LESS (FX Gain)
-            decimal newAmount = balance - totalDeduction;// + variance;
+            // cash goes out (FX Loss), negative means LESS (FX Gain).
+            // OverPay/OverPayExpense are extra cash on top of a full settlement.
+            decimal newAmount = balance - totalDeduction + overPay + overPayExpense;// + variance;
 
             if (newAmount < 0)
                 newAmount = 0;
@@ -966,9 +1163,19 @@ namespace SalesInventorySystem.AccountingDevEx
             if (!ToBool(gridViewMaster.GetRowCellValue(e.RowHandle, "Pay")))
                 return; // do nothing if row isn't checked for payment
 
-            if (col == "EWTAmount" || col == "DiscountAmount" || col == "ReturnAllowances" )//|| col == "Variance")
+            if (col == "EWTAmount" || col == "DiscountAmount" || col == "ReturnAllowances"
+                || col == ColOverPay || col == ColOverPayExpense || col == ColAdvanceApplied)//|| col == "Variance")
             {
                 RecalculateRowAmount(e.RowHandle);
+
+                // Live hint for the one-variant-per-invoice rule (hard block is
+                // in ValidateInvoiceLines + the SP's THROW 60512).
+                int variants = (ToDecimal(gridViewMaster.GetRowCellValue(e.RowHandle, ColOverPay)) > 0 ? 1 : 0)
+                             + (ToDecimal(gridViewMaster.GetRowCellValue(e.RowHandle, ColOverPayExpense)) > 0 ? 1 : 0)
+                             + (ToDecimal(gridViewMaster.GetRowCellValue(e.RowHandle, ColAdvanceApplied)) > 0 ? 1 : 0);
+                if (variants > 1)
+                    ShowRowError(e.RowHandle, "Choose only one of OverPay / OverPay (Expense) / Advance Applied.", col);
+
                 UpdateTotalAmountToPay();
             }
             else if (col == "AmountPaid")
@@ -987,15 +1194,11 @@ namespace SalesInventorySystem.AccountingDevEx
                 // Balance). The SP now rejects this server-side too (THROW
                 // 60502/60503/60504) -- this is the earlier, in-grid warning.
                 decimal balance = ToDecimal(gridViewMaster.GetRowCellValue(e.RowHandle, "Balance"));
-                decimal ewt = ToDecimal(gridViewMaster.GetRowCellValue(e.RowHandle, "EWTAmount"));
-                decimal discount = ToDecimal(gridViewMaster.GetRowCellValue(e.RowHandle, "DiscountAmount"));
-                decimal offset = ToDecimal(gridViewMaster.GetRowCellValue(e.RowHandle, "ReturnAllowances"));
-                decimal amountPaid = ToDecimal(gridViewMaster.GetRowCellValue(e.RowHandle, "AmountPaid"));
-                decimal variance = ToDecimal(gridViewMaster.GetRowCellValue(e.RowHandle, "Variance"));
-                decimal gross = ComputeGross(amountPaid, ewt, discount, offset, variance);
+                decimal gross = ComputeRowGross(e.RowHandle);
 
                 if (Math.Round(gross - balance, 2) > 0)
-                    ShowRowError(e.RowHandle, $"Amount Paid ({gross:N2} incl. EWT/Discount/Offset) exceeds Balance ({balance:N2}).");
+                    ShowRowError(e.RowHandle, $"Amount Paid ({gross:N2} incl. EWT/Discount/Offset) exceeds Balance ({balance:N2})."
+                        + " Put the excess in OverPay (Credit) or OverPay (Expense).");
                 else
                     gridViewMaster.ClearColumnErrors();
 
@@ -1032,10 +1235,13 @@ namespace SalesInventorySystem.AccountingDevEx
             }
 
         }
-        private void ShowRowError(int rowHandle, string message)
+        // fieldName defaults to AmountPaid (every pre-existing caller); the
+        // OverPay/Advance checks pass their own column so the red mark lands
+        // on the cell the user actually has to fix.
+        private void ShowRowError(int rowHandle, string message, string fieldName = "AmountPaid")
         {
             gridViewMaster.SetColumnError(
-                gridViewMaster.Columns["AmountPaid"],
+                gridViewMaster.Columns[fieldName] ?? gridViewMaster.Columns["AmountPaid"],
                 message);
 
             gridViewMaster.FocusedRowHandle = rowHandle;
@@ -1329,6 +1535,7 @@ namespace SalesInventorySystem.AccountingDevEx
             _suppid = SearchLookUpClass.getSingleValue(searchLookUpSupplier, "SupplierID");
             txtsupplierid.Text = _suppid.ToString();
             populate();
+            RefreshAvailableCredit();
         }
 
         private void gridViewLines_CustomRowCellEdit(object sender, CustomRowCellEditEventArgs e)

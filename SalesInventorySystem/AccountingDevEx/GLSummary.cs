@@ -155,7 +155,7 @@ namespace SalesInventorySystem.AccountingDevEx
             string filename = txtreporttype.Text + "_" + txtcutoffdate.Text.Replace('/','-')+'-'+txtdate.Text.Replace('/', '-') + ".xls";
             string file = filepath + filename;
             gridView1.ExportToXls(file);
-            XtraMessageBox.Show("Successfully Exported.. Please Check your Drive C://MyFiles/folder");
+            XtraMessageBox.Show("Successfully Exported!.. Please Check your Drive C://MyFiles/folder");
         }
 
         private void gridControl1_MouseUp(object sender, MouseEventArgs e)
