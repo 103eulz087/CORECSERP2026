@@ -15,6 +15,8 @@ namespace SalesInventorySystem.HOFormsDevEx
         public ManualJournalVoucherFrm()
         {
             InitializeComponent();
+            // Posted tab: draggable split, vouchers grid ~50% / details below.
+            Classes.DevXGridViewSettings.KeepSplitterRatio(splitPosted, 0.50);
         }
 
         private void ManualJournalVoucherFrm_Load(object sender, EventArgs e)
@@ -198,7 +200,7 @@ namespace SalesInventorySystem.HOFormsDevEx
 
                     var tvpParam = cmd.Parameters.AddWithValue("@Lines", lines);
                     tvpParam.SqlDbType = SqlDbType.Structured;
-                    tvpParam.TypeName = "dbo.JournalVoucherLineTVP";
+                    tvpParam.TypeName = "dbo.JournalVoucherLineTVP_V2";
 
                     con.Open();
                     cmd.ExecuteNonQuery();
@@ -218,7 +220,11 @@ namespace SalesInventorySystem.HOFormsDevEx
 
         private DataTable BuildLinesTVP()
         {
+            // Column order must match dbo.JournalVoucherLineTVP_V2 (LineNo first).
+            // LineNo = the line's position as encoded, so View/Edit/Copy can
+            // show it back in the same order (2026-09-25e).
             var dt = new DataTable();
+            dt.Columns.Add("LineNo", typeof(int));
             dt.Columns.Add("AccountCode", typeof(string));
             dt.Columns.Add("Debit", typeof(decimal));
             dt.Columns.Add("Credit", typeof(decimal));
@@ -234,7 +240,7 @@ namespace SalesInventorySystem.HOFormsDevEx
                 if (string.IsNullOrWhiteSpace(acct) || (debit == 0 && credit == 0))
                     continue;
 
-                dt.Rows.Add(acct, debit, credit, particulars);
+                dt.Rows.Add(dt.Rows.Count + 1, acct, debit, credit, particulars);
             }
 
             return dt;

@@ -40,6 +40,9 @@
             this.btnExpandAllGroups = new DevExpress.XtraEditors.SimpleButton();
             this.btnforapprovalstsexcel = new DevExpress.XtraEditors.SimpleButton();
             this.txtbranchsummary = new DevExpress.XtraEditors.SearchLookUpEdit();
+            this.lblBranchCashReceipts = new System.Windows.Forms.Label();
+            this.cboBranchCashReceipts = new DevExpress.XtraEditors.SearchLookUpEdit();
+            this.cboBranchCashReceiptsView = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.gridView5 = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.label6 = new System.Windows.Forms.Label();
             this.btnsalestransummary = new DevExpress.XtraEditors.SimpleButton();
@@ -102,6 +105,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.gridView2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView4)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtbranchsummary.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.cboBranchCashReceipts.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.cboBranchCashReceiptsView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView5)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView3)).BeginInit();
@@ -912,6 +917,41 @@
             this.label9.Size = new System.Drawing.Size(68, 14);
             this.label9.TabIndex = 435;
             this.label9.Text = "Date From:";
+            //
+            // lblBranchCashReceipts
+            //
+            this.lblBranchCashReceipts.AutoSize = true;
+            this.lblBranchCashReceipts.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblBranchCashReceipts.Location = new System.Drawing.Point(618, 18);
+            this.lblBranchCashReceipts.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.lblBranchCashReceipts.Name = "lblBranchCashReceipts";
+            this.lblBranchCashReceipts.Size = new System.Drawing.Size(48, 14);
+            this.lblBranchCashReceipts.TabIndex = 455;
+            this.lblBranchCashReceipts.Text = "Branch:";
+            //
+            // cboBranchCashReceipts
+            //
+            this.cboBranchCashReceipts.Location = new System.Drawing.Point(670, 15);
+            this.cboBranchCashReceipts.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
+            this.cboBranchCashReceipts.Name = "cboBranchCashReceipts";
+            this.cboBranchCashReceipts.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 8.875F);
+            this.cboBranchCashReceipts.Properties.Appearance.Options.UseFont = true;
+            this.cboBranchCashReceipts.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo),
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Delete)});
+            this.cboBranchCashReceipts.Properties.NullText = "(All branches)";
+            this.cboBranchCashReceipts.Properties.PopupView = this.cboBranchCashReceiptsView;
+            this.cboBranchCashReceipts.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;
+            this.cboBranchCashReceipts.Size = new System.Drawing.Size(240, 20);
+            this.cboBranchCashReceipts.TabIndex = 456;
+            this.cboBranchCashReceipts.ButtonClick += new DevExpress.XtraEditors.Controls.ButtonPressedEventHandler(this.cboBranchCashReceipts_ButtonClick);
+            //
+            // cboBranchCashReceiptsView
+            //
+            this.cboBranchCashReceiptsView.FocusRectStyle = DevExpress.XtraGrid.Views.Grid.DrawFocusRectStyle.RowFocus;
+            this.cboBranchCashReceiptsView.Name = "cboBranchCashReceiptsView";
+            this.cboBranchCashReceiptsView.OptionsSelection.EnableAppearanceFocusedCell = false;
+            this.cboBranchCashReceiptsView.OptionsView.ShowGroupPanel = false;
             // 
             // xtraTabControl1
             // 
@@ -1040,6 +1080,8 @@
             this.panelControl6.Controls.Add(this.label7);
             this.panelControl6.Controls.Add(this.simpleButton2);
             this.panelControl6.Controls.Add(this.datetocashreceipts);
+            this.panelControl6.Controls.Add(this.lblBranchCashReceipts);
+            this.panelControl6.Controls.Add(this.cboBranchCashReceipts);
             this.panelControl6.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelControl6.Location = new System.Drawing.Point(2, 2);
             this.panelControl6.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
@@ -1063,6 +1105,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.gridView2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView4)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtbranchsummary.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.cboBranchCashReceipts.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.cboBranchCashReceiptsView)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView5)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView3)).EndInit();
@@ -1144,6 +1188,9 @@
         private DevExpress.XtraGrid.GridControl gridControl3;
         private DevExpress.XtraGrid.Views.Grid.GridView gridView3;
         private DevExpress.XtraEditors.SearchLookUpEdit txtbranchsummary;
+        private System.Windows.Forms.Label lblBranchCashReceipts;
+        private DevExpress.XtraEditors.SearchLookUpEdit cboBranchCashReceipts;
+        private DevExpress.XtraGrid.Views.Grid.GridView cboBranchCashReceiptsView;
         private DevExpress.XtraGrid.Views.Grid.GridView gridView5;
         internal System.Windows.Forms.Label label6;
         private DevExpress.XtraEditors.SimpleButton btnforapprovalstsexcel;

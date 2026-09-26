@@ -17,6 +17,8 @@ namespace SalesInventorySystem.HOFormsDevEx
         public ManualJournalVoucherMultiBranchFrm()
         {
             InitializeComponent();
+            // Posted tab: draggable split, vouchers grid ~55% / details below.
+            Classes.DevXGridViewSettings.KeepSplitterRatio(splitPosted, 0.55);
         }
         private bool _dataLoaded = false;
         public void LoadData()
@@ -282,7 +284,7 @@ namespace SalesInventorySystem.HOFormsDevEx
 
                     var tvpParam = cmd.Parameters.AddWithValue("@Lines", lines);
                     tvpParam.SqlDbType = SqlDbType.Structured;
-                    tvpParam.TypeName = "dbo.JournalVoucherLineMultiTVP";
+                    tvpParam.TypeName = "dbo.JournalVoucherLineMultiTVP_V2";
 
                     con.Open();
 
@@ -304,7 +306,11 @@ namespace SalesInventorySystem.HOFormsDevEx
         
         private DataTable BuildLinesTVP()
         {
+            // Column order must match dbo.JournalVoucherLineMultiTVP_V2 (LineNo first).
+            // LineNo = the line's position as encoded, across all branches, so
+            // View/Edit/Copy can show it back in the same order (2026-09-25e).
             var dt = new DataTable();
+            dt.Columns.Add("LineNo", typeof(int));
             dt.Columns.Add("BranchCode", typeof(string));
             dt.Columns.Add("AccountCode", typeof(string));
 
@@ -325,7 +331,7 @@ namespace SalesInventorySystem.HOFormsDevEx
                 if (string.IsNullOrWhiteSpace(acct) || string.IsNullOrWhiteSpace(branch) || (debit == 0 && credit == 0))
                     continue;
 
-                dt.Rows.Add(branch, acct, debit, credit, particulars);
+                dt.Rows.Add(dt.Rows.Count + 1, branch, acct, debit, credit, particulars);
             }
 
             return dt;
@@ -482,6 +488,7 @@ namespace SalesInventorySystem.HOFormsDevEx
 
             DataTable lines;
             string remarks;
+            string controlNo;
             DateTime voucherDate;
 
             try
@@ -500,6 +507,10 @@ namespace SalesInventorySystem.HOFormsDevEx
                 }
 
                 remarks = gridViewPosted.GetFocusedRowCellValue("Remarks")?.ToString() ?? "";
+                // ControlNo comes from sp_GetPostedManualJournalVouchers (the ticket's
+                // ReferenceKey). Edit re-posts with txtcontrolno, so leaving it blank here
+                // would silently wipe the control no. on save.
+                controlNo = gridViewPosted.GetFocusedRowCellValue("ControlNo")?.ToString() ?? "";
                 voucherDate = Convert.ToDateTime(gridViewPosted.GetFocusedRowCellValue("VoucherDate"));
             }
             catch (SqlException ex)
@@ -522,6 +533,7 @@ namespace SalesInventorySystem.HOFormsDevEx
 
             _linesTable.Rows.Clear();
             txtRemarks.Text = remarks;
+            txtcontrolno.Text = controlNo;
             txtVoucherDate.EditValue = voucherDate;
             txtReferenceNo.Text = editingRefNo;   // already ReadOnly=true in the Designer either way
 

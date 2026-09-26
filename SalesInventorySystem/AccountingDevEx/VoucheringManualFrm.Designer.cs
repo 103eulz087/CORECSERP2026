@@ -497,7 +497,8 @@
             this.grpGLEntry.Name = "grpGLEntry";
             this.grpGLEntry.Size = new System.Drawing.Size(996, 384);
             this.grpGLEntry.TabIndex = 0;
-            this.grpGLEntry.Text = "Additional GL Entry (manual, free-form — e.g. cash advances; AP-Trade/Cash/FX for checked invoices now auto-post separately)";
+            this.grpGLEntry.Text = "Additional GL Entry (manual, free-form — e.g. cash advances; AP-Trade/Cash/FX for" +
+    " checked invoices now auto-post separately)";
             // 
             // gridControlGL
             // 
@@ -692,6 +693,7 @@
             this.tabNewVoucher,
             this.tabPosted});
             this.tabMain.SelectedPageChanged += new DevExpress.XtraTab.TabPageChangedEventHandler(this.TabMain_SelectedPageChanged);
+            //this.tabMain.Click += new System.EventHandler(this.tabMain_Click);
             // 
             // tabNewVoucher
             // 

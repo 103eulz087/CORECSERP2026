@@ -29,6 +29,14 @@ namespace SalesInventorySystem.AccountingDevEx
         public ExpenseManualMultiBranchFrm()
         {
             InitializeComponent();
+            // Posted tab: draggable split, expenses grid ~45% / details below.
+            Classes.DevXGridViewSettings.KeepSplitterRatio(splitPosted, 0.45);
+
+            // Posted tab date range: last month up to today. Set here (not only in
+            // InitializeForm) so the Designer's hard-coded 2026-07-23 never reaches the
+            // Posted query -- same fix as VoucheringManualFrm's Posted tab.
+            txtDateFrom.DateTime = DateTime.Today.AddMonths(-1);
+            txtDateTo.DateTime = DateTime.Today;
         }
 
         public void LoadData()
@@ -68,8 +76,7 @@ namespace SalesInventorySystem.AccountingDevEx
             gridViewLines.GroupSummary.Add(DevExpress.Data.SummaryItemType.Sum, "Debit", colDebit, "Branch Debit: {0:n2}");
             gridViewLines.GroupSummary.Add(DevExpress.Data.SummaryItemType.Sum, "Credit", colCredit, "Branch Credit: {0:n2}");
 
-            txtDateFrom.DateTime = DateTime.Today.AddMonths(-1);
-            txtDateTo.DateTime = DateTime.Today;
+            // Posted-tab date defaults are set in the constructor.
 
             ResetForNewEntry(clearRemarks: true);
         }
@@ -344,7 +351,11 @@ namespace SalesInventorySystem.AccountingDevEx
 
         private DataTable BuildLinesTVP()
         {
+            // Column order must match dbo.ExpenseManualLineTVP_V2 (LineNo first).
+            // LineNo = the line's position as encoded, so View/Edit/Copy can
+            // show it back in the same order (2026-09-25d).
             var dt = new DataTable();
+            dt.Columns.Add("LineNo", typeof(int));
             dt.Columns.Add("BranchCode", typeof(string));
             dt.Columns.Add("AccountCode", typeof(string));
             dt.Columns.Add("Debit", typeof(decimal));
@@ -371,7 +382,7 @@ namespace SalesInventorySystem.AccountingDevEx
                         $"Row {i + 1}: Branch value '{branch}' looks wrong (expected a short code like '002', got the full branch name too). Please re-select the branch from the dropdown.");
                 }
 
-                dt.Rows.Add(branch, acct, debit, credit, particulars);
+                dt.Rows.Add(dt.Rows.Count + 1, branch, acct, debit, credit, particulars);
             }
             return dt;
         }
@@ -416,7 +427,7 @@ namespace SalesInventorySystem.AccountingDevEx
 
                     var tvpParam = cmd.Parameters.AddWithValue("@Lines", lines);
                     tvpParam.SqlDbType = SqlDbType.Structured;
-                    tvpParam.TypeName = "dbo.ExpenseManualLineTVP";
+                    tvpParam.TypeName = "dbo.ExpenseManualLineTVP_V2";
 
                     con.Open();
                     string message = defaultMessage;

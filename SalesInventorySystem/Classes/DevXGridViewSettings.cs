@@ -13,6 +13,38 @@ namespace SalesInventorySystem.Classes
 {
     class DevXGridViewSettings
     {
+        // Keeps a SplitContainerControl's first panel at a fixed share of the container
+        // (e.g. 0.55 = top grid 55%) on every resize, and remembers a new share when the
+        // user drags the divider. Used by the Posted tabs (vouchers grid over details grid)
+        // so the details grid stays visible on low-resolution monitors.
+        // Plain FixedPanel.None proportional resizing isn't enough on its own: if the
+        // control is laid out very small first (e.g. while being hosted), the second panel
+        // gets squeezed to its minimum and the ratio is lost for good.
+        public static void KeepSplitterRatio(DevExpress.XtraEditors.SplitContainerControl split, double firstPanelRatio)
+        {
+            const int minUsableSize = 200;   // ignore transient tiny layouts
+            double ratio = firstPanelRatio;
+            bool applying = false;
+
+            int Length() => split.Horizontal ? split.Width : split.Height;
+
+            void Apply()
+            {
+                if (Length() < minUsableSize) return;
+                applying = true;
+                try { split.SplitterPosition = (int)(Length() * ratio); }
+                finally { applying = false; }
+            }
+
+            split.SizeChanged += (s, e) => Apply();
+            split.SplitterMoved += (s, e) =>
+            {
+                if (applying || Length() < minUsableSize) return;
+                ratio = (double)split.SplitterPosition / Length();
+            };
+            Apply();
+        }
+
         public static GridView gridStrikeout(RowCellStyleEventArgs e,String col,String value)
         {
             GridView view = new GridView();

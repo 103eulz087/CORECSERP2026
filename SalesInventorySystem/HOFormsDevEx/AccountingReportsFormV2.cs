@@ -173,6 +173,9 @@ namespace SalesInventorySystem.HOFormsDevEx
         }
         private bool _dataLoaded = false;
         private ContextMenuStrip _reportContextMenu;
+        // True while gridControlReport is showing an All-Branches pivot result --
+        // Export uses it to pick the data-aware XLSX path (frozen columns).
+        private bool _isPivotResultShown = false;
         public void LoadData()
         {
             if (_dataLoaded)
@@ -690,6 +693,17 @@ namespace SalesInventorySystem.HOFormsDevEx
             gridViewReport.OptionsView.ColumnAutoWidth = false;
             gridViewSummary.OptionsView.ColumnAutoWidth = false;
 
+            // Pivot: keep AccountCode/AccountDescription pinned while scrolling across
+            // the branch columns (also exported as frozen columns -- see ExportPivotToXlsx).
+            // Columns are rebuilt on every Generate, so non-pivot reports start unpinned.
+            _isPivotResultShown = isPivotResult;
+            if (isPivotResult)
+            {
+                foreach (string fixedCol in new[] { "AccountCode", "AccountDescription" })
+                    if (gridViewReport.Columns[fixedCol] != null)
+                        gridViewReport.Columns[fixedCol].Fixed = DevExpress.XtraGrid.Columns.FixedStyle.Left;
+            }
+
             gridViewReport.BestFitColumns();
             gridViewSummary.BestFitColumns();
         }
@@ -930,6 +944,23 @@ namespace SalesInventorySystem.HOFormsDevEx
             {
                 if (sfd.ShowDialog() != DialogResult.OK) return;
 
+                // Pivot -> Excel: data-aware export, so the header row and
+                // AccountCode/AccountDescription (pinned left in BindResults) come out as
+                // frozen panes. The print-layout path below can't freeze anything.
+                if (_isPivotResultShown && sfd.FileName.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase))
+                {
+                    try
+                    {
+                        ExportPivotToXlsx(sfd.FileName);
+                        XtraMessageBox.Show("Exported successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        XtraMessageBox.Show($"Export failed: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    return;
+                }
+
                 try
                 {
                     using (var ps = new DevExpress.XtraPrinting.PrintingSystem())
@@ -983,6 +1014,43 @@ namespace SalesInventorySystem.HOFormsDevEx
                     XtraMessageBox.Show($"Export failed: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
+        }
+
+        // Data-aware XLSX export of the pivot grid: the column header row and the
+        // fixed-left columns (AccountCode, AccountDescription) are frozen, and structural
+        // rows (subtotals / grand totals) keep the grid's highlight.
+        // No title/subtitle rows above the header on purpose: DevExpress only freezes the
+        // header ROW when no sheet-header rows are added (verified in an exported file).
+        private void ExportPivotToXlsx(string fileName)
+        {
+            var options = new XlsxExportOptionsEx
+            {
+                ExportType = DevExpress.Export.ExportType.DataAware,
+                AllowFixedColumns = DevExpress.Utils.DefaultBoolean.True,
+                AllowFixedColumnHeaderPanel = DevExpress.Utils.DefaultBoolean.True,
+                SheetName = "Income Statement Pivot"
+            };
+
+            options.CustomizeCell += e =>
+            {
+                if (e.RowHandle < 0 || gridViewReport.Columns["RowType"] == null) return;
+
+                string rt = gridViewReport.GetRowCellValue(e.RowHandle, "RowType")?.ToString().ToUpperInvariant() ?? "";
+                bool isGrandTotal = rt == "GRANDTOTAL" || rt == "GRANDTOTAL_DIFF";
+                bool isStructural = rt == "SUBTOTAL" || rt == "SECTION_SUBTOTAL" || rt == "SUBSECTION_SUBTOTAL"
+                                 || rt == "HEADER" || rt == "OPENING" || rt == "PERIOD" || rt == "ENDING";
+                if (!isGrandTotal && !isStructural) return;
+
+                e.Formatting.BackColor = isGrandTotal ? G_ROW_GRANDTOTAL_BG : G_ROW_MARK_BG;
+                e.Formatting.Font = new DevExpress.Export.XlCellFont
+                {
+                    Bold = true,
+                    Color = isGrandTotal ? G_ROW_GRANDTOTAL_FG : G_ROW_MARK_FG
+                };
+                e.Handled = true;
+            };
+
+            gridControlReport.ExportToXlsx(fileName, options);
         }
     }
 }

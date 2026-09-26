@@ -426,11 +426,13 @@ namespace SalesInventorySystem.POS
             string dateFilterType = radDateFilterInvoice.Checked ? "I" : "P";
 
             using (SqlConnection con = Database.getConnection())
-            using (SqlCommand com = new SqlCommand("SELECT * FROM dbo.funcview_CustomerCashReceipts(@datefrom, @dateto, @dateFilterType)", con))
+            using (SqlCommand com = new SqlCommand("SELECT * FROM dbo.funcview_CustomerCashReceipts(@datefrom, @dateto, @dateFilterType, @parmbranchcode)", con))
             {
                 com.Parameters.Add("@datefrom", SqlDbType.Date).Value = datefromcashreceipts.Value.Date;
                 com.Parameters.Add("@dateto", SqlDbType.Date).Value = datetocashreceipts.Value.Date;
                 com.Parameters.Add("@dateFilterType", SqlDbType.Char, 1).Value = dateFilterType;
+                // 2026-09-25c - branch filter (SQL/2026-09-25c_CashReceipts_SalesJournal_BranchFilter.sql)
+                com.Parameters.Add("@parmbranchcode", SqlDbType.VarChar, 10).Value = GetCashReceiptsBranchCode();
 
                 using (SqlDataAdapter adapter = new SqlDataAdapter(com))
                 {
@@ -474,15 +476,42 @@ namespace SalesInventorySystem.POS
         }
         private void LoadCustomerSalesJournal()
         {
-            string sql = $@"
-                SELECT *
-                FROM dbo.funcview_CustomerSalesJournal(
-                    '{datefromcashreceipts.Value.Date:yyyy-MM-dd}',
-                    '{datetocashreceipts.Value.Date:yyyy-MM-dd}'
-                )";
-            //ORDER BY CustomerName";
+            // 2026-09-25c - parameterized (was interpolated date literals) and
+            // branch-filtered; same bind idiom as LoadCustomerCashReceipts.
+            using (SqlConnection con = Database.getConnection())
+            using (SqlCommand com = new SqlCommand("SELECT * FROM dbo.funcview_CustomerSalesJournal(@datefrom, @dateto, @parmbranchcode)", con))
+            {
+                com.Parameters.Add("@datefrom", SqlDbType.Date).Value = datefromcashreceipts.Value.Date;
+                com.Parameters.Add("@dateto", SqlDbType.Date).Value = datetocashreceipts.Value.Date;
+                com.Parameters.Add("@parmbranchcode", SqlDbType.VarChar, 10).Value = GetCashReceiptsBranchCode();
 
-            Database.display(sql, gridControl1, gridView1);
+                using (SqlDataAdapter adapter = new SqlDataAdapter(com))
+                {
+                    DataTable table = new DataTable();
+                    adapter.Fill(table);
+                    gridControl1.DataSource = null;
+                    gridControl1.DataSource = table;
+                }
+            }
+        }
+
+        // Branch for the Cash Receipts / Sales Journal tab.
+        // Global admin: the dropdown's BranchCode, or "ALL" when left empty.
+        // Everyone else: always their own Login.assignedBranch (dropdown hidden).
+        private string GetCashReceiptsBranchCode()
+        {
+            if (Convert.ToBoolean(Login.isglobalAdmin))
+            {
+                string selected = cboBranchCashReceipts.EditValue?.ToString();
+                return string.IsNullOrWhiteSpace(selected) ? "ALL" : selected;
+            }
+            return Login.assignedBranch;
+        }
+
+        private void cboBranchCashReceipts_ButtonClick(object sender, DevExpress.XtraEditors.Controls.ButtonPressedEventArgs e)
+        {
+            if (e.Button.Kind == DevExpress.XtraEditors.Controls.ButtonPredefines.Delete)
+                cboBranchCashReceipts.EditValue = null;   // back to "(All branches)"
         }
         private void LoadSalesData(string viewName, string dateColumn, string branchCode)
         {
@@ -658,6 +687,21 @@ namespace SalesInventorySystem.POS
                 Database.displaySearchlookupEdit("Select distinct BranchCode,BranchName FROM Branches Order By BranchCode", txtbranchsummary, "BranchName", "BranchName");
              }
             Database.displaySearchlookupEdit("SELECT CustomerKey,CustomerID,CustomerName From dbo.Customers", searchLookUpEdit1,"CustomerName", "CustomerName");
+
+            // 2026-09-25c - Cash Receipts / Sales Journal branch filter: only a global
+            // admin sees and can change it; everyone else is locked to their
+            // Login.assignedBranch (see GetCashReceiptsBranchCode).
+            bool isGlobalAdmin = Convert.ToBoolean(Login.isglobalAdmin);
+            lblBranchCashReceipts.Visible = isGlobalAdmin;
+            cboBranchCashReceipts.Visible = isGlobalAdmin;
+            if (isGlobalAdmin)
+            {
+                Database.displaySearchlookupEdit(
+                    "SELECT BranchCode, BranchName, BranchCode + ' - ' + BranchName AS DisplayText FROM Branches ORDER BY BranchCode",
+                    cboBranchCashReceipts, "DisplayText", "BranchCode");
+                if (cboBranchCashReceipts.Properties.View.Columns["DisplayText"] != null)
+                    cboBranchCashReceipts.Properties.View.Columns["DisplayText"].Visible = false;
+            }
         }
 
         private void searchLookUpEdit1_EditValueChanged(object sender, EventArgs e)
@@ -740,7 +784,7 @@ namespace SalesInventorySystem.POS
 
                
                 gridView1.Columns.Clear();
-                LoadCustomerCashReceipts();
+                LoadCustomerCashReceipts(); //new
                 
                 gridView1.BestFitColumns();
                 gridView1.ExpandAllGroups();

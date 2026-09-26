@@ -239,6 +239,10 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.dteAsOfDate.EditValue = null;
             this.dteAsOfDate.Location = new System.Drawing.Point(658, 23);
             this.dteAsOfDate.Name = "dteAsOfDate";
+            this.dteAsOfDate.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.dteAsOfDate.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton()});
             this.dteAsOfDate.Size = new System.Drawing.Size(150, 20);
             this.dteAsOfDate.TabIndex = 7;
             // 
@@ -259,6 +263,10 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.dteDateFrom.EditValue = null;
             this.dteDateFrom.Location = new System.Drawing.Point(658, 23);
             this.dteDateFrom.Name = "dteDateFrom";
+            this.dteDateFrom.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.dteDateFrom.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton()});
             this.dteDateFrom.Size = new System.Drawing.Size(150, 20);
             this.dteDateFrom.TabIndex = 9;
             // 
@@ -279,6 +287,10 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.dteDateTo.EditValue = null;
             this.dteDateTo.Location = new System.Drawing.Point(818, 23);
             this.dteDateTo.Name = "dteDateTo";
+            this.dteDateTo.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.dteDateTo.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton()});
             this.dteDateTo.Size = new System.Drawing.Size(150, 20);
             this.dteDateTo.TabIndex = 11;
             // 

@@ -80,6 +80,7 @@
         private System.Windows.Forms.ToolStripMenuItem miViewPODetails;
 
         private DevExpress.XtraEditors.PanelControl pnlPostedButtons;
+        private DevExpress.XtraEditors.SplitContainerControl splitPosted;
         private DevExpress.XtraEditors.SimpleButton btnViewDetails;
         private DevExpress.XtraEditors.SimpleButton btnCopyToNew;
         private DevExpress.XtraEditors.SimpleButton btnEdit;
@@ -141,6 +142,7 @@
             this.tabPosted = new DevExpress.XtraTab.XtraTabPage();
             this.gridControlPostedDetails = new DevExpress.XtraGrid.GridControl();
             this.gridViewPostedDetails = new DevExpress.XtraGrid.Views.Grid.GridView();
+            this.splitPosted = new DevExpress.XtraEditors.SplitContainerControl();
             this.pnlPostedButtons = new DevExpress.XtraEditors.PanelControl();
             this.btnViewDetails = new DevExpress.XtraEditors.SimpleButton();
             this.btnViewPODetails = new DevExpress.XtraEditors.SimpleButton();
@@ -193,6 +195,12 @@
             ((System.ComponentModel.ISupportInitialize)(this.gridViewPOPopup)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtRemarks.Properties)).BeginInit();
             this.tabPosted.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitPosted)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.splitPosted.Panel1)).BeginInit();
+            this.splitPosted.Panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitPosted.Panel2)).BeginInit();
+            this.splitPosted.Panel2.SuspendLayout();
+            this.splitPosted.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridControlPostedDetails)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridViewPostedDetails)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pnlPostedButtons)).BeginInit();
@@ -670,18 +678,38 @@
             // 
             // tabPosted
             // 
-            this.tabPosted.Controls.Add(this.gridControlPostedDetails);
-            this.tabPosted.Controls.Add(this.pnlPostedButtons);
-            this.tabPosted.Controls.Add(this.gridControlPosted);
+            this.tabPosted.Controls.Add(this.splitPosted);
             this.tabPosted.Controls.Add(this.pnlPostedFilter);
             this.tabPosted.Name = "tabPosted";
             this.tabPosted.Size = new System.Drawing.Size(1022, 743);
             this.tabPosted.Text = "Posted Expenses";
             // 
+            // splitPosted
+            // 
+            this.splitPosted.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitPosted.FixedPanel = DevExpress.XtraEditors.SplitFixedPanel.None;
+            this.splitPosted.Horizontal = false;
+            this.splitPosted.Location = new System.Drawing.Point(0, 59);
+            this.splitPosted.Name = "splitPosted";
+            // 
+            // splitPosted.Panel1
+            // 
+            this.splitPosted.Panel1.Controls.Add(this.gridControlPosted);
+            this.splitPosted.Panel1.Text = "Panel1";
+            // 
+            // splitPosted.Panel2
+            // 
+            this.splitPosted.Panel2.Controls.Add(this.gridControlPostedDetails);
+            this.splitPosted.Panel2.Controls.Add(this.pnlPostedButtons);
+            this.splitPosted.Panel2.Text = "Panel2";
+            this.splitPosted.Size = new System.Drawing.Size(1022, 684);
+            this.splitPosted.SplitterPosition = 369;
+            this.splitPosted.TabIndex = 4;
+            // 
             // gridControlPostedDetails
             // 
             this.gridControlPostedDetails.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControlPostedDetails.Location = new System.Drawing.Point(0, 474);
+            this.gridControlPostedDetails.Location = new System.Drawing.Point(0, 46);
             this.gridControlPostedDetails.MainView = this.gridViewPostedDetails;
             this.gridControlPostedDetails.Name = "gridControlPostedDetails";
             this.gridControlPostedDetails.Size = new System.Drawing.Size(1022, 269);
@@ -703,7 +731,7 @@
             this.pnlPostedButtons.Controls.Add(this.btnCopyToNew);
             this.pnlPostedButtons.Controls.Add(this.btnEdit);
             this.pnlPostedButtons.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pnlPostedButtons.Location = new System.Drawing.Point(0, 428);
+            this.pnlPostedButtons.Location = new System.Drawing.Point(0, 0);
             this.pnlPostedButtons.Name = "pnlPostedButtons";
             this.pnlPostedButtons.Size = new System.Drawing.Size(1022, 46);
             this.pnlPostedButtons.TabIndex = 1;
@@ -757,8 +785,8 @@
             // gridControlPosted
             // 
             this.gridControlPosted.ContextMenuStrip = this.cmsPosted;
-            this.gridControlPosted.Dock = System.Windows.Forms.DockStyle.Top;
-            this.gridControlPosted.Location = new System.Drawing.Point(0, 59);
+            this.gridControlPosted.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.gridControlPosted.Location = new System.Drawing.Point(0, 0);
             this.gridControlPosted.MainView = this.gridViewPosted;
             this.gridControlPosted.Name = "gridControlPosted";
             this.gridControlPosted.Size = new System.Drawing.Size(1022, 369);
@@ -933,6 +961,12 @@
             ((System.ComponentModel.ISupportInitialize)(this.gridViewPOPopup)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtRemarks.Properties)).EndInit();
             this.tabPosted.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitPosted.Panel1)).EndInit();
+            this.splitPosted.Panel1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitPosted.Panel2)).EndInit();
+            this.splitPosted.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitPosted)).EndInit();
+            this.splitPosted.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.gridControlPostedDetails)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridViewPostedDetails)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pnlPostedButtons)).EndInit();

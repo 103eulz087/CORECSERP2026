@@ -31,6 +31,8 @@ namespace SalesInventorySystem.AccountingDevEx
         public AddExpenseDevExFrm()
         {
             InitializeComponent();
+            // Posted tab: draggable split, expenses grid ~54% / details below.
+            Classes.DevXGridViewSettings.KeepSplitterRatio(splitPosted, 0.54);
         }
 
         public async void LoadData()

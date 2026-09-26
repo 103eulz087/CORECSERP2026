@@ -94,6 +94,12 @@ namespace SalesInventorySystem.AccountingDevEx
             this.txtPostedDateTo.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
                 new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo) });
 
+            // The Designer hard-codes both dates to 2026-07-24, so the Posted tab only
+            // ever searched that one day and came back empty. Default to the last month
+            // up to today, same as the other Posted tabs (e.g. ExpenseManualMultiBranchFrm).
+            this.txtPostedDateFrom.DateTime = DateTime.Today.AddMonths(-1);
+            this.txtPostedDateTo.DateTime = DateTime.Today;
+
             this.btnRefreshPosted.Text = "Refresh";
             this.btnRefreshPosted.Location = new System.Drawing.Point(346, 9);
             this.btnRefreshPosted.Size = new System.Drawing.Size(100, 30);
@@ -105,8 +111,7 @@ namespace SalesInventorySystem.AccountingDevEx
             this.pnlPostedFilter.Controls.Add(this.txtPostedDateTo);
             this.pnlPostedFilter.Controls.Add(this.btnRefreshPosted);
 
-            this.gridControlPosted.Dock = System.Windows.Forms.DockStyle.Top;
-            this.gridControlPosted.Height = 280;
+            this.gridControlPosted.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gridControlPosted.MainView = this.gridViewPosted;
             this.gridControlPosted.ViewCollection.Add(this.gridViewPosted);
             this.gridViewPosted.GridControl = this.gridControlPosted;
@@ -142,12 +147,26 @@ namespace SalesInventorySystem.AccountingDevEx
             this.gridViewPostedDetails.OptionsBehavior.Editable = false;
             this.gridViewPostedDetails.OptionsView.ShowGroupPanel = false;
 
+            // Draggable splitter between the vouchers grid (top) and buttons + details
+            // (bottom), kept at a set share on resize so the details grid stays visible
+            // on low-resolution monitors (see DevXGridViewSettings.KeepSplitterRatio).
+            this.splitPosted = new DevExpress.XtraEditors.SplitContainerControl
+            {
+                Horizontal = false,
+                FixedPanel = DevExpress.XtraEditors.SplitFixedPanel.None
+            };
+            Classes.DevXGridViewSettings.KeepSplitterRatio(this.splitPosted, 0.45);
+            this.splitPosted.Panel1.Controls.Add(this.gridControlPosted);
+            this.splitPosted.Panel2.Controls.Add(this.gridControlPostedDetails);
+            this.splitPosted.Panel2.Controls.Add(this.pnlPostedButtons);
+            this.splitPosted.Dock = System.Windows.Forms.DockStyle.Fill;
+
             this.tabPosted.Text = "Posted Vouchers";
-            this.tabPosted.Controls.Add(this.gridControlPostedDetails);
-            this.tabPosted.Controls.Add(this.pnlPostedButtons);
-            this.tabPosted.Controls.Add(this.gridControlPosted);
+            this.tabPosted.Controls.Add(this.splitPosted);
             this.tabPosted.Controls.Add(this.pnlPostedFilter);
         }
+
+        private DevExpress.XtraEditors.SplitContainerControl splitPosted;
         public void LoadData()
         {
             if (_dataLoaded) return;
@@ -354,6 +373,11 @@ namespace SalesInventorySystem.AccountingDevEx
                 varianceCol.DisplayFormat.FormatString = "n2";
                 varianceCol.OptionsColumn.AllowEdit = true;
             }
+
+            // ActualCost/Balance already arrive as DECIMAL from splist_Accounts
+            // (Purchase and Expense) but rendered unformatted -- CLAUDE.md
+            // numeric-column convention (row cells, not just a footer).
+            Classes.DevXGridViewSettings.FormatNumericColumns(gridViewInvoices, "ActualCost", "Balance");
 
             // Let a cleared Variance cell commit as null (instead of 0) so
             // GridViewInvoices_CellValueChanged can tell "cleared" apart from
