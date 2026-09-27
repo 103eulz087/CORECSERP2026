@@ -98,8 +98,8 @@
             this.gridControlConfirmedServices = new DevExpress.XtraGrid.GridControl();
             this.gridViewConfirmedServices = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.contextMenuStripForConfirmationProducts = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItemFinalizeCost = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStripForConfirmationServices = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStripApproved = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -156,9 +156,10 @@
             this.tabControlForApproval.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControlForApproval.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tabControlForApproval.Location = new System.Drawing.Point(0, 0);
+            this.tabControlForApproval.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.tabControlForApproval.Name = "tabControlForApproval";
             this.tabControlForApproval.SelectedIndex = 0;
-            this.tabControlForApproval.Size = new System.Drawing.Size(968, 516);
+            this.tabControlForApproval.Size = new System.Drawing.Size(1130, 635);
             this.tabControlForApproval.TabIndex = 1;
             this.tabControlForApproval.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
             // 
@@ -166,10 +167,11 @@
             // 
             this.forapproval.Controls.Add(this.gridControl2);
             this.forapproval.Controls.Add(this.groupBox3);
-            this.forapproval.Location = new System.Drawing.Point(4, 23);
+            this.forapproval.Location = new System.Drawing.Point(4, 27);
+            this.forapproval.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.forapproval.Name = "forapproval";
-            this.forapproval.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
-            this.forapproval.Size = new System.Drawing.Size(960, 489);
+            this.forapproval.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.forapproval.Size = new System.Drawing.Size(1122, 604);
             this.forapproval.TabIndex = 0;
             this.forapproval.Text = "Products";
             this.forapproval.UseVisualStyleBackColor = true;
@@ -177,10 +179,12 @@
             // gridControl2
             // 
             this.gridControl2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControl2.Location = new System.Drawing.Point(3, 53);
+            this.gridControl2.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gridControl2.Location = new System.Drawing.Point(4, 66);
             this.gridControl2.MainView = this.gridView2;
+            this.gridControl2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.gridControl2.Name = "gridControl2";
-            this.gridControl2.Size = new System.Drawing.Size(954, 433);
+            this.gridControl2.Size = new System.Drawing.Size(1114, 534);
             this.gridControl2.TabIndex = 5;
             this.gridControl2.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView2});
@@ -192,14 +196,13 @@
             this.gridView2.Appearance.HeaderPanel.Options.UseFont = true;
             this.gridView2.Appearance.Row.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.gridView2.Appearance.Row.Options.UseFont = true;
-            this.gridView2.DetailHeight = 182;
+            this.gridView2.DetailHeight = 224;
             this.gridView2.FixedLineWidth = 1;
             this.gridView2.GridControl = this.gridControl2;
             this.gridView2.LevelIndent = 0;
             this.gridView2.Name = "gridView2";
             this.gridView2.OptionsBehavior.Editable = false;
             this.gridView2.OptionsBehavior.ReadOnly = true;
-            this.gridView2.OptionsEditForm.PopupEditFormWidth = 686;
             this.gridView2.OptionsView.ColumnAutoWidth = false;
             this.gridView2.OptionsView.RowAutoHeight = true;
             this.gridView2.OptionsView.ShowGroupPanel = false;
@@ -216,9 +219,11 @@
             this.groupBox3.Controls.Add(this.label1);
             this.groupBox3.Dock = System.Windows.Forms.DockStyle.Top;
             this.groupBox3.Font = new System.Drawing.Font("Tahoma", 7.75F);
-            this.groupBox3.Location = new System.Drawing.Point(3, 3);
+            this.groupBox3.Location = new System.Drawing.Point(4, 4);
+            this.groupBox3.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(954, 50);
+            this.groupBox3.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox3.Size = new System.Drawing.Size(1114, 62);
             this.groupBox3.TabIndex = 6;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Filter Date";
@@ -227,9 +232,10 @@
             // 
             this.btnForApprovalProd.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnForApprovalProd.ImageOptions.Image")));
             this.btnForApprovalProd.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btnForApprovalProd.Location = new System.Drawing.Point(339, 17);
+            this.btnForApprovalProd.Location = new System.Drawing.Point(396, 21);
+            this.btnForApprovalProd.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnForApprovalProd.Name = "btnForApprovalProd";
-            this.btnForApprovalProd.Size = new System.Drawing.Size(86, 23);
+            this.btnForApprovalProd.Size = new System.Drawing.Size(100, 28);
             this.btnForApprovalProd.TabIndex = 7;
             this.btnForApprovalProd.Text = "Generate";
             this.btnForApprovalProd.Click += new System.EventHandler(this.btnForApprovalProd_Click);
@@ -238,27 +244,30 @@
             // 
             this.dateToForApprovalProd.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
             this.dateToForApprovalProd.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.dateToForApprovalProd.Location = new System.Drawing.Point(216, 17);
+            this.dateToForApprovalProd.Location = new System.Drawing.Point(252, 21);
+            this.dateToForApprovalProd.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.dateToForApprovalProd.Name = "dateToForApprovalProd";
-            this.dateToForApprovalProd.Size = new System.Drawing.Size(118, 23);
+            this.dateToForApprovalProd.Size = new System.Drawing.Size(137, 27);
             this.dateToForApprovalProd.TabIndex = 3;
             // 
             // datefromForApprovalProd
             // 
             this.datefromForApprovalProd.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
             this.datefromForApprovalProd.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.datefromForApprovalProd.Location = new System.Drawing.Point(58, 17);
+            this.datefromForApprovalProd.Location = new System.Drawing.Point(68, 21);
+            this.datefromForApprovalProd.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.datefromForApprovalProd.Name = "datefromForApprovalProd";
-            this.datefromForApprovalProd.Size = new System.Drawing.Size(118, 23);
+            this.datefromForApprovalProd.Size = new System.Drawing.Size(137, 27);
             this.datefromForApprovalProd.TabIndex = 2;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
-            this.label2.Location = new System.Drawing.Point(182, 22);
+            this.label2.Location = new System.Drawing.Point(212, 27);
+            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(27, 16);
+            this.label2.Size = new System.Drawing.Size(37, 21);
             this.label2.TabIndex = 1;
             this.label2.Text = "To:";
             // 
@@ -266,19 +275,21 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
-            this.label1.Location = new System.Drawing.Point(8, 22);
+            this.label1.Location = new System.Drawing.Point(9, 27);
+            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(43, 16);
+            this.label1.Size = new System.Drawing.Size(60, 21);
             this.label1.TabIndex = 0;
             this.label1.Text = "From:";
             // 
             // fordelivery
             // 
             this.fordelivery.Controls.Add(this.gridControl1);
-            this.fordelivery.Location = new System.Drawing.Point(4, 23);
+            this.fordelivery.Location = new System.Drawing.Point(4, 27);
+            this.fordelivery.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.fordelivery.Name = "fordelivery";
-            this.fordelivery.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
-            this.fordelivery.Size = new System.Drawing.Size(961, 489);
+            this.fordelivery.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.fordelivery.Size = new System.Drawing.Size(1121, 604);
             this.fordelivery.TabIndex = 1;
             this.fordelivery.Text = "Services";
             this.fordelivery.UseVisualStyleBackColor = true;
@@ -286,10 +297,12 @@
             // gridControl1
             // 
             this.gridControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControl1.Location = new System.Drawing.Point(3, 3);
+            this.gridControl1.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gridControl1.Location = new System.Drawing.Point(4, 4);
             this.gridControl1.MainView = this.gridView1;
+            this.gridControl1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.gridControl1.Name = "gridControl1";
-            this.gridControl1.Size = new System.Drawing.Size(955, 483);
+            this.gridControl1.Size = new System.Drawing.Size(1113, 596);
             this.gridControl1.TabIndex = 5;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1});
@@ -301,14 +314,13 @@
             this.gridView1.Appearance.HeaderPanel.Options.UseFont = true;
             this.gridView1.Appearance.Row.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.gridView1.Appearance.Row.Options.UseFont = true;
-            this.gridView1.DetailHeight = 182;
+            this.gridView1.DetailHeight = 224;
             this.gridView1.FixedLineWidth = 1;
             this.gridView1.GridControl = this.gridControl1;
             this.gridView1.LevelIndent = 0;
             this.gridView1.Name = "gridView1";
             this.gridView1.OptionsBehavior.Editable = false;
             this.gridView1.OptionsBehavior.ReadOnly = true;
-            this.gridView1.OptionsEditForm.PopupEditFormWidth = 686;
             this.gridView1.OptionsView.ColumnAutoWidth = false;
             this.gridView1.OptionsView.RowAutoHeight = true;
             this.gridView1.PreviewIndent = 0;
@@ -322,7 +334,7 @@
             this.printPOToolStripMenuItem,
             this.editPurchaseOrderToolStripMenuItem});
             this.contextMenuStripForApprovalProducts.Name = "contextMenuStrip1";
-            this.contextMenuStripForApprovalProducts.Size = new System.Drawing.Size(222, 70);
+            this.contextMenuStripForApprovalProducts.Size = new System.Drawing.Size(265, 76);
             // 
             // confirmOrderToolStripMenuItem
             // 
@@ -330,7 +342,7 @@
             this.fromLocalConnectionToolStripMenuItem,
             this.manualInventoryEntryToolStripMenuItem});
             this.confirmOrderToolStripMenuItem.Name = "confirmOrderToolStripMenuItem";
-            this.confirmOrderToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
+            this.confirmOrderToolStripMenuItem.Size = new System.Drawing.Size(264, 24);
             this.confirmOrderToolStripMenuItem.Text = "Received Inventory";
             this.confirmOrderToolStripMenuItem.Click += new System.EventHandler(this.confirmOrderToolStripMenuItem_Click);
             // 
@@ -340,42 +352,42 @@
             this.fromLocalConnectionToolStripMenuItem1,
             this.fromLiveConnectionToolStripMenuItem});
             this.fromLocalConnectionToolStripMenuItem.Name = "fromLocalConnectionToolStripMenuItem";
-            this.fromLocalConnectionToolStripMenuItem.Size = new System.Drawing.Size(197, 22);
+            this.fromLocalConnectionToolStripMenuItem.Size = new System.Drawing.Size(243, 26);
             this.fromLocalConnectionToolStripMenuItem.Text = "Upload";
             this.fromLocalConnectionToolStripMenuItem.Click += new System.EventHandler(this.fromLocalConnectionToolStripMenuItem_Click);
             // 
             // fromLocalConnectionToolStripMenuItem1
             // 
             this.fromLocalConnectionToolStripMenuItem1.Name = "fromLocalConnectionToolStripMenuItem1";
-            this.fromLocalConnectionToolStripMenuItem1.Size = new System.Drawing.Size(198, 22);
+            this.fromLocalConnectionToolStripMenuItem1.Size = new System.Drawing.Size(244, 26);
             this.fromLocalConnectionToolStripMenuItem1.Text = "From Local Connection";
             this.fromLocalConnectionToolStripMenuItem1.Click += new System.EventHandler(this.fromLocalConnectionToolStripMenuItem1_Click);
             // 
             // fromLiveConnectionToolStripMenuItem
             // 
             this.fromLiveConnectionToolStripMenuItem.Name = "fromLiveConnectionToolStripMenuItem";
-            this.fromLiveConnectionToolStripMenuItem.Size = new System.Drawing.Size(198, 22);
+            this.fromLiveConnectionToolStripMenuItem.Size = new System.Drawing.Size(244, 26);
             this.fromLiveConnectionToolStripMenuItem.Text = "From Live Connection";
             this.fromLiveConnectionToolStripMenuItem.Click += new System.EventHandler(this.fromLiveConnectionToolStripMenuItem_Click);
             // 
             // manualInventoryEntryToolStripMenuItem
             // 
             this.manualInventoryEntryToolStripMenuItem.Name = "manualInventoryEntryToolStripMenuItem";
-            this.manualInventoryEntryToolStripMenuItem.Size = new System.Drawing.Size(197, 22);
+            this.manualInventoryEntryToolStripMenuItem.Size = new System.Drawing.Size(243, 26);
             this.manualInventoryEntryToolStripMenuItem.Text = "Manual Inventory Entry";
             this.manualInventoryEntryToolStripMenuItem.Click += new System.EventHandler(this.manualInventoryEntryToolStripMenuItem_Click);
             // 
             // printPOToolStripMenuItem
             // 
             this.printPOToolStripMenuItem.Name = "printPOToolStripMenuItem";
-            this.printPOToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
+            this.printPOToolStripMenuItem.Size = new System.Drawing.Size(264, 24);
             this.printPOToolStripMenuItem.Text = "View Purchase Order Details";
             this.printPOToolStripMenuItem.Click += new System.EventHandler(this.printPOToolStripMenuItem_Click);
             // 
             // editPurchaseOrderToolStripMenuItem
             // 
             this.editPurchaseOrderToolStripMenuItem.Name = "editPurchaseOrderToolStripMenuItem";
-            this.editPurchaseOrderToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
+            this.editPurchaseOrderToolStripMenuItem.Size = new System.Drawing.Size(264, 24);
             this.editPurchaseOrderToolStripMenuItem.Text = "Edit Purchase Order";
             this.editPurchaseOrderToolStripMenuItem.Click += new System.EventHandler(this.editPurchaseOrderToolStripMenuItem_Click);
             // 
@@ -385,12 +397,12 @@
             this.contextMenuStripForApprovalServices.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripMenuItem1});
             this.contextMenuStripForApprovalServices.Name = "contextMenuStrip1";
-            this.contextMenuStripForApprovalServices.Size = new System.Drawing.Size(183, 26);
+            this.contextMenuStripForApprovalServices.Size = new System.Drawing.Size(218, 28);
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(182, 22);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(217, 24);
             this.toolStripMenuItem1.Text = "View Services Details";
             this.toolStripMenuItem1.Click += new System.EventHandler(this.toolStripMenuItem1_Click);
             // 
@@ -402,9 +414,10 @@
             this.xtraTabControl1.AppearancePage.Header.Options.UseImage = true;
             this.xtraTabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.xtraTabControl1.Location = new System.Drawing.Point(0, 0);
+            this.xtraTabControl1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.xtraTabControl1.Name = "xtraTabControl1";
             this.xtraTabControl1.SelectedTabPage = this.xtraTabPageForApproval;
-            this.xtraTabControl1.Size = new System.Drawing.Size(970, 542);
+            this.xtraTabControl1.Size = new System.Drawing.Size(1132, 667);
             this.xtraTabControl1.TabIndex = 2;
             this.xtraTabControl1.TabPages.AddRange(new DevExpress.XtraTab.XtraTabPage[] {
             this.xtraTabPageForApproval,
@@ -416,15 +429,17 @@
             // xtraTabPageForApproval
             // 
             this.xtraTabPageForApproval.Controls.Add(this.tabControlForApproval);
+            this.xtraTabPageForApproval.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.xtraTabPageForApproval.Name = "xtraTabPageForApproval";
-            this.xtraTabPageForApproval.Size = new System.Drawing.Size(968, 516);
+            this.xtraTabPageForApproval.Size = new System.Drawing.Size(1130, 635);
             this.xtraTabPageForApproval.Text = "FOR APPROVAL";
             // 
             // xtraTabPageApproved
             // 
             this.xtraTabPageApproved.Controls.Add(this.tabControlApproved);
+            this.xtraTabPageApproved.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.xtraTabPageApproved.Name = "xtraTabPageApproved";
-            this.xtraTabPageApproved.Size = new System.Drawing.Size(968, 516);
+            this.xtraTabPageApproved.Size = new System.Drawing.Size(1130, 635);
             this.xtraTabPageApproved.Text = "APPROVED";
             // 
             // tabControlApproved
@@ -434,9 +449,10 @@
             this.tabControlApproved.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControlApproved.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tabControlApproved.Location = new System.Drawing.Point(0, 0);
+            this.tabControlApproved.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.tabControlApproved.Name = "tabControlApproved";
             this.tabControlApproved.SelectedIndex = 0;
-            this.tabControlApproved.Size = new System.Drawing.Size(968, 516);
+            this.tabControlApproved.Size = new System.Drawing.Size(1130, 635);
             this.tabControlApproved.TabIndex = 3;
             this.tabControlApproved.SelectedIndexChanged += new System.EventHandler(this.tabControlApproved_SelectedIndexChanged);
             // 
@@ -444,10 +460,11 @@
             // 
             this.tabPage1.Controls.Add(this.gridControl3);
             this.tabPage1.Controls.Add(this.groupBox1);
-            this.tabPage1.Location = new System.Drawing.Point(4, 23);
+            this.tabPage1.Location = new System.Drawing.Point(4, 27);
+            this.tabPage1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
-            this.tabPage1.Size = new System.Drawing.Size(960, 489);
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPage1.Size = new System.Drawing.Size(1122, 604);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Products";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -455,10 +472,12 @@
             // gridControl3
             // 
             this.gridControl3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControl3.Location = new System.Drawing.Point(3, 53);
+            this.gridControl3.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gridControl3.Location = new System.Drawing.Point(4, 66);
             this.gridControl3.MainView = this.gridView3;
+            this.gridControl3.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.gridControl3.Name = "gridControl3";
-            this.gridControl3.Size = new System.Drawing.Size(954, 433);
+            this.gridControl3.Size = new System.Drawing.Size(1114, 534);
             this.gridControl3.TabIndex = 5;
             this.gridControl3.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView3});
@@ -470,14 +489,13 @@
             this.gridView3.Appearance.HeaderPanel.Options.UseFont = true;
             this.gridView3.Appearance.Row.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.gridView3.Appearance.Row.Options.UseFont = true;
-            this.gridView3.DetailHeight = 182;
+            this.gridView3.DetailHeight = 224;
             this.gridView3.FixedLineWidth = 1;
             this.gridView3.GridControl = this.gridControl3;
             this.gridView3.LevelIndent = 0;
             this.gridView3.Name = "gridView3";
             this.gridView3.OptionsBehavior.Editable = false;
             this.gridView3.OptionsBehavior.ReadOnly = true;
-            this.gridView3.OptionsEditForm.PopupEditFormWidth = 686;
             this.gridView3.OptionsView.ColumnAutoWidth = false;
             this.gridView3.OptionsView.RowAutoHeight = true;
             this.gridView3.OptionsView.ShowGroupPanel = false;
@@ -495,9 +513,11 @@
             this.groupBox1.Controls.Add(this.label4);
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Top;
             this.groupBox1.Font = new System.Drawing.Font("Tahoma", 7.75F);
-            this.groupBox1.Location = new System.Drawing.Point(3, 3);
+            this.groupBox1.Location = new System.Drawing.Point(4, 4);
+            this.groupBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(954, 50);
+            this.groupBox1.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox1.Size = new System.Drawing.Size(1114, 62);
             this.groupBox1.TabIndex = 7;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Filter Date";
@@ -506,9 +526,10 @@
             // 
             this.btnApprovedProd.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnApprovedProd.ImageOptions.Image")));
             this.btnApprovedProd.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btnApprovedProd.Location = new System.Drawing.Point(339, 17);
+            this.btnApprovedProd.Location = new System.Drawing.Point(396, 21);
+            this.btnApprovedProd.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnApprovedProd.Name = "btnApprovedProd";
-            this.btnApprovedProd.Size = new System.Drawing.Size(86, 23);
+            this.btnApprovedProd.Size = new System.Drawing.Size(100, 28);
             this.btnApprovedProd.TabIndex = 7;
             this.btnApprovedProd.Text = "Generate";
             this.btnApprovedProd.Click += new System.EventHandler(this.btnApprovedProd_Click);
@@ -517,27 +538,30 @@
             // 
             this.dateToApprovedProd.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
             this.dateToApprovedProd.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.dateToApprovedProd.Location = new System.Drawing.Point(216, 17);
+            this.dateToApprovedProd.Location = new System.Drawing.Point(252, 21);
+            this.dateToApprovedProd.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.dateToApprovedProd.Name = "dateToApprovedProd";
-            this.dateToApprovedProd.Size = new System.Drawing.Size(118, 23);
+            this.dateToApprovedProd.Size = new System.Drawing.Size(137, 27);
             this.dateToApprovedProd.TabIndex = 3;
             // 
             // dateFromApprovedProd
             // 
             this.dateFromApprovedProd.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
             this.dateFromApprovedProd.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.dateFromApprovedProd.Location = new System.Drawing.Point(58, 17);
+            this.dateFromApprovedProd.Location = new System.Drawing.Point(68, 21);
+            this.dateFromApprovedProd.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.dateFromApprovedProd.Name = "dateFromApprovedProd";
-            this.dateFromApprovedProd.Size = new System.Drawing.Size(118, 23);
+            this.dateFromApprovedProd.Size = new System.Drawing.Size(137, 27);
             this.dateFromApprovedProd.TabIndex = 2;
             // 
             // label3
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
-            this.label3.Location = new System.Drawing.Point(182, 22);
+            this.label3.Location = new System.Drawing.Point(212, 27);
+            this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(27, 16);
+            this.label3.Size = new System.Drawing.Size(37, 21);
             this.label3.TabIndex = 1;
             this.label3.Text = "To:";
             // 
@@ -545,19 +569,21 @@
             // 
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
-            this.label4.Location = new System.Drawing.Point(8, 22);
+            this.label4.Location = new System.Drawing.Point(9, 27);
+            this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(43, 16);
+            this.label4.Size = new System.Drawing.Size(60, 21);
             this.label4.TabIndex = 0;
             this.label4.Text = "From:";
             // 
             // tabPage2
             // 
             this.tabPage2.Controls.Add(this.gridControl4);
-            this.tabPage2.Location = new System.Drawing.Point(4, 23);
+            this.tabPage2.Location = new System.Drawing.Point(4, 27);
+            this.tabPage2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
-            this.tabPage2.Size = new System.Drawing.Size(960, 489);
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPage2.Size = new System.Drawing.Size(1122, 604);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Services";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -565,10 +591,12 @@
             // gridControl4
             // 
             this.gridControl4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControl4.Location = new System.Drawing.Point(3, 3);
+            this.gridControl4.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gridControl4.Location = new System.Drawing.Point(4, 4);
             this.gridControl4.MainView = this.gridView4;
+            this.gridControl4.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.gridControl4.Name = "gridControl4";
-            this.gridControl4.Size = new System.Drawing.Size(954, 483);
+            this.gridControl4.Size = new System.Drawing.Size(1114, 596);
             this.gridControl4.TabIndex = 5;
             this.gridControl4.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView4});
@@ -579,14 +607,13 @@
             this.gridView4.Appearance.HeaderPanel.Options.UseFont = true;
             this.gridView4.Appearance.Row.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.gridView4.Appearance.Row.Options.UseFont = true;
-            this.gridView4.DetailHeight = 182;
+            this.gridView4.DetailHeight = 224;
             this.gridView4.FixedLineWidth = 1;
             this.gridView4.GridControl = this.gridControl4;
             this.gridView4.LevelIndent = 0;
             this.gridView4.Name = "gridView4";
             this.gridView4.OptionsBehavior.Editable = false;
             this.gridView4.OptionsBehavior.ReadOnly = true;
-            this.gridView4.OptionsEditForm.PopupEditFormWidth = 686;
             this.gridView4.OptionsView.ColumnAutoWidth = false;
             this.gridView4.OptionsView.RowAutoHeight = true;
             this.gridView4.PreviewIndent = 0;
@@ -594,9 +621,9 @@
             // xtraTabPageForConfirmation
             // 
             this.xtraTabPageForConfirmation.Controls.Add(this.tabControlForConfirmation);
-            this.xtraTabPageForConfirmation.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.xtraTabPageForConfirmation.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.xtraTabPageForConfirmation.Name = "xtraTabPageForConfirmation";
-            this.xtraTabPageForConfirmation.Size = new System.Drawing.Size(968, 516);
+            this.xtraTabPageForConfirmation.Size = new System.Drawing.Size(1130, 635);
             this.xtraTabPageForConfirmation.Text = "FOR CONFIRMATION";
             // 
             // tabControlForConfirmation
@@ -606,9 +633,10 @@
             this.tabControlForConfirmation.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControlForConfirmation.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tabControlForConfirmation.Location = new System.Drawing.Point(0, 0);
+            this.tabControlForConfirmation.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.tabControlForConfirmation.Name = "tabControlForConfirmation";
             this.tabControlForConfirmation.SelectedIndex = 0;
-            this.tabControlForConfirmation.Size = new System.Drawing.Size(968, 516);
+            this.tabControlForConfirmation.Size = new System.Drawing.Size(1413, 794);
             this.tabControlForConfirmation.TabIndex = 2;
             this.tabControlForConfirmation.SelectedIndexChanged += new System.EventHandler(this.tabControlForConfirmation_SelectedIndexChanged);
             // 
@@ -616,10 +644,11 @@
             // 
             this.tabPageForConfirmationProducts.Controls.Add(this.gridControlProductForConfirmation);
             this.tabPageForConfirmationProducts.Controls.Add(this.groupBox2);
-            this.tabPageForConfirmationProducts.Location = new System.Drawing.Point(4, 23);
+            this.tabPageForConfirmationProducts.Location = new System.Drawing.Point(4, 27);
+            this.tabPageForConfirmationProducts.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.tabPageForConfirmationProducts.Name = "tabPageForConfirmationProducts";
-            this.tabPageForConfirmationProducts.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
-            this.tabPageForConfirmationProducts.Size = new System.Drawing.Size(960, 489);
+            this.tabPageForConfirmationProducts.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPageForConfirmationProducts.Size = new System.Drawing.Size(1405, 763);
             this.tabPageForConfirmationProducts.TabIndex = 0;
             this.tabPageForConfirmationProducts.Text = "Products";
             this.tabPageForConfirmationProducts.UseVisualStyleBackColor = true;
@@ -627,10 +656,12 @@
             // gridControlProductForConfirmation
             // 
             this.gridControlProductForConfirmation.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControlProductForConfirmation.Location = new System.Drawing.Point(3, 53);
+            this.gridControlProductForConfirmation.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gridControlProductForConfirmation.Location = new System.Drawing.Point(4, 66);
             this.gridControlProductForConfirmation.MainView = this.gridViewProductForConfirmation;
+            this.gridControlProductForConfirmation.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.gridControlProductForConfirmation.Name = "gridControlProductForConfirmation";
-            this.gridControlProductForConfirmation.Size = new System.Drawing.Size(954, 433);
+            this.gridControlProductForConfirmation.Size = new System.Drawing.Size(1397, 693);
             this.gridControlProductForConfirmation.TabIndex = 5;
             this.gridControlProductForConfirmation.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewProductForConfirmation});
@@ -642,14 +673,13 @@
             this.gridViewProductForConfirmation.Appearance.HeaderPanel.Options.UseFont = true;
             this.gridViewProductForConfirmation.Appearance.Row.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.gridViewProductForConfirmation.Appearance.Row.Options.UseFont = true;
-            this.gridViewProductForConfirmation.DetailHeight = 182;
+            this.gridViewProductForConfirmation.DetailHeight = 224;
             this.gridViewProductForConfirmation.FixedLineWidth = 1;
             this.gridViewProductForConfirmation.GridControl = this.gridControlProductForConfirmation;
             this.gridViewProductForConfirmation.LevelIndent = 0;
             this.gridViewProductForConfirmation.Name = "gridViewProductForConfirmation";
             this.gridViewProductForConfirmation.OptionsBehavior.Editable = false;
             this.gridViewProductForConfirmation.OptionsBehavior.ReadOnly = true;
-            this.gridViewProductForConfirmation.OptionsEditForm.PopupEditFormWidth = 686;
             this.gridViewProductForConfirmation.OptionsView.ColumnAutoWidth = false;
             this.gridViewProductForConfirmation.OptionsView.RowAutoHeight = true;
             this.gridViewProductForConfirmation.OptionsView.ShowGroupPanel = false;
@@ -665,9 +695,11 @@
             this.groupBox2.Controls.Add(this.label6);
             this.groupBox2.Dock = System.Windows.Forms.DockStyle.Top;
             this.groupBox2.Font = new System.Drawing.Font("Tahoma", 7.75F);
-            this.groupBox2.Location = new System.Drawing.Point(3, 3);
+            this.groupBox2.Location = new System.Drawing.Point(4, 4);
+            this.groupBox2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(954, 50);
+            this.groupBox2.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox2.Size = new System.Drawing.Size(1397, 62);
             this.groupBox2.TabIndex = 7;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Filter Date";
@@ -676,9 +708,10 @@
             // 
             this.btnForConfirmProd.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnForConfirmProd.ImageOptions.Image")));
             this.btnForConfirmProd.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btnForConfirmProd.Location = new System.Drawing.Point(339, 17);
+            this.btnForConfirmProd.Location = new System.Drawing.Point(396, 21);
+            this.btnForConfirmProd.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnForConfirmProd.Name = "btnForConfirmProd";
-            this.btnForConfirmProd.Size = new System.Drawing.Size(86, 23);
+            this.btnForConfirmProd.Size = new System.Drawing.Size(100, 28);
             this.btnForConfirmProd.TabIndex = 7;
             this.btnForConfirmProd.Text = "Generate";
             this.btnForConfirmProd.Click += new System.EventHandler(this.btnForConfirmProd_Click);
@@ -687,27 +720,30 @@
             // 
             this.dateToForConfirmProd.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
             this.dateToForConfirmProd.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.dateToForConfirmProd.Location = new System.Drawing.Point(216, 17);
+            this.dateToForConfirmProd.Location = new System.Drawing.Point(252, 21);
+            this.dateToForConfirmProd.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.dateToForConfirmProd.Name = "dateToForConfirmProd";
-            this.dateToForConfirmProd.Size = new System.Drawing.Size(118, 23);
+            this.dateToForConfirmProd.Size = new System.Drawing.Size(137, 27);
             this.dateToForConfirmProd.TabIndex = 3;
             // 
             // dateFromForConfirmProd
             // 
             this.dateFromForConfirmProd.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
             this.dateFromForConfirmProd.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.dateFromForConfirmProd.Location = new System.Drawing.Point(58, 17);
+            this.dateFromForConfirmProd.Location = new System.Drawing.Point(68, 21);
+            this.dateFromForConfirmProd.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.dateFromForConfirmProd.Name = "dateFromForConfirmProd";
-            this.dateFromForConfirmProd.Size = new System.Drawing.Size(118, 23);
+            this.dateFromForConfirmProd.Size = new System.Drawing.Size(137, 27);
             this.dateFromForConfirmProd.TabIndex = 2;
             // 
             // label5
             // 
             this.label5.AutoSize = true;
             this.label5.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
-            this.label5.Location = new System.Drawing.Point(182, 22);
+            this.label5.Location = new System.Drawing.Point(212, 27);
+            this.label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(27, 16);
+            this.label5.Size = new System.Drawing.Size(37, 21);
             this.label5.TabIndex = 1;
             this.label5.Text = "To:";
             // 
@@ -715,19 +751,21 @@
             // 
             this.label6.AutoSize = true;
             this.label6.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
-            this.label6.Location = new System.Drawing.Point(8, 22);
+            this.label6.Location = new System.Drawing.Point(9, 27);
+            this.label6.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(43, 16);
+            this.label6.Size = new System.Drawing.Size(60, 21);
             this.label6.TabIndex = 0;
             this.label6.Text = "From:";
             // 
             // tabPageForConfirmationServices
             // 
             this.tabPageForConfirmationServices.Controls.Add(this.gridControlServicesForConfirmation);
-            this.tabPageForConfirmationServices.Location = new System.Drawing.Point(4, 23);
+            this.tabPageForConfirmationServices.Location = new System.Drawing.Point(4, 27);
+            this.tabPageForConfirmationServices.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.tabPageForConfirmationServices.Name = "tabPageForConfirmationServices";
-            this.tabPageForConfirmationServices.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
-            this.tabPageForConfirmationServices.Size = new System.Drawing.Size(960, 489);
+            this.tabPageForConfirmationServices.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPageForConfirmationServices.Size = new System.Drawing.Size(1122, 604);
             this.tabPageForConfirmationServices.TabIndex = 1;
             this.tabPageForConfirmationServices.Text = "Services";
             this.tabPageForConfirmationServices.UseVisualStyleBackColor = true;
@@ -735,10 +773,12 @@
             // gridControlServicesForConfirmation
             // 
             this.gridControlServicesForConfirmation.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControlServicesForConfirmation.Location = new System.Drawing.Point(3, 3);
+            this.gridControlServicesForConfirmation.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gridControlServicesForConfirmation.Location = new System.Drawing.Point(4, 4);
             this.gridControlServicesForConfirmation.MainView = this.gridViewServicesForConfirmation;
+            this.gridControlServicesForConfirmation.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.gridControlServicesForConfirmation.Name = "gridControlServicesForConfirmation";
-            this.gridControlServicesForConfirmation.Size = new System.Drawing.Size(954, 483);
+            this.gridControlServicesForConfirmation.Size = new System.Drawing.Size(1114, 596);
             this.gridControlServicesForConfirmation.TabIndex = 5;
             this.gridControlServicesForConfirmation.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewServicesForConfirmation});
@@ -750,14 +790,13 @@
             this.gridViewServicesForConfirmation.Appearance.HeaderPanel.Options.UseFont = true;
             this.gridViewServicesForConfirmation.Appearance.Row.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.gridViewServicesForConfirmation.Appearance.Row.Options.UseFont = true;
-            this.gridViewServicesForConfirmation.DetailHeight = 182;
+            this.gridViewServicesForConfirmation.DetailHeight = 224;
             this.gridViewServicesForConfirmation.FixedLineWidth = 1;
             this.gridViewServicesForConfirmation.GridControl = this.gridControlServicesForConfirmation;
             this.gridViewServicesForConfirmation.LevelIndent = 0;
             this.gridViewServicesForConfirmation.Name = "gridViewServicesForConfirmation";
             this.gridViewServicesForConfirmation.OptionsBehavior.Editable = false;
             this.gridViewServicesForConfirmation.OptionsBehavior.ReadOnly = true;
-            this.gridViewServicesForConfirmation.OptionsEditForm.PopupEditFormWidth = 686;
             this.gridViewServicesForConfirmation.OptionsView.ColumnAutoWidth = false;
             this.gridViewServicesForConfirmation.OptionsView.RowAutoHeight = true;
             this.gridViewServicesForConfirmation.PreviewIndent = 0;
@@ -765,9 +804,9 @@
             // xtraTabPageConfirmed
             // 
             this.xtraTabPageConfirmed.Controls.Add(this.tabControlConfirmed);
-            this.xtraTabPageConfirmed.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.xtraTabPageConfirmed.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.xtraTabPageConfirmed.Name = "xtraTabPageConfirmed";
-            this.xtraTabPageConfirmed.Size = new System.Drawing.Size(968, 516);
+            this.xtraTabPageConfirmed.Size = new System.Drawing.Size(1130, 635);
             this.xtraTabPageConfirmed.Text = "CONFIRMED";
             // 
             // tabControlConfirmed
@@ -777,9 +816,10 @@
             this.tabControlConfirmed.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControlConfirmed.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tabControlConfirmed.Location = new System.Drawing.Point(0, 0);
+            this.tabControlConfirmed.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.tabControlConfirmed.Name = "tabControlConfirmed";
             this.tabControlConfirmed.SelectedIndex = 0;
-            this.tabControlConfirmed.Size = new System.Drawing.Size(968, 516);
+            this.tabControlConfirmed.Size = new System.Drawing.Size(1130, 635);
             this.tabControlConfirmed.TabIndex = 2;
             this.tabControlConfirmed.SelectedIndexChanged += new System.EventHandler(this.tabControlConfirmed_SelectedIndexChanged);
             // 
@@ -787,10 +827,11 @@
             // 
             this.tabPageConfirmedProducts.Controls.Add(this.gridControlConfirmedProducts);
             this.tabPageConfirmedProducts.Controls.Add(this.groupBox4);
-            this.tabPageConfirmedProducts.Location = new System.Drawing.Point(4, 23);
+            this.tabPageConfirmedProducts.Location = new System.Drawing.Point(4, 27);
+            this.tabPageConfirmedProducts.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.tabPageConfirmedProducts.Name = "tabPageConfirmedProducts";
-            this.tabPageConfirmedProducts.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
-            this.tabPageConfirmedProducts.Size = new System.Drawing.Size(960, 489);
+            this.tabPageConfirmedProducts.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPageConfirmedProducts.Size = new System.Drawing.Size(1122, 604);
             this.tabPageConfirmedProducts.TabIndex = 0;
             this.tabPageConfirmedProducts.Text = "Products";
             this.tabPageConfirmedProducts.UseVisualStyleBackColor = true;
@@ -798,10 +839,12 @@
             // gridControlConfirmedProducts
             // 
             this.gridControlConfirmedProducts.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControlConfirmedProducts.Location = new System.Drawing.Point(3, 53);
+            this.gridControlConfirmedProducts.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gridControlConfirmedProducts.Location = new System.Drawing.Point(4, 66);
             this.gridControlConfirmedProducts.MainView = this.gridViewConfirmedProducts;
+            this.gridControlConfirmedProducts.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.gridControlConfirmedProducts.Name = "gridControlConfirmedProducts";
-            this.gridControlConfirmedProducts.Size = new System.Drawing.Size(954, 433);
+            this.gridControlConfirmedProducts.Size = new System.Drawing.Size(1114, 534);
             this.gridControlConfirmedProducts.TabIndex = 5;
             this.gridControlConfirmedProducts.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewConfirmedProducts});
@@ -812,14 +855,13 @@
             this.gridViewConfirmedProducts.Appearance.HeaderPanel.Options.UseFont = true;
             this.gridViewConfirmedProducts.Appearance.Row.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.gridViewConfirmedProducts.Appearance.Row.Options.UseFont = true;
-            this.gridViewConfirmedProducts.DetailHeight = 182;
+            this.gridViewConfirmedProducts.DetailHeight = 224;
             this.gridViewConfirmedProducts.FixedLineWidth = 1;
             this.gridViewConfirmedProducts.GridControl = this.gridControlConfirmedProducts;
             this.gridViewConfirmedProducts.LevelIndent = 0;
             this.gridViewConfirmedProducts.Name = "gridViewConfirmedProducts";
             this.gridViewConfirmedProducts.OptionsBehavior.Editable = false;
             this.gridViewConfirmedProducts.OptionsBehavior.ReadOnly = true;
-            this.gridViewConfirmedProducts.OptionsEditForm.PopupEditFormWidth = 686;
             this.gridViewConfirmedProducts.OptionsView.ColumnAutoWidth = false;
             this.gridViewConfirmedProducts.OptionsView.RowAutoHeight = true;
             this.gridViewConfirmedProducts.OptionsView.ShowGroupPanel = false;
@@ -835,9 +877,11 @@
             this.groupBox4.Controls.Add(this.label8);
             this.groupBox4.Dock = System.Windows.Forms.DockStyle.Top;
             this.groupBox4.Font = new System.Drawing.Font("Tahoma", 7.75F);
-            this.groupBox4.Location = new System.Drawing.Point(3, 3);
+            this.groupBox4.Location = new System.Drawing.Point(4, 4);
+            this.groupBox4.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(954, 50);
+            this.groupBox4.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox4.Size = new System.Drawing.Size(1114, 62);
             this.groupBox4.TabIndex = 7;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Filter Date";
@@ -846,9 +890,10 @@
             // 
             this.btnConfirmedProd.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnConfirmedProd.ImageOptions.Image")));
             this.btnConfirmedProd.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btnConfirmedProd.Location = new System.Drawing.Point(339, 17);
+            this.btnConfirmedProd.Location = new System.Drawing.Point(396, 21);
+            this.btnConfirmedProd.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnConfirmedProd.Name = "btnConfirmedProd";
-            this.btnConfirmedProd.Size = new System.Drawing.Size(86, 23);
+            this.btnConfirmedProd.Size = new System.Drawing.Size(100, 28);
             this.btnConfirmedProd.TabIndex = 7;
             this.btnConfirmedProd.Text = "Generate";
             this.btnConfirmedProd.Click += new System.EventHandler(this.btnConfirmedProd_Click);
@@ -857,27 +902,30 @@
             // 
             this.dateToConfirmedProd.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
             this.dateToConfirmedProd.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.dateToConfirmedProd.Location = new System.Drawing.Point(216, 17);
+            this.dateToConfirmedProd.Location = new System.Drawing.Point(252, 21);
+            this.dateToConfirmedProd.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.dateToConfirmedProd.Name = "dateToConfirmedProd";
-            this.dateToConfirmedProd.Size = new System.Drawing.Size(118, 23);
+            this.dateToConfirmedProd.Size = new System.Drawing.Size(137, 27);
             this.dateToConfirmedProd.TabIndex = 3;
             // 
             // dateFromConfirmedProd
             // 
             this.dateFromConfirmedProd.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
             this.dateFromConfirmedProd.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.dateFromConfirmedProd.Location = new System.Drawing.Point(58, 17);
+            this.dateFromConfirmedProd.Location = new System.Drawing.Point(68, 21);
+            this.dateFromConfirmedProd.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.dateFromConfirmedProd.Name = "dateFromConfirmedProd";
-            this.dateFromConfirmedProd.Size = new System.Drawing.Size(118, 23);
+            this.dateFromConfirmedProd.Size = new System.Drawing.Size(137, 27);
             this.dateFromConfirmedProd.TabIndex = 2;
             // 
             // label7
             // 
             this.label7.AutoSize = true;
             this.label7.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
-            this.label7.Location = new System.Drawing.Point(182, 22);
+            this.label7.Location = new System.Drawing.Point(212, 27);
+            this.label7.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(27, 16);
+            this.label7.Size = new System.Drawing.Size(37, 21);
             this.label7.TabIndex = 1;
             this.label7.Text = "To:";
             // 
@@ -885,19 +933,21 @@
             // 
             this.label8.AutoSize = true;
             this.label8.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
-            this.label8.Location = new System.Drawing.Point(8, 22);
+            this.label8.Location = new System.Drawing.Point(9, 27);
+            this.label8.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(43, 16);
+            this.label8.Size = new System.Drawing.Size(60, 21);
             this.label8.TabIndex = 0;
             this.label8.Text = "From:";
             // 
             // tabPageConfirmedServices
             // 
             this.tabPageConfirmedServices.Controls.Add(this.gridControlConfirmedServices);
-            this.tabPageConfirmedServices.Location = new System.Drawing.Point(4, 23);
+            this.tabPageConfirmedServices.Location = new System.Drawing.Point(4, 27);
+            this.tabPageConfirmedServices.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.tabPageConfirmedServices.Name = "tabPageConfirmedServices";
-            this.tabPageConfirmedServices.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
-            this.tabPageConfirmedServices.Size = new System.Drawing.Size(960, 489);
+            this.tabPageConfirmedServices.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPageConfirmedServices.Size = new System.Drawing.Size(1122, 604);
             this.tabPageConfirmedServices.TabIndex = 1;
             this.tabPageConfirmedServices.Text = "Services";
             this.tabPageConfirmedServices.UseVisualStyleBackColor = true;
@@ -905,10 +955,12 @@
             // gridControlConfirmedServices
             // 
             this.gridControlConfirmedServices.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControlConfirmedServices.Location = new System.Drawing.Point(3, 3);
+            this.gridControlConfirmedServices.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gridControlConfirmedServices.Location = new System.Drawing.Point(4, 4);
             this.gridControlConfirmedServices.MainView = this.gridViewConfirmedServices;
+            this.gridControlConfirmedServices.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.gridControlConfirmedServices.Name = "gridControlConfirmedServices";
-            this.gridControlConfirmedServices.Size = new System.Drawing.Size(954, 483);
+            this.gridControlConfirmedServices.Size = new System.Drawing.Size(1114, 596);
             this.gridControlConfirmedServices.TabIndex = 5;
             this.gridControlConfirmedServices.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewConfirmedServices});
@@ -919,14 +971,13 @@
             this.gridViewConfirmedServices.Appearance.HeaderPanel.Options.UseFont = true;
             this.gridViewConfirmedServices.Appearance.Row.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.gridViewConfirmedServices.Appearance.Row.Options.UseFont = true;
-            this.gridViewConfirmedServices.DetailHeight = 182;
+            this.gridViewConfirmedServices.DetailHeight = 224;
             this.gridViewConfirmedServices.FixedLineWidth = 1;
             this.gridViewConfirmedServices.GridControl = this.gridControlConfirmedServices;
             this.gridViewConfirmedServices.LevelIndent = 0;
             this.gridViewConfirmedServices.Name = "gridViewConfirmedServices";
             this.gridViewConfirmedServices.OptionsBehavior.Editable = false;
             this.gridViewConfirmedServices.OptionsBehavior.ReadOnly = true;
-            this.gridViewConfirmedServices.OptionsEditForm.PopupEditFormWidth = 686;
             this.gridViewConfirmedServices.OptionsView.ColumnAutoWidth = false;
             this.gridViewConfirmedServices.OptionsView.RowAutoHeight = true;
             this.gridViewConfirmedServices.PreviewIndent = 0;
@@ -938,19 +989,19 @@
             this.toolStripMenuItemFinalizeCost,
             this.toolStripMenuItem2});
             this.contextMenuStripForConfirmationProducts.Name = "contextMenuStrip1";
-            this.contextMenuStripForConfirmationProducts.Size = new System.Drawing.Size(220, 48);
-            //
+            this.contextMenuStripForConfirmationProducts.Size = new System.Drawing.Size(248, 52);
+            // 
             // toolStripMenuItemFinalizeCost
-            //
+            // 
             this.toolStripMenuItemFinalizeCost.Name = "toolStripMenuItemFinalizeCost";
-            this.toolStripMenuItemFinalizeCost.Size = new System.Drawing.Size(219, 22);
+            this.toolStripMenuItemFinalizeCost.Size = new System.Drawing.Size(247, 24);
             this.toolStripMenuItemFinalizeCost.Text = "Confirm and Finalize Cost";
             this.toolStripMenuItemFinalizeCost.Click += new System.EventHandler(this.toolStripMenuItemFinalizeCost_Click);
-            //
+            // 
             // toolStripMenuItem2
-            //
+            // 
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(219, 22);
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(247, 24);
             this.toolStripMenuItem2.Text = "Confirm Order";
             this.toolStripMenuItem2.Click += new System.EventHandler(this.toolStripMenuItem2_Click);
             // 
@@ -960,12 +1011,12 @@
             this.contextMenuStripForConfirmationServices.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripMenuItem3});
             this.contextMenuStripForConfirmationServices.Name = "contextMenuStrip1";
-            this.contextMenuStripForConfirmationServices.Size = new System.Drawing.Size(164, 26);
+            this.contextMenuStripForConfirmationServices.Size = new System.Drawing.Size(189, 28);
             // 
             // toolStripMenuItem3
             // 
             this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-            this.toolStripMenuItem3.Size = new System.Drawing.Size(163, 22);
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(188, 24);
             this.toolStripMenuItem3.Text = "Confirm Services";
             this.toolStripMenuItem3.Click += new System.EventHandler(this.toolStripMenuItem3_Click);
             // 
@@ -975,22 +1026,22 @@
             this.contextMenuStripApproved.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripMenuItem9});
             this.contextMenuStripApproved.Name = "contextMenuStrip1";
-            this.contextMenuStripApproved.Size = new System.Drawing.Size(222, 26);
+            this.contextMenuStripApproved.Size = new System.Drawing.Size(265, 28);
             // 
             // toolStripMenuItem9
             // 
             this.toolStripMenuItem9.Name = "toolStripMenuItem9";
-            this.toolStripMenuItem9.Size = new System.Drawing.Size(221, 22);
+            this.toolStripMenuItem9.Size = new System.Drawing.Size(264, 24);
             this.toolStripMenuItem9.Text = "View Purchase Order Details";
             this.toolStripMenuItem9.Click += new System.EventHandler(this.toolStripMenuItem9_Click);
             // 
             // VIEWPO
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(970, 542);
+            this.ClientSize = new System.Drawing.Size(1132, 667);
             this.Controls.Add(this.xtraTabControl1);
-            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.Name = "VIEWPO";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "View Purchase Order";

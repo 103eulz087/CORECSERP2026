@@ -29,6 +29,10 @@ Status checked 2026-09-25 by probing each script's actual feature in each databa
 | 8 | `2026-09-25d_ExpenseManualMultiBranch_PreserveLineOrder.sql` | ✅ | ⏳ ship with the new exe |
 | 9 | `2026-09-25e_ManualJV_PreserveLineOrder.sql` | ✅ | ⏳ ship with the new exe |
 | 10 | `2026-09-25f_IncomeStatementPivot_HeadOfficeFirst.sql` | ✅ | ⏳ |
+| 11 | `2026-09-26_ItemCostingRecon_ExpenseTickets.sql` | ✅ (by user, 14:24) | ✅ (by user, 14:56) |
+
+- 2026-09-26: the live `sp_rpt_ItemCostingRecon_List` on both DBs was changed by the user (14:13 DEV / 14:18 STAGING): `BranchCode` → `BranchName` via `INNER JOIN dbo.Branches`. The repo copy in script 6 (`2026-09-24b`) still has `BranchCode`.
+- Web reporting handoff for the recon: `docs/handoff/2026-09-26_ItemCostingRecon_WebReporting_Handoff.md`.
 
 - Earlier testing and deploys this session went to `CORECSERP_002_DEV`, the old DEV.
 - COREX001 already had all 10 scripts when checked, and STAGING had 1–7; it's unclear who or what applied them.
@@ -91,6 +95,9 @@ balance is wrong. Modeled on the AR version (`ClientPaymentsDevExAcctg.cs`, acco
   - New SP `sp_rpt_ItemCostingRecon_List` returns 2 result sets. It's set-based and ticket aggregation is scoped to the expenses in scope.
   - The old `_Header/_Detail` procs are kept but no longer called.
 - ReconStatus values: MATCHED / VARIANCE / LOTS DIVERGE / NO INVENTORY / NO EXPENSES.
+
+- 2026-09-26: right-click or double-click a Linked Expense row → "View Related Tickets" popup (posting ticket, payment-voucher tickets, reversals, each with GL lines).
+  New read-only SP `sp_rpt_ItemCostingRecon_ExpenseTickets` (script 11). Payments link via `APPaymentDetails.BatchReferenceID` → voucher (`ReferenceNumber`+`VoucherID`) → `TicketMaster`.
 
 **Status:** done on DEV. **Next:** UI check, including whether Export includes the expense rows, then STAGING.
 

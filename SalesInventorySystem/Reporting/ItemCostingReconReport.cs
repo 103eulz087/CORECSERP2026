@@ -36,6 +36,12 @@ namespace SalesInventorySystem.Reporting
             InitializeComponent();
             Classes.DevXGridViewSettings.ApplyTotalsBandAppearance(gridViewMaster);
             Classes.DevXGridViewSettings.ApplyTotalsBandAppearance(gridViewExpenses);
+
+            // Wired on the detail PATTERN view -- DevExpress copies its event
+            // handlers to every clone it creates for an expanded master row, so
+            // sender is the clone the user actually clicked in.
+            gridViewExpenses.PopupMenuShowing += gridViewExpenses_PopupMenuShowing;
+            gridViewExpenses.DoubleClick += gridViewExpenses_DoubleClick;
         }
 
         private void ItemCostingReconReport_Load(object sender, EventArgs e)
@@ -282,6 +288,160 @@ namespace SalesInventorySystem.Reporting
             {
                 if (_statusFont == null) _statusFont = new Font(e.Appearance.Font, FontStyle.Bold);
                 e.Appearance.Font = _statusFont;
+            }
+        }
+
+        // ---- Linked Expenses -> related GL tickets (posting, payments, reversals) ----
+
+        private void gridViewExpenses_PopupMenuShowing(object sender, PopupMenuShowingEventArgs e)
+        {
+            var view = sender as GridView;
+            if (view == null || e.MenuType != GridMenuType.Row || !view.IsDataRow(e.HitInfo.RowHandle)) return;
+
+            int rowHandle = e.HitInfo.RowHandle;
+            view.FocusedRowHandle = rowHandle;
+            e.Menu.Items.Add(new DevExpress.Utils.Menu.DXMenuItem("View Related Tickets",
+                (s, args) => ShowExpenseTickets(view, rowHandle)));
+        }
+
+        private void gridViewExpenses_DoubleClick(object sender, EventArgs e)
+        {
+            var view = sender as GridView;
+            if (view == null) return;
+            var hit = view.CalcHitInfo(view.GridControl.PointToClient(MousePosition));
+            if (hit.InRowCell && view.IsDataRow(hit.RowHandle))
+                ShowExpenseTickets(view, hit.RowHandle);
+        }
+
+        private void ShowExpenseTickets(GridView view, int rowHandle)
+        {
+            string referenceNumber = view.GetRowCellValue(rowHandle, "ReferenceNumber")?.ToString();
+            string invoiceNo = view.GetRowCellValue(rowHandle, "InvoiceNo")?.ToString();
+            string shipmentNo = view.GetRowCellValue(rowHandle, "ShipmentNo")?.ToString();
+            if (string.IsNullOrWhiteSpace(referenceNumber) || invoiceNo == null || string.IsNullOrWhiteSpace(shipmentNo)) return;
+
+            var ds = new DataSet();
+            try
+            {
+                Cursor.Current = Cursors.WaitCursor;
+                using (var con = Database.getConnection())
+                using (var cmd = new SqlCommand("sp_rpt_ItemCostingRecon_ExpenseTickets", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandTimeout = 120;
+                    cmd.Parameters.Add("@ReferenceNumber", SqlDbType.VarChar, 10).Value = referenceNumber;
+                    cmd.Parameters.Add("@InvoiceNo", SqlDbType.VarChar, 150).Value = invoiceNo;
+                    cmd.Parameters.Add("@ShipmentNo", SqlDbType.VarChar, 10).Value = shipmentNo;
+
+                    using (var da = new SqlDataAdapter(cmd))
+                    {
+                        // Result-set order is the SP's documented contract: 1 = Tickets, 2 = Lines.
+                        da.TableMappings.Add("Table", "Tickets");
+                        da.TableMappings.Add("Table1", "Lines");
+                        da.Fill(ds);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                XtraMessageBox.Show(ex.Message, "Load Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            finally
+            {
+                Cursor.Current = Cursors.Default;
+            }
+
+            if (ds.Tables["Tickets"] == null || ds.Tables["Tickets"].Rows.Count == 0)
+            {
+                XtraMessageBox.Show("No tickets found for this expense.", "No Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            ShowTicketsPopup(ds, referenceNumber + " / " + invoiceNo);
+        }
+
+        private void ShowTicketsPopup(DataSet ds, string title)
+        {
+            const string linesRelation = "Ticket Lines";
+            DataTable tickets = ds.Tables["Tickets"], lines = ds.Tables["Lines"];
+            ds.Relations.Add(new DataRelation(linesRelation,
+                new[] { tickets.Columns["TicketNumber"], tickets.Columns["ReferenceNumber"] },
+                new[] { lines.Columns["TicketNumber"], lines.Columns["ReferenceNumber"] },
+                false));
+
+            using (var popup = new XtraForm())
+            using (var grid = new DevExpress.XtraGrid.GridControl { Dock = DockStyle.Fill })
+            {
+                popup.Text = "Related Tickets - Expense " + title;
+                popup.Size = new Size(1100, 560);
+                popup.StartPosition = FormStartPosition.CenterParent;
+                popup.MinimizeBox = false;
+
+                var note = new LabelControl
+                {
+                    Dock = DockStyle.Top,
+                    AutoSizeMode = LabelAutoSizeMode.None,
+                    Height = 28,
+                    Padding = new Padding(8, 6, 8, 6),
+                    Text = "Expand a ticket to see its GL lines. A payment voucher's ticket is shown whole - "
+                         + "if that voucher paid other invoices too, their lines are included."
+                };
+
+                var ticketView = new GridView(grid);
+                var lineView = new GridView(grid);
+                grid.MainView = ticketView;
+                grid.LevelTree.Nodes.Add(linesRelation, lineView);
+                grid.DataSource = tickets;
+                grid.ForceInitialize();
+                lineView.PopulateColumns(lines);
+
+                foreach (GridView v in new[] { ticketView, lineView })
+                {
+                    v.OptionsBehavior.Editable = false;
+                    v.OptionsView.ShowGroupPanel = false;
+                    v.OptionsView.ShowFooter = true;
+                    Classes.DevXGridViewSettings.ApplyTotalsBandAppearance(v);
+                }
+
+                Hide(lineView, "TicketNumber", "ReferenceNumber");   // relation key - shown on the ticket row
+                Caption(ticketView, "TicketNumber", "Ticket No.");
+                Caption(ticketView, "ReferenceNumber", "Reference No.");
+                Caption(ticketView, "ReferenceKey", "Reference Key");
+                Caption(ticketView, "TicketDate", "Date");
+                Caption(ticketView, "VoucherType", "Voucher Type");
+                Caption(ticketView, "TotalDebit", "Total Debit");
+                Caption(ticketView, "TotalCredit", "Total Credit");
+                Caption(lineView, "BranchCode", "Branch");
+
+                if (ticketView.Columns["TicketDate"] != null)
+                {
+                    ticketView.Columns["TicketDate"].DisplayFormat.FormatType = DevExpress.Utils.FormatType.DateTime;
+                    ticketView.Columns["TicketDate"].DisplayFormat.FormatString = "MM/dd/yyyy";
+                }
+                Numeric(ticketView, "TotalDebit", "N2");
+                Numeric(ticketView, "TotalCredit", "N2");
+                Numeric(lineView, "Debit", "N2");
+                Numeric(lineView, "Credit", "N2");
+                SumFooter(lineView, "Debit", "N2");
+                SumFooter(lineView, "Credit", "N2");
+
+                ticketView.RowCellStyle += (s, e) =>
+                {
+                    if (e.Column.FieldName == "Source"
+                        && "PAYMENT REVERSAL".Equals(ticketView.GetRowCellValue(e.RowHandle, "Source")?.ToString()))
+                        e.Appearance.ForeColor = Color.Red;
+                };
+
+                ticketView.BestFitColumns();
+                if (ticketView.Columns["Particulars"] != null && ticketView.Columns["Particulars"].Width > 350)
+                    ticketView.Columns["Particulars"].Width = 350;
+                for (int i = 0; i < ticketView.RowCount; i++)
+                    ticketView.ExpandMasterRow(i);   // usually only a handful of tickets
+
+                popup.Controls.Add(grid);
+                popup.Controls.Add(note);
+                popup.ShowDialog(this);
             }
         }
 
