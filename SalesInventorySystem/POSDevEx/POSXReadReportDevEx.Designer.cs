@@ -118,6 +118,7 @@
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.printToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.showCreditDetailsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.generateInvoicesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.xtraTabControl1)).BeginInit();
             this.xtraTabControl1.SuspendLayout();
             this.xtraTabPage1.SuspendLayout();
@@ -1393,9 +1394,10 @@
             this.contextMenuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.printToolStripMenuItem,
-            this.showCreditDetailsToolStripMenuItem});
+            this.showCreditDetailsToolStripMenuItem,
+            this.generateInvoicesToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(213, 56);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(213, 82);
             // 
             // printToolStripMenuItem
             // 
@@ -1412,6 +1414,13 @@
             this.showCreditDetailsToolStripMenuItem.Size = new System.Drawing.Size(212, 26);
             this.showCreditDetailsToolStripMenuItem.Text = "Show Credit Details";
             this.showCreditDetailsToolStripMenuItem.Click += new System.EventHandler(this.showCreditDetailsToolStripMenuItem_Click);
+            //
+            // generateInvoicesToolStripMenuItem
+            //
+            this.generateInvoicesToolStripMenuItem.Name = "generateInvoicesToolStripMenuItem";
+            this.generateInvoicesToolStripMenuItem.Size = new System.Drawing.Size(212, 26);
+            this.generateInvoicesToolStripMenuItem.Text = "Generate Invoices";
+            this.generateInvoicesToolStripMenuItem.Click += new System.EventHandler(this.generateInvoicesToolStripMenuItem_Click);
             // 
             // POSXReadReportDevEx
             // 
@@ -1576,6 +1585,7 @@
         private System.Windows.Forms.ToolStripMenuItem printToolStripMenuItem;
         private DevExpress.XtraEditors.SimpleButton simpleButton12;
         private System.Windows.Forms.ToolStripMenuItem showCreditDetailsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem generateInvoicesToolStripMenuItem;
         private DevExpress.XtraEditors.SearchLookUpEdit txtreporttypeposreading;
         private DevExpress.XtraGrid.Views.Grid.GridView gridView11;
     }

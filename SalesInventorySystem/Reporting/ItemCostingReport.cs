@@ -119,6 +119,8 @@ namespace SalesInventorySystem.Reporting
                     SetCaption(masterView, "TotalSoldQty", "Total Sold Qty");
                     SetCaption(masterView, "TotalCostOfSales", "Cost of Sales");
                     SetCaption(masterView, "TotalSalesRevenue", "Sales Revenue");
+                    SetCaption(masterView, "TotalTransferQty", "Transfer Qty");
+                    SetCaption(masterView, "TotalTransferCost", "Transfer Cost");
                     SetCaption(masterView, "TotalAdjustedQty", "Adjusted Qty");
                     SetCaption(masterView, "TotalAdjustedAmount", "Adjusted Amount");
                     SetCaption(masterView, "TotalConvertedQty", "Converted Qty");
@@ -133,6 +135,8 @@ namespace SalesInventorySystem.Reporting
                     FormatNumericColumn(masterView, "TotalSoldQty", "N3");
                     FormatNumericColumn(masterView, "TotalCostOfSales", "N2");
                     FormatNumericColumn(masterView, "TotalSalesRevenue", "N2");
+                    FormatNumericColumn(masterView, "TotalTransferQty", "N3");
+                    FormatNumericColumn(masterView, "TotalTransferCost", "N2");
                     FormatNumericColumn(masterView, "TotalAdjustedQty", "N3");
                     FormatNumericColumn(masterView, "TotalAdjustedAmount", "N2");
                     FormatNumericColumn(masterView, "TotalConvertedQty", "N3");

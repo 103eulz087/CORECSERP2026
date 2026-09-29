@@ -756,6 +756,7 @@
     <Compile Include="Classes\POSDownloadUpdates.cs" />
     <Compile Include="Classes\POSTransaction.cs" />
     <Compile Include="Classes\POSTransactionZ.cs" />
+    <Compile Include="Classes\POSInvoiceRegenerator.cs" />
     <Compile Include="Classes\Printing.cs" />
     <Compile Include="Classes\Product.cs" />
     <Compile Include="Classes\Productss.cs" />

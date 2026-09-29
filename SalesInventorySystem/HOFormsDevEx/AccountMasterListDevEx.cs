@@ -125,6 +125,9 @@ namespace SalesInventorySystem.HOFormsDevEx
             else
                 Database.display("SELECT AccountKey,AccountName,FORMAT(AccountBalance,'N', 'en-us') as AccountBalance,AccountStatus,LastMovementDate FROM ClientAccounts with(nolock) ", gridControl2, gridView2);
 
+            // Amounts come back FORMAT()-ed as text, which the grid left-aligns -- right-align them.
+            AlignRight(gridView2, "AccountBalance");
+
             //if (chckzerobalar.Checked == false)
             //    // Database.display("SELECT SupplierID,SupplierName,InvoiceNo,DueDate,ActualCost,Balance,AmountPaid FROM ShipmentOrder WHERE PaymentStatus='UNPAID' OR PaymentStatus='PARTIAL' AND Balance > 0", gridControl1, gridView1);
             //    Database.display("SELECT AccountID,AccountName,FORMAT(AccountBalance,'N', 'en-us') as AccountBalance,LastMovementDate FROM ClientAccounts WHERE AccountBalance > 0", gridControl2, gridView2);
@@ -139,7 +142,21 @@ namespace SalesInventorySystem.HOFormsDevEx
             HOFormsDevEx.AccountReceivablesDevEx acctdev = new HOFormsDevEx.AccountReceivablesDevEx();
             acctdev.Show();
             Database.display("SELECT CustomerID,CAST(TransactionDate as date) as TransactionDate,OrderNo,FORMAT(Amount,'N', 'en-us') as Amount,FORMAT(AmountPaid,'N', 'en-us') as AmountPaid,FORMAT(Balance,'N', 'en-us') as Balance,PaymentStatus FROM view_TransactionChargeSales WHERE CustomerID='" + gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "AccountKey").ToString() + "'", acctdev.gridControl1, acctdev.gridView1);
+            AlignRight(acctdev.gridView1, "Amount", "AmountPaid", "Balance");
+        }
 
+        // Right-aligns the given columns' cells (and headers) if they exist in the view.
+        private static void AlignRight(DevExpress.XtraGrid.Views.Grid.GridView view, params string[] fields)
+        {
+            foreach (string field in fields)
+            {
+                var col = view.Columns[field];
+                if (col == null) continue;
+                col.AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+                col.AppearanceCell.Options.UseTextOptions = true;
+                col.AppearanceHeader.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+                col.AppearanceHeader.Options.UseTextOptions = true;
+            }
         }
         private bool _dataLoaded = false;
         public void LoadData()

@@ -40,6 +40,13 @@ namespace SalesInventorySystem.HOFormsDevEx
             new KeyValuePair<string, string>("navGLTicketEntries", "GL Ticket Entries"),
         };
 
+        // Accounting Reports V2 (HOFormsDevEx/AccountingReportsFormV2.cs) "Report Type"
+        // dropdown -- Key = ReportConfig.Key, Value = caption. Taken from the form itself so
+        // a new report shows up here automatically. Table: UserAccountingReportAccess
+        // (SQL/2026-09-28b_UserAccountingReportAccess_NewTable.sql). Same semantics as the
+        // Accounting Board: no rows = every report; global admins always see every report.
+        static readonly List<KeyValuePair<string, string>> AcctReportItems = AccountingReportsFormV2.ReportAccessCatalog;
+
 
         public UserAccessDevEx()
         {
@@ -97,6 +104,7 @@ namespace SalesInventorySystem.HOFormsDevEx
                 }
                 reader.Close();
                 loadAcctBoardAccess(con);
+                loadAcctReportAccess(con);
             }
             catch(SqlException ex)
             {
@@ -125,6 +133,28 @@ namespace SalesInventorySystem.HOFormsDevEx
             {
                 if (allowedKeys.Contains(AcctBoardMenuItems[i].Key))
                     acctBoard_checklist.Items[i].CheckState = CheckState.Checked;
+            }
+        }
+
+        // Same reset-then-check approach as loadAcctBoardAccess.
+        void loadAcctReportAccess(SqlConnection con)
+        {
+            for (int i = 0; i <= acctReports_checklist.Items.Count - 1; i++)
+                acctReports_checklist.Items[i].CheckState = CheckState.Unchecked;
+
+            var allowedKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            SqlCommand com = new SqlCommand("SELECT ReportKey FROM UserAccountingReportAccess WHERE UserID=@UserID", con);
+            com.Parameters.Add("@UserID", SqlDbType.VarChar, 50).Value = searchLookUpEdit1.Text;
+            using (SqlDataReader reader = com.ExecuteReader())
+            {
+                while (reader.Read())
+                    allowedKeys.Add(reader["ReportKey"].ToString());
+            }
+
+            for (int i = 0; i < AcctReportItems.Count; i++)
+            {
+                if (allowedKeys.Contains(AcctReportItems[i].Key))
+                    acctReports_checklist.Items[i].CheckState = CheckState.Checked;
             }
         }
 
@@ -168,6 +198,7 @@ namespace SalesInventorySystem.HOFormsDevEx
                 Database.ExecuteQuery("DELETE FROM UserMenuAccess WHERE UserID='" + searchLookUpEdit1.Text + "'");
                 Database.ExecuteQuery("INSERT INTO UserMenuAccess (UserID,isAdmin,isSales,isInventory,isAccounting,isHotel,isPayroll,isReporting,isForwarding,isClientDataSheet) VALUES ('" + searchLookUpEdit1.Text + "','" + strmenuAdmin + "','" + strmenuSales + "','" + strmenuInventory + "','" + strmenuAccounting + "','"+strmenuHotel+"',0,'" + strmenuReporting + "','"+strmenuForwarding+"','"+strmenucif+"') ", "Successfully Inserted!");
                 saveAcctBoardAccess();
+                saveAcctReportAccess();
                 if(Login.isglobalUserID == searchLookUpEdit1.Text)
                 {
                     Application.Restart();
@@ -212,6 +243,41 @@ namespace SalesInventorySystem.HOFormsDevEx
             }
         }
 
+        // Delete-then-insert in one transaction, same as saveAcctBoardAccess. Leaving every
+        // box unticked saves no rows = the user sees every report (no restriction).
+        void saveAcctReportAccess()
+        {
+            using (SqlConnection con = Database.getConnection())
+            {
+                con.Open();
+                SqlTransaction tran = con.BeginTransaction();
+                try
+                {
+                    SqlCommand delCom = new SqlCommand("DELETE FROM UserAccountingReportAccess WHERE UserID=@UserID", con, tran);
+                    delCom.Parameters.Add("@UserID", SqlDbType.VarChar, 50).Value = searchLookUpEdit1.Text;
+                    delCom.ExecuteNonQuery();
+
+                    for (int i = 0; i < AcctReportItems.Count; i++)
+                    {
+                        if (acctReports_checklist.Items[i].CheckState != CheckState.Checked)
+                            continue;
+
+                        SqlCommand insCom = new SqlCommand("INSERT INTO UserAccountingReportAccess (UserID, ReportKey) VALUES (@UserID, @ReportKey)", con, tran);
+                        insCom.Parameters.Add("@UserID", SqlDbType.VarChar, 50).Value = searchLookUpEdit1.Text;
+                        insCom.Parameters.Add("@ReportKey", SqlDbType.VarChar, 50).Value = AcctReportItems[i].Key;
+                        insCom.ExecuteNonQuery();
+                    }
+
+                    tran.Commit();
+                }
+                catch (SqlException ex)
+                {
+                    tran.Rollback();
+                    XtraMessageBox.Show(ex.Message.ToString());
+                }
+            }
+        }
+
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         void loadeulz()
         {
@@ -222,6 +288,10 @@ namespace SalesInventorySystem.HOFormsDevEx
             acctBoard_checklist.Items.Clear();
             foreach (var item in AcctBoardMenuItems)
                 acctBoard_checklist.Items.Add(item.Value);
+
+            acctReports_checklist.Items.Clear();
+            foreach (var item in AcctReportItems)
+                acctReports_checklist.Items.Add(item.Value);
 
             foreach (RibbonPage currentPage in main.Ribbon.Pages)
             {

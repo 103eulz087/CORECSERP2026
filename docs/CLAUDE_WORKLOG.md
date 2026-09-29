@@ -30,6 +30,12 @@ Status checked 2026-09-25 by probing each script's actual feature in each databa
 | 9 | `2026-09-25e_ManualJV_PreserveLineOrder.sql` | ✅ | ⏳ ship with the new exe |
 | 10 | `2026-09-25f_IncomeStatementPivot_HeadOfficeFirst.sql` | ✅ | ⏳ |
 | 11 | `2026-09-26_ItemCostingRecon_ExpenseTickets.sql` | ✅ (by user, 14:24) | ✅ (by user, 14:56) |
+| 12 | `2026-09-28_ConversionBarcode_CostComputation.sql` | ✅ (2026-09-28) | ⏳ |
+| 13 | `2026-09-28b_UserAccountingReportAccess_NewTable.sql` | ✅ (2026-09-28) | ⏳ ship with the new exe |
+| 14 | `2026-09-28c_ItemCostingDetail_SoldVsTransfer.sql` | ✅ (2026-09-28) | ⏳ deploy together with 15 |
+| 15 | `2026-09-28d_ItemCostingMaster_TransferTotals.sql` | ✅ (2026-09-28) | ⏳ deploy together with 14 + new exe |
+| 16 | `2026-09-29_InventoryUnitActivity_TransferColumn.sql` | ✅ (2026-09-29) | ⏳ ship with the new exe |
+| 17 | `2026-09-29b_PostedClientPayments_PaymentDetails.sql` | ✅ (2026-09-29) | ⏳ ship with the new exe (optional: old exe just shows extra columns) |
 
 - 2026-09-26: the live `sp_rpt_ItemCostingRecon_List` on both DBs was changed by the user (14:13 DEV / 14:18 STAGING): `BranchCode` → `BranchName` via `INNER JOIN dbo.Branches`. The repo copy in script 6 (`2026-09-24b`) still has `BranchCode`.
 - Web reporting handoff for the recon: `docs/handoff/2026-09-26_ItemCostingRecon_WebReporting_Handoff.md`.
@@ -154,6 +160,85 @@ Tested full / partial / two-step on multi-branch and SINGLE invoices. **Status:*
   - Plain `FixedPanel.None` lost the ratio when the control was first laid out tiny: the details panel got squeezed to 0.
 - Verified in a harness at 900 px and 560 px window heights, and a simulated drag + resize.
 - The ratio is not persisted between sessions.
+
+## Feature 8 — Conversion (ConversionPerBarcode) output cost (script 12)
+
+- **Bugs in `spu_PostConversionBarcode`:**
+  - The material rate took drip loss off twice (÷ 29.08 instead of 29.54).
+  - The whole cutting charge was added per kg.
+  - CVB-000045 posted 450.04 / 51.25 per kg.
+- **Fix, exactly per the user's worksheet** (Google Sheet, yellow cells):
+  - `unit = (SourceCost/Q + CuttingCharge/Q) × (qty/Q)`, where Q = source qty − drip loss.
+  - CVB-000045 → 229.68 / 26.16.
+- **User-confirmed:** the "× qty/Q" factor means output value < input value when there are 2+ outputs (CVB-000045: 6,170.13 of 7,557.40). The difference lands in the CONV-FINALIZE COGS legs.
+- Test data (CVB-000001..45) lives in the old DEV (`CORECSERP_002_DEV`). Posted conversions were not recomputed.
+- Tested on COREX001 in a rolled-back transaction: every yellow number matched. Many-to-One = (cost + charge)/Q. sp-reviewer run 2026-09-28.
+
+## Feature 9 — Accounting Reports V2: per-user report visibility (script 13)
+
+- **Table:** new `UserAccountingReportAccess(UserID, ReportKey)`, same pattern as `UserAccountingBoardAccess`.
+- **Report form:** each ReportConfig in `AccountingReportsFormV2` has a stable `Key` (e.g. `TRIAL_BALANCE`).
+  - The dropdown is filtered in `LoadData()`, and Generate re-checks access.
+- **Rules (user's choice):**
+  - A user with no rows sees all reports.
+  - Global admins always see all.
+  - Only the V2 form is filtered; V1 is untouched.
+- **Admin:** new "Accounting Reports" tab in User Access (`UserAccessDevEx`).
+  - It's filled from `AccountingReportsFormV2.ReportAccessCatalog`, so new reports appear automatically.
+- **Status:** compiled; exe copy blocked while the app was open in the debugger. ui-form-reviewer run. Needs a UI test.
+
+## Feature 10 — Item Costing Report: Sold vs Transfer (script 14)
+
+- `sp_rpt_ItemCostingReport_Detail`: a delivery's MovementType is `Transfer` if its PONumber is in `TransferOrderSummary`, else `Sold`.
+- Data on COREX001:
+  - 7,070 POs are in PurchaseOrderSummary, 25 in TransferOrderSummary, 0 in both.
+  - 14 are in neither (branch 004, 2026-09-09). They have C- charge invoices, so they're treated as Sold. Their PO headers are missing, which is worth a data fix.
+- `ServiceOrderSummary` was not used: SVCNumber overlaps PONumber (164 collisions).
+- Verified old vs new: same 13,683 rows, identical rows by content, identical per-lot net qty/value. 104 rows changed Sold → Transfer.
+- **Pre-existing:** the running-balance ORDER BY has ties, so tied rows' running values shuffle between runs. Candidate fix: add a tiebreaker.
+- **Master (script 15):** Sold totals now cover sales only; new `TotalTransferQty` and `TotalTransferCost` columns.
+  - Captions and N3/N2 formats added in `Reporting/ItemCostingReport.cs`.
+  - Verified: same 1,196 rows, and Sold + Transfer = old Sold for every lot. Master matches Detail for all lots (50 have transfers).
+- Why the bare PONumber match is safe: Purchase and Transfer orders share one counter (`dbo.ponumber`).
+
+## Feature 11 — Inventory Unit Activity report: transfers (script 16)
+
+- **Key fact:** on a transfer row, `InventoryDeliveryFIFO.BranchCode` = the requesting (destination) branch. The stock leaves the source lot's `Inventory.Branch` (all 108 rows). Sales rows have BranchCode = lot branch.
+- **`spr_InventoryUnitActivity` changes:**
+  - New `InventoryTransfer` column: transfer-out, credited to the source lot's branch.
+  - UnitSold and Sales now cover sales only, and are date-filtered (they were all-time).
+  - One row per item; it used to split into a stock row + a zero-cost row.
+  - UnitCost = weighted average over all the branch's lots, so COGS is no longer 0.
+- Form: caption + N3 + footer sum.
+- **Verified on COREX001 for branches 888 and 004 (Sept):**
+  - Beginning and Purchased unchanged.
+  - Sold and Transfer equal direct queries (888 transfer-out 81,449.78).
+  - 0 split rows, 0 zero-cost moved rows.
+- **Pre-existing, not fixed:**
+  - Unit Purchased join multiplies PODETAILS qty by lots per shipment (888 Sept = 106M).
+  - "Adjustment" is always 0.
+  - "Beginning" = lots received in the range.
+
+## Feature 12 — POS X/Z-Read: "Generate Invoices" for a Z-Read (C# only)
+
+- **New `Classes/POSInvoiceRegenerator.cs`** (in the csproj):
+  - Rebuilds each sale's invoice text in the checkout format. It mirrors both `Printing.printReceipt` overloads (regular, and one-time discount, which writes CLIENT/ACCOUNTING copies).
+  - Reads saved data: BatchSalesSummary/Details, SalesDiscount, Users.
+  - Writes files to `C:\POSTransaction\ZReadInvoices\<Branch>\<yyyyMMdd>_<Machine>\` plus a `GenerationLog.txt`. No printing, no DB writes; the live `printReceipt` is untouched.
+- **`POSXReadReportDevEx`:** new context-menu item "Generate Invoices", shown for ZREAD only.
+  - Right-click now focuses the clicked row; this also affects Print and Show Credit Details.
+- **User's choices:** exact copy, files only, Tran# matched by sequence to POSTransaction 'SALES' rows (blank if counts differ).
+- **Known limits:**
+  - Customer name/address/TIN typed at checkout are never saved → blanks.
+  - Date/time comes from the paired POSTransaction.DateAdded, else Transdate.
+- **Not tested with data:** no reachable DB has POS sales or Z-Reads. The user will test on a terminal, comparing files against `C:\POSTransaction\DailySales`.
+- **Review fixes (csharp-data-reviewer):**
+  - Amount payable = lines − SUM(DiscountAmount) − SUM(VatAdjustment), as checkout computes it. `BatchSalesSummary.TotalAmount` is NOT net of the VAT adjustment.
+  - Tran# pairing is checked against CashiersBlotter (Tran# + amount, written for every sale) and falls back to amount matching.
+  - TOTAL DISCOUNT uses {0:n2}; SalesDiscount is filtered by machine; FORMAT text is parsed in en-US.
+  - The log flags an empty header and line/total mismatches.
+  - One connection per run, with caches; the folder is cleared before each run.
+- **Tran# facts:** the branch-wide counter is MAX(POSTransaction)+1. Discount, cancel-line, void, reprint and error-correct also bump it. So `SalesDiscount.TransactionNo` can differ from the printed Tran#; it's used only as a fallback.
 
 ---
 

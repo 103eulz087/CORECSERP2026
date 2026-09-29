@@ -287,6 +287,8 @@
             this.dtPeriod.Location = new System.Drawing.Point(663, 15);
             this.dtPeriod.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.dtPeriod.Name = "dtPeriod";
+            this.dtPeriod.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.dtPeriod.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.dtPeriod.Properties.Mask.EditMask = "yyyy-MM-dd";

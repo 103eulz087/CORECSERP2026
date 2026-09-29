@@ -50,6 +50,9 @@ namespace SalesInventorySystem.HOFormsDevEx
 
         private class ReportConfig
         {
+            // Stable access key stored in UserAccountingReportAccess.ReportKey -- never
+            // change an existing one (it would silently drop users' access to that report).
+            public string Key;
             public string SpName;
             public ParamMode Mode;
             public ResultShape Shape;
@@ -60,10 +63,12 @@ namespace SalesInventorySystem.HOFormsDevEx
             public bool AllowAllBranches;          // branch selector can be left blank -> passes NULL
         }
 
-        private readonly Dictionary<string, ReportConfig> _reportConfigs = new Dictionary<string, ReportConfig>
+        // Static so UserAccessDevEx can list the same catalog (see ReportAccessCatalog).
+        private static readonly Dictionary<string, ReportConfig> _reportConfigs = new Dictionary<string, ReportConfig>
         {
             ["GL Detail Ledger"] = new ReportConfig
             {
+                Key = "GL_DETAIL_LEDGER",
                 SpName = "sp_rpt_GLDetailLedgerWithDate",
                 Mode = ParamMode.BranchAccountDateRange,
                 Shape = ResultShape.GLDetailLedgerLegacy,
@@ -72,6 +77,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             },
             ["GL Detail Transaction"] = new ReportConfig
             {
+                Key = "GL_DETAIL_TRANSACTION",
                 SpName = "sp_rpt_GLDetailTransactionReport",
                 Mode = ParamMode.BranchAccountDateRange,
                 Shape = ResultShape.SingleSet,
@@ -81,6 +87,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             },
             ["General Ledger (All Accounts)"] = new ReportConfig
             {
+                Key = "GENERAL_LEDGER_ALL",
                 SpName = "sp_rpt_GeneralLedger_WithRunningBal",
                 Mode = ParamMode.BranchDateRange,
                 Shape = ResultShape.SingleSet,
@@ -89,6 +96,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             },
             ["Trial Balance"] = new ReportConfig
             {
+                Key = "TRIAL_BALANCE",
                 SpName = "sp_rpt_TrialBalanceWithDate",
                 Mode = ParamMode.BranchAsOfDate,
                 Shape = ResultShape.Standard2Set,
@@ -116,6 +124,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             //},
             ["Income Statement (v2)"] = new ReportConfig
             {
+                Key = "INCOME_STATEMENT_V2",
                 SpName = "sp_rpt_IncomeStatementLiveWithDateSingleGrid",
                 Mode = ParamMode.BranchDateRange,
                 Shape = ResultShape.SingleSet,
@@ -139,6 +148,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             {
                 // V2-only: single-grid, matching this form's "Balance Sheet" entry -- see
                 // SQL/2026-09-13_sp_rpt_BalanceSheetLiveWithDateSingleGrid_NewReport.sql.
+                Key = "BALANCE_SHEET_V2",
                 SpName = "sp_rpt_BalanceSheetLiveWithDateSingleGrid",
                 Mode = ParamMode.BranchAsOfDate,
                 Shape = ResultShape.SingleSet,
@@ -147,6 +157,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             },
             ["Bank Reconciliation"] = new ReportConfig
             {
+                Key = "BANK_RECON",
                 SpName = "sp_rpt_BankReconciliationWithDate",
                 Mode = ParamMode.BranchAccountAsOfDate,
                 Shape = ResultShape.BankReconShape,
@@ -155,6 +166,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             },
             ["Consolidated GL"] = new ReportConfig
             {
+                Key = "CONSOLIDATED_GL",
                 SpName = "sp_rpt_ConsolidatedGLWithDate",
                 Mode = ParamMode.ConsolidatedGL,
                 Shape = ResultShape.Standard2Set,
@@ -166,6 +178,46 @@ namespace SalesInventorySystem.HOFormsDevEx
             cboReportType.SelectedItem != null && _reportConfigs.ContainsKey(cboReportType.SelectedItem.ToString())
                 ? _reportConfigs[cboReportType.SelectedItem.ToString()]
                 : null;
+
+        // Report catalog for the User Access screen: Key = ReportConfig.Key (what
+        // UserAccountingReportAccess stores), Value = the caption shown in the dropdown.
+        internal static List<KeyValuePair<string, string>> ReportAccessCatalog
+        {
+            get
+            {
+                var list = new List<KeyValuePair<string, string>>();
+                foreach (var kv in _reportConfigs)
+                    list.Add(new KeyValuePair<string, string>(kv.Value.Key, kv.Key));
+                return list;
+            }
+        }
+
+        // Per-user report visibility (UserAccountingReportAccess). null = no restriction:
+        // global admins, and users with no rows recorded (same rollout semantics as
+        // UserAccountingBoardAccess / AccountingBoard.cs). Loaded once in LoadData().
+        private HashSet<string> _allowedReportKeys;
+
+        private static HashSet<string> LoadAllowedReportKeys()
+        {
+            bool isAdmin;
+            if (bool.TryParse(Login.isglobalAdmin, out isAdmin) && isAdmin)
+                return null;
+
+            var keys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            using (var con = Database.getConnection())
+            using (var cmd = new SqlCommand("SELECT ReportKey FROM dbo.UserAccountingReportAccess WHERE UserID = @UserID", con))
+            {
+                cmd.Parameters.Add("@UserID", SqlDbType.VarChar, 50).Value = Login.isglobalUserID ?? "";
+                con.Open();
+                using (var rdr = cmd.ExecuteReader())
+                    while (rdr.Read())
+                        keys.Add(rdr["ReportKey"].ToString());
+            }
+            return keys.Count == 0 ? null : keys;
+        }
+
+        private bool IsReportAllowed(ReportConfig cfg) =>
+            cfg != null && (_allowedReportKeys == null || _allowedReportKeys.Contains(cfg.Key));
 
         public AccountingReportsFormV2()
         {
@@ -192,10 +244,22 @@ namespace SalesInventorySystem.HOFormsDevEx
             dteDateFrom.EditValue = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
             dteDateTo.EditValue = DateTime.Today;
 
+            // Only the reports this user may see (UserAccountingReportAccess).
+            _allowedReportKeys = LoadAllowedReportKeys();
             cboReportType.Properties.Items.Clear();
-            foreach (var key in _reportConfigs.Keys)
-                cboReportType.Properties.Items.Add(key);
-            cboReportType.SelectedIndex = 0;
+            foreach (var kv in _reportConfigs)
+                if (IsReportAllowed(kv.Value))
+                    cboReportType.Properties.Items.Add(kv.Key);
+
+            if (cboReportType.Properties.Items.Count > 0)
+            {
+                cboReportType.SelectedIndex = 0;
+            }
+            else
+            {
+                btnGenerate.Enabled = false;
+                lblReportSubtitle.Text = "No reports are assigned to your account. Ask an administrator (User Access > Accounting Reports).";
+            }
             ApplyParamModeForSelection();
             SetupReportContextMenu();
 
@@ -205,10 +269,12 @@ namespace SalesInventorySystem.HOFormsDevEx
 
             _dataLoaded = true;
         }
+        private ToolStripItem _miViewRelatedEntries;
+
         private void SetupReportContextMenu()
         {
             _reportContextMenu = new ContextMenuStrip();
-            _reportContextMenu.Items.Add("View Related Entries (Same Ticket)", null, ViewRelatedEntries_Click);
+            _miViewRelatedEntries = _reportContextMenu.Items.Add("View Related Entries (Same Ticket)", null, ViewRelatedEntries_Click);
 
             gridControlReport.MouseUp += GridControlReport_MouseUp;
         }
@@ -217,10 +283,22 @@ namespace SalesInventorySystem.HOFormsDevEx
             if (e.Button != MouseButtons.Right) return;
             if (gridControlReport.DataSource == null) return;
 
+            // Only transaction-level reports return a TicketNumber column (it's hidden in
+            // BindResults but still bound). Summary reports (Trial Balance, Balance Sheet,
+            // Income Statement, Consolidated GL, ...) have no ticket to drill into, so the
+            // menu isn't shown there at all.
+            if (gridViewReport.Columns["TicketNumber"] == null) return;
+
             var hitInfo = gridViewReport.CalcHitInfo(e.Location);
             if (hitInfo.InRow || hitInfo.InRowCell)
             {
                 gridViewReport.FocusedRowHandle = hitInfo.RowHandle;
+
+                // Rows without a ticket (Beginning/Ending balance, period-total rows) show
+                // the item disabled instead of a "Ticket Number is blank" message on click.
+                string ticketNumber = gridViewReport.GetRowCellValue(hitInfo.RowHandle, "TicketNumber")?.ToString();
+                _miViewRelatedEntries.Enabled = !string.IsNullOrWhiteSpace(ticketNumber);
+
                 _reportContextMenu.Show(gridControlReport, e.Location);
             }
         }
@@ -449,6 +527,14 @@ namespace SalesInventorySystem.HOFormsDevEx
         {
             var cfg = CurrentConfig;
             if (cfg == null) return;
+
+            // Second guard -- the dropdown is already filtered in LoadData().
+            if (!IsReportAllowed(cfg))
+            {
+                XtraMessageBox.Show("You don't have access to this report.", "Access Denied",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
             if (cfg.SupportsAllBranchPivot && chkAllBranches.Checked)
             {
@@ -689,6 +775,19 @@ namespace SalesInventorySystem.HOFormsDevEx
             // as "0.00"/"1.00" instead of being hidden.
             if (gridViewReport.Columns["IsContraCOGS"] != null)
                 gridViewReport.Columns["IsContraCOGS"].Visible = false;
+
+            // Consolidated GL: hide the COA attribute columns, the TB Debit/Credit split and
+            // the IS Debits/Credits + period columns, so the account code/description are
+            // followed only by ConsolidatedBalance (TB, as-of date) or NetAmount (IS, date
+            // range). The two modes return different columns, so one list covers both.
+            // Hidden columns are also left out of Export (print-layout path).
+            if (cfg.Key == "CONSOLIDATED_GL")
+            {
+                foreach (string col in new[] { "LevelNumber", "Nature", "YearEndIndicator", "IsIntercompany", "TBDebit", "TBCredit",
+                                               "ConsolidatedDebits", "ConsolidatedCredits", "PeriodFrom", "PeriodTo" })
+                    if (gridViewReport.Columns[col] != null)
+                        gridViewReport.Columns[col].Visible = false;
+            }
 
             gridViewReport.OptionsView.ColumnAutoWidth = false;
             gridViewSummary.OptionsView.ColumnAutoWidth = false;

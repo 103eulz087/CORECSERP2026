@@ -140,6 +140,7 @@ namespace SalesInventorySystem.Reporting
             SetCaption("UnitPurchased", "Unit Purchased");
             SetCaption("Adjustment", "Adjustment");
             SetCaption("UnitSold", "Unit Sold");
+            SetCaption("InventoryTransfer", "Inventory Transfer");
             SetCaption("QtyOnHand", "Qty On Hand");
             SetCaption("UnitCost", "Unit Cost");
             SetCaption("ItemValue", "Item Value");
@@ -150,6 +151,9 @@ namespace SalesInventorySystem.Reporting
             FormatNumericColumn("UnitPurchased", "N3");
             FormatNumericColumn("Adjustment", "N3");
             FormatNumericColumn("UnitSold", "N3");
+            // Transfer-out qty (spr_InventoryUnitActivity, 2026-09-29) -- counted against the
+            // SOURCE branch whose lot was reduced; already subtracted in Qty On Hand.
+            FormatNumericColumn("InventoryTransfer", "N3");
             FormatNumericColumn("QtyOnHand", "N3");
             FormatNumericColumn("UnitCost", "N2");
             FormatNumericColumn("ItemValue", "N2");

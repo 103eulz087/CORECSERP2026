@@ -54,6 +54,8 @@
             this.panelControl1 = new DevExpress.XtraEditors.PanelControl();
             this.tab_AccountingBoard = new DevExpress.XtraTab.XtraTabPage();
             this.acctBoard_checklist = new DevExpress.XtraEditors.CheckedListBoxControl();
+            this.tab_AccountingReports = new DevExpress.XtraTab.XtraTabPage();
+            this.acctReports_checklist = new DevExpress.XtraEditors.CheckedListBoxControl();
             ((System.ComponentModel.ISupportInitialize)(this.groupControl1)).BeginInit();
             this.groupControl1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.searchLookUpEdit1.Properties)).BeginInit();
@@ -80,6 +82,8 @@
             this.panelControl1.SuspendLayout();
             this.tab_AccountingBoard.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.acctBoard_checklist)).BeginInit();
+            this.tab_AccountingReports.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.acctReports_checklist)).BeginInit();
             this.SuspendLayout();
             // 
             // groupControl1
@@ -161,7 +165,8 @@
             this.tab_hotel,
             this.tab_Forwarding,
             this.tab_cif,
-            this.tab_AccountingBoard});
+            this.tab_AccountingBoard,
+            this.tab_AccountingReports});
             // 
             // tab_AdminTools
             // 
@@ -359,7 +364,26 @@
             this.acctBoard_checklist.Name = "acctBoard_checklist";
             this.acctBoard_checklist.Size = new System.Drawing.Size(991, 558);
             this.acctBoard_checklist.TabIndex = 63;
-            // 
+            //
+            // tab_AccountingReports
+            //
+            this.tab_AccountingReports.Controls.Add(this.acctReports_checklist);
+            this.tab_AccountingReports.Name = "tab_AccountingReports";
+            this.tab_AccountingReports.Size = new System.Drawing.Size(991, 558);
+            this.tab_AccountingReports.Text = "Accounting Reports";
+            //
+            // acctReports_checklist
+            //
+            this.acctReports_checklist.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F);
+            this.acctReports_checklist.Appearance.Options.UseFont = true;
+            this.acctReports_checklist.CheckOnClick = true;
+            this.acctReports_checklist.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.acctReports_checklist.Location = new System.Drawing.Point(0, 0);
+            this.acctReports_checklist.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.acctReports_checklist.Name = "acctReports_checklist";
+            this.acctReports_checklist.Size = new System.Drawing.Size(991, 558);
+            this.acctReports_checklist.TabIndex = 64;
+            //
             // UserAccessDevEx
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
@@ -399,6 +423,8 @@
             this.panelControl1.ResumeLayout(false);
             this.tab_AccountingBoard.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.acctBoard_checklist)).EndInit();
+            this.tab_AccountingReports.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.acctReports_checklist)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -429,5 +455,7 @@
         private DevExpress.XtraEditors.PanelControl panelControl1;
         private DevExpress.XtraTab.XtraTabPage tab_AccountingBoard;
         private DevExpress.XtraEditors.CheckedListBoxControl acctBoard_checklist;
+        private DevExpress.XtraTab.XtraTabPage tab_AccountingReports;
+        private DevExpress.XtraEditors.CheckedListBoxControl acctReports_checklist;
     }
 }

@@ -1275,7 +1275,84 @@ namespace SalesInventorySystem.POSDevEx
             if (comboBoxEdit1.Text == "XREAD" || comboBoxEdit1.Text == "ZREAD" || comboBoxEdit1.Text == "BACKUPDATA")
             {
                 if (e.Button == MouseButtons.Right)
+                {
+                    // Act on the row under the cursor (right-click doesn't move focus by itself).
+                    var hit = gridView1.CalcHitInfo(e.Location);
+                    if (hit.InRow || hit.InRowCell)
+                        gridView1.FocusedRowHandle = hit.RowHandle;
+
+                    // "Generate Invoices" only applies to a Z-Read row.
+                    generateInvoicesToolStripMenuItem.Visible = comboBoxEdit1.Text == "ZREAD";
                     contextMenuStrip1.Show(gridControl1, e.Location);
+                }
+            }
+        }
+
+        // Re-creates the sales-invoice text files for every sale covered by the selected
+        // Z-Read (same format as the checkout receipt), under
+        // C:\POSTransaction\ZReadInvoices\<Branch>\<yyyyMMdd>_<Machine>\ -- files only, no printing.
+        private void generateInvoicesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (comboBoxEdit1.Text != "ZREAD" || gridView1.FocusedRowHandle < 0)
+            {
+                XtraMessageBox.Show("Select a Z-Read row first.", "Generate Invoices", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            // The combo can say ZREAD while the grid still shows another report's rows (switched
+            // without reloading) -- those have no Z-Read columns, and GetRowCellValue would throw.
+            if (gridView1.Columns["DateExecute"] == null || gridView1.Columns["MachineUsed"] == null)
+            {
+                XtraMessageBox.Show("Load the ZREAD report first, then right-click a Z-Read row.", "Generate Invoices", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            object dateObj = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "DateExecute");
+            object machineObj = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "MachineUsed");
+            string branch = gridView1.Columns["BranchCode"] != null
+                ? gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "BranchCode")?.ToString().Trim()
+                : txtbranch.Text.Trim();
+            if (string.IsNullOrWhiteSpace(branch)) branch = txtbranch.Text.Trim();
+
+            DateTime zreadDate;
+            if (dateObj == null || dateObj == DBNull.Value || !DateTime.TryParse(dateObj.ToString(), out zreadDate)
+                || machineObj == null || string.IsNullOrWhiteSpace(machineObj.ToString()) || string.IsNullOrWhiteSpace(branch))
+            {
+                XtraMessageBox.Show("This row has no Z-Read date, machine or branch.", "Generate Invoices", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            string machine = machineObj.ToString().Trim();
+
+            if (XtraMessageBox.Show(
+                    $"Generate the sales invoices for this Z-Read?\n\nBranch: {branch}\nMachine: {machine}\nDate: {zreadDate:yyyy-MM-dd}\n\n" +
+                    $"Files will be saved to:\n{Classes.POSInvoiceRegenerator.DefaultRootFolder}",
+                    "Generate Invoices", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                return;
+
+            try
+            {
+                Cursor.Current = Cursors.WaitCursor;
+                var result = Classes.POSInvoiceRegenerator.GenerateForZRead(branch, machine, zreadDate);
+                Cursor.Current = Cursors.Default;
+
+                if (result.Invoices == 0)
+                {
+                    XtraMessageBox.Show("No invoices were generated.\n\n" + string.Join("\n", result.Warnings),
+                        "Generate Invoices", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                string msg = $"{result.Invoices} invoice(s) generated ({result.Files} file(s)) in:\n{result.Folder}";
+                if (result.Warnings.Count > 0)
+                    msg += $"\n\n{result.Warnings.Count} warning(s) -- see GenerationLog.txt in that folder.";
+                msg += "\n\nOpen the folder now?";
+
+                if (XtraMessageBox.Show(msg, "Generate Invoices", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
+                    System.Diagnostics.Process.Start("explorer.exe", "\"" + result.Folder + "\"");
+            }
+            catch (Exception ex)
+            {
+                Cursor.Current = Cursors.Default;
+                XtraMessageBox.Show("Generate Invoices failed: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

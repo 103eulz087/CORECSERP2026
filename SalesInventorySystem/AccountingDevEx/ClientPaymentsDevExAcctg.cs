@@ -765,10 +765,10 @@ namespace SalesInventorySystem.AccountingDevEx
             radCreditCard.Checked = false;
             ApplyPaymentTypeVisibility();
 
-            txtcontrolno.Text = "";
-            txtcrno.Text = "";
+            //txtcontrolno.Text = "";
+            //txtcrno.Text = "";
             txtremakrs.Text = "";
-            txtdate.EditValue = DateTime.Today;
+            //txtdate.EditValue = DateTime.Today;
             txtdebitglcode.Text = "";
             txtcreditglcode.Text = "";
             txtdebitdesc.Text = "";
@@ -1061,7 +1061,51 @@ namespace SalesInventorySystem.AccountingDevEx
             gridView9.OptionsView.ColumnAutoWidth = false;
             if (gridView9.Columns["BlockedReason"] != null)
                 gridView9.Columns["BlockedReason"].VisibleIndex = 0;
+            FormatPaymentMethodColumns();
             gridView9.BestFitColumns();
+        }
+
+        // Payment-method columns from sp_GetPostedClientPayments (2026-09-29b): cash /
+        // cheque / online details and the receiving account. Summary + Deposited To sit
+        // right after Payment Type; the per-method columns stay at the end (blank when N/A).
+        void FormatPaymentMethodColumns()
+        {
+            var captions = new Dictionary<string, string>
+            {
+                ["PaymentDetails"] = "Payment Details",
+                ["DepositedTo"] = "Deposited To",
+                ["CheckNo"] = "Cheque No.",
+                ["CheckName"] = "Cheque Name",
+                ["CheckBank"] = "Cheque Bank",
+                ["CheckDate"] = "Cheque Date",
+                ["CheckAmount"] = "Cheque Amount",
+                ["OnlineRefNo"] = "Online Ref No.",
+                ["OnlineBank"] = "Online Bank",
+                ["DepositDate"] = "Deposit Date"
+            };
+            foreach (var kv in captions)
+                if (gridView9.Columns[kv.Key] != null) gridView9.Columns[kv.Key].Caption = kv.Value;
+
+            var payType = gridView9.Columns["PaymentType"];
+            if (payType != null && payType.VisibleIndex >= 0)
+            {
+                if (gridView9.Columns["PaymentDetails"] != null) gridView9.Columns["PaymentDetails"].VisibleIndex = payType.VisibleIndex + 1;
+                if (gridView9.Columns["DepositedTo"] != null) gridView9.Columns["DepositedTo"].VisibleIndex = payType.VisibleIndex + 2;
+            }
+
+            var amt = gridView9.Columns["CheckAmount"];
+            if (amt != null)
+            {
+                amt.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+                amt.DisplayFormat.FormatString = "N2";
+            }
+            foreach (string dateCol in new[] { "CheckDate", "DepositDate" })
+            {
+                var col = gridView9.Columns[dateCol];
+                if (col == null) continue;
+                col.DisplayFormat.FormatType = DevExpress.Utils.FormatType.DateTime;
+                col.DisplayFormat.FormatString = "yyyy-MM-dd";
+            }
         }
 
         private void gridView9_RowCellStyle(object sender, RowCellStyleEventArgs e)
