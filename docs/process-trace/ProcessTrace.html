@@ -1,0 +1,404 @@
+<title>Process Trace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#eef1f3; --surface:#ffffff; --surface-2:#f4f6f8; --grid:#e3e8ec; --border:#cfd7de;
+  --text:#16202a; --text-dim:#51606e; --text-faint:#85919c;
+  --accent:#1f5f99; --accent-tint:#e5eef7;
+  --risk:#b3261e; --risk-bg:#fbeceb; --info:#1f5f99; --info-bg:#e8f0f8;
+  --mix-base:#ffffff;
+  --shadow:0 1px 2px rgba(18,28,40,.06),0 4px 14px rgba(18,28,40,.05);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0e1216; --surface:#151b21; --surface-2:#1a2129; --grid:#232c35; --border:#2d3843;
+    --text:#e4e9ee; --text-dim:#a0acb8; --text-faint:#6d7985;
+    --accent:#6ea8dc; --accent-tint:#16283a;
+    --risk:#ff8a80; --risk-bg:#3a1a19; --info:#8cbde8; --info-bg:#15263a;
+    --mix-base:#151b21;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 14px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0e1216; --surface:#151b21; --surface-2:#1a2129; --grid:#232c35; --border:#2d3843;
+  --text:#e4e9ee; --text-dim:#a0acb8; --text-faint:#6d7985;
+  --accent:#6ea8dc; --accent-tint:#16283a;
+  --risk:#ff8a80; --risk-bg:#3a1a19; --info:#8cbde8; --info-bg:#15263a;
+  --mix-base:#151b21;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 14px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:14px;line-height:1.5}
+.mono,code{font-family:"IBM Plex Mono",ui-monospace,Consolas,monospace}
+code{font-size:.92em;background:var(--surface-2);border:1px solid var(--grid);border-radius:4px;padding:0 4px}
+.shell{max-width:1480px;margin:0 auto;padding-inline:16px;padding-block:20px 64px;display:grid;grid-template-columns:280px minmax(0,1fr);gap:24px;align-items:start}
+aside{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);display:flex;flex-direction:column;gap:16px;max-height:calc(100vh - 32px);overflow:auto;padding-bottom:8px}
+.brand{font-family:"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;font-weight:700;font-size:20px;letter-spacing:.01em;margin:0}
+.brand small{display:block;font-family:"IBM Plex Sans",sans-serif;font-weight:400;font-size:12px;color:var(--text-faint);letter-spacing:0;margin-top:2px}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px}
+.panel h3{margin:0 0 8px;font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);font-weight:600}
+label.fld{display:block;font-size:12px;color:var(--text-dim);margin-bottom:4px}
+select{width:100%;padding:7px 8px;border-radius:7px;border:1px solid var(--border);background:var(--surface);color:var(--text);font:inherit;font-size:13px}
+select:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.keys{display:flex;flex-direction:column;gap:2px}
+.keybtn{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:none;border:1px solid transparent;border-radius:6px;padding:4px 6px;font:inherit;font-size:12.5px;color:var(--text);cursor:pointer}
+.keybtn:hover{background:var(--surface-2)}
+.keybtn[aria-pressed="true"]{border-color:var(--kc);background:color-mix(in srgb,var(--kc) 14%,var(--mix-base))}
+.sw{width:12px;height:12px;border-radius:3px;background:var(--kc);flex:none}
+.keybtn .cnt{margin-left:auto;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--text-faint)}
+.inspector .none{color:var(--text-faint);font-size:12.5px}
+.inspector .val{font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:600;padding:2px 8px;border-radius:5px;display:inline-block;background:color-mix(in srgb,var(--kc) 22%,var(--mix-base));border-left:3px solid var(--kc)}
+.inspector ul{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:2px}
+.inspector li button{background:none;border:0;padding:3px 0;font:inherit;font-size:12.5px;color:var(--accent);cursor:pointer;text-align:left}
+.inspector li button:hover{text-decoration:underline}
+.inspector li span{color:var(--text-faint);font-family:"IBM Plex Mono",monospace;font-size:11px;margin-left:4px}
+.btnrow{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.btn{padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--text);font:inherit;font-size:12px;cursor:pointer}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.tog{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--text-dim);cursor:pointer;margin-top:6px}
+.tog input{accent-color:var(--accent);margin:0}
+
+main{min-width:0;display:flex;flex-direction:column;gap:20px}
+.hero h1{margin:0;font-family:"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;font-size:28px;font-weight:700;letter-spacing:-.005em;text-wrap:balance}
+.hero .sub{color:var(--text-dim);margin:2px 0 10px;font-size:14px}
+.hero p{margin:0;max-width:80ch;color:var(--text)}
+.meta{font-size:12px;color:var(--text-faint);margin-top:10px}
+.meta b{color:var(--text-dim);font-weight:600}
+.story{background:var(--accent-tint);border:1px solid color-mix(in srgb,var(--accent) 30%,var(--mix-base));border-radius:10px;padding:10px 14px;font-size:13.5px;max-width:100ch}
+.story b{font-weight:600}
+
+.flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.fstep{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;text-align:left;font:inherit;color:inherit;cursor:pointer;display:flex;flex-direction:column;gap:6px;box-shadow:var(--shadow);position:relative}
+.fstep:hover{border-color:var(--accent)}
+.fstep .no{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--text-faint)}
+.fstep .tt{font-weight:600;font-size:13.5px;line-height:1.3}
+.fstep .who{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--accent)}
+.fstep .tbls{display:flex;flex-wrap:wrap;gap:4px}
+.fstep .tbls span{font-family:"IBM Plex Mono",monospace;font-size:10.5px;background:var(--surface-2);border:1px solid var(--grid);border-radius:4px;padding:0 5px;color:var(--text-dim)}
+.fstep .tbls span.empty{opacity:.45;text-decoration:line-through}
+
+section.step{display:flex;flex-direction:column;gap:12px;scroll-margin-top:16px}
+.stephead{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:start;border-top:2px solid var(--text);padding-top:10px}
+.stepno{font-family:"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;font-weight:700;font-size:34px;line-height:1;color:var(--text);grid-row:span 3}
+.stephead h2{margin:0;font-family:"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;font-size:21px;font-weight:600;text-wrap:balance}
+.stephead .who{font-size:12.5px;color:var(--text-dim)}
+.stephead .who code{color:var(--accent)}
+.stephead p{margin:2px 0 0;max-width:95ch;font-size:13.5px}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow);overflow:hidden;scroll-margin-top:16px}
+.card.flash{animation:flash 1.2s ease-out}
+@keyframes flash{0%{box-shadow:0 0 0 3px var(--accent)}100%{box-shadow:var(--shadow)}}
+.cardhead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;padding:9px 14px;border-bottom:1px solid var(--grid)}
+.cardhead .tn{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:13.5px}
+.cardhead .role{color:var(--text-dim);font-size:12.5px}
+.cardhead .rc{margin-left:auto;font-size:11.5px;color:var(--text-faint);font-variant-numeric:tabular-nums}
+.empty-note{padding:12px 14px;color:var(--text-faint);font-size:13px}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:max-content;min-width:100%;font-size:12.5px}
+th{position:sticky;top:0;background:var(--surface-2);text-align:left;font-weight:600;font-size:11px;color:var(--text-dim);padding:6px 10px;border-bottom:1px solid var(--border);white-space:nowrap}
+th.k{box-shadow:inset 0 -3px 0 var(--kc)}
+th.num,td.num{text-align:right}
+td{padding:4px 10px;border-bottom:1px solid var(--grid);white-space:nowrap;font-variant-numeric:tabular-nums;vertical-align:top}
+td.txt{white-space:normal;min-width:180px;max-width:360px}
+td.null{color:var(--text-faint);font-style:italic}
+td.num{font-family:"IBM Plex Mono",monospace;font-size:12px}
+td.kc{padding:3px 6px}
+.kv{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:500;padding:1px 7px;border-radius:5px;background:color-mix(in srgb,var(--kc) 20%,var(--mix-base));border-left:3px solid var(--kc);cursor:pointer;color:var(--text);line-height:1.6}
+.kv:hover,.kv.hot{background:color-mix(in srgb,var(--kc) 45%,var(--mix-base));outline:2px solid var(--kc);outline-offset:0}
+.kv.pin{outline:2px solid var(--text);background:color-mix(in srgb,var(--kc) 55%,var(--mix-base))}
+body.focusing .kv:not(.hot):not(.pin){opacity:.35}
+body.famfocus .kv:not(.fam){opacity:.3}
+tfoot td{background:var(--surface-2);font-weight:600;border-top:1px solid var(--border)}
+tfoot td.lbl{font-family:"IBM Plex Sans",sans-serif;font-size:11.5px;color:var(--text-dim)}
+
+.matrix .tw table{font-size:12px}
+.matrix td.hit{font-family:"IBM Plex Mono",monospace;font-size:11.5px;background:color-mix(in srgb,var(--kc) 16%,var(--mix-base))}
+.matrix td.miss{color:var(--grid)}
+.matrix th.kh{text-align:center;box-shadow:inset 0 -3px 0 var(--kc)}
+.matrix td.step{font-family:"IBM Plex Mono",monospace;color:var(--text-faint)}
+
+.findings{display:flex;flex-direction:column;gap:10px}
+.finding{border-radius:10px;padding:10px 14px;border:1px solid;max-width:110ch}
+.finding.risk{background:var(--risk-bg);border-color:color-mix(in srgb,var(--risk) 40%,var(--mix-base))}
+.finding.info{background:var(--info-bg);border-color:color-mix(in srgb,var(--info) 35%,var(--mix-base))}
+.finding .lv{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+.finding.risk .lv{color:var(--risk)} .finding.info .lv{color:var(--info)}
+.finding h4{margin:2px 0 4px;font-size:14px}
+.finding p{margin:0;font-size:13px}
+h2.sec{margin:8px 0 0;font-family:"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;font-size:21px;font-weight:600;border-top:2px solid var(--text);padding-top:10px}
+.secnote{margin:0;color:var(--text-dim);font-size:13px;max-width:95ch}
+footer{font-size:12px;color:var(--text-faint);max-width:100ch}
+
+@media (max-width:900px){
+  .shell{grid-template-columns:1fr}
+  aside{position:static;max-height:none}
+}
+@media (prefers-reduced-motion:reduce){.card.flash{animation:none}}
+</style>
+
+<div class="shell">
+  <aside>
+    <p class="brand">Process Trace<small>CORECS ERP · follow one transaction through every table it touches</small></p>
+    <div class="panel">
+      <label class="fld" for="modSel">Module</label>
+      <select id="modSel"></select>
+      <label class="fld" for="scSel" style="margin-top:10px">Sample transaction</label>
+      <select id="scSel"></select>
+      <label class="tog"><input type="checkbox" id="compact">Key and amount columns only</label>
+    </div>
+    <div class="panel">
+      <h3>Linking keys</h3>
+      <div class="keys" id="keys"></div>
+      <div class="btnrow"><button class="btn" id="clearFam" type="button">Show all keys</button></div>
+    </div>
+    <div class="panel inspector" id="inspector">
+      <h3>Selected value</h3>
+      <div id="insBody"><p class="none">Click any colored value to pin it and list every table and column where it appears.</p></div>
+    </div>
+  </aside>
+  <main id="main"></main>
+</div>
+
+<script>
+const TRACE = {"generated":"2026-10-01 07:35","db":"COREX001","masked":true,"modules":[{"def":{
+  "id": "ar-payment",
+  "title": "AR Payment",
+  "subtitle": "Client payment: invoice → payment capture → posting → reversal",
+  "form": "AccountingDevEx/ClientPaymentsDevExAcctg.cs",
+  "sql": "ARPayment.sql",
+  "summary": "A charge invoice is created when a sales order is confirmed. Accounting then records the client's payment in Client Payments: the form writes the payment header, the payment-method row and one ARPaymentDetails row per invoice and deduction type, then calls sp_AddPaymentClient in the same transaction. The proc settles the invoices, books the GL ticket from JournalEntryMapping, credits the client ledger and adds a deposit-in-transit line to bank recon. sp_ReversePaymentClient undoes all of it with mirrored entries.",
+  "keys": [
+    { "id": "cust",   "label": "Customer",          "color": "#f59e0b", "note": "CustomerKey (char 8). ClientLedger calls it AccountKey / AccountID; the cheque and online rows store it in CustomerID." },
+    { "id": "po",     "label": "Sales order (PO)",  "color": "#22c55e", "note": "The sales order number. TransactionChargeSales.ReferenceNo = ARPaymentDetails.PONumber = sales ticket ReferenceNumber." },
+    { "id": "inv",    "label": "Invoice",           "color": "#eab308", "note": "InvoiceNo. Always paired with the PO: sp_AddPaymentClient matches invoices on InvoiceNo + ReferenceNo/PONumber + CustomerKey." },
+    { "id": "ref",    "label": "Payment reference", "color": "#06b6d4", "note": "PaymentHeader.ReferenceNo from sp_GetReferenceNumber. Becomes the ticket's ReferenceNumber/ReferenceKey, the ledger's ReferenceNumber/ORNumber and the bank recon SourceRef." },
+    { "id": "phid",   "label": "PaymentHeaderID",   "color": "#3b82f6", "note": "Identity of PaymentHeader. Links the payment-method row and every ARPaymentDetails row." },
+    { "id": "ctrl",   "label": "Control no.",       "color": "#d946ef", "note": "Typed by the user on the form; copied to the cheque/online row." },
+    { "id": "cr",     "label": "CR no.",            "color": "#8b5cf6", "note": "Collection receipt number, typed by the user." },
+    { "id": "ticket", "label": "GL ticket",         "color": "#ef6f5e", "note": "TicketNumber from GetTicketNumber. ClientLedger.TicketReference points back to it." },
+    { "id": "mnem",   "label": "Mnemonic",          "color": "#84cc16", "note": "Chosen by sp_AddPaymentClient from the deduction mix (OR-COLL, OR-EWT, OR-DISC-OVERPAY, …). Selects the JournalEntryMapping rows and becomes the ledger TransCode." },
+    { "id": "acct",   "label": "GL account",        "color": "#14b8a6", "note": "AccountCode. The bank/cash account entered on the form (DebitGLCode) replaces the {BANK} token in JournalEntryMapping." }
+  ],
+  "tables": {
+    "tcs":      { "table": "TransactionChargeSales", "role": "AR invoice (subledger)", "keys": { "CustomerKey": "cust", "ReferenceNo": "po", "InvoiceNo": "inv" }, "money": ["TotalAmount"], "empty": "No invoice found." },
+    "tcsd":     { "table": "TransactionChargeSalesDetails", "role": "Invoice lines", "keys": { "ReferenceNo": "po", "InvoiceNo": "inv", "TransCode": "mnem" }, "money": ["Cost", "SellingPrice", "TotalAmount"], "qty": ["Quantity"], "empty": "No lines: these are balance-forward invoices loaded at go-live, not confirmed sales orders." },
+    "salesTm":  { "table": "TicketMaster", "role": "Sales GL ticket (header)", "keys": { "TicketNumber": "ticket", "ReferenceNumber": "po", "ReferenceKey": "inv", "Mnemonic": "mnem" }, "mask": ["Owner", "EnteredBy"], "empty": "No sales ticket: balance-forward invoices have no GL ticket of their own." },
+    "salesTd":  { "table": "TicketDetails", "role": "Sales GL ticket (lines)", "keys": { "TicketNumber": "ticket", "ReferenceNumber": "po", "ReferenceKey": "inv", "AccountCode": "acct" }, "money": ["Debit", "Credit"], "lookup": ["AccountName"], "total": true, "empty": "No sales ticket lines." },
+    "salesCl":  { "table": "ClientLedger", "role": "Client ledger: invoice debit", "keys": { "AccountKey": "cust", "ReferenceNumber": "po", "InvoiceNo": "inv", "TransCode": "mnem", "TicketReference": "ticket" }, "money": ["BeginningBalance", "Debit", "Credit", "EndingBalance"], "empty": "No SI ledger row (balance-forward invoice)." },
+
+    "ph":       { "table": "PaymentHeader", "role": "Payment header", "keys": { "PaymentHeaderID": "phid", "CustomerKey": "cust", "ReferenceNo": "ref", "ControlNo": "ctrl", "CRNo": "cr" }, "money": ["TotalAmount"], "mask": ["CreatedBy", "ReversedBy"] },
+    "cheque":   { "table": "TransactionCheque", "role": "Payment method: cheque", "keys": { "PaymentHeaderID": "phid", "ControlNo": "ctrl", "CRNo": "cr", "CustomerID": "cust", "CreditGLCode": "acct" }, "money": ["CheckAmount", "Amount"], "mask": ["CustomerName", "CheckName"], "empty": "Not a cheque payment." },
+    "online":   { "table": "TransactionOnline", "role": "Payment method: online / deposit", "keys": { "PaymentHeaderID": "phid", "ControlNo": "ctrl", "CRNo": "cr", "CustomerID": "cust", "CreditGLCode": "acct" }, "money": ["Amount"], "mask": ["CustomerName"], "empty": "Not an online payment." },
+    "cash":     { "table": "TransactionCashCollection", "role": "Payment method: cash", "keys": { "PaymentHeaderID": "phid", "CustomerKey": "cust" }, "money": ["AmountPaid"], "mask": ["TransactedBy"], "empty": "Not a cash payment." },
+    "arpd":     { "table": "ARPaymentDetails", "role": "Payment lines (one per invoice × type)", "keys": { "PaymentHeaderID": "phid", "CustomerKey": "cust", "ReferenceNo": "ref", "PONumber": "po", "InvoiceNo": "inv", "DebitGLCode": "acct", "CreditGLCode": "acct" }, "money": ["Amount"], "total": "PaymentType" },
+
+    "jem":      { "table": "JournalEntryMapping", "role": "Config: GL legs for the mnemonic", "keys": { "Mnemonic": "mnem", "AccountCode": "acct" } },
+    "tcsAfter": { "table": "TransactionChargeSales", "role": "Invoice balances now", "keys": { "CustomerKey": "cust", "ReferenceNo": "po", "InvoiceNo": "inv" }, "money": ["TotalAmount", "AmountPaid", "EWTAmount", "DiscountAmount", "OffsetAmount", "AdvancePayment", "Balance"] },
+    "payTm":    { "table": "TicketMaster", "role": "Payment GL ticket (header)", "keys": { "TicketNumber": "ticket", "ReferenceNumber": "ref", "ReferenceKey": "ref", "Mnemonic": "mnem" }, "mask": ["Owner", "EnteredBy"] },
+    "payTd":    { "table": "TicketDetails", "role": "Payment GL ticket (lines)", "keys": { "TicketNumber": "ticket", "ReferenceNumber": "ref", "ReferenceKey": "ref", "AccountCode": "acct" }, "money": ["Debit", "Credit"], "lookup": ["AccountName"], "total": true },
+    "payCl":    { "table": "ClientLedger", "role": "Client ledger: payment credit (one per invoice)", "keys": { "AccountKey": "cust", "ReferenceNumber": "ref", "ORNumber": "ref", "InvoiceNo": "inv", "TransCode": "mnem", "TicketReference": "ticket" }, "money": ["BeginningBalance", "Debit", "Credit", "EndingBalance"] },
+    "bsr":      { "table": "BankStatementRecon", "role": "Bank recon: deposit in transit", "keys": { "AccountCode": "acct", "ReferenceNo": "ref", "SourceRef": "ref" }, "money": ["Amount"], "empty": "No DIT line (no cash reached the bank account)." },
+    "ca":       { "table": "ClientAccounts", "role": "Client account balance now", "keys": { "AccountKey": "cust", "AccountID": "cust" }, "money": ["AccountBalance", "CashWalletBalance"], "mask": ["AccountName"] },
+
+    "revTm":    { "table": "TicketMaster", "role": "Reversal GL ticket (header)", "keys": { "TicketNumber": "ticket", "ReferenceNumber": "ref", "ReferenceKey": "ref" }, "mask": ["EnteredBy"], "empty": "Not reversed." },
+    "revTd":    { "table": "TicketDetails", "role": "Reversal GL ticket (lines, DR/CR swapped)", "keys": { "TicketNumber": "ticket", "ReferenceNumber": "ref", "AccountCode": "acct" }, "money": ["Debit", "Credit"], "lookup": ["AccountName"], "total": true, "empty": "Not reversed." },
+    "revCl":    { "table": "ClientLedger", "role": "Client ledger: reversal debit", "keys": { "AccountKey": "cust", "ReferenceNumber": "ref", "InvoiceNo": "inv", "TransCode": "mnem", "TicketReference": "ticket" }, "money": ["Debit", "Credit", "EndingBalance"], "empty": "Not reversed." }
+  },
+  "steps": [
+    { "n": 1, "title": "Sales invoice is created", "who": "sp_ConfirmOrder", "where": "Orders › Confirm sales order",
+      "what": "Writes the invoice and its lines, posts the SI-VAT / SI-VATEX ticket through sp_PostCompoundTicketSales, which also debits the client ledger. The ticket's ReferenceNumber is the PO and its ReferenceKey is the invoice.",
+      "tables": ["tcs", "tcsd", "salesTm", "salesTd", "salesCl"] },
+    { "n": 2, "title": "Payment is captured", "who": "ClientPaymentsDevExAcctg (C#, one SqlTransaction)", "where": "Accounting › Client Payments › Submit",
+      "what": "InsertPaymentHeader gets the reference number and returns the new PaymentHeaderID. InsertPaymentMethod writes the cheque, online or cash row. InsertARPaymentDetails writes INVOICE PAYMENT at gross plus one row each for EWT, DISCOUNT, OFFSET, OVERPAY, OVERPAYINCOME and SERVICES.",
+      "tables": ["ph", "cheque", "online", "cash", "arpd"] },
+    { "n": 3, "title": "Payment is posted", "who": "sp_AddPaymentClient @PaymentHeaderID", "where": "Called by the form before commit",
+      "what": "Sums ARPaymentDetails by type, picks the mnemonic, loads its JournalEntryMapping legs ({BANK} = DebitGLCode), checks DR = CR, then updates each invoice's AmountPaid / EWT / Discount / Offset / Balance / PayStatus, writes the ticket, one ClientLedger credit per invoice, and a DIT line in BankStatementRecon. The ledger trigger recomputes ClientAccounts.",
+      "tables": ["jem", "tcsAfter", "payTm", "payTd", "payCl", "bsr", "ca"] },
+    { "n": 4, "title": "Payment is reversed", "who": "sp_ReversePaymentClient", "where": "Client Payments › Posted › Reverse",
+      "what": "Backs the amounts out of each invoice, sets ARPaymentDetails.ErrorTag = 1, copies every ticket with ReferenceNumber = the payment reference with DR/CR swapped, mirrors the ledger rows, marks PaymentHeader REVERSED, flags the payment-method row and resolves the DIT line.",
+      "tables": ["revTm", "revTd", "revCl"] }
+  ],
+  "scenarios": [
+    { "id": "check-ewt", "title": "Cheque, 3 invoices, EWT withheld", "ids": "5155",
+      "story": "One cheque settles three invoices with EWT withheld on each. Two came from confirmed sales orders and have their own sales tickets; the third is a balance-forward invoice, so step 1 shows fewer tickets than invoices. Mnemonic OR-EWT: DR bank (net), DR creditable withholding tax, CR AR-trade (gross)." },
+    { "id": "cash-overpay-reversed", "title": "Cash with overpayment, reversed, then paid again", "ids": "5591,6163",
+      "story": "Payment 5591 paid four invoices in cash and carried 17,500 extra as customer credit (OR-OVERPAY). It was reversed, then posted again as 6163. Both payments share the invoices, so the invoice and customer keys light up across both runs." }
+  ],
+  "findings": [
+    { "level": "risk", "title": "Reversal matches tickets and ledger rows on the reference number alone",
+      "text": "sp_ReversePaymentClient copies every TicketMaster/TicketDetails row WHERE ReferenceNumber = the payment reference, and every ClientLedger row with that ReferenceNumber. Sales tickets carry the PO number in the same column, and PO numbers and payment references come from different counters. On COREX001, 34 payments share their reference with another ticket; 31 of them are still POSTED, so reversing one would also mirror an unrelated customer's sales ticket and ledger row. The 3 reversed ones ran before the colliding sales ticket existed. Suggested fix: filter by Mnemonic LIKE 'OR-%' (tickets) and AccountKey = the customer + TransCode LIKE 'OR-%' (ledger)." },
+    { "level": "info", "title": "ARPaymentDetails.TicketNumber stays blank",
+      "text": "The form inserts '' and the proc never fills it. The ticket is reachable through ClientLedger.TicketReference or TicketMaster.ReferenceNumber = the payment reference." }
+  ]
+},"data":{"check-ewt":{"tcs":{"c":["CustomerKey","BranchCode","TransactionDate","ReferenceNo","InvoiceNo","TotalAmount","PaymentType","DueDate","Remarks"],"r":[["00009981","010","2026-07-30","3008","Z_010667",26500.00,"CREDIT","2026-07-30","C.O.D."],["00009981","010","2026-08-06","6114","Z_010730",26000.00,"CREDIT","2026-08-06",""],["00009981","010","2026-08-12","7332","Z_010768",43072.80,"CREDIT","2026-08-12",""]]},"tcsd":{"c":["SeqNo","BranchCode","ReferenceNo","InvoiceNo","TransactionDate","Product","Quantity","Cost","SellingPrice","TotalAmount","SKU","TransCode","Type"],"r":[[1,"010","6114","Z_010730","2026-08-06","15055",200.000,119.09,130.00,26000.00,"150552000000001","SI-VATEX","SALES VAT EXEMPT"],[2,"010","6114","Z_010730","2026-08-06","15055",200.000,119.09,130.00,23818.00,"150552000000001","COGS-VATEX","COST OF SALES VATEX"],[1,"010","7332","Z_010768","2026-08-12","13160",37.320,265.54,290.00,10822.80,"13160373200002","SI-VATEX","SALES VAT EXEMPT"],[2,"010","7332","Z_010768","2026-08-12","13160",37.320,265.54,290.00,9909.95,"13160373200002","COGS-VATEX","COST OF SALES VATEX"],[3,"010","7332","Z_010768","2026-08-12","13480",50.000,95.54,125.00,6250.00,"13480500000001","SI-VATEX","SALES VAT EXEMPT"],[4,"010","7332","Z_010768","2026-08-12","13480",50.000,95.54,125.00,4777.00,"13480500000001","COGS-VATEX","COST OF SALES VATEX"],[5,"010","7332","Z_010768","2026-08-12","15055",200.000,119.09,130.00,26000.00,"150552000000003","SI-VATEX","SALES VAT EXEMPT"],[6,"010","7332","Z_010768","2026-08-12","15055",200.000,119.09,130.00,23818.00,"150552000000003","COGS-VATEX","COST OF SALES VATEX"]]},"salesTm":{"c":["TicketDate","BranchCode","TicketNumber","ReferenceNumber","ReferenceKey","Owner","Particulars","Status","Mnemonic","EnteredBy"],"r":[["2026-08-06","010","5593","6114","Z_010730","Customer A","SALES INVOICE | Customer: Customer A | PO: 6114 | Invoice: Z_010730","POSTED","SI-VATEX","User 1"],["2026-08-12","010","7008","7332","Z_010768","Customer A","SALES INVOICE | Customer: Customer A | PO: 7332 | Invoice: Z_010768","POSTED","SI-VATEX","User 1"]]},"salesTd":{"c":["TicketNumber","BranchCode","ReferenceNumber","ReferenceKey","AccountCode","AccountName","Debit","Credit"],"r":[["5593","010","6114","Z_010730","101030101","ACCOUNTS RECEIVABLE - TRADE",26000.0000,0.0000],["5593","010","6114","Z_010730","501","COS - VAT EXEMPT",23818.0000,0.0000],["5593","010","6114","Z_010730","101040201","INVENTORY - VAT EXEMPT",0.0000,23818.0000],["5593","010","6114","Z_010730","401","SALES - VAT EXEMPT",0.0000,26000.0000],["7008","010","7332","Z_010768","101030101","ACCOUNTS RECEIVABLE - TRADE",43072.8000,0.0000],["7008","010","7332","Z_010768","501","COS - VAT EXEMPT",38504.9500,0.0000],["7008","010","7332","Z_010768","101040201","INVENTORY - VAT EXEMPT",0.0000,38504.9500],["7008","010","7332","Z_010768","401","SALES - VAT EXEMPT",0.0000,43072.8000]]},"salesCl":{"c":["AccountKey","TRN_SEQ_NO","PostingDate","TransCode","ReferenceNumber","InvoiceNo","BeginningBalance","Debit","Credit","EndingBalance","TicketReference"],"r":[["00009981",1,"2026-08-06","SI-VATEX","6114","Z_010730",0.0000,26000.0000,0.0000,26000.0000,"5593"],["00009981",2,"2026-08-12","SI-VATEX","7332","Z_010768",26000.0000,43072.8000,0.0000,69072.8000,"7008"]]},"ph":{"c":["PaymentHeaderID","CustomerKey","ReferenceNo","ControlNo","CRNo","PaymentType","TotalAmount","PaymentDate","Remarks","CreatedBy","Status","ReversedBy","ReversedDate"],"r":[[5155,"00009981","28622","K2608-28-B","Z-CR-009731","CHECK",94617.07,"2026-08-28","CAR# 010295","User 1","POSTED",null,null]]},"cheque":{"c":["PaymentHeaderID","BranchCode","ControlNo","CRNo","CustomerID","CustomerName","CheckNo","CheckName","CheckBankName","CheckAmount","CheckDate","Amount","Remarks","CreditGLCode"],"r":[[5155,"010","K2608-28-B","Z-CR-009731","00009981","Customer A","1497994","","MBTC-ZAM",94617.0700,"2026-08-27",94617.0700,"CAR# 010295","101020107"]]},"arpd":{"c":["PaymentHeaderID","CustomerKey","ReferenceNo","PONumber","InvoiceNo","InvoiceDate","PaymentType","Amount","DebitGLCode","CreditGLCode","ErrorTag"],"r":[[5155,"00009981","28622","3008","Z_010667","2026-07-30","INVOICE PAYMENT",26500.00,"101020107",null,null],[5155,"00009981","28622","3008","Z_010667","2026-07-30","EWT",265.00,"101020107",null,null],[5155,"00009981","28622","6114","Z_010730","2026-08-06","INVOICE PAYMENT",26000.00,"101020107",null,null],[5155,"00009981","28622","6114","Z_010730","2026-08-06","EWT",260.00,"101020107",null,null],[5155,"00009981","28622","7332","Z_010768","2026-08-12","INVOICE PAYMENT",43072.80,"101020107",null,null],[5155,"00009981","28622","7332","Z_010768","2026-08-12","EWT",430.73,"101020107",null,null]]},"jem":{"c":["Origin","Mnemonic","Seq","DebitCredit","AccountCode","AccountDescription","AmountType","IsConditional","ConditionFlag"],"r":[["OR","OR-EWT",1,"D","{BANK}","Cash in Bank (net)","NET",false,null],["OR","OR-EWT",2,"D","1010504","PREPAID CORPORATE INCOME TAX (CWTAX)","EWT",true,"HasEWT"],["OR","OR-EWT",3,"C","101030101","Accounts Receivable - Trade","GROSS",false,null],["OR","OR-EWT",4,"C","101030103","ACCOUNTS RECEIVABLE - OTHERS","SERVICES",true,"HasServices"]]},"tcsAfter":{"c":["CustomerKey","ReferenceNo","InvoiceNo","TotalAmount","AmountPaid","EWTAmount","DiscountAmount","OffsetAmount","AdvancePayment","Balance","PayStatus"],"r":[["00009981","3008","Z_010667",26500.00,26235.00,265.00,0.00,0.00,0.00,0.00,"FULLYPAID"],["00009981","6114","Z_010730",26000.00,25740.00,260.00,null,null,null,0.00,"FULLYPAID"],["00009981","7332","Z_010768",43072.80,42642.07,430.73,null,null,null,0.00,"FULLYPAID"]]},"payTm":{"c":["TicketDate","BranchCode","Origin","TicketNumber","ReferenceNumber","ReferenceKey","Owner","Particulars","Status","Mnemonic","EnteredBy"],"r":[["2026-08-28","888","888","12933","28622","28622","Customer A","OR-EWT ENTRY","UPDATED","OR-EWT","User 1"]]},"payTd":{"c":["TicketNumber","BranchCode","ReferenceNumber","ReferenceKey","AccountCode","AccountName","Debit","Credit"],"r":[["12933","888","28622","28622","101020107","CASH IN BANK - MBTC PESO1",94617.0700,0.0000],["12933","888","28622","28622","1010504","PREPAID CORPORATE INCOME TAX (CWTAX)",955.7300,0.0000],["12933","888","28622","28622","101030101","ACCOUNTS RECEIVABLE - TRADE",0.0000,95572.8000]]},"payCl":{"c":["AccountKey","TRN_SEQ_NO","PostingDate","TransCode","ReferenceNumber","ORNumber","InvoiceNo","BeginningBalance","Debit","Credit","EndingBalance","TicketReference"],"r":[["00009981",13,"2026-08-28","OR-EWT","28622","28622","Z_010667",201572.8000,0.0000,26500.0000,175072.8000,"12933"],["00009981",14,"2026-08-28","OR-EWT","28622","28622","Z_010730",175072.8000,0.0000,26000.0000,149072.8000,"12933"],["00009981",15,"2026-08-28","OR-EWT","28622","28622","Z_010768",149072.8000,0.0000,43072.8000,106000.0000,"12933"]]},"bsr":{"c":["ReconID","HeaderID","BranchCode","AccountCode","PeriodEnd","ItemType","ItemDate","Payee","ReferenceNo","Amount","SourceModule","SourceRef","IsResolved","ResolvedReason"],"r":[[1011,1146,"888","101020107","2026-08-31","DIT","2026-08-28","CLIENT COLLECTION - Customer A","28622",94617.07,"AR-PAYMENT","28622",false,""]]},"ca":{"c":["AccountKey","AccountID","AccountName","AccountStatus","AccountBalance","CashWalletBalance"],"r":[["00009981","00009981","Customer A","Active",106000.00,0.00]]}},"cash-overpay-reversed":{"tcs":{"c":["CustomerKey","BranchCode","TransactionDate","ReferenceNo","InvoiceNo","TotalAmount","PaymentType","DueDate","Remarks"],"r":[["00001897","004","2026-07-13","602","C-047418",39529.40,"CREDIT","2026-07-13","C.O.D."],["00001897","004","2026-07-29","605","C-047988",20490.00,"CREDIT","2026-07-29","C.O.D."],["00001897","004","2026-08-01","4697","C-048095",37400.00,"CREDIT","2026-08-01",""],["00001897","004","2026-08-01","4722","C-048111",6000.00,"CREDIT","2026-08-01",""]]},"tcsd":{"c":["SeqNo","BranchCode","ReferenceNo","InvoiceNo","TransactionDate","Product","Quantity","Cost","SellingPrice","TotalAmount","SKU","TransCode","Type"],"r":[[1,"004","4697","C-048095","2026-08-01","13055",200.000,157.77,175.00,35000.00,"130552000000001","SI-VATEX","SALES VAT EXEMPT"],[2,"004","4697","C-048095","2026-08-01","13055",200.000,157.77,175.00,31554.00,"130552000000001","COGS-VATEX","COST OF SALES VATEX"],[3,"004","4697","C-048095","2026-08-01","15055",20.000,112.09,120.00,2400.00,"15055200000002","SI-VATEX","SALES VAT EXEMPT"],[4,"004","4697","C-048095","2026-08-01","15055",20.000,112.09,120.00,2241.80,"15055200000002","COGS-VATEX","COST OF SALES VATEX"],[1,"004","4722","C-048111","2026-08-01","13350",40.000,141.50,150.00,6000.00,"13350400000001","SI-VATEX","SALES VAT EXEMPT"],[2,"004","4722","C-048111","2026-08-01","13350",40.000,141.50,150.00,5660.00,"13350400000001","COGS-VATEX","COST OF SALES VATEX"]]},"salesTm":{"c":["TicketDate","BranchCode","TicketNumber","ReferenceNumber","ReferenceKey","Owner","Particulars","Status","Mnemonic","EnteredBy"],"r":[["2026-08-01","004","4553","4697","C-048095","Customer B","SALES INVOICE | Customer: Customer B | PO: 4697 | Invoice: C-048095","POSTED","SI-VATEX","User 2"],["2026-08-01","004","4578","4722","C-048111","Customer B","SALES INVOICE | Customer: Customer B | PO: 4722 | Invoice: C-048111","POSTED","SI-VATEX","User 2"]]},"salesTd":{"c":["TicketNumber","BranchCode","ReferenceNumber","ReferenceKey","AccountCode","AccountName","Debit","Credit"],"r":[["4553","004","4697","C-048095","101030101","ACCOUNTS RECEIVABLE - TRADE",37400.0000,0.0000],["4553","004","4697","C-048095","501","COS - VAT EXEMPT",33795.8000,0.0000],["4553","004","4697","C-048095","401","SALES - VAT EXEMPT",0.0000,37400.0000],["4553","004","4697","C-048095","101040201","INVENTORY - VAT EXEMPT",0.0000,33795.8000],["4578","004","4722","C-048111","101030101","ACCOUNTS RECEIVABLE - TRADE",6000.0000,0.0000],["4578","004","4722","C-048111","501","COS - VAT EXEMPT",5660.0000,0.0000],["4578","004","4722","C-048111","401","SALES - VAT EXEMPT",0.0000,6000.0000],["4578","004","4722","C-048111","101040201","INVENTORY - VAT EXEMPT",0.0000,5660.0000]]},"salesCl":{"c":["AccountKey","TRN_SEQ_NO","PostingDate","TransCode","ReferenceNumber","InvoiceNo","BeginningBalance","Debit","Credit","EndingBalance","TicketReference"],"r":[["00001897",1,"2026-08-01","SI-VATEX","4697","C-048095",0.0000,37400.0000,0.0000,37400.0000,"4553"],["00001897",2,"2026-08-01","SI-VATEX","4722","C-048111",37400.0000,6000.0000,0.0000,43400.0000,"4578"]]},"ph":{"c":["PaymentHeaderID","CustomerKey","ReferenceNo","ControlNo","CRNo","PaymentType","TotalAmount","PaymentDate","Remarks","CreatedBy","Status","ReversedBy","ReversedDate"],"r":[[5591,"00001897","29671","E2608-01-A","C-CR-041709","CASH",120919.40,"2026-08-01","","User 2","REVERSED","User 2","2026-09-23 13:26"],[6163,"00001897","30862","E2608-01-A","C-CR-041709","CASH",120919.40,"2026-08-01","","User 2","POSTED",null,null]]},"cash":{"c":["PaymentHeaderID","CustomerKey","AmountPaid","Remarks","DatePaid","TransactedBy","isErrorCorrect"],"r":[[5591,"00001897",120919.40,"","2026-08-01","User 2",true],[6163,"00001897",120919.40,"","2026-08-01","User 2",false]]},"arpd":{"c":["PaymentHeaderID","CustomerKey","ReferenceNo","PONumber","InvoiceNo","InvoiceDate","PaymentType","Amount","DebitGLCode","CreditGLCode","ErrorTag"],"r":[[5591,"00001897","29671","602","C-047418","2026-07-13","INVOICE PAYMENT",39529.40,"101020111",null,true],[5591,"00001897","29671","605","C-047988","2026-07-29","INVOICE PAYMENT",20490.00,"101020111",null,true],[5591,"00001897","29671","4697","C-048095","2026-08-01","INVOICE PAYMENT",37400.00,"101020111",null,true],[5591,"00001897","29671","4722","C-048111","2026-08-01","INVOICE PAYMENT",6000.00,"101020111",null,true],[5591,"00001897","29671","4722","C-048111","2026-08-01","OVERPAY",17500.00,"101020111",null,true],[6163,"00001897","30862","602","C-047418","2026-07-13","INVOICE PAYMENT",39529.40,"101020111",null,null],[6163,"00001897","30862","605","C-047988","2026-07-29","INVOICE PAYMENT",20490.00,"101020111",null,null],[6163,"00001897","30862","4697","C-048095","2026-08-01","INVOICE PAYMENT",37400.00,"101020111",null,null],[6163,"00001897","30862","4722","C-048111","2026-08-01","INVOICE PAYMENT",6000.00,"101020111",null,null],[6163,"00001897","30862","4722","C-048111","2026-08-01","OVERPAY",17500.00,"101020111",null,null]]},"jem":{"c":["Origin","Mnemonic","Seq","DebitCredit","AccountCode","AccountDescription","AmountType","IsConditional","ConditionFlag"],"r":[["OR","OR-OVERPAY",1,"D","{BANK}","Cash in Bank","NET_OVERPAY",false,null],["OR","OR-OVERPAY",2,"C","101030101","Accounts Receivable - Trade","GROSS",false,null],["OR","OR-OVERPAY",3,"C","20115","Other Income","OVERPAY",true,"HasOverpay"],["OR","OR-OVERPAY",4,"C","101030103","ACCOUNTS RECEIVABLE - OTHERS","SERVICES",true,"HasServices"]]},"tcsAfter":{"c":["CustomerKey","ReferenceNo","InvoiceNo","TotalAmount","AmountPaid","EWTAmount","DiscountAmount","OffsetAmount","AdvancePayment","Balance","PayStatus"],"r":[["00001897","602","C-047418",39529.40,39529.40,0.00,0.00,0.00,0.00,0.00,"FULLYPAID"],["00001897","605","C-047988",20490.00,20490.00,0.00,0.00,0.00,0.00,0.00,"FULLYPAID"],["00001897","4697","C-048095",37400.00,37400.00,null,null,null,null,0.00,"FULLYPAID"],["00001897","4722","C-048111",6000.00,6000.00,null,null,null,35000.00,0.00,"FULLYPAID"]]},"payTm":{"c":["TicketDate","BranchCode","Origin","TicketNumber","ReferenceNumber","ReferenceKey","Owner","Particulars","Status","Mnemonic","EnteredBy"],"r":[["2026-08-01","888","888","13696","29671","29671","Customer B","OR-OVERPAY ENTRY","UPDATED","OR-OVERPAY","User 2"],["2026-08-01","888","888","14614","30862","30862","Customer B","OR-OVERPAY ENTRY","UPDATED","OR-OVERPAY","User 2"]]},"payTd":{"c":["TicketNumber","BranchCode","ReferenceNumber","ReferenceKey","AccountCode","AccountName","Debit","Credit"],"r":[["13696","888","29671","29671","101020111","CASH IN BANK - PNB PESO",120919.4000,0.0000],["13696","888","29671","29671","101030101","ACCOUNTS RECEIVABLE - TRADE",0.0000,103419.4000],["13696","888","29671","29671","404","OTHER INCOME",0.0000,17500.0000],["14614","888","30862","30862","101020111","CASH IN BANK - PNB PESO",120919.4000,0.0000],["14614","888","30862","30862","101030101","ACCOUNTS RECEIVABLE - TRADE",0.0000,103419.4000],["14614","888","30862","30862","20115","CUSTOMER ADVANCES / OVERPAYMENTS",0.0000,17500.0000]]},"payCl":{"c":["AccountKey","TRN_SEQ_NO","PostingDate","TransCode","ReferenceNumber","ORNumber","InvoiceNo","BeginningBalance","Debit","Credit","EndingBalance","TicketReference"],"r":[["00001897",28,"2026-08-01","OR-OVERPAY","29671","29671","C-047418",596304.3500,0.0000,39529.4000,556774.9500,"13696"],["00001897",29,"2026-08-01","OR-OVERPAY","29671","29671","C-047988",556774.9500,0.0000,20490.0000,536284.9500,"13696"],["00001897",30,"2026-08-01","OR-OVERPAY","29671","29671","C-048095",536284.9500,0.0000,37400.0000,498884.9500,"13696"],["00001897",31,"2026-08-01","OR-OVERPAY","29671","29671","C-048111",498884.9500,0.0000,6000.0000,492884.9500,"13696"],["00001897",37,"2026-08-01","OR-OVERPAY","30862","30862","C-047418",521850.7500,0.0000,39529.4000,482321.3500,"14614"],["00001897",38,"2026-08-01","OR-OVERPAY","30862","30862","C-047988",482321.3500,0.0000,20490.0000,461831.3500,"14614"],["00001897",39,"2026-08-01","OR-OVERPAY","30862","30862","C-048095",461831.3500,0.0000,37400.0000,424431.3500,"14614"],["00001897",40,"2026-08-01","OR-OVERPAY","30862","30862","C-048111",424431.3500,0.0000,6000.0000,418431.3500,"14614"]]},"bsr":{"c":["ReconID","HeaderID","BranchCode","AccountCode","PeriodEnd","ItemType","ItemDate","Payee","ReferenceNo","Amount","SourceModule","SourceRef","IsResolved","ResolvedReason"],"r":[[1491,1144,"888","101020111","2026-08-31","DIT","2026-08-01","CLIENT COLLECTION - Customer B","29671",120919.40,"AR-PAYMENT","29671",true,"REVERSED"],[2080,1144,"888","101020111","2026-08-31","DIT","2026-08-01","CLIENT COLLECTION - Customer B","30862",120919.40,"AR-PAYMENT","30862",false,""]]},"ca":{"c":["AccountKey","AccountID","AccountName","AccountStatus","AccountBalance","CashWalletBalance"],"r":[["00001897","00001897","Customer B","Active",132896.25,0.00]]},"revTm":{"c":["TicketDate","BranchCode","TicketNumber","ReferenceNumber","ReferenceKey","Particulars","Status","EnteredBy","Product"],"r":[["2026-08-01","888","13883","29671","29671","REVERSAL: OR-OVERPAY ENTRY","REVERSED","User 2","REVERSAL of 29671"]]},"revTd":{"c":["TicketNumber","ReferenceNumber","AccountCode","AccountName","Debit","Credit"],"r":[["13883","29671","101030101","ACCOUNTS RECEIVABLE - TRADE",103419.4000,0.0000],["13883","29671","404","OTHER INCOME",17500.0000,0.0000],["13883","29671","101020111","CASH IN BANK - PNB PESO",0.0000,120919.4000]]},"revCl":{"c":["AccountKey","TRN_SEQ_NO","PostingDate","TransCode","ReferenceNumber","InvoiceNo","Debit","Credit","EndingBalance","TicketReference","Remarks"],"r":[["00001897",32,"2026-09-23 13:26","OR-OVERPAY","29671","C-047418",39529.4000,0.0000,532414.3500,"13883","REVERSAL ENTRY"],["00001897",33,"2026-09-23 13:26","OR-OVERPAY","29671","C-047988",20490.0000,0.0000,552904.3500,"13883","REVERSAL ENTRY"],["00001897",34,"2026-09-23 13:26","OR-OVERPAY","29671","C-048095",37400.0000,0.0000,590304.3500,"13883","REVERSAL ENTRY"],["00001897",35,"2026-09-23 13:26","OR-OVERPAY","29671","C-048111",6000.0000,0.0000,596304.3500,"13883","REVERSAL ENTRY"]]}}}}]};
+(function(){
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const fmtN = (v, d) => Number(v).toLocaleString('en-US', {minimumFractionDigits:d, maximumFractionDigits:d});
+  const norm = v => { const s = String(v).trim(); return /^\d+(\.0+)?$/.test(s) ? String(BigInt(s.split('.')[0])) : s.toUpperCase(); };
+
+  let mod, scen, data, keyById = {}, pinned = null, famFocus = null;
+
+  function initModules(){
+    $('modSel').innerHTML = TRACE.modules.map((m, i) => '<option value="' + i + '">' + esc(m.def.title) + '</option>').join('');
+    let start = 0;
+    try { const saved = localStorage.getItem('pt.module'); if (saved) { const i = TRACE.modules.findIndex(m => m.def.id === saved); if (i >= 0) start = i; } } catch(e){}
+    $('modSel').value = String(start);
+    setModule(start);
+  }
+  function setModule(i){
+    mod = TRACE.modules[i].def; const md = TRACE.modules[i].data;
+    try { localStorage.setItem('pt.module', mod.id); } catch(e){}
+    keyById = {}; mod.keys.forEach(k => keyById[k.id] = k);
+    $('scSel').innerHTML = mod.scenarios.map(s => '<option value="' + esc(s.id) + '">' + esc(s.title) + '</option>').join('');
+    setScenario(mod.scenarios[0].id, md);
+  }
+  function setScenario(id, md){
+    md = md || TRACE.modules[+$('modSel').value].data;
+    scen = mod.scenarios.find(s => s.id === id); data = md[id] || {};
+    pinned = null; famFocus = null; render();
+  }
+
+  // column classification
+  const cfg = tid => mod.tables[tid] || {};
+  const famOf = (tid, col) => (cfg(tid).keys || {})[col];
+  const isMoney = (tid, col) => (cfg(tid).money || []).includes(col);
+  const isQty = (tid, col) => (cfg(tid).qty || []).includes(col);
+  const isText = col => /Remarks|Particulars|Description|Payee|Product$|Name$/i.test(col) && !/^Product$/.test(col);
+
+  function cell(tid, col, v){
+    if (v === null || v === undefined || v === '') return '<td class="null">' + (v === '' ? '' : 'NULL') + '</td>';
+    const fam = famOf(tid, col);
+    if (fam && keyById[fam]){
+      const k = keyById[fam], n = norm(v);
+      return '<td class="kc"><span class="kv' + (famFocus === fam ? ' fam' : '') + (pinned && pinned.f === fam && pinned.v === n ? ' pin' : '') + '" style="--kc:' + k.color + '" data-f="' + fam + '" data-v="' + esc(n) + '" title="' + esc(k.label + ' · ' + col) + '" tabindex="0">' + esc(v) + '</span></td>';
+    }
+    if (isMoney(tid, col) && typeof v === 'number') return '<td class="num">' + fmtN(v, 2) + '</td>';
+    if (isQty(tid, col) && typeof v === 'number') return '<td class="num">' + fmtN(v, 3) + '</td>';
+    if (typeof v === 'number') return '<td class="num">' + esc(v) + '</td>';
+    if (v === true || v === false) return '<td>' + (v ? '1' : '0') + '</td>';
+    return '<td' + (isText(col) ? ' class="txt"' : '') + '>' + esc(v) + '</td>';
+  }
+
+  function tableCard(tid){
+    const c = cfg(tid), d = data[tid];
+    let h = '<div class="card" id="card-' + tid + '"><div class="cardhead"><span class="tn">' + esc(c.table || tid) + '</span><span class="role">' + esc(c.role || '') + '</span>'
+      + '<span class="rc">' + (d ? d.r.length + ' row' + (d.r.length === 1 ? '' : 's') : '0 rows') + '</span></div>';
+    if (!d){ return h + '<p class="empty-note">' + esc(c.empty || 'No rows for this transaction.') + '</p></div>'; }
+    let idx = d.c.map((_, i) => i);
+    if ($('compact').checked) idx = idx.filter(i => famOf(tid, d.c[i]) || isMoney(tid, d.c[i]) || isQty(tid, d.c[i]) || /Type$|Status|TransCode|AccountName/.test(d.c[i]));
+    h += '<div class="tw"><table><thead><tr>' + idx.map(i => {
+      const col = d.c[i], fam = famOf(tid, col);
+      const cls = [fam ? 'k' : '', isMoney(tid, col) || isQty(tid, col) ? 'num' : ''].filter(Boolean).join(' ');
+      return '<th' + (cls ? ' class="' + cls + '"' : '') + (fam ? ' style="--kc:' + keyById[fam].color + '" title="' + esc(keyById[fam].label) + '"' : '') + '>' + esc(col) + '</th>';
+    }).join('') + '</tr></thead><tbody>';
+    d.r.forEach(r => { h += '<tr>' + idx.map(i => cell(tid, d.c[i], r[i])).join('') + '</tr>'; });
+    h += '</tbody>';
+    // totals
+    const moneyIdx = idx.filter(i => isMoney(tid, d.c[i]));
+    if (c.total && moneyIdx.length){
+      const foot = rows => '<tr>' + idx.map((i, j) => {
+        if (moneyIdx.includes(i)) return '<td class="num">' + fmtN(rows.reduce((s, r) => s + (typeof r[i] === 'number' ? r[i] : 0), 0), 2) + '</td>';
+        return j === 0 ? '<td class="lbl">' + '{L}' + '</td>' : '<td></td>';
+      }).join('') + '</tr>';
+      if (c.total === true){ h += '<tfoot>' + foot(d.r).replace('{L}', 'Total') + '</tfoot>'; }
+      else {
+        const gi = d.c.indexOf(c.total); const groups = {};
+        d.r.forEach(r => (groups[r[gi]] = groups[r[gi]] || []).push(r));
+        h += '<tfoot>' + Object.keys(groups).map(g => foot(groups[g]).replace('{L}', esc(g))).join('') + '</tfoot>';
+      }
+    }
+    return h + '</table></div></div>';
+  }
+
+  function keyMatrix(){
+    const rows = [];
+    mod.steps.forEach(s => s.tables.forEach(tid => rows.push([s.n, tid])));
+    let h = '<div class="card matrix"><div class="tw"><table><thead><tr><th>Step</th><th>Table</th><th>Role</th>'
+      + mod.keys.map(k => '<th class="kh" style="--kc:' + k.color + '">' + esc(k.label) + '</th>').join('') + '</tr></thead><tbody>';
+    rows.forEach(([n, tid]) => {
+      const c = cfg(tid), keys = c.keys || {};
+      h += '<tr><td class="step">' + n + '</td><td class="mono">' + esc(c.table) + '</td><td>' + esc(c.role || '') + '</td>' + mod.keys.map(k => {
+        const cols = Object.keys(keys).filter(col => keys[col] === k.id);
+        return cols.length ? '<td class="hit" style="--kc:' + k.color + '">' + esc(cols.join(', ')) + '</td>' : '<td class="miss">·</td>';
+      }).join('') + '</tr>';
+    });
+    return h + '</tbody></table></div></div>';
+  }
+
+  function render(){
+    // key counts in this scenario
+    const counts = {};
+    for (const tid in data){ const d = data[tid]; d.c.forEach((col, i) => { const f = famOf(tid, col); if (f) { counts[f] = counts[f] || new Set(); d.r.forEach(r => { if (r[i] !== null && r[i] !== '') counts[f].add(norm(r[i])); }); } }); }
+    $('keys').innerHTML = mod.keys.map(k => '<button type="button" class="keybtn" style="--kc:' + k.color + '" data-fam="' + k.id + '" aria-pressed="' + (famFocus === k.id) + '" title="' + esc(k.note) + '"><span class="sw"></span>' + esc(k.label) + '<span class="cnt">' + (counts[k.id] ? counts[k.id].size : 0) + '</span></button>').join('');
+
+    let h = '<header class="hero"><h1>' + esc(mod.title) + '</h1><div class="sub">' + esc(mod.subtitle) + ' · <code>' + esc(mod.form) + '</code></div><p>' + esc(mod.summary) + '</p>'
+      + '<div class="meta">Real rows from <b>' + esc(TRACE.db) + '</b>, generated <b>' + esc(TRACE.generated) + '</b>' + (TRACE.masked ? ' · customer and user names replaced with pseudonyms; keys and amounts are real' : '') + '.</div></header>';
+    h += '<div class="story"><b>' + esc(scen.title) + '</b> (PaymentHeaderID ' + esc(scen.ids) + '). ' + esc(scen.story) + '</div>';
+    h += '<div class="flow">' + mod.steps.map(s => '<button type="button" class="fstep" data-goto="step-' + s.n + '"><span class="no">STEP ' + s.n + '</span><span class="tt">' + esc(s.title) + '</span><span class="who">' + esc(s.who) + '</span><span class="tbls">'
+      + s.tables.map(t => '<span class="' + (data[t] ? '' : 'empty') + '">' + esc(cfg(t).table) + '</span>').join('') + '</span></button>').join('') + '</div>';
+    mod.steps.forEach(s => {
+      h += '<section class="step" id="step-' + s.n + '"><div class="stephead"><div class="stepno">' + s.n + '</div><h2>' + esc(s.title) + '</h2>'
+        + '<div class="who"><code>' + esc(s.who) + '</code> · ' + esc(s.where) + '</div><p>' + esc(s.what) + '</p></div>'
+        + s.tables.map(tableCard).join('') + '</section>';
+    });
+    h += '<h2 class="sec">Where each key lives</h2><p class="secnote">Every table in this module and the column that carries each linking key. Read across a row to see what a table can be joined on; read down a column to see every table a key reaches.</p>' + keyMatrix();
+    if (mod.findings && mod.findings.length){
+      h += '<h2 class="sec">Findings</h2><div class="findings">' + mod.findings.map(f => '<div class="finding ' + (f.level === 'risk' ? 'risk' : 'info') + '"><span class="lv">' + (f.level === 'risk' ? 'Risk' : 'Note') + '</span><h4>' + esc(f.title) + '</h4><p>' + esc(f.text) + '</p></div>').join('') + '</div>';
+    }
+    h += '<footer>Rebuild with <code>tools/ProcessTrace/Build-ProcessTrace.ps1</code>. Each module is a pair of files in <code>tools/ProcessTrace/modules/</code>: a JSON definition (steps, tables, keys, sample transactions, findings) and a read-only trace query.</footer>';
+    $('main').innerHTML = h;
+    document.body.classList.toggle('famfocus', !!famFocus);
+    renderInspector();
+  }
+
+  function occurrences(f, v){
+    const out = [];
+    mod.steps.forEach(s => s.tables.forEach(tid => {
+      const d = data[tid]; if (!d) return;
+      d.c.forEach((col, i) => { if (famOf(tid, col) !== f) return; const n = d.r.filter(r => r[i] !== null && norm(r[i]) === v).length; if (n) out.push({s: s.n, tid, col, n}); });
+    }));
+    return out;
+  }
+  function renderInspector(){
+    if (!pinned){ $('insBody').innerHTML = '<p class="none">Click any colored value to pin it and list every table and column where it appears.</p>'; document.body.classList.remove('focusing'); return; }
+    const k = keyById[pinned.f], occ = occurrences(pinned.f, pinned.v);
+    $('insBody').innerHTML = '<div style="font-size:11.5px;color:var(--text-dim);margin-bottom:4px">' + esc(k.label) + '</div><span class="val" style="--kc:' + k.color + '">' + esc(pinned.raw) + '</span>'
+      + '<ul>' + occ.map(o => '<li><button type="button" data-card="' + o.tid + '">' + o.s + ' · ' + esc(cfg(o.tid).table) + '.' + esc(o.col) + '</button><span>×' + o.n + '</span></li>').join('') + '</ul>'
+      + '<p class="none" style="margin-top:8px">' + esc(k.note) + '</p><div class="btnrow"><button class="btn" id="unpin" type="button">Clear</button></div>';
+    document.querySelectorAll('.kv').forEach(el => el.classList.toggle('pin', el.dataset.f === pinned.f && el.dataset.v === pinned.v));
+    document.body.classList.add('focusing');
+    document.querySelectorAll('.kv').forEach(el => el.classList.toggle('hot', el.dataset.f === pinned.f && el.dataset.v === pinned.v));
+  }
+  function hover(el, on){
+    if (pinned) return;
+    const f = el.dataset.f, v = el.dataset.v;
+    document.querySelectorAll('.kv').forEach(x => x.classList.toggle('hot', on && x.dataset.f === f && x.dataset.v === v));
+    document.body.classList.toggle('focusing', on);
+  }
+
+  document.addEventListener('mouseover', e => { const el = e.target.closest('.kv'); if (el) hover(el, true); });
+  document.addEventListener('mouseout', e => { const el = e.target.closest('.kv'); if (el) hover(el, false); });
+  document.addEventListener('click', e => {
+    const kv = e.target.closest('.kv');
+    if (kv){ const same = pinned && pinned.f === kv.dataset.f && pinned.v === kv.dataset.v; pinned = same ? null : {f: kv.dataset.f, v: kv.dataset.v, raw: kv.textContent}; if (!pinned) document.querySelectorAll('.kv').forEach(x => x.classList.remove('hot', 'pin')); renderInspector(); return; }
+    if (e.target.id === 'unpin'){ pinned = null; document.querySelectorAll('.kv').forEach(x => x.classList.remove('hot', 'pin')); renderInspector(); return; }
+    const card = e.target.closest('[data-card]');
+    if (card){ const el = $('card-' + card.dataset.card); if (el){ el.scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start'}); el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); } return; }
+    const go = e.target.closest('[data-goto]');
+    if (go){ $(go.dataset.goto).scrollIntoView({behavior: 'smooth', block: 'start'}); return; }
+    const fb = e.target.closest('.keybtn');
+    if (fb){ famFocus = famFocus === fb.dataset.fam ? null : fb.dataset.fam; render(); return; }
+    if (e.target.id === 'clearFam'){ famFocus = null; render(); }
+  });
+  document.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.classList && e.target.classList.contains('kv')){ e.preventDefault(); e.target.click(); } });
+  $('modSel').addEventListener('change', e => setModule(+e.target.value));
+  $('scSel').addEventListener('change', e => setScenario(e.target.value));
+  $('compact').addEventListener('change', render);
+  initModules();
+})();
+</script>

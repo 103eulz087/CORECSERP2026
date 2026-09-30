@@ -1,0 +1,334 @@
+<title>Process Trace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#eef1f3; --surface:#ffffff; --surface-2:#f4f6f8; --grid:#e3e8ec; --border:#cfd7de;
+  --text:#16202a; --text-dim:#51606e; --text-faint:#85919c;
+  --accent:#1f5f99; --accent-tint:#e5eef7;
+  --risk:#b3261e; --risk-bg:#fbeceb; --info:#1f5f99; --info-bg:#e8f0f8;
+  --mix-base:#ffffff;
+  --shadow:0 1px 2px rgba(18,28,40,.06),0 4px 14px rgba(18,28,40,.05);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0e1216; --surface:#151b21; --surface-2:#1a2129; --grid:#232c35; --border:#2d3843;
+    --text:#e4e9ee; --text-dim:#a0acb8; --text-faint:#6d7985;
+    --accent:#6ea8dc; --accent-tint:#16283a;
+    --risk:#ff8a80; --risk-bg:#3a1a19; --info:#8cbde8; --info-bg:#15263a;
+    --mix-base:#151b21;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 14px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0e1216; --surface:#151b21; --surface-2:#1a2129; --grid:#232c35; --border:#2d3843;
+  --text:#e4e9ee; --text-dim:#a0acb8; --text-faint:#6d7985;
+  --accent:#6ea8dc; --accent-tint:#16283a;
+  --risk:#ff8a80; --risk-bg:#3a1a19; --info:#8cbde8; --info-bg:#15263a;
+  --mix-base:#151b21;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 14px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:14px;line-height:1.5}
+.mono,code{font-family:"IBM Plex Mono",ui-monospace,Consolas,monospace}
+code{font-size:.92em;background:var(--surface-2);border:1px solid var(--grid);border-radius:4px;padding:0 4px}
+.shell{max-width:1480px;margin:0 auto;padding-inline:16px;padding-block:20px 64px;display:grid;grid-template-columns:280px minmax(0,1fr);gap:24px;align-items:start}
+aside{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);display:flex;flex-direction:column;gap:16px;max-height:calc(100vh - 32px);overflow:auto;padding-bottom:8px}
+.brand{font-family:"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;font-weight:700;font-size:20px;letter-spacing:.01em;margin:0}
+.brand small{display:block;font-family:"IBM Plex Sans",sans-serif;font-weight:400;font-size:12px;color:var(--text-faint);letter-spacing:0;margin-top:2px}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px}
+.panel h3{margin:0 0 8px;font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);font-weight:600}
+label.fld{display:block;font-size:12px;color:var(--text-dim);margin-bottom:4px}
+select{width:100%;padding:7px 8px;border-radius:7px;border:1px solid var(--border);background:var(--surface);color:var(--text);font:inherit;font-size:13px}
+select:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.keys{display:flex;flex-direction:column;gap:2px}
+.keybtn{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:none;border:1px solid transparent;border-radius:6px;padding:4px 6px;font:inherit;font-size:12.5px;color:var(--text);cursor:pointer}
+.keybtn:hover{background:var(--surface-2)}
+.keybtn[aria-pressed="true"]{border-color:var(--kc);background:color-mix(in srgb,var(--kc) 14%,var(--mix-base))}
+.sw{width:12px;height:12px;border-radius:3px;background:var(--kc);flex:none}
+.keybtn .cnt{margin-left:auto;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--text-faint)}
+.inspector .none{color:var(--text-faint);font-size:12.5px}
+.inspector .val{font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:600;padding:2px 8px;border-radius:5px;display:inline-block;background:color-mix(in srgb,var(--kc) 22%,var(--mix-base));border-left:3px solid var(--kc)}
+.inspector ul{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:2px}
+.inspector li button{background:none;border:0;padding:3px 0;font:inherit;font-size:12.5px;color:var(--accent);cursor:pointer;text-align:left}
+.inspector li button:hover{text-decoration:underline}
+.inspector li span{color:var(--text-faint);font-family:"IBM Plex Mono",monospace;font-size:11px;margin-left:4px}
+.btnrow{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.btn{padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--text);font:inherit;font-size:12px;cursor:pointer}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.tog{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--text-dim);cursor:pointer;margin-top:6px}
+.tog input{accent-color:var(--accent);margin:0}
+
+main{min-width:0;display:flex;flex-direction:column;gap:20px}
+.hero h1{margin:0;font-family:"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;font-size:28px;font-weight:700;letter-spacing:-.005em;text-wrap:balance}
+.hero .sub{color:var(--text-dim);margin:2px 0 10px;font-size:14px}
+.hero p{margin:0;max-width:80ch;color:var(--text)}
+.meta{font-size:12px;color:var(--text-faint);margin-top:10px}
+.meta b{color:var(--text-dim);font-weight:600}
+.story{background:var(--accent-tint);border:1px solid color-mix(in srgb,var(--accent) 30%,var(--mix-base));border-radius:10px;padding:10px 14px;font-size:13.5px;max-width:100ch}
+.story b{font-weight:600}
+
+.flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.fstep{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;text-align:left;font:inherit;color:inherit;cursor:pointer;display:flex;flex-direction:column;gap:6px;box-shadow:var(--shadow);position:relative}
+.fstep:hover{border-color:var(--accent)}
+.fstep .no{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--text-faint)}
+.fstep .tt{font-weight:600;font-size:13.5px;line-height:1.3}
+.fstep .who{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--accent)}
+.fstep .tbls{display:flex;flex-wrap:wrap;gap:4px}
+.fstep .tbls span{font-family:"IBM Plex Mono",monospace;font-size:10.5px;background:var(--surface-2);border:1px solid var(--grid);border-radius:4px;padding:0 5px;color:var(--text-dim)}
+.fstep .tbls span.empty{opacity:.45;text-decoration:line-through}
+
+section.step{display:flex;flex-direction:column;gap:12px;scroll-margin-top:16px}
+.stephead{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:start;border-top:2px solid var(--text);padding-top:10px}
+.stepno{font-family:"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;font-weight:700;font-size:34px;line-height:1;color:var(--text);grid-row:span 3}
+.stephead h2{margin:0;font-family:"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;font-size:21px;font-weight:600;text-wrap:balance}
+.stephead .who{font-size:12.5px;color:var(--text-dim)}
+.stephead .who code{color:var(--accent)}
+.stephead p{margin:2px 0 0;max-width:95ch;font-size:13.5px}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow);overflow:hidden;scroll-margin-top:16px}
+.card.flash{animation:flash 1.2s ease-out}
+@keyframes flash{0%{box-shadow:0 0 0 3px var(--accent)}100%{box-shadow:var(--shadow)}}
+.cardhead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;padding:9px 14px;border-bottom:1px solid var(--grid)}
+.cardhead .tn{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:13.5px}
+.cardhead .role{color:var(--text-dim);font-size:12.5px}
+.cardhead .rc{margin-left:auto;font-size:11.5px;color:var(--text-faint);font-variant-numeric:tabular-nums}
+.empty-note{padding:12px 14px;color:var(--text-faint);font-size:13px}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:max-content;min-width:100%;font-size:12.5px}
+th{position:sticky;top:0;background:var(--surface-2);text-align:left;font-weight:600;font-size:11px;color:var(--text-dim);padding:6px 10px;border-bottom:1px solid var(--border);white-space:nowrap}
+th.k{box-shadow:inset 0 -3px 0 var(--kc)}
+th.num,td.num{text-align:right}
+td{padding:4px 10px;border-bottom:1px solid var(--grid);white-space:nowrap;font-variant-numeric:tabular-nums;vertical-align:top}
+td.txt{white-space:normal;min-width:180px;max-width:360px}
+td.null{color:var(--text-faint);font-style:italic}
+td.num{font-family:"IBM Plex Mono",monospace;font-size:12px}
+td.kc{padding:3px 6px}
+.kv{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:500;padding:1px 7px;border-radius:5px;background:color-mix(in srgb,var(--kc) 20%,var(--mix-base));border-left:3px solid var(--kc);cursor:pointer;color:var(--text);line-height:1.6}
+.kv:hover,.kv.hot{background:color-mix(in srgb,var(--kc) 45%,var(--mix-base));outline:2px solid var(--kc);outline-offset:0}
+.kv.pin{outline:2px solid var(--text);background:color-mix(in srgb,var(--kc) 55%,var(--mix-base))}
+body.focusing .kv:not(.hot):not(.pin){opacity:.35}
+body.famfocus .kv:not(.fam){opacity:.3}
+tfoot td{background:var(--surface-2);font-weight:600;border-top:1px solid var(--border)}
+tfoot td.lbl{font-family:"IBM Plex Sans",sans-serif;font-size:11.5px;color:var(--text-dim)}
+
+.matrix .tw table{font-size:12px}
+.matrix td.hit{font-family:"IBM Plex Mono",monospace;font-size:11.5px;background:color-mix(in srgb,var(--kc) 16%,var(--mix-base))}
+.matrix td.miss{color:var(--grid)}
+.matrix th.kh{text-align:center;box-shadow:inset 0 -3px 0 var(--kc)}
+.matrix td.step{font-family:"IBM Plex Mono",monospace;color:var(--text-faint)}
+
+.findings{display:flex;flex-direction:column;gap:10px}
+.finding{border-radius:10px;padding:10px 14px;border:1px solid;max-width:110ch}
+.finding.risk{background:var(--risk-bg);border-color:color-mix(in srgb,var(--risk) 40%,var(--mix-base))}
+.finding.info{background:var(--info-bg);border-color:color-mix(in srgb,var(--info) 35%,var(--mix-base))}
+.finding .lv{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+.finding.risk .lv{color:var(--risk)} .finding.info .lv{color:var(--info)}
+.finding h4{margin:2px 0 4px;font-size:14px}
+.finding p{margin:0;font-size:13px}
+h2.sec{margin:8px 0 0;font-family:"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;font-size:21px;font-weight:600;border-top:2px solid var(--text);padding-top:10px}
+.secnote{margin:0;color:var(--text-dim);font-size:13px;max-width:95ch}
+footer{font-size:12px;color:var(--text-faint);max-width:100ch}
+
+@media (max-width:900px){
+  .shell{grid-template-columns:1fr}
+  aside{position:static;max-height:none}
+}
+@media (prefers-reduced-motion:reduce){.card.flash{animation:none}}
+</style>
+
+<div class="shell">
+  <aside>
+    <p class="brand">Process Trace<small>CORECS ERP · follow one transaction through every table it touches</small></p>
+    <div class="panel">
+      <label class="fld" for="modSel">Module</label>
+      <select id="modSel"></select>
+      <label class="fld" for="scSel" style="margin-top:10px">Sample transaction</label>
+      <select id="scSel"></select>
+      <label class="tog"><input type="checkbox" id="compact">Key and amount columns only</label>
+    </div>
+    <div class="panel">
+      <h3>Linking keys</h3>
+      <div class="keys" id="keys"></div>
+      <div class="btnrow"><button class="btn" id="clearFam" type="button">Show all keys</button></div>
+    </div>
+    <div class="panel inspector" id="inspector">
+      <h3>Selected value</h3>
+      <div id="insBody"><p class="none">Click any colored value to pin it and list every table and column where it appears.</p></div>
+    </div>
+  </aside>
+  <main id="main"></main>
+</div>
+
+<script>
+const TRACE = /*__TRACE_DATA__*/null;
+(function(){
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const fmtN = (v, d) => Number(v).toLocaleString('en-US', {minimumFractionDigits:d, maximumFractionDigits:d});
+  const norm = v => { const s = String(v).trim(); return /^\d+(\.0+)?$/.test(s) ? String(BigInt(s.split('.')[0])) : s.toUpperCase(); };
+
+  let mod, scen, data, keyById = {}, pinned = null, famFocus = null;
+
+  function initModules(){
+    $('modSel').innerHTML = TRACE.modules.map((m, i) => '<option value="' + i + '">' + esc(m.def.title) + '</option>').join('');
+    let start = 0;
+    try { const saved = localStorage.getItem('pt.module'); if (saved) { const i = TRACE.modules.findIndex(m => m.def.id === saved); if (i >= 0) start = i; } } catch(e){}
+    $('modSel').value = String(start);
+    setModule(start);
+  }
+  function setModule(i){
+    mod = TRACE.modules[i].def; const md = TRACE.modules[i].data;
+    try { localStorage.setItem('pt.module', mod.id); } catch(e){}
+    keyById = {}; mod.keys.forEach(k => keyById[k.id] = k);
+    $('scSel').innerHTML = mod.scenarios.map(s => '<option value="' + esc(s.id) + '">' + esc(s.title) + '</option>').join('');
+    setScenario(mod.scenarios[0].id, md);
+  }
+  function setScenario(id, md){
+    md = md || TRACE.modules[+$('modSel').value].data;
+    scen = mod.scenarios.find(s => s.id === id); data = md[id] || {};
+    pinned = null; famFocus = null; render();
+  }
+
+  // column classification
+  const cfg = tid => mod.tables[tid] || {};
+  const famOf = (tid, col) => (cfg(tid).keys || {})[col];
+  const isMoney = (tid, col) => (cfg(tid).money || []).includes(col);
+  const isQty = (tid, col) => (cfg(tid).qty || []).includes(col);
+  const isText = col => /Remarks|Particulars|Description|Payee|Product$|Name$/i.test(col) && !/^Product$/.test(col);
+
+  function cell(tid, col, v){
+    if (v === null || v === undefined || v === '') return '<td class="null">' + (v === '' ? '' : 'NULL') + '</td>';
+    const fam = famOf(tid, col);
+    if (fam && keyById[fam]){
+      const k = keyById[fam], n = norm(v);
+      return '<td class="kc"><span class="kv' + (famFocus === fam ? ' fam' : '') + (pinned && pinned.f === fam && pinned.v === n ? ' pin' : '') + '" style="--kc:' + k.color + '" data-f="' + fam + '" data-v="' + esc(n) + '" title="' + esc(k.label + ' · ' + col) + '" tabindex="0">' + esc(v) + '</span></td>';
+    }
+    if (isMoney(tid, col) && typeof v === 'number') return '<td class="num">' + fmtN(v, 2) + '</td>';
+    if (isQty(tid, col) && typeof v === 'number') return '<td class="num">' + fmtN(v, 3) + '</td>';
+    if (typeof v === 'number') return '<td class="num">' + esc(v) + '</td>';
+    if (v === true || v === false) return '<td>' + (v ? '1' : '0') + '</td>';
+    return '<td' + (isText(col) ? ' class="txt"' : '') + '>' + esc(v) + '</td>';
+  }
+
+  function tableCard(tid){
+    const c = cfg(tid), d = data[tid];
+    let h = '<div class="card" id="card-' + tid + '"><div class="cardhead"><span class="tn">' + esc(c.table || tid) + '</span><span class="role">' + esc(c.role || '') + '</span>'
+      + '<span class="rc">' + (d ? d.r.length + ' row' + (d.r.length === 1 ? '' : 's') : '0 rows') + '</span></div>';
+    if (!d){ return h + '<p class="empty-note">' + esc(c.empty || 'No rows for this transaction.') + '</p></div>'; }
+    let idx = d.c.map((_, i) => i);
+    if ($('compact').checked) idx = idx.filter(i => famOf(tid, d.c[i]) || isMoney(tid, d.c[i]) || isQty(tid, d.c[i]) || /Type$|Status|TransCode|AccountName/.test(d.c[i]));
+    h += '<div class="tw"><table><thead><tr>' + idx.map(i => {
+      const col = d.c[i], fam = famOf(tid, col);
+      const cls = [fam ? 'k' : '', isMoney(tid, col) || isQty(tid, col) ? 'num' : ''].filter(Boolean).join(' ');
+      return '<th' + (cls ? ' class="' + cls + '"' : '') + (fam ? ' style="--kc:' + keyById[fam].color + '" title="' + esc(keyById[fam].label) + '"' : '') + '>' + esc(col) + '</th>';
+    }).join('') + '</tr></thead><tbody>';
+    d.r.forEach(r => { h += '<tr>' + idx.map(i => cell(tid, d.c[i], r[i])).join('') + '</tr>'; });
+    h += '</tbody>';
+    // totals
+    const moneyIdx = idx.filter(i => isMoney(tid, d.c[i]));
+    if (c.total && moneyIdx.length){
+      const foot = rows => '<tr>' + idx.map((i, j) => {
+        if (moneyIdx.includes(i)) return '<td class="num">' + fmtN(rows.reduce((s, r) => s + (typeof r[i] === 'number' ? r[i] : 0), 0), 2) + '</td>';
+        return j === 0 ? '<td class="lbl">' + '{L}' + '</td>' : '<td></td>';
+      }).join('') + '</tr>';
+      if (c.total === true){ h += '<tfoot>' + foot(d.r).replace('{L}', 'Total') + '</tfoot>'; }
+      else {
+        const gi = d.c.indexOf(c.total); const groups = {};
+        d.r.forEach(r => (groups[r[gi]] = groups[r[gi]] || []).push(r));
+        h += '<tfoot>' + Object.keys(groups).map(g => foot(groups[g]).replace('{L}', esc(g))).join('') + '</tfoot>';
+      }
+    }
+    return h + '</table></div></div>';
+  }
+
+  function keyMatrix(){
+    const rows = [];
+    mod.steps.forEach(s => s.tables.forEach(tid => rows.push([s.n, tid])));
+    let h = '<div class="card matrix"><div class="tw"><table><thead><tr><th>Step</th><th>Table</th><th>Role</th>'
+      + mod.keys.map(k => '<th class="kh" style="--kc:' + k.color + '">' + esc(k.label) + '</th>').join('') + '</tr></thead><tbody>';
+    rows.forEach(([n, tid]) => {
+      const c = cfg(tid), keys = c.keys || {};
+      h += '<tr><td class="step">' + n + '</td><td class="mono">' + esc(c.table) + '</td><td>' + esc(c.role || '') + '</td>' + mod.keys.map(k => {
+        const cols = Object.keys(keys).filter(col => keys[col] === k.id);
+        return cols.length ? '<td class="hit" style="--kc:' + k.color + '">' + esc(cols.join(', ')) + '</td>' : '<td class="miss">·</td>';
+      }).join('') + '</tr>';
+    });
+    return h + '</tbody></table></div></div>';
+  }
+
+  function render(){
+    // key counts in this scenario
+    const counts = {};
+    for (const tid in data){ const d = data[tid]; d.c.forEach((col, i) => { const f = famOf(tid, col); if (f) { counts[f] = counts[f] || new Set(); d.r.forEach(r => { if (r[i] !== null && r[i] !== '') counts[f].add(norm(r[i])); }); } }); }
+    $('keys').innerHTML = mod.keys.map(k => '<button type="button" class="keybtn" style="--kc:' + k.color + '" data-fam="' + k.id + '" aria-pressed="' + (famFocus === k.id) + '" title="' + esc(k.note) + '"><span class="sw"></span>' + esc(k.label) + '<span class="cnt">' + (counts[k.id] ? counts[k.id].size : 0) + '</span></button>').join('');
+
+    let h = '<header class="hero"><h1>' + esc(mod.title) + '</h1><div class="sub">' + esc(mod.subtitle) + ' · <code>' + esc(mod.form) + '</code></div><p>' + esc(mod.summary) + '</p>'
+      + '<div class="meta">Real rows from <b>' + esc(TRACE.db) + '</b>, generated <b>' + esc(TRACE.generated) + '</b>' + (TRACE.masked ? ' · customer and user names replaced with pseudonyms; keys and amounts are real' : '') + '.</div></header>';
+    h += '<div class="story"><b>' + esc(scen.title) + '</b> (PaymentHeaderID ' + esc(scen.ids) + '). ' + esc(scen.story) + '</div>';
+    h += '<div class="flow">' + mod.steps.map(s => '<button type="button" class="fstep" data-goto="step-' + s.n + '"><span class="no">STEP ' + s.n + '</span><span class="tt">' + esc(s.title) + '</span><span class="who">' + esc(s.who) + '</span><span class="tbls">'
+      + s.tables.map(t => '<span class="' + (data[t] ? '' : 'empty') + '">' + esc(cfg(t).table) + '</span>').join('') + '</span></button>').join('') + '</div>';
+    mod.steps.forEach(s => {
+      h += '<section class="step" id="step-' + s.n + '"><div class="stephead"><div class="stepno">' + s.n + '</div><h2>' + esc(s.title) + '</h2>'
+        + '<div class="who"><code>' + esc(s.who) + '</code> · ' + esc(s.where) + '</div><p>' + esc(s.what) + '</p></div>'
+        + s.tables.map(tableCard).join('') + '</section>';
+    });
+    h += '<h2 class="sec">Where each key lives</h2><p class="secnote">Every table in this module and the column that carries each linking key. Read across a row to see what a table can be joined on; read down a column to see every table a key reaches.</p>' + keyMatrix();
+    if (mod.findings && mod.findings.length){
+      h += '<h2 class="sec">Findings</h2><div class="findings">' + mod.findings.map(f => '<div class="finding ' + (f.level === 'risk' ? 'risk' : 'info') + '"><span class="lv">' + (f.level === 'risk' ? 'Risk' : 'Note') + '</span><h4>' + esc(f.title) + '</h4><p>' + esc(f.text) + '</p></div>').join('') + '</div>';
+    }
+    h += '<footer>Rebuild with <code>tools/ProcessTrace/Build-ProcessTrace.ps1</code>. Each module is a pair of files in <code>tools/ProcessTrace/modules/</code>: a JSON definition (steps, tables, keys, sample transactions, findings) and a read-only trace query.</footer>';
+    $('main').innerHTML = h;
+    document.body.classList.toggle('famfocus', !!famFocus);
+    renderInspector();
+  }
+
+  function occurrences(f, v){
+    const out = [];
+    mod.steps.forEach(s => s.tables.forEach(tid => {
+      const d = data[tid]; if (!d) return;
+      d.c.forEach((col, i) => { if (famOf(tid, col) !== f) return; const n = d.r.filter(r => r[i] !== null && norm(r[i]) === v).length; if (n) out.push({s: s.n, tid, col, n}); });
+    }));
+    return out;
+  }
+  function renderInspector(){
+    if (!pinned){ $('insBody').innerHTML = '<p class="none">Click any colored value to pin it and list every table and column where it appears.</p>'; document.body.classList.remove('focusing'); return; }
+    const k = keyById[pinned.f], occ = occurrences(pinned.f, pinned.v);
+    $('insBody').innerHTML = '<div style="font-size:11.5px;color:var(--text-dim);margin-bottom:4px">' + esc(k.label) + '</div><span class="val" style="--kc:' + k.color + '">' + esc(pinned.raw) + '</span>'
+      + '<ul>' + occ.map(o => '<li><button type="button" data-card="' + o.tid + '">' + o.s + ' · ' + esc(cfg(o.tid).table) + '.' + esc(o.col) + '</button><span>×' + o.n + '</span></li>').join('') + '</ul>'
+      + '<p class="none" style="margin-top:8px">' + esc(k.note) + '</p><div class="btnrow"><button class="btn" id="unpin" type="button">Clear</button></div>';
+    document.querySelectorAll('.kv').forEach(el => el.classList.toggle('pin', el.dataset.f === pinned.f && el.dataset.v === pinned.v));
+    document.body.classList.add('focusing');
+    document.querySelectorAll('.kv').forEach(el => el.classList.toggle('hot', el.dataset.f === pinned.f && el.dataset.v === pinned.v));
+  }
+  function hover(el, on){
+    if (pinned) return;
+    const f = el.dataset.f, v = el.dataset.v;
+    document.querySelectorAll('.kv').forEach(x => x.classList.toggle('hot', on && x.dataset.f === f && x.dataset.v === v));
+    document.body.classList.toggle('focusing', on);
+  }
+
+  document.addEventListener('mouseover', e => { const el = e.target.closest('.kv'); if (el) hover(el, true); });
+  document.addEventListener('mouseout', e => { const el = e.target.closest('.kv'); if (el) hover(el, false); });
+  document.addEventListener('click', e => {
+    const kv = e.target.closest('.kv');
+    if (kv){ const same = pinned && pinned.f === kv.dataset.f && pinned.v === kv.dataset.v; pinned = same ? null : {f: kv.dataset.f, v: kv.dataset.v, raw: kv.textContent}; if (!pinned) document.querySelectorAll('.kv').forEach(x => x.classList.remove('hot', 'pin')); renderInspector(); return; }
+    if (e.target.id === 'unpin'){ pinned = null; document.querySelectorAll('.kv').forEach(x => x.classList.remove('hot', 'pin')); renderInspector(); return; }
+    const card = e.target.closest('[data-card]');
+    if (card){ const el = $('card-' + card.dataset.card); if (el){ el.scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start'}); el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); } return; }
+    const go = e.target.closest('[data-goto]');
+    if (go){ $(go.dataset.goto).scrollIntoView({behavior: 'smooth', block: 'start'}); return; }
+    const fb = e.target.closest('.keybtn');
+    if (fb){ famFocus = famFocus === fb.dataset.fam ? null : fb.dataset.fam; render(); return; }
+    if (e.target.id === 'clearFam'){ famFocus = null; render(); }
+  });
+  document.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.classList && e.target.classList.contains('kv')){ e.preventDefault(); e.target.click(); } });
+  $('modSel').addEventListener('change', e => setModule(+e.target.value));
+  $('scSel').addEventListener('change', e => setScenario(e.target.value));
+  $('compact').addEventListener('change', render);
+  initModules();
+})();
+</script>

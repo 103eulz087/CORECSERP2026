@@ -126,6 +126,22 @@ The project is organized by business domain rather than by layer. Within most do
 - **Rebuild and republish whenever a module is added or its SQL surface changes** (new form, new/renamed SP, view, function, table or TVP), after the SQL is deployed to DEV. Republish to the same artifact URL above; don't create a new one.
 - Limits: only C# string literals are scanned (comments skipped). SQL-to-SQL links come from `sys.sql_expression_dependencies`, so dynamic SQL inside a proc isn't followed. `_OLD_` backups and `_Backup_` tables are excluded. Names that look like SQL objects but aren't in the DB are listed in dashed red: likely broken calls or objects in another database.
 
+## Process Trace (built module by module)
+
+"Process Trace": follows one real transaction step by step through every table its module writes, in posting order, with the linking keys (customer, PO, invoice, reference, header ID, ticket, mnemonic, GL account, …) color-coded so a value can be followed from table to table. It replaces the user's hand-built Excel trace sheets (one sheet per process, highlighted foreign-key cells).
+
+- Live page (artifact): https://claude.ai/artifact/Bmoqk3GnfkQefi74rbnRkU. Generated file: `docs/process-trace/ProcessTrace.html`.
+- Modules so far: **AR Payment** (`ClientPaymentsDevExAcctg`: `sp_ConfirmOrder` → form inserts → `sp_AddPaymentClient` → `sp_ReversePaymentClient`).
+- Each module is a pair in `tools/ProcessTrace/modules/`:
+  - `<Name>.json`: steps (who writes what), table instances with their key-column → key-family map, money/qty columns, columns to mask, sample transactions (`ids`), findings.
+  - `<Name>.sql`: read-only trace query taking `@Ids`; every result set starts with `_t` = the table-instance id. Scope rows by the same keys the procs use.
+  - Use separate table instances when one column means different keys in different rows (e.g. `TicketMaster.ReferenceNumber` is the PO on sales tickets and the payment reference on OR tickets).
+- Builder (read-only, same connection options as the Atlas; names are masked unless `-NoMask`):
+  ```cmd
+  powershell -NoProfile -File tools\ProcessTrace\Build-ProcessTrace.ps1 -RegistryKey "AAITCRE\ConnSettingsMain"
+  ```
+- **When a module's posting procs change, or a new module is traced**, update its JSON/SQL pair, rebuild, and republish to the same artifact URL; don't create a new one.
+
 ## Session handoff (work in progress)
 
 The current work log (in-flight features, DEV/STAGING deploy status, open decisions)

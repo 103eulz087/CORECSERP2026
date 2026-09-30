@@ -5,7 +5,7 @@ machine picks up where the last one stopped. **Keep it short and current:** upda
 the Status / Open items when something changes; move finished items to "Done" in one
 line. Durable rules belong in `CLAUDE.md` itself, not here.
 
-Last updated: **2026-09-30 (night)**
+Last updated: **2026-10-01**
 
 ---
 
@@ -285,6 +285,15 @@ Tested full / partial / two-step on multi-branch and SINGLE invoices. **Status:*
   6. Is 20115 (COA says "ADVANCES FROM ACCOUNT MANAGERS") the right customer-credit account?
 - Unverified: 3 other negative rows (−10,190, FULLYPAID) whose columns are consistent, i.e. some screen let a payment exceed the invoice. Query blocked by a transient permission-check error.
 
+## Feature 13 — Tooling: Dependency Atlas + Process Trace (2026-09-30 / 10-01)
+
+- **Dependency Atlas** rebuilt with tables + table types and a builder script (see CLAUDE.md). Artifact https://claude.ai/artifact/ExWdEYaxmbU9VMZbLpumWa.
+- **Process Trace**, the replacement for the user's Excel trace sheets (see CLAUDE.md). Artifact https://claude.ai/artifact/Bmoqk3GnfkQefi74rbnRkU.
+  - Module 1 = AR Payment. Samples: 5155 (cheque + EWT, 3 invoices) and 5591 → reversed → 6163 (cash + overpay).
+  - **Next module: user to pick** (Supplier Payment / Expense / STS).
+- `tools/ProcessTrace/` and `docs/process-trace/` were not committed yet as of this entry.
+- Git: on 10-01 `main`'s uncommitted `ClientPaymentsDevExAcctg.Designer.cs` / `.resx` + build output were stashed (`stash@{0}`, "main WIP …") before switching back to `laptopdell`. They're still in the stash; nothing is applied.
+
 ## Open decisions (ask the user)
 
 1. **1-cent rounding in multi-branch payments.** In `sp_AddPaymentSupplierCompound_V2`'s BATCH branch, the last branch's gross = eGross − SUM(**unrounded**
@@ -303,6 +312,10 @@ Tested full / partial / two-step on multi-branch and SINGLE invoices. **Status:*
 7. **Optional indexes:** `TicketMaster(ReferenceNumber, ReferenceKey)` and `TicketDetails(TicketNumber, ReferenceNumber)`.
 
 ## Pre-existing issues found (flagged, not fixed)
+
+- `sp_ReversePaymentClient` mirrors every `TicketMaster`/`TicketDetails`/`ClientLedger` row `WHERE ReferenceNumber = @refno`. Sales tickets hold the PO number in that same column, and the two numbers come from different counters.
+  - On COREX001, 34 payments share their reference with another ticket, and 31 of them are still POSTED. Reversing one would also mirror another customer's sales ticket and ledger row.
+  - Fix, when the user approves: `Mnemonic LIKE 'OR-%'` on the tickets; `AccountKey = @custkey AND TransCode LIKE 'OR-%'` on the ledger.
 
 - `sp_PostCompoundTicket`: amount type `MIRROR`, or any amount type missing from `@Amounts`, silently becomes GROSS. So `PV-AP-DISC` and `PV-AP-EWT-DISC` post the
   discount leg at the gross amount. No DR = CR check. No PV-AP tickets existed on DEV yet.

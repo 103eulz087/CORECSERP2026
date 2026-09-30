@@ -1,0 +1,71 @@
+{
+  "id": "ar-payment",
+  "title": "AR Payment",
+  "subtitle": "Client payment: invoice → payment capture → posting → reversal",
+  "form": "AccountingDevEx/ClientPaymentsDevExAcctg.cs",
+  "sql": "ARPayment.sql",
+  "summary": "A charge invoice is created when a sales order is confirmed. Accounting then records the client's payment in Client Payments: the form writes the payment header, the payment-method row and one ARPaymentDetails row per invoice and deduction type, then calls sp_AddPaymentClient in the same transaction. The proc settles the invoices, books the GL ticket from JournalEntryMapping, credits the client ledger and adds a deposit-in-transit line to bank recon. sp_ReversePaymentClient undoes all of it with mirrored entries.",
+  "keys": [
+    { "id": "cust",   "label": "Customer",          "color": "#f59e0b", "note": "CustomerKey (char 8). ClientLedger calls it AccountKey / AccountID; the cheque and online rows store it in CustomerID." },
+    { "id": "po",     "label": "Sales order (PO)",  "color": "#22c55e", "note": "The sales order number. TransactionChargeSales.ReferenceNo = ARPaymentDetails.PONumber = sales ticket ReferenceNumber." },
+    { "id": "inv",    "label": "Invoice",           "color": "#eab308", "note": "InvoiceNo. Always paired with the PO: sp_AddPaymentClient matches invoices on InvoiceNo + ReferenceNo/PONumber + CustomerKey." },
+    { "id": "ref",    "label": "Payment reference", "color": "#06b6d4", "note": "PaymentHeader.ReferenceNo from sp_GetReferenceNumber. Becomes the ticket's ReferenceNumber/ReferenceKey, the ledger's ReferenceNumber/ORNumber and the bank recon SourceRef." },
+    { "id": "phid",   "label": "PaymentHeaderID",   "color": "#3b82f6", "note": "Identity of PaymentHeader. Links the payment-method row and every ARPaymentDetails row." },
+    { "id": "ctrl",   "label": "Control no.",       "color": "#d946ef", "note": "Typed by the user on the form; copied to the cheque/online row." },
+    { "id": "cr",     "label": "CR no.",            "color": "#8b5cf6", "note": "Collection receipt number, typed by the user." },
+    { "id": "ticket", "label": "GL ticket",         "color": "#ef6f5e", "note": "TicketNumber from GetTicketNumber. ClientLedger.TicketReference points back to it." },
+    { "id": "mnem",   "label": "Mnemonic",          "color": "#84cc16", "note": "Chosen by sp_AddPaymentClient from the deduction mix (OR-COLL, OR-EWT, OR-DISC-OVERPAY, …). Selects the JournalEntryMapping rows and becomes the ledger TransCode." },
+    { "id": "acct",   "label": "GL account",        "color": "#14b8a6", "note": "AccountCode. The bank/cash account entered on the form (DebitGLCode) replaces the {BANK} token in JournalEntryMapping." }
+  ],
+  "tables": {
+    "tcs":      { "table": "TransactionChargeSales", "role": "AR invoice (subledger)", "keys": { "CustomerKey": "cust", "ReferenceNo": "po", "InvoiceNo": "inv" }, "money": ["TotalAmount"], "empty": "No invoice found." },
+    "tcsd":     { "table": "TransactionChargeSalesDetails", "role": "Invoice lines", "keys": { "ReferenceNo": "po", "InvoiceNo": "inv", "TransCode": "mnem" }, "money": ["Cost", "SellingPrice", "TotalAmount"], "qty": ["Quantity"], "empty": "No lines: these are balance-forward invoices loaded at go-live, not confirmed sales orders." },
+    "salesTm":  { "table": "TicketMaster", "role": "Sales GL ticket (header)", "keys": { "TicketNumber": "ticket", "ReferenceNumber": "po", "ReferenceKey": "inv", "Mnemonic": "mnem" }, "mask": ["Owner", "EnteredBy"], "empty": "No sales ticket: balance-forward invoices have no GL ticket of their own." },
+    "salesTd":  { "table": "TicketDetails", "role": "Sales GL ticket (lines)", "keys": { "TicketNumber": "ticket", "ReferenceNumber": "po", "ReferenceKey": "inv", "AccountCode": "acct" }, "money": ["Debit", "Credit"], "lookup": ["AccountName"], "total": true, "empty": "No sales ticket lines." },
+    "salesCl":  { "table": "ClientLedger", "role": "Client ledger: invoice debit", "keys": { "AccountKey": "cust", "ReferenceNumber": "po", "InvoiceNo": "inv", "TransCode": "mnem", "TicketReference": "ticket" }, "money": ["BeginningBalance", "Debit", "Credit", "EndingBalance"], "empty": "No SI ledger row (balance-forward invoice)." },
+
+    "ph":       { "table": "PaymentHeader", "role": "Payment header", "keys": { "PaymentHeaderID": "phid", "CustomerKey": "cust", "ReferenceNo": "ref", "ControlNo": "ctrl", "CRNo": "cr" }, "money": ["TotalAmount"], "mask": ["CreatedBy", "ReversedBy"] },
+    "cheque":   { "table": "TransactionCheque", "role": "Payment method: cheque", "keys": { "PaymentHeaderID": "phid", "ControlNo": "ctrl", "CRNo": "cr", "CustomerID": "cust", "CreditGLCode": "acct" }, "money": ["CheckAmount", "Amount"], "mask": ["CustomerName", "CheckName"], "empty": "Not a cheque payment." },
+    "online":   { "table": "TransactionOnline", "role": "Payment method: online / deposit", "keys": { "PaymentHeaderID": "phid", "ControlNo": "ctrl", "CRNo": "cr", "CustomerID": "cust", "CreditGLCode": "acct" }, "money": ["Amount"], "mask": ["CustomerName"], "empty": "Not an online payment." },
+    "cash":     { "table": "TransactionCashCollection", "role": "Payment method: cash", "keys": { "PaymentHeaderID": "phid", "CustomerKey": "cust" }, "money": ["AmountPaid"], "mask": ["TransactedBy"], "empty": "Not a cash payment." },
+    "arpd":     { "table": "ARPaymentDetails", "role": "Payment lines (one per invoice × type)", "keys": { "PaymentHeaderID": "phid", "CustomerKey": "cust", "ReferenceNo": "ref", "PONumber": "po", "InvoiceNo": "inv", "DebitGLCode": "acct", "CreditGLCode": "acct" }, "money": ["Amount"], "total": "PaymentType" },
+
+    "jem":      { "table": "JournalEntryMapping", "role": "Config: GL legs for the mnemonic", "keys": { "Mnemonic": "mnem", "AccountCode": "acct" } },
+    "tcsAfter": { "table": "TransactionChargeSales", "role": "Invoice balances now", "keys": { "CustomerKey": "cust", "ReferenceNo": "po", "InvoiceNo": "inv" }, "money": ["TotalAmount", "AmountPaid", "EWTAmount", "DiscountAmount", "OffsetAmount", "AdvancePayment", "Balance"] },
+    "payTm":    { "table": "TicketMaster", "role": "Payment GL ticket (header)", "keys": { "TicketNumber": "ticket", "ReferenceNumber": "ref", "ReferenceKey": "ref", "Mnemonic": "mnem" }, "mask": ["Owner", "EnteredBy"] },
+    "payTd":    { "table": "TicketDetails", "role": "Payment GL ticket (lines)", "keys": { "TicketNumber": "ticket", "ReferenceNumber": "ref", "ReferenceKey": "ref", "AccountCode": "acct" }, "money": ["Debit", "Credit"], "lookup": ["AccountName"], "total": true },
+    "payCl":    { "table": "ClientLedger", "role": "Client ledger: payment credit (one per invoice)", "keys": { "AccountKey": "cust", "ReferenceNumber": "ref", "ORNumber": "ref", "InvoiceNo": "inv", "TransCode": "mnem", "TicketReference": "ticket" }, "money": ["BeginningBalance", "Debit", "Credit", "EndingBalance"] },
+    "bsr":      { "table": "BankStatementRecon", "role": "Bank recon: deposit in transit", "keys": { "AccountCode": "acct", "ReferenceNo": "ref", "SourceRef": "ref" }, "money": ["Amount"], "empty": "No DIT line (no cash reached the bank account)." },
+    "ca":       { "table": "ClientAccounts", "role": "Client account balance now", "keys": { "AccountKey": "cust", "AccountID": "cust" }, "money": ["AccountBalance", "CashWalletBalance"], "mask": ["AccountName"] },
+
+    "revTm":    { "table": "TicketMaster", "role": "Reversal GL ticket (header)", "keys": { "TicketNumber": "ticket", "ReferenceNumber": "ref", "ReferenceKey": "ref" }, "mask": ["EnteredBy"], "empty": "Not reversed." },
+    "revTd":    { "table": "TicketDetails", "role": "Reversal GL ticket (lines, DR/CR swapped)", "keys": { "TicketNumber": "ticket", "ReferenceNumber": "ref", "AccountCode": "acct" }, "money": ["Debit", "Credit"], "lookup": ["AccountName"], "total": true, "empty": "Not reversed." },
+    "revCl":    { "table": "ClientLedger", "role": "Client ledger: reversal debit", "keys": { "AccountKey": "cust", "ReferenceNumber": "ref", "InvoiceNo": "inv", "TransCode": "mnem", "TicketReference": "ticket" }, "money": ["Debit", "Credit", "EndingBalance"], "empty": "Not reversed." }
+  },
+  "steps": [
+    { "n": 1, "title": "Sales invoice is created", "who": "sp_ConfirmOrder", "where": "Orders › Confirm sales order",
+      "what": "Writes the invoice and its lines, posts the SI-VAT / SI-VATEX ticket through sp_PostCompoundTicketSales, which also debits the client ledger. The ticket's ReferenceNumber is the PO and its ReferenceKey is the invoice.",
+      "tables": ["tcs", "tcsd", "salesTm", "salesTd", "salesCl"] },
+    { "n": 2, "title": "Payment is captured", "who": "ClientPaymentsDevExAcctg (C#, one SqlTransaction)", "where": "Accounting › Client Payments › Submit",
+      "what": "InsertPaymentHeader gets the reference number and returns the new PaymentHeaderID. InsertPaymentMethod writes the cheque, online or cash row. InsertARPaymentDetails writes INVOICE PAYMENT at gross plus one row each for EWT, DISCOUNT, OFFSET, OVERPAY, OVERPAYINCOME and SERVICES.",
+      "tables": ["ph", "cheque", "online", "cash", "arpd"] },
+    { "n": 3, "title": "Payment is posted", "who": "sp_AddPaymentClient @PaymentHeaderID", "where": "Called by the form before commit",
+      "what": "Sums ARPaymentDetails by type, picks the mnemonic, loads its JournalEntryMapping legs ({BANK} = DebitGLCode), checks DR = CR, then updates each invoice's AmountPaid / EWT / Discount / Offset / Balance / PayStatus, writes the ticket, one ClientLedger credit per invoice, and a DIT line in BankStatementRecon. The ledger trigger recomputes ClientAccounts.",
+      "tables": ["jem", "tcsAfter", "payTm", "payTd", "payCl", "bsr", "ca"] },
+    { "n": 4, "title": "Payment is reversed", "who": "sp_ReversePaymentClient", "where": "Client Payments › Posted › Reverse",
+      "what": "Backs the amounts out of each invoice, sets ARPaymentDetails.ErrorTag = 1, copies every ticket with ReferenceNumber = the payment reference with DR/CR swapped, mirrors the ledger rows, marks PaymentHeader REVERSED, flags the payment-method row and resolves the DIT line.",
+      "tables": ["revTm", "revTd", "revCl"] }
+  ],
+  "scenarios": [
+    { "id": "check-ewt", "title": "Cheque, 3 invoices, EWT withheld", "ids": "5155",
+      "story": "One cheque settles three invoices with EWT withheld on each. Two came from confirmed sales orders and have their own sales tickets; the third is a balance-forward invoice, so step 1 shows fewer tickets than invoices. Mnemonic OR-EWT: DR bank (net), DR creditable withholding tax, CR AR-trade (gross)." },
+    { "id": "cash-overpay-reversed", "title": "Cash with overpayment, reversed, then paid again", "ids": "5591,6163",
+      "story": "Payment 5591 paid four invoices in cash and carried 17,500 extra as customer credit (OR-OVERPAY). It was reversed, then posted again as 6163. Both payments share the invoices, so the invoice and customer keys light up across both runs." }
+  ],
+  "findings": [
+    { "level": "risk", "title": "Reversal matches tickets and ledger rows on the reference number alone",
+      "text": "sp_ReversePaymentClient copies every TicketMaster/TicketDetails row WHERE ReferenceNumber = the payment reference, and every ClientLedger row with that ReferenceNumber. Sales tickets carry the PO number in the same column, and PO numbers and payment references come from different counters. On COREX001, 34 payments share their reference with another ticket; 31 of them are still POSTED, so reversing one would also mirror an unrelated customer's sales ticket and ledger row. The 3 reversed ones ran before the colliding sales ticket existed. Suggested fix: filter by Mnemonic LIKE 'OR-%' (tickets) and AccountKey = the customer + TransCode LIKE 'OR-%' (ledger)." },
+    { "level": "info", "title": "ARPaymentDetails.TicketNumber stays blank",
+      "text": "The form inserts '' and the proc never fills it. The ticket is reachable through ClientLedger.TicketReference or TicketMaster.ReferenceNumber = the payment reference." }
+  ]
+}
