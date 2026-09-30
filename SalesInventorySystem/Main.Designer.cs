@@ -278,6 +278,7 @@
             this.btnSupplierDebitCreditMemo = new DevExpress.XtraBars.BarButtonItem();
             this.btnAccountingBoard = new DevExpress.XtraBars.BarButtonItem();
             this.barbtnPOSAutomation = new DevExpress.XtraBars.BarButtonItem();
+            this.btnCostingReconReport = new DevExpress.XtraBars.BarButtonItem();
             this.ribbonPage1 = new DevExpress.XtraBars.Ribbon.RibbonPage();
             this.ribbonPageGroup20 = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             this.ribbonPageGroup2 = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
@@ -325,7 +326,6 @@
             this.barButtonItem103 = new DevExpress.XtraBars.BarButtonItem();
             this.barButtonItem1 = new DevExpress.XtraBars.BarButtonItem();
             this.barButtonItem5 = new DevExpress.XtraBars.BarButtonItem();
-            this.btnCostingReconReport = new DevExpress.XtraBars.BarButtonItem();
             ((System.ComponentModel.ISupportInitialize)(this.ribbonControl)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.popupMenuTickets)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.popupMenuInvTransfer)).BeginInit();
@@ -344,7 +344,6 @@
             // 
             this.ribbonControl.ApplicationButtonText = null;
             this.ribbonControl.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(236)))), ((int)(((byte)(239)))));
-            this.ribbonControl.EmptyAreaImageOptions.ImagePadding = new System.Windows.Forms.Padding(26, 24, 26, 24);
             this.ribbonControl.ExpandCollapseItem.Id = 0;
             this.ribbonControl.Items.AddRange(new DevExpress.XtraBars.BarItem[] {
             this.ribbonControl.ExpandCollapseItem,
@@ -588,10 +587,9 @@
             this.barbtnPOSAutomation,
             this.btnCostingReconReport});
             this.ribbonControl.Location = new System.Drawing.Point(0, 0);
-            this.ribbonControl.Margin = new System.Windows.Forms.Padding(0, 3, 0, 3);
+            this.ribbonControl.Margin = new System.Windows.Forms.Padding(0, 4, 0, 4);
             this.ribbonControl.MaxItemId = 239;
             this.ribbonControl.Name = "ribbonControl";
-            this.ribbonControl.OptionsMenuMinWidth = 283;
             this.ribbonControl.PageHeaderItemLinks.Add(this.barStaticItem2);
             this.ribbonControl.Pages.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPage[] {
             this.ribbonPage1,
@@ -606,7 +604,7 @@
             this.ribbonControl.RibbonStyle = DevExpress.XtraBars.Ribbon.RibbonControlStyle.Office2013;
             this.ribbonControl.ShowApplicationButton = DevExpress.Utils.DefaultBoolean.False;
             this.ribbonControl.ShowPageHeadersMode = DevExpress.XtraBars.Ribbon.ShowPageHeadersMode.Show;
-            this.ribbonControl.Size = new System.Drawing.Size(1447, 158);
+            this.ribbonControl.Size = new System.Drawing.Size(1688, 193);
             this.ribbonControl.StatusBar = this.ribbonStatusBar;
             this.ribbonControl.SelectedPageChanged += new System.EventHandler(this.ribbonControl_SelectedPageChanged);
             this.ribbonControl.Click += new System.EventHandler(this.ribbon_Click);
@@ -2868,6 +2866,15 @@
             this.barbtnPOSAutomation.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
             this.barbtnPOSAutomation.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.barbtnPOSAutomation_ItemClick);
             // 
+            // btnCostingReconReport
+            // 
+            this.btnCostingReconReport.Caption = "Costing Recon Summary";
+            this.btnCostingReconReport.Id = 238;
+            this.btnCostingReconReport.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnCostingReconReport.ImageOptions.Image")));
+            this.btnCostingReconReport.ImageOptions.LargeImage = ((System.Drawing.Image)(resources.GetObject("btnCostingReconReport.ImageOptions.LargeImage")));
+            this.btnCostingReconReport.Name = "btnCostingReconReport";
+            this.btnCostingReconReport.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnCostingReconReport_ItemClick);
+            // 
             // ribbonPage1
             // 
             this.ribbonPage1.Groups.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPageGroup[] {
@@ -3271,11 +3278,11 @@
             this.ribbonStatusBar.ItemLinks.Add(this.barHeaderItem4);
             this.ribbonStatusBar.ItemLinks.Add(this.barStaticItem8);
             this.ribbonStatusBar.ItemLinks.Add(this.barStaticCashierTransNo);
-            this.ribbonStatusBar.Location = new System.Drawing.Point(0, 618);
-            this.ribbonStatusBar.Margin = new System.Windows.Forms.Padding(0, 3, 0, 3);
+            this.ribbonStatusBar.Location = new System.Drawing.Point(0, 760);
+            this.ribbonStatusBar.Margin = new System.Windows.Forms.Padding(0, 4, 0, 4);
             this.ribbonStatusBar.Name = "ribbonStatusBar";
             this.ribbonStatusBar.Ribbon = this.ribbonControl;
-            this.ribbonStatusBar.Size = new System.Drawing.Size(1447, 24);
+            this.ribbonStatusBar.Size = new System.Drawing.Size(1688, 30);
             // 
             // barAndDockingController1
             // 
@@ -3345,27 +3352,18 @@
             this.barButtonItem5.Name = "barButtonItem5";
             this.barButtonItem5.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
             // 
-            // btnCostingReconReport
-            // 
-            this.btnCostingReconReport.Caption = "Costing Recon Summary";
-            this.btnCostingReconReport.Id = 238;
-            this.btnCostingReconReport.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnCostingReconReport.ImageOptions.Image")));
-            this.btnCostingReconReport.ImageOptions.LargeImage = ((System.Drawing.Image)(resources.GetObject("btnCostingReconReport.ImageOptions.LargeImage")));
-            this.btnCostingReconReport.Name = "btnCostingReconReport";
-            this.btnCostingReconReport.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnCostingReconReport_ItemClick);
-            // 
             // Main
             // 
             this.Appearance.BackColor = System.Drawing.SystemColors.Control;
             this.Appearance.Options.UseBackColor = true;
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1447, 642);
+            this.ClientSize = new System.Drawing.Size(1688, 790);
             this.Controls.Add(this.ribbonControl);
             this.Controls.Add(this.ribbonStatusBar);
             this.IconOptions.Image = ((System.Drawing.Image)(resources.GetObject("Main.IconOptions.Image")));
             this.IsMdiContainer = true;
-            this.Margin = new System.Windows.Forms.Padding(0, 3, 0, 3);
+            this.Margin = new System.Windows.Forms.Padding(0, 4, 0, 4);
             this.Name = "Main";
             this.Ribbon = this.ribbonControl;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

@@ -156,7 +156,7 @@
             this.tabControlForApproval.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControlForApproval.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tabControlForApproval.Location = new System.Drawing.Point(0, 0);
-            this.tabControlForApproval.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabControlForApproval.Margin = new System.Windows.Forms.Padding(4);
             this.tabControlForApproval.Name = "tabControlForApproval";
             this.tabControlForApproval.SelectedIndex = 0;
             this.tabControlForApproval.Size = new System.Drawing.Size(1130, 635);
@@ -168,9 +168,9 @@
             this.forapproval.Controls.Add(this.gridControl2);
             this.forapproval.Controls.Add(this.groupBox3);
             this.forapproval.Location = new System.Drawing.Point(4, 27);
-            this.forapproval.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.forapproval.Margin = new System.Windows.Forms.Padding(4);
             this.forapproval.Name = "forapproval";
-            this.forapproval.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.forapproval.Padding = new System.Windows.Forms.Padding(4);
             this.forapproval.Size = new System.Drawing.Size(1122, 604);
             this.forapproval.TabIndex = 0;
             this.forapproval.Text = "Products";
@@ -179,10 +179,10 @@
             // gridControl2
             // 
             this.gridControl2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControl2.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gridControl2.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4);
             this.gridControl2.Location = new System.Drawing.Point(4, 66);
             this.gridControl2.MainView = this.gridView2;
-            this.gridControl2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gridControl2.Margin = new System.Windows.Forms.Padding(4);
             this.gridControl2.Name = "gridControl2";
             this.gridControl2.Size = new System.Drawing.Size(1114, 534);
             this.gridControl2.TabIndex = 5;
@@ -220,9 +220,9 @@
             this.groupBox3.Dock = System.Windows.Forms.DockStyle.Top;
             this.groupBox3.Font = new System.Drawing.Font("Tahoma", 7.75F);
             this.groupBox3.Location = new System.Drawing.Point(4, 4);
-            this.groupBox3.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox3.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox3.Padding = new System.Windows.Forms.Padding(4);
             this.groupBox3.Size = new System.Drawing.Size(1114, 62);
             this.groupBox3.TabIndex = 6;
             this.groupBox3.TabStop = false;
@@ -233,7 +233,7 @@
             this.btnForApprovalProd.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnForApprovalProd.ImageOptions.Image")));
             this.btnForApprovalProd.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.btnForApprovalProd.Location = new System.Drawing.Point(396, 21);
-            this.btnForApprovalProd.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnForApprovalProd.Margin = new System.Windows.Forms.Padding(4);
             this.btnForApprovalProd.Name = "btnForApprovalProd";
             this.btnForApprovalProd.Size = new System.Drawing.Size(100, 28);
             this.btnForApprovalProd.TabIndex = 7;
@@ -245,7 +245,7 @@
             this.dateToForApprovalProd.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
             this.dateToForApprovalProd.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
             this.dateToForApprovalProd.Location = new System.Drawing.Point(252, 21);
-            this.dateToForApprovalProd.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.dateToForApprovalProd.Margin = new System.Windows.Forms.Padding(4);
             this.dateToForApprovalProd.Name = "dateToForApprovalProd";
             this.dateToForApprovalProd.Size = new System.Drawing.Size(137, 27);
             this.dateToForApprovalProd.TabIndex = 3;
@@ -255,7 +255,7 @@
             this.datefromForApprovalProd.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
             this.datefromForApprovalProd.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
             this.datefromForApprovalProd.Location = new System.Drawing.Point(68, 21);
-            this.datefromForApprovalProd.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.datefromForApprovalProd.Margin = new System.Windows.Forms.Padding(4);
             this.datefromForApprovalProd.Name = "datefromForApprovalProd";
             this.datefromForApprovalProd.Size = new System.Drawing.Size(137, 27);
             this.datefromForApprovalProd.TabIndex = 2;
@@ -286,10 +286,10 @@
             // 
             this.fordelivery.Controls.Add(this.gridControl1);
             this.fordelivery.Location = new System.Drawing.Point(4, 27);
-            this.fordelivery.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.fordelivery.Margin = new System.Windows.Forms.Padding(4);
             this.fordelivery.Name = "fordelivery";
-            this.fordelivery.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.fordelivery.Size = new System.Drawing.Size(1121, 604);
+            this.fordelivery.Padding = new System.Windows.Forms.Padding(4);
+            this.fordelivery.Size = new System.Drawing.Size(1122, 604);
             this.fordelivery.TabIndex = 1;
             this.fordelivery.Text = "Services";
             this.fordelivery.UseVisualStyleBackColor = true;
@@ -297,12 +297,12 @@
             // gridControl1
             // 
             this.gridControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControl1.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gridControl1.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4);
             this.gridControl1.Location = new System.Drawing.Point(4, 4);
             this.gridControl1.MainView = this.gridView1;
-            this.gridControl1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gridControl1.Margin = new System.Windows.Forms.Padding(4);
             this.gridControl1.Name = "gridControl1";
-            this.gridControl1.Size = new System.Drawing.Size(1113, 596);
+            this.gridControl1.Size = new System.Drawing.Size(1114, 596);
             this.gridControl1.TabIndex = 5;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1});
@@ -414,7 +414,7 @@
             this.xtraTabControl1.AppearancePage.Header.Options.UseImage = true;
             this.xtraTabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.xtraTabControl1.Location = new System.Drawing.Point(0, 0);
-            this.xtraTabControl1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.xtraTabControl1.Margin = new System.Windows.Forms.Padding(4);
             this.xtraTabControl1.Name = "xtraTabControl1";
             this.xtraTabControl1.SelectedTabPage = this.xtraTabPageForApproval;
             this.xtraTabControl1.Size = new System.Drawing.Size(1132, 667);
@@ -429,7 +429,7 @@
             // xtraTabPageForApproval
             // 
             this.xtraTabPageForApproval.Controls.Add(this.tabControlForApproval);
-            this.xtraTabPageForApproval.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.xtraTabPageForApproval.Margin = new System.Windows.Forms.Padding(4);
             this.xtraTabPageForApproval.Name = "xtraTabPageForApproval";
             this.xtraTabPageForApproval.Size = new System.Drawing.Size(1130, 635);
             this.xtraTabPageForApproval.Text = "FOR APPROVAL";
@@ -437,7 +437,7 @@
             // xtraTabPageApproved
             // 
             this.xtraTabPageApproved.Controls.Add(this.tabControlApproved);
-            this.xtraTabPageApproved.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.xtraTabPageApproved.Margin = new System.Windows.Forms.Padding(4);
             this.xtraTabPageApproved.Name = "xtraTabPageApproved";
             this.xtraTabPageApproved.Size = new System.Drawing.Size(1130, 635);
             this.xtraTabPageApproved.Text = "APPROVED";
@@ -449,7 +449,7 @@
             this.tabControlApproved.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControlApproved.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tabControlApproved.Location = new System.Drawing.Point(0, 0);
-            this.tabControlApproved.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabControlApproved.Margin = new System.Windows.Forms.Padding(4);
             this.tabControlApproved.Name = "tabControlApproved";
             this.tabControlApproved.SelectedIndex = 0;
             this.tabControlApproved.Size = new System.Drawing.Size(1130, 635);
@@ -461,9 +461,9 @@
             this.tabPage1.Controls.Add(this.gridControl3);
             this.tabPage1.Controls.Add(this.groupBox1);
             this.tabPage1.Location = new System.Drawing.Point(4, 27);
-            this.tabPage1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPage1.Margin = new System.Windows.Forms.Padding(4);
             this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(4);
             this.tabPage1.Size = new System.Drawing.Size(1122, 604);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Products";
@@ -472,10 +472,10 @@
             // gridControl3
             // 
             this.gridControl3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControl3.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gridControl3.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4);
             this.gridControl3.Location = new System.Drawing.Point(4, 66);
             this.gridControl3.MainView = this.gridView3;
-            this.gridControl3.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gridControl3.Margin = new System.Windows.Forms.Padding(4);
             this.gridControl3.Name = "gridControl3";
             this.gridControl3.Size = new System.Drawing.Size(1114, 534);
             this.gridControl3.TabIndex = 5;
@@ -514,9 +514,9 @@
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Top;
             this.groupBox1.Font = new System.Drawing.Font("Tahoma", 7.75F);
             this.groupBox1.Location = new System.Drawing.Point(4, 4);
-            this.groupBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox1.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox1.Padding = new System.Windows.Forms.Padding(4);
             this.groupBox1.Size = new System.Drawing.Size(1114, 62);
             this.groupBox1.TabIndex = 7;
             this.groupBox1.TabStop = false;
@@ -527,7 +527,7 @@
             this.btnApprovedProd.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnApprovedProd.ImageOptions.Image")));
             this.btnApprovedProd.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.btnApprovedProd.Location = new System.Drawing.Point(396, 21);
-            this.btnApprovedProd.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnApprovedProd.Margin = new System.Windows.Forms.Padding(4);
             this.btnApprovedProd.Name = "btnApprovedProd";
             this.btnApprovedProd.Size = new System.Drawing.Size(100, 28);
             this.btnApprovedProd.TabIndex = 7;
@@ -539,7 +539,7 @@
             this.dateToApprovedProd.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
             this.dateToApprovedProd.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
             this.dateToApprovedProd.Location = new System.Drawing.Point(252, 21);
-            this.dateToApprovedProd.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.dateToApprovedProd.Margin = new System.Windows.Forms.Padding(4);
             this.dateToApprovedProd.Name = "dateToApprovedProd";
             this.dateToApprovedProd.Size = new System.Drawing.Size(137, 27);
             this.dateToApprovedProd.TabIndex = 3;
@@ -549,7 +549,7 @@
             this.dateFromApprovedProd.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
             this.dateFromApprovedProd.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
             this.dateFromApprovedProd.Location = new System.Drawing.Point(68, 21);
-            this.dateFromApprovedProd.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.dateFromApprovedProd.Margin = new System.Windows.Forms.Padding(4);
             this.dateFromApprovedProd.Name = "dateFromApprovedProd";
             this.dateFromApprovedProd.Size = new System.Drawing.Size(137, 27);
             this.dateFromApprovedProd.TabIndex = 2;
@@ -580,9 +580,9 @@
             // 
             this.tabPage2.Controls.Add(this.gridControl4);
             this.tabPage2.Location = new System.Drawing.Point(4, 27);
-            this.tabPage2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPage2.Margin = new System.Windows.Forms.Padding(4);
             this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(4);
             this.tabPage2.Size = new System.Drawing.Size(1122, 604);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Services";
@@ -591,10 +591,10 @@
             // gridControl4
             // 
             this.gridControl4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControl4.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gridControl4.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4);
             this.gridControl4.Location = new System.Drawing.Point(4, 4);
             this.gridControl4.MainView = this.gridView4;
-            this.gridControl4.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gridControl4.Margin = new System.Windows.Forms.Padding(4);
             this.gridControl4.Name = "gridControl4";
             this.gridControl4.Size = new System.Drawing.Size(1114, 596);
             this.gridControl4.TabIndex = 5;
@@ -633,10 +633,10 @@
             this.tabControlForConfirmation.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControlForConfirmation.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tabControlForConfirmation.Location = new System.Drawing.Point(0, 0);
-            this.tabControlForConfirmation.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabControlForConfirmation.Margin = new System.Windows.Forms.Padding(4);
             this.tabControlForConfirmation.Name = "tabControlForConfirmation";
             this.tabControlForConfirmation.SelectedIndex = 0;
-            this.tabControlForConfirmation.Size = new System.Drawing.Size(1413, 794);
+            this.tabControlForConfirmation.Size = new System.Drawing.Size(1130, 635);
             this.tabControlForConfirmation.TabIndex = 2;
             this.tabControlForConfirmation.SelectedIndexChanged += new System.EventHandler(this.tabControlForConfirmation_SelectedIndexChanged);
             // 
@@ -645,10 +645,10 @@
             this.tabPageForConfirmationProducts.Controls.Add(this.gridControlProductForConfirmation);
             this.tabPageForConfirmationProducts.Controls.Add(this.groupBox2);
             this.tabPageForConfirmationProducts.Location = new System.Drawing.Point(4, 27);
-            this.tabPageForConfirmationProducts.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPageForConfirmationProducts.Margin = new System.Windows.Forms.Padding(4);
             this.tabPageForConfirmationProducts.Name = "tabPageForConfirmationProducts";
-            this.tabPageForConfirmationProducts.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.tabPageForConfirmationProducts.Size = new System.Drawing.Size(1405, 763);
+            this.tabPageForConfirmationProducts.Padding = new System.Windows.Forms.Padding(4);
+            this.tabPageForConfirmationProducts.Size = new System.Drawing.Size(1122, 604);
             this.tabPageForConfirmationProducts.TabIndex = 0;
             this.tabPageForConfirmationProducts.Text = "Products";
             this.tabPageForConfirmationProducts.UseVisualStyleBackColor = true;
@@ -656,12 +656,12 @@
             // gridControlProductForConfirmation
             // 
             this.gridControlProductForConfirmation.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControlProductForConfirmation.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gridControlProductForConfirmation.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4);
             this.gridControlProductForConfirmation.Location = new System.Drawing.Point(4, 66);
             this.gridControlProductForConfirmation.MainView = this.gridViewProductForConfirmation;
-            this.gridControlProductForConfirmation.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gridControlProductForConfirmation.Margin = new System.Windows.Forms.Padding(4);
             this.gridControlProductForConfirmation.Name = "gridControlProductForConfirmation";
-            this.gridControlProductForConfirmation.Size = new System.Drawing.Size(1397, 693);
+            this.gridControlProductForConfirmation.Size = new System.Drawing.Size(1114, 534);
             this.gridControlProductForConfirmation.TabIndex = 5;
             this.gridControlProductForConfirmation.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewProductForConfirmation});
@@ -696,10 +696,10 @@
             this.groupBox2.Dock = System.Windows.Forms.DockStyle.Top;
             this.groupBox2.Font = new System.Drawing.Font("Tahoma", 7.75F);
             this.groupBox2.Location = new System.Drawing.Point(4, 4);
-            this.groupBox2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox2.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.groupBox2.Size = new System.Drawing.Size(1397, 62);
+            this.groupBox2.Padding = new System.Windows.Forms.Padding(4);
+            this.groupBox2.Size = new System.Drawing.Size(1114, 62);
             this.groupBox2.TabIndex = 7;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Filter Date";
@@ -709,7 +709,7 @@
             this.btnForConfirmProd.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnForConfirmProd.ImageOptions.Image")));
             this.btnForConfirmProd.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.btnForConfirmProd.Location = new System.Drawing.Point(396, 21);
-            this.btnForConfirmProd.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnForConfirmProd.Margin = new System.Windows.Forms.Padding(4);
             this.btnForConfirmProd.Name = "btnForConfirmProd";
             this.btnForConfirmProd.Size = new System.Drawing.Size(100, 28);
             this.btnForConfirmProd.TabIndex = 7;
@@ -721,7 +721,7 @@
             this.dateToForConfirmProd.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
             this.dateToForConfirmProd.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
             this.dateToForConfirmProd.Location = new System.Drawing.Point(252, 21);
-            this.dateToForConfirmProd.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.dateToForConfirmProd.Margin = new System.Windows.Forms.Padding(4);
             this.dateToForConfirmProd.Name = "dateToForConfirmProd";
             this.dateToForConfirmProd.Size = new System.Drawing.Size(137, 27);
             this.dateToForConfirmProd.TabIndex = 3;
@@ -731,7 +731,7 @@
             this.dateFromForConfirmProd.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
             this.dateFromForConfirmProd.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
             this.dateFromForConfirmProd.Location = new System.Drawing.Point(68, 21);
-            this.dateFromForConfirmProd.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.dateFromForConfirmProd.Margin = new System.Windows.Forms.Padding(4);
             this.dateFromForConfirmProd.Name = "dateFromForConfirmProd";
             this.dateFromForConfirmProd.Size = new System.Drawing.Size(137, 27);
             this.dateFromForConfirmProd.TabIndex = 2;
@@ -762,9 +762,9 @@
             // 
             this.tabPageForConfirmationServices.Controls.Add(this.gridControlServicesForConfirmation);
             this.tabPageForConfirmationServices.Location = new System.Drawing.Point(4, 27);
-            this.tabPageForConfirmationServices.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPageForConfirmationServices.Margin = new System.Windows.Forms.Padding(4);
             this.tabPageForConfirmationServices.Name = "tabPageForConfirmationServices";
-            this.tabPageForConfirmationServices.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPageForConfirmationServices.Padding = new System.Windows.Forms.Padding(4);
             this.tabPageForConfirmationServices.Size = new System.Drawing.Size(1122, 604);
             this.tabPageForConfirmationServices.TabIndex = 1;
             this.tabPageForConfirmationServices.Text = "Services";
@@ -773,10 +773,10 @@
             // gridControlServicesForConfirmation
             // 
             this.gridControlServicesForConfirmation.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControlServicesForConfirmation.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gridControlServicesForConfirmation.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4);
             this.gridControlServicesForConfirmation.Location = new System.Drawing.Point(4, 4);
             this.gridControlServicesForConfirmation.MainView = this.gridViewServicesForConfirmation;
-            this.gridControlServicesForConfirmation.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gridControlServicesForConfirmation.Margin = new System.Windows.Forms.Padding(4);
             this.gridControlServicesForConfirmation.Name = "gridControlServicesForConfirmation";
             this.gridControlServicesForConfirmation.Size = new System.Drawing.Size(1114, 596);
             this.gridControlServicesForConfirmation.TabIndex = 5;
@@ -816,7 +816,7 @@
             this.tabControlConfirmed.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControlConfirmed.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tabControlConfirmed.Location = new System.Drawing.Point(0, 0);
-            this.tabControlConfirmed.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabControlConfirmed.Margin = new System.Windows.Forms.Padding(4);
             this.tabControlConfirmed.Name = "tabControlConfirmed";
             this.tabControlConfirmed.SelectedIndex = 0;
             this.tabControlConfirmed.Size = new System.Drawing.Size(1130, 635);
@@ -828,9 +828,9 @@
             this.tabPageConfirmedProducts.Controls.Add(this.gridControlConfirmedProducts);
             this.tabPageConfirmedProducts.Controls.Add(this.groupBox4);
             this.tabPageConfirmedProducts.Location = new System.Drawing.Point(4, 27);
-            this.tabPageConfirmedProducts.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPageConfirmedProducts.Margin = new System.Windows.Forms.Padding(4);
             this.tabPageConfirmedProducts.Name = "tabPageConfirmedProducts";
-            this.tabPageConfirmedProducts.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPageConfirmedProducts.Padding = new System.Windows.Forms.Padding(4);
             this.tabPageConfirmedProducts.Size = new System.Drawing.Size(1122, 604);
             this.tabPageConfirmedProducts.TabIndex = 0;
             this.tabPageConfirmedProducts.Text = "Products";
@@ -839,10 +839,10 @@
             // gridControlConfirmedProducts
             // 
             this.gridControlConfirmedProducts.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControlConfirmedProducts.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gridControlConfirmedProducts.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4);
             this.gridControlConfirmedProducts.Location = new System.Drawing.Point(4, 66);
             this.gridControlConfirmedProducts.MainView = this.gridViewConfirmedProducts;
-            this.gridControlConfirmedProducts.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gridControlConfirmedProducts.Margin = new System.Windows.Forms.Padding(4);
             this.gridControlConfirmedProducts.Name = "gridControlConfirmedProducts";
             this.gridControlConfirmedProducts.Size = new System.Drawing.Size(1114, 534);
             this.gridControlConfirmedProducts.TabIndex = 5;
@@ -878,9 +878,9 @@
             this.groupBox4.Dock = System.Windows.Forms.DockStyle.Top;
             this.groupBox4.Font = new System.Drawing.Font("Tahoma", 7.75F);
             this.groupBox4.Location = new System.Drawing.Point(4, 4);
-            this.groupBox4.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox4.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox4.Padding = new System.Windows.Forms.Padding(4);
             this.groupBox4.Size = new System.Drawing.Size(1114, 62);
             this.groupBox4.TabIndex = 7;
             this.groupBox4.TabStop = false;
@@ -891,7 +891,7 @@
             this.btnConfirmedProd.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnConfirmedProd.ImageOptions.Image")));
             this.btnConfirmedProd.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.btnConfirmedProd.Location = new System.Drawing.Point(396, 21);
-            this.btnConfirmedProd.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnConfirmedProd.Margin = new System.Windows.Forms.Padding(4);
             this.btnConfirmedProd.Name = "btnConfirmedProd";
             this.btnConfirmedProd.Size = new System.Drawing.Size(100, 28);
             this.btnConfirmedProd.TabIndex = 7;
@@ -903,7 +903,7 @@
             this.dateToConfirmedProd.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
             this.dateToConfirmedProd.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
             this.dateToConfirmedProd.Location = new System.Drawing.Point(252, 21);
-            this.dateToConfirmedProd.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.dateToConfirmedProd.Margin = new System.Windows.Forms.Padding(4);
             this.dateToConfirmedProd.Name = "dateToConfirmedProd";
             this.dateToConfirmedProd.Size = new System.Drawing.Size(137, 27);
             this.dateToConfirmedProd.TabIndex = 3;
@@ -913,7 +913,7 @@
             this.dateFromConfirmedProd.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold);
             this.dateFromConfirmedProd.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
             this.dateFromConfirmedProd.Location = new System.Drawing.Point(68, 21);
-            this.dateFromConfirmedProd.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.dateFromConfirmedProd.Margin = new System.Windows.Forms.Padding(4);
             this.dateFromConfirmedProd.Name = "dateFromConfirmedProd";
             this.dateFromConfirmedProd.Size = new System.Drawing.Size(137, 27);
             this.dateFromConfirmedProd.TabIndex = 2;
@@ -944,9 +944,9 @@
             // 
             this.tabPageConfirmedServices.Controls.Add(this.gridControlConfirmedServices);
             this.tabPageConfirmedServices.Location = new System.Drawing.Point(4, 27);
-            this.tabPageConfirmedServices.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPageConfirmedServices.Margin = new System.Windows.Forms.Padding(4);
             this.tabPageConfirmedServices.Name = "tabPageConfirmedServices";
-            this.tabPageConfirmedServices.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPageConfirmedServices.Padding = new System.Windows.Forms.Padding(4);
             this.tabPageConfirmedServices.Size = new System.Drawing.Size(1122, 604);
             this.tabPageConfirmedServices.TabIndex = 1;
             this.tabPageConfirmedServices.Text = "Services";
@@ -955,10 +955,10 @@
             // gridControlConfirmedServices
             // 
             this.gridControlConfirmedServices.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControlConfirmedServices.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gridControlConfirmedServices.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4);
             this.gridControlConfirmedServices.Location = new System.Drawing.Point(4, 4);
             this.gridControlConfirmedServices.MainView = this.gridViewConfirmedServices;
-            this.gridControlConfirmedServices.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gridControlConfirmedServices.Margin = new System.Windows.Forms.Padding(4);
             this.gridControlConfirmedServices.Name = "gridControlConfirmedServices";
             this.gridControlConfirmedServices.Size = new System.Drawing.Size(1114, 596);
             this.gridControlConfirmedServices.TabIndex = 5;

@@ -1,0 +1,329 @@
+<title>Dependency Atlas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f3f5f7; --surface:#ffffff; --surface-2:#e9edf1; --border:#d4dae1;
+  --text:#18202a; --text-dim:#566170; --text-faint:#86909d;
+  --accent:#0f7a82; --accent-strong:#0a5e64; --accent-tint:#e2f1f1;
+  --p-bg:#fbeddf; --p-fg:#9a5215;
+  --v-bg:#e4ecfa; --v-fg:#2455a3;
+  --f-bg:#efe7fa; --f-fg:#6a3db3;
+  --u-bg:#e2f1e5; --u-fg:#2c6a38;
+  --t-bg:#f8e5ec; --t-fg:#983457;
+  --miss:#b3261e; --scratch:#b8541e;
+  --shadow:0 1px 2px rgba(20,28,38,.06),0 6px 20px rgba(20,28,38,.05);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0f1318; --surface:#161c23; --surface-2:#1d242d; --border:#2a333e;
+    --text:#e6eaef; --text-dim:#a2acb8; --text-faint:#6c7682;
+    --accent:#3cb5ad; --accent-strong:#68d3cb; --accent-tint:#13302e;
+    --p-bg:#3a2716; --p-fg:#f0b477;
+    --v-bg:#1b2b46; --v-fg:#92b6ee;
+    --f-bg:#2a2246; --f-fg:#c4aaf2;
+    --u-bg:#172f1d; --u-fg:#8fd29d;
+    --t-bg:#3a1b27; --t-fg:#f09ab8;
+    --miss:#ff8a80; --scratch:#e2924f;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0f1318; --surface:#161c23; --surface-2:#1d242d; --border:#2a333e;
+  --text:#e6eaef; --text-dim:#a2acb8; --text-faint:#6c7682;
+  --accent:#3cb5ad; --accent-strong:#68d3cb; --accent-tint:#13302e;
+  --p-bg:#3a2716; --p-fg:#f0b477;
+  --v-bg:#1b2b46; --v-fg:#92b6ee;
+  --f-bg:#2a2246; --f-fg:#c4aaf2;
+  --u-bg:#172f1d; --u-fg:#8fd29d;
+  --t-bg:#3a1b27; --t-fg:#f09ab8;
+  --miss:#ff8a80; --scratch:#e2924f;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:14px;line-height:1.45}
+code,.mono{font-family:"IBM Plex Mono",ui-monospace,Consolas,monospace}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--border);padding-block:16px 12px;padding-inline:16px}
+.inner{max-width:1400px;margin:0 auto}
+.wrap{max-width:1400px;margin:0 auto;padding-inline:16px;padding-block:16px 64px}
+h1{margin:0 0 4px;font-size:22px;font-weight:700;letter-spacing:-.01em;text-wrap:balance}
+.subtitle{margin:0 0 12px;color:var(--text-dim);font-size:13px;max-width:78ch}
+.subtitle code{font-size:12px;background:var(--surface-2);padding:0 4px;border-radius:4px}
+.meta{font-size:12px;color:var(--text-faint);margin:0 0 12px}
+.meta b{color:var(--text-dim);font-weight:600}
+.stats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:6px 12px;display:flex;flex-direction:column;min-width:96px}
+.stat b{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;font-size:17px;font-weight:600}
+.stat span{font-size:10.5px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.06em}
+.controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tabs{display:inline-flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--surface)}
+.tabs button{border:0;background:transparent;color:var(--text-dim);padding:8px 14px;font:inherit;font-size:13px;font-weight:500;cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--accent);color:#fff}
+.tabs button:focus-visible,.btn:focus-visible,.tog:focus-within,.row-head:focus-visible,.chip:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.search{position:relative;flex:1 1 300px;min-width:0}
+.search input{width:100%;padding:8px 12px 8px 32px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:"IBM Plex Mono",monospace;font-size:13px}
+.search input:focus{outline:2px solid var(--accent);outline-offset:1px}
+.search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);opacity:.5}
+.filters{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:10px;font-size:12px;color:var(--text-dim)}
+.filters .lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-faint);margin-right:2px}
+.filters .sep{width:1px;height:18px;background:var(--border);margin:0 4px}
+.tog{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--border);background:var(--surface);border-radius:999px;padding:3px 10px 3px 7px;cursor:pointer;user-select:none}
+.tog input{margin:0;accent-color:var(--accent)}
+.btn{padding:7px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font:inherit;font-size:12.5px;font-weight:500;cursor:pointer}
+.btn:hover{border-color:var(--accent);color:var(--accent-strong)}
+
+.chip{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:11px;padding:1px 7px;border-radius:5px;margin:2px 4px 2px 0;white-space:nowrap;border:1px solid transparent;cursor:pointer;background:none;line-height:1.6}
+.chip.P{background:var(--p-bg);color:var(--p-fg)} .chip.V{background:var(--v-bg);color:var(--v-fg)}
+.chip.F{background:var(--f-bg);color:var(--f-fg)} .chip.U{background:var(--u-bg);color:var(--u-fg)}
+.chip.T{background:var(--t-bg);color:var(--t-fg)}
+.chip.miss{background:transparent;color:var(--miss);border:1px dashed var(--miss);cursor:default}
+.chip.hit{box-shadow:0 0 0 2px var(--accent)}
+.chip.static{cursor:default}
+.kind{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-faint);border:1px solid var(--border);border-radius:4px;padding:0 5px;margin-left:6px;font-weight:600}
+.scratch{font-size:10px;color:var(--scratch);border:1px solid var(--scratch);border-radius:4px;padding:0 5px;margin-left:6px;text-transform:uppercase;letter-spacing:.04em;font-weight:600}
+
+details.group{background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;box-shadow:var(--shadow);overflow:hidden}
+summary{cursor:pointer;list-style:none;padding:12px 16px;display:flex;align-items:baseline;gap:10px;font-weight:600;user-select:none}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"\25B8";color:var(--text-faint);font-size:11px;width:10px;transition:transform .15s}
+details[open]>summary::before{transform:rotate(90deg)}
+.gcount{font-size:12px;font-weight:400;color:var(--text-faint)}
+.row{border-top:1px solid var(--border)}
+.row-head{display:grid;grid-template-columns:minmax(200px,280px) 1fr auto;gap:12px;padding:8px 16px;cursor:pointer;align-items:start}
+.row-head:hover{background:var(--accent-tint)}
+.row.open>.row-head{background:var(--accent-tint)}
+.fname{font-weight:600;font-size:13px;word-break:break-word}
+.path{display:block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--text-faint);margin-top:2px;word-break:break-all}
+.counts{font-size:11.5px;color:var(--text-faint);white-space:nowrap;font-variant-numeric:tabular-nums;text-align:right}
+.counts b{color:var(--text-dim);font-weight:600}
+.none{color:var(--text-faint)}
+.detail{padding:4px 16px 14px 16px;display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));background:var(--surface)}
+.dsec h4{margin:6px 0 4px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-faint);font-weight:600}
+.dsec .tline{margin:2px 0 6px}
+.dsec .tname{font-size:11px;color:var(--text-dim);margin-right:6px}
+.flink{display:block;background:none;border:0;padding:2px 0;color:var(--accent-strong);font:inherit;font-size:12.5px;cursor:pointer;text-align:left}
+.flink:hover{text-decoration:underline}
+.flink .path{display:inline;margin-left:6px}
+.more{margin:10px 16px 14px}
+.empty{text-align:center;color:var(--text-faint);padding:40px 16px}
+footer.note{margin-top:20px;font-size:12px;color:var(--text-faint);max-width:90ch}
+footer.note code{background:var(--surface-2);padding:1px 5px;border-radius:4px}
+@media (max-width:720px){
+  .row-head{grid-template-columns:1fr}
+  .counts{text-align:left}
+}
+@media (prefers-reduced-motion:reduce){summary::before{transition:none}}
+</style>
+
+<header class="top">
+  <div class="inner">
+    <h1>Dependency Atlas</h1>
+    <p class="subtitle">Every Form/UserControl in SalesInventorySystem, cross-referenced against the SQL views, functions, stored procedures, tables and table types its code references, and what those objects reach inside the database. Use it to trace a broken form down to its query surface, or to find every screen touching a given <code>sp_</code>/<code>vw_</code>/<code>func_</code>/table name before you change it.</p>
+    <p class="meta" id="meta"></p>
+    <div class="stats" id="stats"></div>
+    <div class="controls">
+      <div class="tabs" role="group" aria-label="View">
+        <button id="modeForms" type="button" aria-pressed="true">By form</button>
+        <button id="modeObjects" type="button" aria-pressed="false">By SQL object</button>
+      </div>
+      <div class="search">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="search" type="search" placeholder="Type a form name, path, or SQL object (e.g. AddExpenseDevExFrm, sp_PostVoucherManual, TicketDetails)" autocomplete="off" spellcheck="false" aria-label="Search">
+      </div>
+      <button class="btn" id="expandAll" type="button">Expand all</button>
+      <button class="btn" id="collapseAll" type="button">Collapse all</button>
+    </div>
+    <div class="filters" id="filters">
+      <span class="lbl">Show</span>
+      <label class="tog"><input type="checkbox" id="tP" checked><span class="chip P static">Procedures</span></label>
+      <label class="tog"><input type="checkbox" id="tV" checked><span class="chip V static">Views</span></label>
+      <label class="tog"><input type="checkbox" id="tF" checked><span class="chip F static">Functions</span></label>
+      <label class="tog"><input type="checkbox" id="tU" checked><span class="chip U static">Tables</span></label>
+      <label class="tog"><input type="checkbox" id="tT" checked><span class="chip T static">Table types</span></label>
+      <span class="sep"></span>
+      <label class="tog"><input type="checkbox" id="kForm" checked>Forms</label>
+      <label class="tog"><input type="checkbox" id="kReport" checked>Reports</label>
+      <label class="tog"><input type="checkbox" id="kClass" checked>Other classes</label>
+      <span class="sep"></span>
+      <label class="tog"><input type="checkbox" id="optVia">Search through SQL too</label>
+      <label class="tog"><input type="checkbox" id="optDeps">Only with SQL references</label>
+      <label class="tog"><input type="checkbox" id="optScratch">Hide scratch folders</label>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <main id="main"></main>
+  <footer class="note" id="footnote"></footer>
+</div>
+
+<script>
+const ATLAS = /*__ATLAS_DATA__*/null;
+(function(){
+  const $ = id => document.getElementById(id);
+  const TYPE_NAME = {P:'Procedures',V:'Views',F:'Functions',U:'Tables',T:'Table types'};
+  const TYPE_ORDER = ['P','V','F','U','T'];
+  const KIND_NAME = {form:'Form',report:'Report',class:'Class'};
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+  const names = ATLAS.names, types = ATLAS.types, files = ATLAS.files;
+  const lower = names.map(n => n.toLowerCase());
+  const edges = {};  for (const k in ATLAS.edges) edges[+k] = ATLAS.edges[k];
+  const redges = {}; for (const k in edges) for (const b of edges[k]) (redges[b] = redges[b] || []).push(+k);
+
+  // through-SQL closure per file (objects reached from its direct references, minus the direct ones)
+  files.forEach((f, fi) => {
+    f.i = fi;
+    const seen = new Set(f.d), stack = [...f.d], via = [];
+    while (stack.length){ const a = stack.pop(); for (const b of (edges[a] || [])) if (!seen.has(b)){ seen.add(b); via.push(b); stack.push(b); } }
+    f.v = via;
+    f.lc = (f.n + ' ' + f.p).toLowerCase();
+  });
+  const usedBy = {}, reachedBy = {};
+  files.forEach(f => { f.d.forEach(o => (usedBy[o] = usedBy[o] || []).push(f.i)); f.v.forEach(o => (reachedBy[o] = reachedBy[o] || []).push(f.i)); });
+  const touched = [];
+  for (let o = 0; o < names.length; o++) if (usedBy[o] || reachedBy[o]) touched.push(o);
+  touched.sort((a, b) => lower[a] < lower[b] ? -1 : 1);
+
+  // header
+  const forms = files.filter(f => f.k === 'form');
+  const missingCount = new Set(files.flatMap(f => f.m.map(x => x.toLowerCase()))).size;
+  $('meta').innerHTML = 'Generated <b>' + esc(ATLAS.generated) + '</b> from database <b>' + esc(ATLAS.db) + '</b> and the source tree. Rebuild with <code>tools/DependencyAtlas/Build-DependencyAtlas.ps1</code>.';
+  const stat = (v, l) => '<div class="stat"><b>' + v.toLocaleString() + '</b><span>' + l + '</span></div>';
+  $('stats').innerHTML = stat(forms.length, 'Forms') + stat(forms.filter(f => f.d.length).length, 'Forms with SQL')
+    + stat(files.length, 'Code files') + stat(touched.length, 'SQL objects used') + stat(names.length, 'Objects in DB')
+    + stat(missingCount, 'Names not in DB');
+  $('footnote').innerHTML = '<p><b>How references are found.</b> Only C# string literals are scanned (comments are skipped), so SQL built in code, helper calls such as <code>Database.getMultipleQuery("Inventory", …)</code> and <code>TypeName = "dbo.…TVP"</code> are all caught. Procedure, view, function and type names match anywhere in a literal. Table names must be in SQL position (after FROM, JOIN, INTO, UPDATE, EXEC, <code>dbo.</code>) or be the whole literal, which keeps words like <code>Inventory</code> in UI text from counting. The <code>.Designer.cs</code> of each file is included.</p>'
+    + '<p><b>Through SQL</b> is everything the directly named objects reach inside the database: <code>sys.sql_expression_dependencies</code> plus table-type parameters, followed recursively. Dynamic SQL inside a procedure is invisible to it. Timestamped <code>_OLD_</code> backups and <code>_Backup_</code> tables are excluded. <span class="chip miss">dashed red</span> names look like SQL objects (sp_, func_, view_…) but do not exist in ' + esc(ATLAS.db) + ': a likely broken call, or an object that lives in another database.</p>';
+
+  // state
+  let mode = 'forms', q = '';
+  const openRows = new Set();
+  let limit = 250;
+  const typeOn = t => $('t' + t).checked;
+  const kindOn = k => $(k === 'form' ? 'kForm' : k === 'report' ? 'kReport' : 'kClass').checked;
+
+  function chip(o, hitSet){
+    const t = types[o];
+    return '<button type="button" class="chip ' + t + (hitSet && hitSet.has(o) ? ' hit' : '') + '" data-obj="' + o + '" title="' + TYPE_NAME[t] + '">' + esc(names[o]) + '</button>';
+  }
+  function chipsByType(list, hitSet){
+    const by = {}; list.forEach(o => { const t = types[o]; if (typeOn(t)) (by[t] = by[t] || []).push(o); });
+    let h = '';
+    TYPE_ORDER.forEach(t => { if (by[t]) { by[t].sort((a, b) => lower[a] < lower[b] ? -1 : 1); h += '<div class="tline"><span class="tname">' + TYPE_NAME[t] + ' (' + by[t].length + ')</span>' + by[t].map(o => chip(o, hitSet)).join('') + '</div>'; } });
+    return h || '<span class="none">None</span>';
+  }
+  function fileVisible(f){
+    if (!kindOn(f.k)) return false;
+    if ($('optScratch').checked && f.s) return false;
+    if ($('optDeps').checked && !f.d.length) return false;
+    return true;
+  }
+  function fileHits(f){
+    if (!q) return {ok:true, hits:null};
+    if (f.lc.includes(q)) return {ok:true, hits:null};
+    const hits = new Set();
+    f.d.forEach(o => { if (lower[o].includes(q)) hits.add(o); });
+    if ($('optVia').checked) f.v.forEach(o => { if (lower[o].includes(q)) hits.add(o); });
+    const miss = f.m.some(m => m.toLowerCase().includes(q));
+    return {ok: hits.size > 0 || miss, hits};
+  }
+
+  function fileDetail(f, hits){
+    const miss = f.m.length ? '<div class="dsec"><h4>Named in code, not found in ' + esc(ATLAS.db) + '</h4>' + f.m.map(m => '<span class="chip miss">' + esc(m) + '</span>').join('') + '</div>' : '';
+    return '<div class="detail"><div class="dsec"><h4>Called from code (' + f.d.length + ')</h4>' + chipsByType(f.d, hits) + '</div>'
+      + '<div class="dsec"><h4>Reached through SQL (' + f.v.length + ')</h4>' + chipsByType(f.v, hits) + '</div>' + miss + '</div>';
+  }
+
+  function renderForms(){
+    const groups = new Map();
+    let shown = 0;
+    files.forEach(f => {
+      if (!fileVisible(f)) return;
+      const r = fileHits(f); if (!r.ok) return;
+      if (!groups.has(f.g)) groups.set(f.g, []);
+      groups.get(f.g).push([f, r.hits]); shown++;
+    });
+    if (!shown){ $('main').innerHTML = '<p class="empty">Nothing matches “' + esc(q) + '”. Try part of the name, or turn on “Search through SQL too”.</p>'; return; }
+    const keys = [...groups.keys()].sort((a, b) => a === '(root)' ? -1 : b === '(root)' ? 1 : a.localeCompare(b));
+    let h = '';
+    keys.forEach(g => {
+      const rows = groups.get(g).sort((a, b) => a[0].n.localeCompare(b[0].n));
+      const withSql = rows.filter(r => r[0].d.length).length;
+      h += '<details class="group" open><summary><span>' + esc(g) + '</span><span class="gcount">' + rows.length + ' files · ' + withSql + ' with SQL references</span></summary>';
+      rows.forEach(([f, hits]) => {
+        const open = openRows.has('f' + f.i) || (q && hits && hits.size && rows.length <= 3);
+        const direct = f.d.filter(o => typeOn(types[o]));
+        const preview = direct.length ? direct.slice().sort((a, b) => TYPE_ORDER.indexOf(types[a]) - TYPE_ORDER.indexOf(types[b]) || (lower[a] < lower[b] ? -1 : 1)).map(o => chip(o, hits)).join('') : '<span class="none">No SQL references</span>';
+        h += '<div class="row' + (open ? ' open' : '') + '" data-row="f' + f.i + '"><div class="row-head" tabindex="0" role="button" aria-expanded="' + (open ? 'true' : 'false') + '">'
+          + '<div><span class="fname">' + esc(f.n) + '</span>' + (f.k !== 'form' ? '<span class="kind">' + KIND_NAME[f.k] + '</span>' : '') + (f.s ? '<span class="scratch">scratch</span>' : '') + '<span class="path">' + esc(f.p) + '</span></div>'
+          + '<div>' + preview + (f.m.length ? f.m.map(m => '<span class="chip miss">' + esc(m) + '</span>').join('') : '') + '</div>'
+          + '<div class="counts"><b>' + f.d.length + '</b> direct · <b>' + f.v.length + '</b> via SQL</div></div>'
+          + (open ? fileDetail(f, hits) : '') + '</div>';
+      });
+      h += '</details>';
+    });
+    $('main').innerHTML = h;
+  }
+
+  function fileLink(fi){ const f = files[fi]; return '<button type="button" class="flink" data-file="' + fi + '">' + esc(f.n) + '<span class="path">' + esc(f.p) + '</span></button>'; }
+  function fileList(list){
+    const vis = (list || []).filter(fi => fileVisible(files[fi]));
+    return vis.length ? vis.sort((a, b) => files[a].n.localeCompare(files[b].n)).map(fileLink).join('') : '<span class="none">None</span>';
+  }
+  function objectDetail(o){
+    return '<div class="detail"><div class="dsec"><h4>Called directly by (' + (usedBy[o] || []).length + ')</h4>' + fileList(usedBy[o]) + '</div>'
+      + '<div class="dsec"><h4>Reached through SQL by (' + (reachedBy[o] || []).length + ')</h4>' + fileList(reachedBy[o]) + '</div>'
+      + '<div class="dsec"><h4>Depends on (' + (edges[o] || []).length + ')</h4>' + chipsByType(edges[o] || []) + '</div>'
+      + '<div class="dsec"><h4>Used by SQL objects (' + (redges[o] || []).length + ')</h4>' + chipsByType(redges[o] || []) + '</div></div>';
+  }
+  function renderObjects(){
+    const list = touched.filter(o => typeOn(types[o]) && (!q || lower[o].includes(q)));
+    if (!list.length){ $('main').innerHTML = '<p class="empty">No SQL object used by the code matches “' + esc(q) + '”.</p>'; return; }
+    const exact = q ? list.find(o => lower[o] === q) : undefined;
+    let h = '<details class="group" open><summary><span>SQL objects used by the code</span><span class="gcount">' + list.length.toLocaleString() + ' match</span></summary>';
+    list.slice(0, limit).forEach(o => {
+      const open = openRows.has('o' + o) || o === exact || list.length === 1;
+      h += '<div class="row' + (open ? ' open' : '') + '" data-row="o' + o + '"><div class="row-head" tabindex="0" role="button" aria-expanded="' + (open ? 'true' : 'false') + '">'
+        + '<div><span class="chip ' + types[o] + ' static">' + esc(names[o]) + '</span></div>'
+        + '<div class="none" style="font-size:12px">' + TYPE_NAME[types[o]].replace(/s$/, '') + '</div>'
+        + '<div class="counts"><b>' + (usedBy[o] || []).length + '</b> direct · <b>' + (reachedBy[o] || []).length + '</b> via SQL</div></div>'
+        + (open ? objectDetail(o) : '') + '</div>';
+    });
+    h += '</details>';
+    if (list.length > limit) h += '<button class="btn more" id="showMore" type="button">Show ' + Math.min(250, list.length - limit) + ' more of ' + (list.length - limit).toLocaleString() + ' remaining</button>';
+    $('main').innerHTML = h;
+  }
+
+  function render(){ mode === 'forms' ? renderForms() : renderObjects(); }
+  function setMode(m){ mode = m; limit = 250; $('modeForms').setAttribute('aria-pressed', m === 'forms'); $('modeObjects').setAttribute('aria-pressed', m === 'objects'); render(); }
+
+  let t;
+  $('search').addEventListener('input', e => { clearTimeout(t); t = setTimeout(() => { q = e.target.value.trim().toLowerCase(); limit = 250; render(); }, 120); });
+  $('modeForms').addEventListener('click', () => setMode('forms'));
+  $('modeObjects').addEventListener('click', () => setMode('objects'));
+  $('filters').addEventListener('change', render);
+  $('expandAll').addEventListener('click', () => { document.querySelectorAll('.row').forEach(r => openRows.add(r.dataset.row)); render(); });
+  $('collapseAll').addEventListener('click', () => { openRows.clear(); render(); document.querySelectorAll('details.group').forEach(d => d.open = false); });
+
+  function jump(newMode, text){
+    $('search').value = text; q = text.toLowerCase(); openRows.clear(); setMode(newMode); window.scrollTo({top: 0});
+  }
+  $('main').addEventListener('click', e => {
+    const c = e.target.closest('.chip[data-obj]');
+    if (c){ e.stopPropagation(); const o = +c.dataset.obj; jump('objects', names[o]); openRows.add('o' + o); render(); return; }
+    const fl = e.target.closest('.flink');
+    if (fl){ const f = files[+fl.dataset.file]; jump('forms', f.p); openRows.add('f' + f.i); render(); return; }
+    if (e.target.id === 'showMore'){ limit += 250; render(); return; }
+    const head = e.target.closest('.row-head');
+    if (head){ const id = head.parentElement.dataset.row; openRows.has(id) ? openRows.delete(id) : openRows.add(id); render(); }
+  });
+  $('main').addEventListener('keydown', e => {
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('row-head')){ e.preventDefault(); e.target.click(); }
+  });
+  render();
+})();
+</script>

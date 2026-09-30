@@ -25,6 +25,16 @@ namespace SalesInventorySystem.Orders
         public ViewBranchOrderSTS()
         {
             InitializeComponent();
+
+            // STS V2 (FIFO engine) test entry, 2026-09-29 -- admins only while it's
+            // being tested. Added in code so the designer file stays untouched.
+            bool isAdmin;
+            if (bool.TryParse(Login.isglobalAdmin, out isAdmin) && isAdmin)
+            {
+                var fifoV2 = new ToolStripMenuItem("FIFO V2 (Test)");
+                fifoV2.Click += (s, e) => openBranchOrderV2();
+                processThisOrderToolStripMenuItem.DropDownItems.Add(fifoV2);
+            }
         }
 
         private void gridView1_DoubleClick(object sender, EventArgs e)
@@ -532,6 +542,52 @@ namespace SalesInventorySystem.Orders
             {
                 XtraMessageBox.Show("You Already Processed This Request!");
             }
+        }
+
+        // Same checks and field set-up as openBranchOrder("STS"), but opens the
+        // V2 form (Orders/AddBranchOrderSTSV2, FIFO engine) modally and
+        // refreshes this list when it closes.
+        void openBranchOrderV2()
+        {
+            if (gridView1.FocusedRowHandle < 0 || !gridView1.IsDataRow(gridView1.FocusedRowHandle))
+                return;
+
+            branchno = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "InitiatingBranch").ToString();
+            ponumber = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "PONumber").ToString();
+            string stat = Convert.ToString(gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "WareHouseStatus"));
+            effectivedate = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "EffectivityDate").ToString();
+
+            if (!(String.IsNullOrEmpty(stat) || stat == "PENDING"))
+            {
+                XtraMessageBox.Show("You Already Processed This Request!");
+                return;
+            }
+
+            using (var addbrorder = new Orders.AddBranchOrderSTSV2())
+            {
+                addbrorder.txtbrcode.Text = branchno;
+                addbrorder.txtponum.Text = ponumber;
+                addbrorder.txtdevno.Text = Orders.AddBranchOrderSTSV2.ResolveDeliveryNo(ponumber);
+                addbrorder.txtrefno.Text = IDGenerator.getIDNumberSP("sp_GetReferenceNumber", "ReferenceNumber");
+                addbrorder.txteffectivedate.Text = effectivedate;
+                addbrorder.Text = custname + "-" + Branch.getBranchName(branchno);
+
+                using (var con = Database.getConnection())
+                using (var cmd = new SqlCommand("SELECT * FROM dbo.funcview_TransferOrderDetailsSTS(@Branch, @PONumber)", con))
+                {
+                    cmd.Parameters.Add("@Branch", SqlDbType.VarChar, 10).Value = Login.assignedBranch ?? "";
+                    cmd.Parameters.Add("@PONumber", SqlDbType.VarChar, 10).Value = ponumber;
+                    Database.display(cmd, addbrorder.gridControl1, addbrorder.gridView1);
+                }
+                if (addbrorder.gridView1.Columns["PONumber"] != null)
+                    addbrorder.gridView1.Columns["PONumber"].Visible = false;
+                addbrorder.gridView1.ExpandAllGroups();
+
+                addbrorder.LoadData();
+                addbrorder.ShowDialog(this);
+            }
+            Orders.AddBranchOrderSTSV2.isdone = false;
+            display();
         }
 
         void openBranchOrderBatchMode(string type)

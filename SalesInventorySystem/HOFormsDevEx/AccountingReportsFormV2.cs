@@ -159,8 +159,90 @@ namespace SalesInventorySystem.HOFormsDevEx
                 Mode = ParamMode.ConsolidatedGL,
                 Shape = ResultShape.Standard2Set,
                 Description = "All branches combined. Trial Balance mode uses an as-of date; Income Statement mode uses a date range. (TB mode also returns a 3rd 'intercompany check' set, not yet shown here.)"
+            },
+
+            // ── Real-Time versions (2026-09-30, SQL/2026-09-30_GL_RealTime_Reports.sql) ──
+            // Same parameters, result sets and layout as the entries above, but computed
+            // straight from TicketDetails -- no GLSummary, so they don't depend on the daily
+            // GL posting and always include back-dated entries. The entries above are kept
+            // unchanged for comparison.
+            ["Trial Balance (Real-Time)"] = new ReportConfig
+            {
+                SpName = "sp_rpt_TrialBalanceRealTime",
+                Mode = ParamMode.BranchAsOfDate,
+                Shape = ResultShape.Standard2Set,
+                Description = "Every account's balance as of a date, straight from the posted tickets (no GL posting needed). Debit must equal Credit.",
+                AllowAllBranches = true
+            },
+            ["Balance Sheet (Real-Time)"] = new ReportConfig
+            {
+                SpName = "sp_rpt_BalanceSheetRealTimeSingleGrid",
+                Mode = ParamMode.BranchAsOfDate,
+                Shape = ResultShape.SingleSet,
+                Description = "Assets, Liabilities and Equity as of a date, straight from the posted tickets -- same layout as Balance Sheet V2, no GL posting needed.",
+                AllowAllBranches = true
+            },
+            ["Income Statement (Real-Time)"] = new ReportConfig
+            {
+                SpName = "sp_rpt_IncomeStatementRealTimeSingleGrid",
+                Mode = ParamMode.BranchDateRange,
+                Shape = ResultShape.SingleSet,
+                Description = "Revenue, COGS and expenses for a date range, straight from the posted tickets -- same layout as Income Statement (v2). Check 'All Branches' for the side-by-side pivot.",
+                AllowAllBranches = true,
+                SupportsAllBranchPivot = true,
+                PivotSpName = "sp_rpt_IncomeStatementRealTimeAllBranchesPivot"
+            },
+            ["GL Detail Ledger (Real-Time)"] = new ReportConfig
+            {
+                SpName = "sp_rpt_GLDetailLedgerRealTime",
+                Mode = ParamMode.BranchAccountDateRange,
+                Shape = ResultShape.GLDetailLedgerLegacy,
+                Description = "Day-by-day activity of one account with opening and running balance, straight from the posted tickets. Requires a specific account.",
+                AllowAllBranches = true
+            },
+            ["GL Detail Transaction (Real-Time)"] = new ReportConfig
+            {
+                SpName = "sp_rpt_GLDetailTransactionRealTime",
+                Mode = ParamMode.BranchAccountDateRange,
+                Shape = ResultShape.SingleSet,
+                Description = "One row per posting leg with opening and ending balance, straight from the posted tickets (the opening now ties to the Trial Balance).",
+                AllowAllBranches = true,
+                SupportsAllAccounts = true
+            },
+            ["Bank Reconciliation (Real-Time)"] = new ReportConfig
+            {
+                SpName = "sp_rpt_BankReconciliationRealTime",
+                // Date range: the reconciliation proc takes @DateFrom/@DateTo.
+                Mode = ParamMode.BranchAccountDateRange,
+                Shape = ResultShape.BankReconShape,
+                Description = "GL side vs Bank side for one bank account over a date range. The GL side equals the account's ledger (Trial Balance / GL Detail Ledger).",
+                AllowAllBranches = true
+            },
+            ["Consolidated GL (Real-Time)"] = new ReportConfig
+            {
+                SpName = "sp_rpt_ConsolidatedGLRealTime",
+                Mode = ParamMode.ConsolidatedGL,
+                Shape = ResultShape.Standard2Set,
+                Description = "All branches combined, straight from the posted tickets. Trial Balance mode uses an as-of date; Income Statement mode uses a date range."
             }
         };
+
+        // Report procs that take @IncludeZeroActivity (drives the checkbox and the parameter).
+        private static readonly HashSet<string> _takesIncludeZero = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "sp_rpt_GLDetailTransactionReport",
+            "sp_rpt_BalanceSheetLiveWithDate",
+            "sp_rpt_BalanceSheetLiveWithDateSingleGrid",
+            "sp_rpt_IncomeStatementLiveWithDate",
+            "sp_rpt_IncomeStatementLiveWithDateSingleGrid",
+            "sp_rpt_GLDetailTransactionRealTime",
+            "sp_rpt_BalanceSheetRealTimeSingleGrid",
+            "sp_rpt_IncomeStatementRealTimeSingleGrid"
+        };
+
+        // Accounts are optional only where the report offers 'All Accounts'.
+        private static bool RequiresAccount(ReportConfig cfg) =>
+            (cfg.Mode == ParamMode.BranchAccountDateRange || cfg.Mode == ParamMode.BranchAccountAsOfDate) && !cfg.SupportsAllAccounts;
 
         private ReportConfig CurrentConfig =>
             cboReportType.SelectedItem != null && _reportConfigs.ContainsKey(cboReportType.SelectedItem.ToString())
@@ -360,11 +442,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             bool showDateRange = cfg.Mode == ParamMode.BranchAccountDateRange || cfg.Mode == ParamMode.BranchDateRange;
             bool showAllBranch = cfg.SupportsAllBranchPivot || cfg.AllowAllBranches;
             bool showAllAccounts = cfg.SupportsAllAccounts;
-            bool showZeroChk = cfg.SpName == "sp_rpt_GLDetailTransactionReport"
-                || cfg.SpName == "sp_rpt_BalanceSheetLiveWithDate"
-                || cfg.SpName == "sp_rpt_BalanceSheetLiveWithDateSingleGrid"
-                || cfg.SpName == "sp_rpt_IncomeStatementLiveWithDate"
-                || cfg.SpName == "sp_rpt_IncomeStatementLiveWithDateSingleGrid";
+            bool showZeroChk = _takesIncludeZero.Contains(cfg.SpName);
             bool showConsolidated = cfg.Mode == ParamMode.ConsolidatedGL;
             bool showBranch = !showConsolidated; // consolidated is always all-branch
 
@@ -474,7 +552,8 @@ namespace SalesInventorySystem.HOFormsDevEx
                 return;
             }
 
-            if (cfg.Mode == ParamMode.BranchAccountAsOfDate && txtAccountCode.EditValue == null)
+            bool noAccountPicked = string.IsNullOrWhiteSpace(txtAccountCode.EditValue?.ToString());
+            if (RequiresAccount(cfg) && noAccountPicked)
             {
                 XtraMessageBox.Show("Select an Account Code.", "Missing Parameter", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
@@ -498,7 +577,7 @@ namespace SalesInventorySystem.HOFormsDevEx
                                 : string.IsNullOrWhiteSpace(txtAccountCode.EditValue?.ToString()) ? (object)DBNull.Value : txtAccountCode.EditValue.ToString();
                             cmd.Parameters.Add("@DateFrom", SqlDbType.Date).Value = dteDateFrom.DateTime;
                             cmd.Parameters.Add("@DateTo", SqlDbType.Date).Value = dteDateTo.DateTime;
-                            if (cfg.SpName == "sp_rpt_GLDetailTransactionReport")
+                            if (_takesIncludeZero.Contains(cfg.SpName))
                                 cmd.Parameters.Add("@IncludeZeroActivity", SqlDbType.Bit).Value = chkIncludeZeroActivity.Checked;
                             break;
 
@@ -506,8 +585,7 @@ namespace SalesInventorySystem.HOFormsDevEx
                             cmd.Parameters.Add("@BranchCode", SqlDbType.VarChar, 5).Value =
                                 (cfg.AllowAllBranches && chkAllBranches.Checked) ? (object)DBNull.Value : cboBranchCode.EditValue?.ToString();
                             cmd.Parameters.Add("@AsOfDate", SqlDbType.Date).Value = dteAsOfDate.DateTime;
-                            if (cfg.SpName == "sp_rpt_BalanceSheetLiveWithDate"
-                                || cfg.SpName == "sp_rpt_BalanceSheetLiveWithDateSingleGrid")
+                            if (_takesIncludeZero.Contains(cfg.SpName))
                                 cmd.Parameters.Add("@IncludeZeroActivity", SqlDbType.Bit).Value = chkIncludeZeroActivity.Checked;
                             break;
 
@@ -521,8 +599,7 @@ namespace SalesInventorySystem.HOFormsDevEx
                                 cmd.Parameters.Add("@AccountType", SqlDbType.VarChar, 10).Value = DBNull.Value;
                                 cmd.Parameters.Add("@SkipZero", SqlDbType.Bit).Value = !chkIncludeZeroActivity.Checked;
                             }
-                            if (cfg.SpName == "sp_rpt_IncomeStatementLiveWithDate"
-                                || cfg.SpName == "sp_rpt_IncomeStatementLiveWithDateSingleGrid")
+                            if (_takesIncludeZero.Contains(cfg.SpName))
                                 cmd.Parameters.Add("@IncludeZeroActivity", SqlDbType.Bit).Value = chkIncludeZeroActivity.Checked;
                             break;
 

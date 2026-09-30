@@ -72,6 +72,7 @@ namespace SalesInventorySystem
 
             // enzowarehouse.Visible = false;
             validate_userAccess();
+            SetupGLPeriodClosingMenu();
             //checkAccess();
             //  ribbonPage1.Visible = false;
             //if (Convert.ToBoolean(Login.isglobalAdmin) != true) //ADMIN TOOLS TAB
@@ -1131,6 +1132,32 @@ namespace SalesInventorySystem
             //addnewtcet.Show();
             //HOFormsDevEx.ManualJournalVoucherFrm addnewtcet = new HOFormsDevEx.ManualJournalVoucherFrm();
             //addnewtcet.Show();
+        }
+
+        // 2026-09-30: daily GL posting is retired -- the reports read posted tickets live
+        // (SQL/2026-09-30_GL_RealTime_Reports.sql) and months are closed with GL Period
+        // Closing (SQL/2026-09-30_GL_PeriodLock.sql). The GL Posting button is hidden, not
+        // removed (form + procs kept). GL Period Closing is added here in code so
+        // Main.Designer.cs stays untouched; global admins only.
+        private void SetupGLPeriodClosingMenu()
+        {
+            btnGLPosting.Visibility = BarItemVisibility.Never;
+
+            bool isAdmin;
+            if (!(bool.TryParse(Login.isglobalAdmin, out isAdmin) && isAdmin))
+                return;
+
+            var btnGLPeriodClosing = new BarButtonItem { Caption = "GL Period Closing" };
+            btnGLPeriodClosing.ItemClick += (s, args) =>
+            {
+                using (var frm = new AccountingDevEx.GLPeriodClosingFrm())
+                {
+                    frm.LoadData();
+                    frm.ShowDialog(this);
+                }
+            };
+            ribbonControl.Items.Add(btnGLPeriodClosing);
+            popupMenuAcctgSettings.ItemLinks.Insert(0, btnGLPeriodClosing);
         }
 
         private void barButtonItem42_ItemClick(object sender, ItemClickEventArgs e)
