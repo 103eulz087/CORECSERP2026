@@ -103,9 +103,13 @@ Correct.
 
 ## 4. If you go with V2 (recommended): alignment pass
 
-**Decision 2026-10-01: V2.** Items 1–2 below are in `SQL/2026-10-01f_STS_V2_Alignment.sql`. The script also makes
-Save take the PO lock first, which is needed so the shared lock can't deadlock. Item 3 is
-`SQL/2026-10-01f_STS_V2_Alignment_Test.sql`, which hasn't been run on a database yet.
+**Decision 2026-10-01: V2.** Items 1–2 below are in `SQL/2026-10-01f_STS_V2_Alignment.sql`, with these changes:
+- After sp-reviewer, the post proc refuses a saved transfer (59835) instead of syncing.
+- It also refuses a second delivery for one transfer (59836).
+- Both V2 procs also refuse once the branch has started receiving.
+- Save and the FIFO receive proc take the same PO lock.
+
+Item 3 is `SQL/2026-10-01f_STS_V2_Alignment_Test.sql`, which hasn't been run on a database yet.
 
 1. `spu_ReverseSTSLineV2`:
    - After restoring the lots, call `spu_STS_SyncInTransit` instead of posting its own ITR-HO
