@@ -439,7 +439,7 @@ namespace SalesInventorySystem.POS
                     DataTable table = new DataTable();
                     adapter.Fill(table);
                     gridControl1.DataSource = null; // clean slate -- same idiom Database.display uses
-                    gridControl1.DataSource = table;
+                    gridControl1.DataSource = table;//tesdt
                 }
             }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
@@ -95,6 +96,8 @@ namespace SalesInventorySystem.Classes
                     break;
 
                 case "Users":
+                    // Use the same column set as SyncAllReferenceDataAsync to avoid requesting
+                    // columns that may not exist on the cloud Users table (which causes failures).
                     await SyncTableAsync("Users", new[] { "UserID" }, new[] {
                 "UserID", "FullName", "Designation", "EmailAddress", "Password", "AssignedBranch",
                 "isAdmin", "isGlobalOfficer", "isBranchOfficer", "isWarehouseOfficer", "isCashier",
@@ -155,9 +158,12 @@ namespace SalesInventorySystem.Classes
                 {
                     try
                     {
-                        // 1. CREATE TEMP TABLE INSTANTLY
+                        // 1. CREATE TEMP TABLE WITH ONLY THE COLUMNS WE'RE COPYING
+                        // This avoids creating NOT NULL columns (like MustChangePassword) that we
+                        // don't supply values for and would otherwise cause NULL insert errors.
                         string tempTable = $"#Temp_{tableName}";
-                        string createTempTable = $"SELECT TOP 0 * INTO {tempTable} FROM [dbo].[{tableName}];";
+                        string colsList = string.Join(", ", allColumns.Select(c => $"[{c}]") );
+                        string createTempTable = $"SELECT TOP 0 {colsList} INTO {tempTable} FROM [dbo].[{tableName}];";
                         using (SqlCommand createCmd = new SqlCommand(createTempTable, localConn, localTx))
                         {
                             await createCmd.ExecuteNonQueryAsync();
@@ -186,7 +192,45 @@ namespace SalesInventorySystem.Classes
                                     bulkCopy.DestinationTableName = tempTable;
                                     bulkCopy.BatchSize = 5000;
                                     bulkCopy.BulkCopyTimeout = 120;
-                                    await bulkCopy.WriteToServerAsync(reader);
+
+                                    foreach (var col in allColumns)
+                                    {
+                                        try { bulkCopy.ColumnMappings.Add(col, col); } catch { }
+                                    }
+
+                                    // Read rows into a DataTable with object-typed columns and write in batches.
+                                    // This allows us to catch per-field read/cast errors and replace them with NULL
+                                    // instead of failing the entire bulk copy with an invalid cast.
+                                    var table = new DataTable();
+                                    foreach (var col in allColumns)
+                                        table.Columns.Add(col, typeof(object));
+
+                                    int batchSize = 5000;
+                                    while (await reader.ReadAsync())
+                                    {
+                                        var row = table.NewRow();
+                                        for (int i = 0; i < allColumns.Length; i++)
+                                        {
+                                            try
+                                            {
+                                                row[i] = reader.IsDBNull(i) ? DBNull.Value : reader.GetValue(i);
+                                            }
+                                            catch
+                                            {
+                                                row[i] = DBNull.Value;
+                                            }
+                                        }
+                                        table.Rows.Add(row);
+
+                                        if (table.Rows.Count >= batchSize)
+                                        {
+                                            await bulkCopy.WriteToServerAsync(table);
+                                            table.Clear();
+                                        }
+                                    }
+
+                                    if (table.Rows.Count > 0)
+                                        await bulkCopy.WriteToServerAsync(table);
                                 }
                             }
                         }

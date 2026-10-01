@@ -80,6 +80,15 @@ namespace SalesInventorySystem.POSDevEx
                 // 5. HANDLE FAILURES GRACEFULLY
                 lblStatus.Text = "Sync failed.";
                 BigAlert.Show("SYNC ERROR", $"Could not synchronize data.\n\nError: {ex.Message}", MessageBoxIcon.Error);
+                // Show full exception details to aid debugging (stack trace / inner exceptions)
+                try
+                {
+                    XtraMessageBox.Show(ex.ToString(), "Sync Exception", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                catch
+                {
+                    // If UI fails to show full exception, ignore - we already showed the user-friendly alert above.
+                }
             }
             finally
             {

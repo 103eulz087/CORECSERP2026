@@ -136,6 +136,7 @@ Setup and run steps for other people (branch, prerequisites, commands, common er
 - Modules so far, in business-flow order (the JSON `order` field sets the menu order):
   1. **Sales Order**: `AddOrder` (`sp_AddSalesOrderRequest`) → approval (`POForApprovalDetails`) → `AddBranchOrder` (`sp_AddBranchOrderHRI_JFC` → FIFO deduction, `sp_ConfirmBranchOrder`) → invoice no. (`ViewForDeliveryDetails`) → `ConfirmOrderDevEx` (`sp_ConfirmOrder`).
   2. **AR Payment** (`ClientPaymentsDevExAcctg`: form inserts → `sp_AddPaymentClient` → `sp_ReversePaymentClient`).
+  3. **Supplier Payment**: expense payable (`spu_PostExpenseV2` / `sp_PostExpenseManualMultiBranch`) → `SupplierPaymentDevEx` (`sp_PostSupplierPaymentWithManualLines` → `sp_AddPaymentSupplierCompound_V2`) → `SupplierVoucherReversalFrm` (`sp_ReverseCombinedSupplierVoucher` → `sp_CancelledChequesCS`). Expense mode only; PURCHASE mode not traced yet.
 - Each module is a pair in `tools/ProcessTrace/modules/`:
   - `<Name>.json`: steps (who writes what), table instances with their key-column → key-family map, money/qty columns, columns to mask, sample transactions (`ids`), findings.
   - `<Name>.sql`: read-only trace query taking `@Ids`; every result set starts with `_t` = the table-instance id. Scope rows by the same keys the procs use.
@@ -145,6 +146,15 @@ Setup and run steps for other people (branch, prerequisites, commands, common er
   powershell -NoProfile -File tools\ProcessTrace\Build-ProcessTrace.ps1 -RegistryKey "AAITCRE\ConnSettingsMain"
   ```
 - **When a module's posting procs change, or a new module is traced**, update its JSON/SQL pair, rebuild, and republish to the same artifact URL; don't create a new one.
+
+## Exception Center (Sales Order + STS health checks)
+
+The Sales Order and STS cycles (place → process → cancel → confirm → credit memo → return; STS save → return → receive) move stock and post GL at every step. One silent mistake (stock not returned to the source branch, a duplicate Save or receipt, In Transit not cleared) ruins the whole flow, so they are rechecked on purpose.
+
+- Script: `tools/ExceptionCenter/SO_STS_ExceptionCheck.sql` (read-only; how to run and what each check means: `tools/ExceptionCenter/README.md`). A healthy database shows `Found = 0` on every check.
+- **Run it on DEV after any change to a Sales Order / STS procedure, and on STAGING after deploying it.** Report the result to the user; never call such a change done with CRITICAL exceptions open that the change could have caused.
+- **When a new failure mode is found, add a check for it** (next free code in its group: X stock, S sales, T STS, G GL), verify every hit on DEV and STAGING is real, and note it in the work log.
+- The ties it tests are the ones the rolled-back lifecycle tests proved (invoice = client ledger = GL AR; GL inventory = stock movement; In Transit = live FIFO cost until received, then 0; cancelled / returned line ⇒ no live FIFO lot).
 
 ## Session handoff (work in progress)
 

@@ -1895,3 +1895,4 @@ C:\Program Files\KMSpico\temp\claude\D--GITHUB-CORECSERP2026\3f810a14-d5b6-4465-
 D:\GITHUB\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.exe.config
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.exe.config
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.Orders.AddBranchOrderSTSV2.resources
+D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.Reporting.ItemCostingReport.resources

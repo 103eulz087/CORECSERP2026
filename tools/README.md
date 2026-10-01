@@ -5,7 +5,7 @@ Two read-only tools that turn the source code and the database into a browsable 
 | Tool | What it shows | Builder | Output page |
 |---|---|---|---|
 | **Dependency Atlas** | Every form, report and class, and the stored procedures, views, functions, tables and table types it uses, directly and through SQL. | `tools\DependencyAtlas\Build-DependencyAtlas.ps1` | `docs\atlas\DependencyAtlas.html` |
-| **Process Trace** | One real transaction followed step by step through every table a module writes, with the linking keys color-coded. Modules: Sales Order, AR Payment. | `tools\ProcessTrace\Build-ProcessTrace.ps1` | `docs\process-trace\ProcessTrace.html` |
+| **Process Trace** | One real transaction followed step by step through every table a module writes, with the linking keys color-coded. Modules: Sales Order, AR Payment, Supplier Payment. | `tools\ProcessTrace\Build-ProcessTrace.ps1` | `docs\process-trace\ProcessTrace.html` |
 
 Neither tool ever writes to the database. They only run `SELECT` queries.
 

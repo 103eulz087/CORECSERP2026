@@ -66,7 +66,7 @@ function JVal($v) {
     return J ([string]$v).TrimEnd()
 }
 
-$peopleCols = @('CreatedBy', 'ReversedBy', 'EnteredBy', 'TransactedBy', 'PreparedBy', 'ApprovedBy', 'CheckedBy', 'RequestedBy', 'ProcessedBy', 'UserID')
+$peopleCols = @('CreatedBy', 'ReversedBy', 'EnteredBy', 'TransactedBy', 'PreparedBy', 'ApprovedBy', 'CheckedBy', 'RequestedBy', 'ProcessedBy', 'UserID', 'CancelledBy', 'AddedBy', 'UpdatedBy', 'ExecuteBy')
 
 $con = New-Object System.Data.SqlClient.SqlConnection($csb.ConnectionString)
 $con.Open()
@@ -83,6 +83,7 @@ try {
         Write-Host "Module $($def.title) ..."
 
         # pseudonyms are shared across one module's scenarios so the same customer keeps one name
+        $maskLabel = if ($def.maskLabel) { [string]$def.maskLabel } else { 'Customer' }
         $custMap = @{}; $userMap = @{}
         $scenParts = New-Object System.Collections.Generic.List[string]
         foreach ($sc in $def.scenarios) {
@@ -103,7 +104,7 @@ try {
                         $v = ([string]$r[$mc]).Trim()
                         if ($v.Length -lt 2) { continue }
                         if ($peopleCols -contains $mc) { if (-not $userMap.ContainsKey($v)) { $userMap[$v] = 'User ' + ($userMap.Count + 1) } }
-                        elseif (-not $custMap.ContainsKey($v)) { $custMap[$v] = 'Customer ' + [char](65 + ($custMap.Count % 26)) + $(if ($custMap.Count -ge 26) { [int]($custMap.Count / 26) } else { '' }) }
+                        elseif (-not $custMap.ContainsKey($v)) { $custMap[$v] = $maskLabel + ' ' + [char](65 + ($custMap.Count % 26)) + $(if ($custMap.Count -ge 26) { [int]($custMap.Count / 26) } else { '' }) }
                     }
                 }
             }

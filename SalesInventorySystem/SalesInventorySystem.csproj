@@ -5053,6 +5053,9 @@
     <EmbeddedResource Include="Reporting\InventoryUnitActivity.resx">
       <DependentUpon>InventoryUnitActivity.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Reporting\ItemCostingReport.resx">
+      <DependentUpon>ItemCostingReport.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Reporting\POPreview.resx">
       <DependentUpon>POPreview.cs</DependentUpon>
       <SubType>Designer</SubType>

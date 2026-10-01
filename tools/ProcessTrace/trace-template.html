@@ -267,7 +267,7 @@ const TRACE = /*__TRACE_DATA__*/null;
     $('keys').innerHTML = mod.keys.map(k => '<button type="button" class="keybtn" style="--kc:' + k.color + '" data-fam="' + k.id + '" aria-pressed="' + (famFocus === k.id) + '" title="' + esc(k.note) + '"><span class="sw"></span>' + esc(k.label) + '<span class="cnt">' + (counts[k.id] ? counts[k.id].size : 0) + '</span></button>').join('');
 
     let h = '<header class="hero"><h1>' + esc(mod.title) + '</h1><div class="sub">' + esc(mod.subtitle) + ' · <code>' + esc(mod.form) + '</code></div><p>' + esc(mod.summary) + '</p>'
-      + '<div class="meta">Real rows from <b>' + esc(TRACE.db) + '</b>, generated <b>' + esc(TRACE.generated) + '</b>' + (TRACE.masked ? ' · customer and user names replaced with pseudonyms; keys and amounts are real' : '') + '.</div></header>';
+      + '<div class="meta">Real rows from <b>' + esc(TRACE.db) + '</b>, generated <b>' + esc(TRACE.generated) + '</b>' + (TRACE.masked ? ' · customer, supplier and user names replaced with pseudonyms; keys and amounts are real' : '') + '.</div></header>';
     h += '<div class="story"><b>' + esc(scen.title) + '</b> (' + esc(mod.idLabel || 'IDs') + ' ' + esc(scen.ids) + '). ' + esc(scen.story) + '</div>';
     h += '<div class="flow">' + mod.steps.map(s => '<button type="button" class="fstep" data-goto="step-' + s.n + '"><span class="no">STEP ' + s.n + '</span><span class="tt">' + esc(s.title) + '</span><span class="who">' + esc(s.who) + '</span><span class="tbls">'
       + s.tables.map(t => '<span class="' + (data[t] ? '' : 'empty') + '">' + esc(cfg(t).table) + '</span>').join('') + '</span></button>').join('') + '</div>';

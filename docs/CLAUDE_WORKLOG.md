@@ -26,17 +26,22 @@ Status checked 2026-09-25 by probing each script's actual feature in each databa
 | 5 | `2026-09-24_ExpenseInventoryCosting_InventoryLegsOnly.sql` | ✅ | ✅ |
 | 6 | `2026-09-24b_ItemCostingRecon_MasterDetail.sql` | ✅ | ✅ |
 | 7 | `2026-09-25c_CashReceipts_SalesJournal_BranchFilter.sql` | ✅ (incl. EWT) | ✅ |
-| 8 | `2026-09-25d_ExpenseManualMultiBranch_PreserveLineOrder.sql` | ✅ | ⏳ ship with the new exe |
-| 9 | `2026-09-25e_ManualJV_PreserveLineOrder.sql` | ✅ | ⏳ ship with the new exe |
-| 10 | `2026-09-25f_IncomeStatementPivot_HeadOfficeFirst.sql` | ✅ | ⏳ |
+| 8 | `2026-09-25d_ExpenseManualMultiBranch_PreserveLineOrder.sql` | ✅ | ✅ found applied 2026-09-26 00:54 (same as DEV) — STAGING users need the new exe |
+| 9 | `2026-09-25e_ManualJV_PreserveLineOrder.sql` | ✅ | ✅ found applied 2026-09-26 00:53 (same as DEV) — STAGING users need the new exe |
+| 10 | `2026-09-25f_IncomeStatementPivot_HeadOfficeFirst.sql` | ✅ | ✅ found applied 2026-09-26 00:54 (same as DEV) |
 | 11 | `2026-09-26_ItemCostingRecon_ExpenseTickets.sql` | ✅ (by user, 14:24) | ✅ (by user, 14:56) |
-| 12 | `2026-09-29_EditSingleExpense_NoDoubleCosting.sql` | ✅ already applied 2026-09-29 14:50 (outside this log); matches the script, backup = original; smoke-tested 2026-09-30 | ⏳ |
+| 12 | `2026-09-29_EditSingleExpense_NoDoubleCosting.sql` | ✅ already applied 2026-09-29 14:50 (outside this log); matches the script, backup = original; smoke-tested 2026-09-30 | ✅ found applied 2026-09-29 22:30 (same as DEV) |
 | 13 | `2026-09-29b_InvFIFO_Engine.sql` | ✅ 2026-09-30 13:33 (smoke-tested, rolled back) | ⏳ |
 | 14 | `2026-09-29c_STS_V2_FIFOEngine.sql` (needs 13) | ✅ 2026-09-30 13:33 | ⏳ ship with the new exe |
-| 15 | `2026-09-30_GL_RealTime_Reports.sql` | ✅ 2026-09-30 23:08 (smoke-tested) | ⏳ ship with the new exe |
-| 16 | `2026-09-30_GL_PeriodLock.sql` | ✅ 2026-09-30 23:08; nothing closed yet; two-session race test passed | ⏳ ship with the new exe |
+| 15 | `2026-09-30_GL_RealTime_Reports.sql` | ✅ 2026-09-30 23:08 (smoke-tested) | ✅ found applied 2026-09-30 23:34 (same as DEV) |
+| 16 | `2026-09-30_GL_PeriodLock.sql` | ✅ 2026-09-30 23:08; nothing closed yet; two-session race test passed | ✅ found applied 2026-09-30 23:34 (same as DEV); no month closed yet |
 | 17 | `2026-09-30b_SupplierLedger_Rebuild.sql` | ✅ 2026-09-30 23:24 (829 rows / 33 accounts fixed; audit now 0/0/0) | ✅ 2026-09-30 23:26, user-approved (801 rows / 38 accounts fixed; rehearsed rolled back first; audit now 0/0/0) |
 | 18 | `2026-09-30c_ClientLedger_RecalcTrigger.sql` | ✅ 2026-09-30 (3 rows / 2 accounts fixed; audit now 0/0/0) | ✅ 2026-09-30, user-approved (6 rows / 2 accounts fixed; rehearsed rolled back first; audit now 0/0/0) |
+| 19 | `2026-10-01_SalesOrder_Lifecycle_Fixes.sql` | ✅ 2026-10-01 13:22 (one transaction; 10 lifecycle scenarios re-tested on the live procs) | ✅ 2026-10-01 21:52, run by the user; verified same as DEV |
+| 20 | `2026-10-01b_STS_Lifecycle_Fixes.sql` (needs 19) | ✅ 2026-10-01 (one transaction; 9 STS scenarios re-tested on the live procs) | ✅ 2026-10-01 21:52, run by the user; verified same as DEV |
+| 21 | `2026-10-01c_STS_InTransit_Correction.sql` (data fix; needs 20) | ✅ 2026-10-01: corrected 11699, 11700, 11702; skipped 11701 (stock never restored, DEV copy only); residuals now empty | — not needed: checked 2026-10-01 after 19/20/23, nothing to correct. The duplicate tickets 18547 / 18554 had been deleted by hand (master + details); each PO's IT-HO-VATEX equals its live FIFO cost |
+| 23 | `2026-10-01e_GL_AllVatExempt.sql` (needs 19 + 20; run before 21) | ✅ 2026-10-01 21:22 (sales A/C/D/E/G + STS S1/S2/S3/S5/S8 re-tested rolled back: no VAT legs, all tie); script 21 (updated) re-run: VAT reclass on 11699/11700/11702 reversed (tickets 15881–15886) | ✅ 2026-10-01 21:53, run by the user; verified same as DEV (all 5 procs carry the patch note) |
+| 22 | `2026-10-01d_SalesCost_SeptemberFinalCost.sql` (data fix for STAGING) | — | ✅ 2026-10-01, user-approved (rehearsed rolled back first): 20 FIFO rows, 16 SI-VATEX tickets, COGS −3,375.36; backups `CostFix_20261001_*` |
 
 - 2026-09-26: the live `sp_rpt_ItemCostingRecon_List` on both DBs was changed by the user (14:13 DEV / 14:18 STAGING): `BranchCode` → `BranchName` via `INNER JOIN dbo.Branches`. The repo copy in script 6 (`2026-09-24b`) still has `BranchCode`.
 - Web reporting handoff for the recon: `docs/handoff/2026-09-26_ItemCostingRecon_WebReporting_Handoff.md`.
@@ -298,9 +303,118 @@ Tested full / partial / two-step on multi-branch and SINGLE invoices. **Status:*
       - `sp_ConfirmOrder` overwrites `DateApproved`. With auto-approval, `ApprovedBy` is blank on every order.
       - Inventory ledger remarks say "STS" for sales orders.
       - Invoice uniqueness is checked only against DeliverySummary.
-  - **Next module: user to pick** (Supplier Payment / Expense / STS).
+  - Supplier Payment (added 10-01, expense mode). Samples:
+    - 686: single-branch cheque.
+    - 688: multi-branch, 3 branch shares.
+    - 735 → 736 → 737: overpay credit applied, reversed, applied again.
+    - 628: cash voucher reversed.
+    - Findings (on the page, not fixed):
+      - `spu_PostExpenseV2` writes `SupplierLedger.TicketReference` from a second `GetTicketNumber` call. All 379 SNGLE ledger rows point to a ticket that doesn't exist.
+      - `sp_PostSupplierPaymentWithManualLines` isn't atomic (V2 commits before the manual lines run).
+      - The reversal's "already reversed" guard checks `CheckVoucher` only, and the `sp_ReverseCombinedSupplierVoucher` wrapper has no transaction.
+      - Reversal tickets keep Status POSTED and the original Mnemonic.
+      - SupplierKey vs SupplierID naming is mixed (equal for all 138 suppliers today).
+    - PURCHASE mode not traced yet (only 3 vouchers on DEV).
+  - Static bundle for colleagues: `CORECS_Tools_Static.zip` in the repo root (not committed). Rebuild it after republishing.
+  - **Next module: user to pick** (Expense / STS / Conversion / …).
 - `tools/ProcessTrace/` and `docs/process-trace/` were not committed yet as of this entry.
 - Git: on 10-01 `main`'s uncommitted `ClientPaymentsDevExAcctg.Designer.cs` / `.resx` + build output were stashed (`stash@{0}`, "main WIP …") before switching back to `laptopdell`. They're still in the stash; nothing is applied.
+
+## Feature 14 — Sales Order lifecycle fixes (script 19, 2026-10-01, on DEV)
+
+- **Scope:** place → approve → process (scan) → cancel line → save → invoice no. → confirm → credit memo → return.
+  - Forms: `Orders/AddOrder`, `Orders/POForApproval(Details)`, `Orders/AddBranchOrder`, `HOForms/ViewForDeliveryDetails`, `HOFormsDevEx/ConfirmOrderDevEx`, `HOFormsDevEx/CreditMemoDevEx`, `Orders/ReturnSalesOrder`.
+  - No C# change: every procedure keeps its parameters.
+- **User rules (10-01):**
+  - Credit memo = shrinkage. The missing qty's cost goes to COS OTHERS (503 VAT-exempt / 504 VAT); no stock back.
+  - A credit memo or return larger than the unpaid balance → the excess becomes customer credit (OVERPAY in the AR pool, GL 20115).
+  - A return restores and credits ActualQty (the billed qty).
+- **Bugs fixed (proven with rolled-back lifecycle tests on DEV):**
+  - Cancel restored only the last lot of a scan that spanned lots.
+  - Credit memo before confirm credited the client ledger and confirm billed the reduced qty too (counted twice).
+  - Return ignored payments (reset the invoice to UNPAID).
+  - A second return subtracted the running total of all returns again (invoice went negative).
+  - Return after a credit memo credited the delivered qty, not the billed qty.
+  - VAT-exempt returns never reversed COGS (CM-CLIENT-VATEX cost rows inactive). STAGING history: 135 lines, 2,125,661.70.
+  - BatchSalesSummary was never updated by returns (CashierTransNo filter). STAGING: 59 POs.
+  - Credit memo on a VAT item put cost back into GL inventory without stock.
+  - Line cost after Save came from one arbitrary lot, not the weighted cost.
+- **Script 19:**
+  - New mnemonics SO-SHRINK / SO-CM / SO-RET (VAT and VATEX).
+  - New shared proc `spu_SO_PostInvoiceReduction`.
+  - Rewrote `sp_CancelDeliveryFIFOJFC`, `sp_CreditMemo` and `sp_ReturnSalesOrder`; patched `sp_ConfirmBranchOrder`.
+  - Tickets are dated today, VAT is rounded per line like `sp_ConfirmOrder`, and every ticket is checked DR = CR.
+- **Testing:**
+  - The sp-reviewer's 3 should-fix items are in: DeliveryNo in the weighted cost, one credit row per ticket, per-line VAT.
+  - Its XACT_ABORT "leak" claim was not taken: SET options revert when a procedure returns.
+  - Harness: scratchpad `lc/test_so.ps1`. 10 scenarios (A, A2, B, B2, B3, C to H), rolled back, all tie: invoice = client ledger = GL AR, GL inventory = stock movement, tickets balance, credit pool correct.
+  - Deployed to COREX001 in one transaction (scratchpad `deploy_tx.ps1`), then re-tested against the live procs.
+- **Next:** user UI test on DEV → STAGING. Then STS (same cancel bug; STAGING POs 11700 / 11701 have 35,733.47 stuck).
+- **Open (user to decide):**
+  - Repair the STAGING history (VAT-exempt return COGS 2.1M; 59 sales headers; 11 returned invoices whose balance ≠ ledger).
+  - There is no reversal for a posted credit memo / return.
+  - Hide the dead legacy return menu (`viewBranchOrderDetails` → `ReturnCustomerOrder` → `sp_ReturnDeliveredOrder`: wrong parameter count, never used).
+  - Conversion lots carry cost 0, so sales of converted items post 0 COGS.
+  - 184 sales-order invoices with plain payments don't match the client ledger (STAGING); not yet investigated (AR side).
+
+## Feature 15 — STS lifecycle fixes (scripts 20 + 21, 2026-10-01, tested on DEV, not deployed)
+
+- **Flow:**
+  - Request: `Orders/AddOrderSTS` → `sp_AddTransferOrderRequest`.
+  - Approve: `Orders/STSForApprovalDetails` → `sp_ApproveTransferOrder`.
+  - Process: `Orders/ViewBranchOrderSTS` → `Orders/AddBranchOrderSTS`.
+    - Scan: `sp_AddBranchOrder_JFC` → `sp_SalesQtyToInventoryQtySTS_JFC`; barcode: `sp_AddBranchOrderByBarcode`.
+    - Save: `sp_ConfirmBranchOrderSTS` posts IT-HO-*.
+    - Return: `sp_ReverseSTSInventoryTransfer`.
+  - Receive: `Orders/ReceivedSTS` → `HOFormsDevEx/ReceivedSTSBatchModeFIFO` (the one STAGING uses: `spu_PostSTSReceiveFromFIFO`, which writes branch Inventory rows) or `ReceivedSTSBatchMode` (`sp_AddBranchInventoryBatch`). Then `sp_ConfirmBranchRecievedOrderJFC` posts IT-BR-*.
+- **Bugs proven by rolled-back tests (scratchpad `sts/test_sts.ps1`, 9 scenarios):**
+  - Saving twice posted the whole transfer-out again.
+  - The VAT split used `InventoryDeliveryFIFO.isVat`, which the JFC deduction always wrote as 0; receipt splits by the line flag. STAGING: 309,906.00 of VAT cost was booked as VAT-exempt.
+  - A short receipt left the missing cost in In Transit.
+  - The line cost after Save was one arbitrary lot's cost.
+  - A barcode return reset a lot to its full original quantity.
+  - The normal receive skipped a second line of the same product and wrote ledger rows for cancelled lots.
+- **User rule (10-01):** a short receipt is a loss at head office: DR COS OTHERS 503/504 / CR In Transit on 888.
+- **Script 20 (`2026-10-01b_STS_Lifecycle_Fixes.sql`):**
+  - New `spu_STS_SyncInTransit`: head office's In Transit for a PO equals the cost of its live FIFO lots, split by line VAT; it posts only the difference. Save and returns call it.
+  - FIFO rows get the product VAT flag.
+  - Save: weighted line cost; refused after the PO is received.
+  - Return (JFC): always lot-based.
+  - Receipt: posts STS-SHORT-* / STS-OVER-*.
+  - Normal receive matches per barcode.
+  - New mnemonics STS-SHORT-* / STS-OVER-*. Needs script 19 first.
+- **Script 21 (`2026-10-01c_STS_InTransit_Correction.sql`):** runs the sync for every saved STS whose In Transit differs.
+  - STAGING: POs 11699 (VAT reclass), 11700 (duplicate + VAT), 11701 (duplicate 1,900,713.41), 14100 (VAT reclass, not yet received).
+  - Tested on DEV (rolled back): residuals empty afterwards; a second run posts nothing.
+- **STAGING incident 10-01:**
+  - POs 11700 / 11701 were hand-un-cancelled and re-saved at 13:09 / 13:18, which created the duplicate IT-HO tickets 18547 / 18554. They were received at 13:22 / 13:25.
+  - Their stock is now consistent; only the GL needs script 21.
+  - Someone else edited data then (and overwrote scratchpad `q.ps1` at 13:07).
+- **Review and deploy:**
+  - sp-reviewer blocker taken in a different form: the sync now refuses a PO whose cancelled or returned lines still have active lots (stock never restored), and the correction skips and lists such POs instead of posting (its suggested filter alone would have put GL out of step with stock).
+  - Also taken: target and posted both use the whole PO; receive / return / Save share the `STSTRANSIT:<PO>` applock; THROW instead of RAISERROR in the receipt procs; deterministic TOP 1.
+  - Deployed 20 + 21 to DEV 2026-10-01.
+- **Next:** user UI test on DEV → STAGING (20, then 21).
+- **Open:** DEV's PO 11701 (10 lots / 18,644.94 on cancelled lines never restored) needs a decision on DEV only; STAGING's copy was fixed by hand.
+- **Open:**
+  - Barcode scans write no stock-ledger row.
+  - The receive screens make 3 separate calls (not atomic; C# change).
+  - DEV's copy of PO 11701 still has cancelled lines with active lots (STAGING was fixed by hand).
+
+## ⚠️ 2026-10-01 rule: the GL is all VAT-exempt (rework needed in scripts 19/20/21)
+
+- User: every item posts as VAT-exempt in the GL (sales, credit memo, return, shrinkage, STS). VAT shows only on printed invoices; the month-end VAT is computed by hand. Keep the line `isVat` and VAT amounts for printing.
+- Done (script 23, DEV): `sp_ConfirmOrder` (one SI-VATEX ticket per invoice), `sp_CreditMemo`, `sp_ReturnSalesOrder`, `spu_STS_SyncInTransit`, `sp_ConfirmBranchRecievedOrderJFC` all post VATEX only. Script 21 updated to the same target. Line VAT data (BSD SubTotal/TaxTotal, BSS VAT columns, TCSD SI-VAT/COGS-VAT rows) kept for printing / the month-end VAT.
+- Not done (user didn't ask yet): reclass STAGING history — 348 SI-VAT tickets (Aug 1 – Sep 4; 20112 = 225,569.66) and 4 IT-BR-VAT receipts.
+
+## Feature 16 — Exception Center (2026-10-01)
+
+- `tools/ExceptionCenter/SO_STS_ExceptionCheck.sql` (read-only, 15 checks; see CLAUDE.md and its README).
+- First run, open findings (nothing fixed yet, user to decide):
+  - **STAGING X01, SO 13902:** line 2 (14016, 1,500 kg) cancelled 10-01 18:06 on the OLD cancel proc (before the 21:52 deploy). Only lot 30784 (660) was restored; **840 kg still out of lot 30778**. Repair = restore lot 30778 + ledger row + flag the FIFO row.
+  - **STAGING T02, STS 11911 / 11913 / 14100:** In Transit left 224,976.73 / 109,907.78 / 275,683.95 after receipt. In each, product **13025** shipped 2,034.31 / 1,002.60 / 2,506.80 kg but was received as 4.75 / 11.10 / 19.80. Likely a unit/entry error at the receive screen, not a real loss; received with the old proc, so no STS-SHORT posted. Ask the branch before posting anything.
+  - **DEV X01, STS 11701:** known (cancelled lines never restored, DEV copy only).
+- Checked and not a problem: returns 13809 / 13821 / 14061 and cancel 14044 on 10-01 ran on the old procs, which restored stock without stock-ledger rows (hence `@FromDate` = 2026-10-02 for X02).
 
 ## Open decisions (ask the user)
 
