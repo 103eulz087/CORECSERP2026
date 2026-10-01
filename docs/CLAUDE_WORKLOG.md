@@ -289,7 +289,15 @@ Tested full / partial / two-step on multi-branch and SINGLE invoices. **Status:*
 
 - **Dependency Atlas** rebuilt with tables + table types and a builder script (see CLAUDE.md). Artifact https://claude.ai/artifact/ExWdEYaxmbU9VMZbLpumWa.
 - **Process Trace**, the replacement for the user's Excel trace sheets (see CLAUDE.md). Artifact https://claude.ai/artifact/Bmoqk3GnfkQefi74rbnRkU.
-  - Module 1 = AR Payment. Samples: 5155 (cheque + EWT, 3 invoices) and 5591 → reversed → 6163 (cash + overpay).
+  - AR Payment. Samples: 5155 (cheque + EWT, 3 invoices) and 5591 → reversed → 6163 (cash + overpay).
+  - Sales Order (added 10-01, listed first). Samples: PO 9496 (VAT + VAT-exempt, 2 SI tickets) and PO 7375 (3 lines cancelled and re-scanned).
+    - The user's name `AddSalesOrder.cs` doesn't exist; the form is `Orders/AddOrder.cs`.
+    - Findings (on the page, not fixed):
+      - `sp_CancelDeliveryFIFOJFC` restores one lot only.
+      - Approval, reject and invoice-number updates are string-built SQL.
+      - `sp_ConfirmOrder` overwrites `DateApproved`. With auto-approval, `ApprovedBy` is blank on every order.
+      - Inventory ledger remarks say "STS" for sales orders.
+      - Invoice uniqueness is checked only against DeliverySummary.
   - **Next module: user to pick** (Supplier Payment / Expense / STS).
 - `tools/ProcessTrace/` and `docs/process-trace/` were not committed yet as of this entry.
 - Git: on 10-01 `main`'s uncommitted `ClientPaymentsDevExAcctg.Designer.cs` / `.resx` + build output were stashed (`stash@{0}`, "main WIP …") before switching back to `laptopdell`. They're still in the stash; nothing is applied.

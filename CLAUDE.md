@@ -128,10 +128,14 @@ The project is organized by business domain rather than by layer. Within most do
 
 ## Process Trace (built module by module)
 
+Setup and run steps for other people (branch, prerequisites, commands, common errors) are in `tools/README.md`; keep it in step with these two sections.
+
 "Process Trace": follows one real transaction step by step through every table its module writes, in posting order, with the linking keys (customer, PO, invoice, reference, header ID, ticket, mnemonic, GL account, …) color-coded so a value can be followed from table to table. It replaces the user's hand-built Excel trace sheets (one sheet per process, highlighted foreign-key cells).
 
 - Live page (artifact): https://claude.ai/artifact/Bmoqk3GnfkQefi74rbnRkU. Generated file: `docs/process-trace/ProcessTrace.html`.
-- Modules so far: **AR Payment** (`ClientPaymentsDevExAcctg`: `sp_ConfirmOrder` → form inserts → `sp_AddPaymentClient` → `sp_ReversePaymentClient`).
+- Modules so far, in business-flow order (the JSON `order` field sets the menu order):
+  1. **Sales Order**: `AddOrder` (`sp_AddSalesOrderRequest`) → approval (`POForApprovalDetails`) → `AddBranchOrder` (`sp_AddBranchOrderHRI_JFC` → FIFO deduction, `sp_ConfirmBranchOrder`) → invoice no. (`ViewForDeliveryDetails`) → `ConfirmOrderDevEx` (`sp_ConfirmOrder`).
+  2. **AR Payment** (`ClientPaymentsDevExAcctg`: form inserts → `sp_AddPaymentClient` → `sp_ReversePaymentClient`).
 - Each module is a pair in `tools/ProcessTrace/modules/`:
   - `<Name>.json`: steps (who writes what), table instances with their key-column → key-family map, money/qty columns, columns to mask, sample transactions (`ids`), findings.
   - `<Name>.sql`: read-only trace query taking `@Ids`; every result set starts with `_t` = the table-instance id. Scope rows by the same keys the procs use.

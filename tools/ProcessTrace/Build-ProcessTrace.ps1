@@ -66,13 +66,15 @@ function JVal($v) {
     return J ([string]$v).TrimEnd()
 }
 
-$peopleCols = @('CreatedBy', 'ReversedBy', 'EnteredBy', 'TransactedBy', 'PreparedBy', 'ApprovedBy', 'CheckedBy')
+$peopleCols = @('CreatedBy', 'ReversedBy', 'EnteredBy', 'TransactedBy', 'PreparedBy', 'ApprovedBy', 'CheckedBy', 'RequestedBy', 'ProcessedBy', 'UserID')
 
 $con = New-Object System.Data.SqlClient.SqlConnection($csb.ConnectionString)
 $con.Open()
 $moduleParts = New-Object System.Collections.Generic.List[string]
 try {
-    $defs = Get-ChildItem -Path $modDir -Filter *.json | Sort-Object Name
+    # modules appear in business-flow order: the optional "order" field, then file name
+    $defs = Get-ChildItem -Path $modDir -Filter *.json |
+        Sort-Object @{ Expression = { $o = ([IO.File]::ReadAllText($_.FullName) | ConvertFrom-Json).order; if ($o -ne $null) { [int]$o } else { 999 } } }, Name
     if ($Modules) { $defs = $defs | Where-Object { $Modules -contains $_.BaseName } }
     foreach ($defFile in $defs) {
         $defText = [IO.File]::ReadAllText($defFile.FullName)

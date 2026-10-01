@@ -1,8 +1,10 @@
 {
   "id": "ar-payment",
+  "order": 2,
   "title": "AR Payment",
   "subtitle": "Client payment: invoice → payment capture → posting → reversal",
   "form": "AccountingDevEx/ClientPaymentsDevExAcctg.cs",
+  "idLabel": "PaymentHeaderID",
   "sql": "ARPayment.sql",
   "summary": "A charge invoice is created when a sales order is confirmed. Accounting then records the client's payment in Client Payments: the form writes the payment header, the payment-method row and one ARPaymentDetails row per invoice and deduction type, then calls sp_AddPaymentClient in the same transaction. The proc settles the invoices, books the GL ticket from JournalEntryMapping, credits the client ledger and adds a deposit-in-transit line to bank recon. sp_ReversePaymentClient undoes all of it with mirrored entries.",
   "keys": [

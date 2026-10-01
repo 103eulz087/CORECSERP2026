@@ -1,0 +1,81 @@
+{
+  "id": "sales-order",
+  "order": 1,
+  "title": "Sales Order",
+  "subtitle": "Client order: place → approve → process (stock out) → invoice no. → confirm (sale + AR)",
+  "form": "Orders/AddOrder.cs → Orders/AddBranchOrder.cs → HOFormsDevEx/ConfirmOrderDevEx.cs",
+  "idLabel": "PO",
+  "sql": "SalesOrder.sql",
+  "summary": "The branch places the client's order in Add Sales Order: sp_AddSalesOrderRequest writes the order header and lines with the next PO number. Once it's approved, the commissary processes it in Process Sales Order (AddBranchOrder): every scan or weighed quantity is deducted from inventory FIFO within the chosen shipment right away, and Save costs the lines and marks the delivery FOR DELIVERY. After the invoice number is typed in on Print Delivery Receipt, Confirm Order (sp_ConfirmOrder) turns the delivery into the sale: batch sales rows, the AR invoice, the SI-VAT / SI-VATEX ticket and the client ledger debit. From there the invoice is collected in AR Payment.",
+  "keys": [
+    { "id": "cust",   "label": "Customer",          "color": "#f59e0b", "note": "CustomerKey (char 8). PurchaseOrderSummary calls it Customer, BatchSalesSummary CustomerNo, ClientLedger AccountKey." },
+    { "id": "po",     "label": "Sales order (PO)",  "color": "#22c55e", "note": "PONumber from sp_GetPurchaseOrderNumber. It is the ReferenceNo of the batch sales and AR invoice rows and the ReferenceNumber of the sales ticket and ledger row." },
+    { "id": "dev",    "label": "Delivery no.",      "color": "#0ea5e9", "note": "DeliveryNo from sp_GetDeliveryNumber, allocated when Process Sales Order opens. Scopes the delivery lines and the FIFO rows." },
+    { "id": "drref",  "label": "Delivery reference","color": "#a855f7", "note": "ReferenceNumber from sp_GetReferenceNumber when the order is opened for processing. DeliverySummary.InvoiceNo starts as this value until the real invoice number is typed in." },
+    { "id": "inv",    "label": "Invoice",           "color": "#eab308", "note": "The sales invoice number typed on Print Delivery Receipt (DeliverySummary.InvoiceNo, isInvoiceUpdate = 1). Confirm copies it to BatchSalesSummary.Invoice, the AR invoice, the ticket ReferenceKey and the ledger." },
+    { "id": "prod",   "label": "Product",           "color": "#64748b", "note": "ProductCode. DeliveryDetails / InventoryDeliveryFIFO call it ProductNo; Inventory calls it Product." },
+    { "id": "line",   "label": "Delivery line",     "color": "#ec4899", "note": "DeliveryDetails.SeqNo within the delivery. InventoryDeliveryFIFO.DevDetSeqNo points back to the scan line that consumed the lot." },
+    { "id": "lot",    "label": "Inventory lot",     "color": "#f97316", "note": "Inventory.SequenceNumber. InventoryDeliveryFIFO.SequenceReferenceNumber and InventoryLedger.SequenceRefNum record which lot was deducted or restored." },
+    { "id": "ticket", "label": "GL ticket",         "color": "#ef6f5e", "note": "TicketNumber of the SI ticket posted by sp_PostCompoundTicketSales. ClientLedger.TicketReference points back to it." },
+    { "id": "mnem",   "label": "Mnemonic",          "color": "#84cc16", "note": "SI-VAT for VAT items, SI-VATEX for VAT-exempt items (one ticket each). The AR invoice lines carry the matching SI-/COGS- TransCode." },
+    { "id": "acct",   "label": "GL account",        "color": "#14b8a6", "note": "AccountCode on the sales ticket lines: AR trade, sales, output VAT, cost of sales, inventory." }
+  ],
+  "tables": {
+    "pos":     { "table": "PurchaseOrderSummary", "role": "Order header", "keys": { "PONumber": "po", "Customer": "cust" }, "qty": ["Qty"], "mask": ["RequestedBy"] },
+    "pod":     { "table": "PurchaseOrderDetails", "role": "Ordered products", "keys": { "PONumber": "po", "ProductCode": "prod" }, "qty": ["Qty"], "money": ["SellingPrice"] },
+    "posAppr": { "table": "PurchaseOrderSummary", "role": "Order status now", "keys": { "PONumber": "po" }, "mask": ["ApprovedBy"] },
+
+    "dd":      { "table": "DeliveryDetails", "role": "Delivery lines (one per scan / weigh)", "keys": { "DeliveryNo": "dev", "PONumber": "po", "ReferenceNumber": "drref", "SeqNo": "line", "ProductNo": "prod" }, "qty": ["QtyDelivered", "ActualQty", "Variance"], "money": ["Cost", "SellingPrice"], "mask": ["ProcessedBy"] },
+    "fifo":    { "table": "InventoryDeliveryFIFO", "role": "Lots deducted per line", "keys": { "DeliveryNo": "dev", "PONumber": "po", "DevDetSeqNo": "line", "ProductNo": "prod", "SequenceReferenceNumber": "lot" }, "qty": ["QtyDelivered"], "money": ["Cost", "TotalCost"] },
+    "inv":     { "table": "Inventory", "role": "Lots touched (balances now)", "keys": { "SequenceNumber": "lot", "Product": "prod" }, "qty": ["Quantity", "Available"], "money": ["Cost"] },
+    "il":      { "table": "InventoryLedger", "role": "Stock movement log", "keys": { "SequenceRefNum": "lot", "Product": "prod" }, "qty": ["BegQty", "QtyIN", "QtyOut", "EndQty"], "money": ["Cost"], "mask": ["ProcessedBy"] },
+    "hist":    { "table": "HistoryLogs", "role": "Audit line written by Save", "keys": {}, "mask": ["UserID"], "empty": "No history line." },
+
+    "ds":      { "table": "DeliverySummary", "role": "Delivery header", "keys": { "DeliveryNo": "dev", "PONumber": "po", "ReferenceNumber": "drref", "InvoiceNo": "inv" }, "qty": ["TotalQtyDelivered"], "mask": ["PreparedBy"] },
+
+    "bsd":     { "table": "BatchSalesDetails", "role": "Sale lines (CashierTransNo 99999)", "keys": { "ReferenceNo": "po", "ProductCode": "prod" }, "qty": ["QtySold"], "money": ["Cost", "SellingPrice", "TaxTotal", "SubTotal", "DiscountTotal", "TotalAmount"], "total": true },
+    "bss":     { "table": "BatchSalesSummary", "role": "Sale header", "keys": { "ReferenceNo": "po", "CustomerNo": "cust", "Invoice": "inv" }, "qty": ["TotalKilos"], "money": ["TotalVatableSale", "TotalVATSale", "TotalVATExemptSale", "TotalAmount"] },
+    "tcs":     { "table": "TransactionChargeSales", "role": "AR invoice (subledger)", "keys": { "CustomerKey": "cust", "ReferenceNo": "po", "InvoiceNo": "inv" }, "money": ["TotalAmount", "Balance", "AmountPaid"] },
+    "tcsd":    { "table": "TransactionChargeSalesDetails", "role": "AR invoice lines (sales + cost legs)", "keys": { "ReferenceNo": "po", "InvoiceNo": "inv", "Product": "prod", "TransCode": "mnem" }, "qty": ["Quantity"], "money": ["Cost", "SellingPrice", "TotalAmount"] },
+    "salesTm": { "table": "TicketMaster", "role": "Sales GL ticket (header)", "keys": { "TicketNumber": "ticket", "ReferenceNumber": "po", "ReferenceKey": "inv", "Mnemonic": "mnem" }, "mask": ["Owner", "EnteredBy"] },
+    "salesTd": { "table": "TicketDetails", "role": "Sales GL ticket (lines)", "keys": { "TicketNumber": "ticket", "ReferenceNumber": "po", "ReferenceKey": "inv", "AccountCode": "acct" }, "money": ["Debit", "Credit"], "lookup": ["AccountName"], "total": true },
+    "salesCl": { "table": "ClientLedger", "role": "Client ledger: invoice debit", "keys": { "AccountKey": "cust", "ReferenceNumber": "po", "InvoiceNo": "inv", "TransCode": "mnem", "TicketReference": "ticket" }, "money": ["BeginningBalance", "Debit", "Credit", "EndingBalance"] }
+  },
+  "steps": [
+    { "n": 1, "title": "Order is placed", "who": "sp_AddSalesOrderRequest", "where": "Sales › Add Sales Order (AddOrder)",
+      "what": "Save allocates the PO number (sp_GetPurchaseOrderNumber) and sends the grid as dbo.tt_PurchaseOrderLines. The proc writes the lines and the header with Status FOR APPROVAL, or APPROVED straight away when ApprovalSettings has AddSalesOrder on auto. The optional Final checkbox also runs spitcr_AddSalesOrderFinal, which approves it and creates the delivery rows itself.",
+      "tables": ["pos", "pod"] },
+    { "n": 2, "title": "Order is approved", "who": "POForApprovalDetails (inline UPDATE)", "where": "Orders for Approval › open order › Approve",
+      "what": "Manual approval sets PurchaseOrderSummary.Status = APPROVED with ApprovedBy, DateApproved and the approver's Remarks (Reject sets REJECTED). On JFC, ApprovalSettings has AddSalesOrder on auto, so step 1 already saved the order as APPROVED with a blank ApprovedBy and this step is skipped: that is why ApprovedBy is empty in the samples. DateApproved shows the confirm time because sp_ConfirmOrder overwrites it in step 5. isProcess turns 1 when the commissary saves the processed order.",
+      "tables": ["posAppr"] },
+    { "n": 3, "title": "Order is processed and stock goes out", "who": "sp_AddBranchOrderHRI_JFC → sp_FiFoMappingHRI_JFC → sp_SalesQtyToInventoryQtyHRI_JFC, then sp_ConfirmBranchOrder", "where": "View Branch Order › Process Sales Order (AddBranchOrder)",
+      "what": "Opening the order allocates the delivery number and reference. Each scan checks stock in the chosen shipment, deducts it oldest SequenceNumber first (UPDLOCK), writes one InventoryDeliveryFIFO and one InventoryLedger row per lot, and adds a PENDING DeliveryDetails line. Cancelling a line (sp_CancelDeliveryFIFOJFC) restores the lot, flags the FIFO row isErrorCorrect = 1 and the line isCancelled = 1. Save (sp_ConfirmBranchOrder) copies the FIFO cost onto each line, sets the delivery FOR DELIVERY, sets PurchaseOrderSummary.isProcess = 1 and logs it.",
+      "tables": ["dd", "fifo", "inv", "il", "hist"] },
+    { "n": 4, "title": "Invoice number is entered", "who": "ViewForDeliveryDetails (inline UPDATE)", "where": "Orders for Approval › For Delivery › Print Delivery Receipt",
+      "what": "The user types the sales invoice number. The form rejects it if another DeliverySummary already has it, then sets DeliverySummary.InvoiceNo and isInvoiceUpdate = 1. Confirm Order is blocked until this is done.",
+      "tables": ["ds"] },
+    { "n": 5, "title": "Order is confirmed as a sale", "who": "sp_ConfirmOrder", "where": "Orders for Approval › For Delivery › Confirm Order (ConfirmOrderDevEx)",
+      "what": "Refuses a second confirm. Marks the order, delivery and lines DELIVERED, writes BatchSalesDetails / BatchSalesSummary from the non-cancelled lines, the AR invoice lines (sales, VAT and cost legs) and the invoice (Balance = net AR, UNPAID, due after the customer's term), then posts SI-VAT and/or SI-VATEX through sp_PostCompoundTicketSales, which also writes the client ledger debit.",
+      "tables": ["bss", "bsd", "tcs", "tcsd", "salesTm", "salesTd", "salesCl"] }
+  ],
+  "scenarios": [
+    { "id": "clean-vat-mix", "title": "3 products, VAT and VAT-exempt, no cancellations", "ids": "9496",
+      "story": "Three ordered products processed as four delivery lines, each drawing on its own lot. Because the order mixes VAT and VAT-exempt items, confirm posts two tickets (SI-VAT and SI-VATEX) for the one invoice." },
+    { "id": "cancel-rescan", "title": "Scanned lines cancelled and re-scanned", "ids": "7375",
+      "story": "All three products were scanned (lines 1–3, delivery reference 17421), cancelled, and scanned again after the order was reopened (lines 4–6, new reference 17425, same delivery number). Follow a lot key: the ledger shows the deduction, the cancel restore (STS CANCEL ITEM) and the second deduction. The cancelled lines and their FIFO rows stay behind with isCancelled / isErrorCorrect = 1, and only lines 4–6 reach the sale." }
+  ],
+  "findings": [
+    { "level": "risk", "title": "Cancelling a line restores only one lot",
+      "text": "sp_CancelDeliveryFIFOJFC reads a single InventoryDeliveryFIFO row for the line (DevDetSeqNo) and puts that quantity back on that one lot. When a scan was bigger than the oldest lot and spilled into a second lot, the second lot's deduction is never restored and its FIFO row stays active, although the line is marked cancelled. The stock is lost from Inventory with no sale behind it." },
+    { "level": "risk", "title": "Approval, reject and invoice-number updates are string-built SQL",
+      "text": "POForApprovalDetails and ViewForDeliveryDetails concatenate the typed Remarks and invoice number straight into UPDATE statements. An apostrophe in the remarks breaks the update, and any text typed there runs as SQL. These should move to parameterized commands (CLAUDE.md rule 2)." },
+    { "level": "info", "title": "Confirm overwrites the approval date; auto-approval leaves no approver",
+      "text": "sp_ConfirmOrder runs UPDATE PurchaseOrderSummary SET Status = 'DELIVERED', DateApproved = GETDATE(), so the approval date is lost once an order is confirmed: on COREX001, 6,792 of the 6,796 delivered orders since August show a DateApproved later than their effectivity date. With AddSalesOrder on auto-approval, ApprovedBy is blank on every order, so nothing records who approved, or when. Rejects done from the Orders for Approval list only set Status, so the 298 rejected orders have no rejecter either." },
+    { "level": "info", "title": "Sales-order stock moves are labelled as STS in the inventory ledger",
+      "text": "The JFC deduction and cancel procs were copied from the STS transfer flow, so InventoryLedger.Remarks reads 'STS IN-TRANSIT PO#-…' and 'STS CANCEL ITEM PO#…' for sales orders too, and DestinationBranch is the ordering branch. A ledger report can't tell a client sale from a branch transfer except by the PO number. This trace matches the rows on that remark text." },
+    { "level": "info", "title": "Stock leaves at processing, the sale is booked at confirm",
+      "text": "Inventory is reduced on every scan in step 3, but cost of sales and AR are only posted in step 5. An order that is processed but never confirmed keeps its stock deducted with no sales ticket; the inventory sits in DeliveryDetails / InventoryDeliveryFIFO as FOR DELIVERY." },
+    { "level": "info", "title": "Invoice uniqueness is checked against deliveries only",
+      "text": "Print Delivery Receipt only checks DeliverySummary for a duplicate invoice number. A number already used by a balance-forward invoice in TransactionChargeSales would be accepted, and AR Payment matches invoices on InvoiceNo + PO + customer, so it wouldn't mix them up, but reports that key on InvoiceNo alone would." }
+  ]
+}
