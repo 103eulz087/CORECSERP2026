@@ -111,23 +111,25 @@ namespace SalesInventorySystem.Orders
                 }
 
                 sp(dt);
+                // Only reached when sp_ReturnSalesOrder committed: sp() lets its SqlException through.
                 XtraMessageBox.Show("Successfully Returned!..");
-                this.Dispose();
+                this.Close();
             }
             catch (SqlException ex)
             {
+                // Nothing was returned (the proc rolls back on any error); keep the form open.
                 XtraMessageBox.Show(ex.Message.ToString());
             }
         }
 
+        // No catch here on purpose: it used to swallow the SqlException, so executeTransfer()
+        // showed "Successfully Returned!" and closed the form even when the return had failed.
         void sp(DataTable lines)
         {
-            SqlConnection con = Database.getConnection();
-            con.Open();
-            try
+            using (SqlConnection con = Database.getConnection())
+            using (SqlCommand com = new SqlCommand("sp_ReturnSalesOrder", con))
             {
-                string query = "sp_ReturnSalesOrder";
-                SqlCommand com = new SqlCommand(query, con);
+                com.CommandType = CommandType.StoredProcedure;
                 com.Parameters.AddWithValue("@parmbranchcode", txtbrcode.Text);
                 com.Parameters.AddWithValue("@parmpono", txtpono.Text);
                 com.Parameters.AddWithValue("@parmdevno", txtdevno.Text);
@@ -138,17 +140,8 @@ namespace SalesInventorySystem.Orders
                 var tvpParam = com.Parameters.AddWithValue("@Lines", lines);
                 tvpParam.SqlDbType = SqlDbType.Structured;
                 tvpParam.TypeName = "dbo.tt_ReturnSalesOrderLines";
-                com.CommandType = CommandType.StoredProcedure;
-                com.CommandText = query;
+                con.Open();
                 com.ExecuteNonQuery();
-            }
-            catch (SqlException ex)
-            {
-                XtraMessageBox.Show(ex.Message.ToString());
-            }
-            finally
-            {
-                con.Close();
             }
         }
         private void simpleButton1_Click(object sender, EventArgs e)
@@ -158,9 +151,17 @@ namespace SalesInventorySystem.Orders
                 XtraMessageBox.Show("Please enter a reason for the return.");
                 return;
             }
-            else
+
+            // A second click while the return posts would submit the same lines again.
+            simpleButton1.Enabled = false;
+            try
             {
                 executeTransfer();
+            }
+            finally
+            {
+                if (!IsDisposed)
+                    simpleButton1.Enabled = true;
             }
         }
 
