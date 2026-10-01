@@ -5,7 +5,7 @@ machine picks up where the last one stopped. **Keep it short and current:** upda
 the Status / Open items when something changes; move finished items to "Done" in one
 line. Durable rules belong in `CLAUDE.md` itself, not here.
 
-Last updated: **2026-10-01**
+Last updated: **2026-10-01** (Feature 17 plan added)
 
 ---
 
@@ -415,6 +415,24 @@ Tested full / partial / two-step on multi-branch and SINGLE invoices. **Status:*
   - **STAGING T02, STS 11911 / 11913 / 14100:** In Transit left 224,976.73 / 109,907.78 / 275,683.95 after receipt. In each, product **13025** shipped 2,034.31 / 1,002.60 / 2,506.80 kg but was received as 4.75 / 11.10 / 19.80. Likely a unit/entry error at the receive screen, not a real loss; received with the old proc, so no STS-SHORT posted. Ask the branch before posting anything.
   - **DEV X01, STS 11701:** known (cancelled lines never restored, DEV copy only).
 - Checked and not a problem: returns 13809 / 13821 / 14061 and cancel 14044 on 10-01 ran on the old procs, which restored stock without stock-ledger rows (hence `@FromDate` = 2026-10-02 for X02).
+
+## Feature 17 — Partial return, Sales Order + STS (PLAN ONLY, 2026-10-01, nothing built)
+
+- Plan: `docs/plans/2026-10-01_PartialReturn_SO_STS_Plan.md`. Ask: return 50 of a 100-qty line from Orders for Approval › Delivered › Return Order.
+- Today a return is whole-line only: the line is the unit of state in 4 tables (`DeliveryDetails.isReturned`, `InventoryDeliveryFIFO.isErrorCorrect`, `BatchSalesDetails.isCancelled`, `TransactionChargeSalesDetails.ErrorTag`).
+  - Adding a qty column would touch 54 / 39 / 43 SQL objects.
+  - `InventoryDeliveryFIFO` is inserted positionally by the DispatchPerBarcode posting proc.
+- Proposed: split the line (and its FIFO, sales and AR detail rows) into kept + returned parts, then run the existing whole-line return on the returned part.
+  - New optional TVP `@ReturnQty` on `sp_ReturnSalesOrder`, so the old exe still works.
+  - The return is costed at the cost of the lots put back.
+  - STS: phase 2, before receipt only.
+- Found, not fixed:
+  - `ReturnSalesOrder.cs` shows "Successfully Returned!" even when the proc fails (`sp()` swallows the SqlException).
+  - Fully paid POs can't be returned or credit-memo'd (the Paid tab has no menu).
+  - The return tags `TransactionChargeSalesDetails` by product + barcode only, so it tags every line with that product + barcode.
+  - `ReturnedOrderSummary` keeps the first return's reason and the latest return's tickets only.
+  - At STS receiving, a partial qty is booked as a loss (STS-SHORT), never as stock back at head office.
+- Waiting on the user: decisions D1–D6 in the plan, and the DEV checks in its section 5.
 
 ## Open decisions (ask the user)
 
