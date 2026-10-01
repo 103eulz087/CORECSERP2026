@@ -426,13 +426,41 @@ Tested full / partial / two-step on multi-branch and SINGLE invoices. **Status:*
   - New optional TVP `@ReturnQty` on `sp_ReturnSalesOrder`, so the old exe still works.
   - The return is costed at the cost of the lots put back.
   - STS: phase 2, before receipt only.
+- **Fixed (C# only, commit bb48873, not yet built or UI-tested on Windows):** `ReturnSalesOrder.cs` showed "Successfully Returned!" even when the proc failed (`sp()` swallowed the SqlException).
+  - It now shows success only after a commit; on an error the form stays open.
+  - Submit is disabled while the proc runs.
+  - `HOFormsDevEx/CreditMemoDevEx.cs` has the same pattern ("Payment Successfully Posted" after a swallowed error); not fixed.
 - Found, not fixed:
-  - `ReturnSalesOrder.cs` shows "Successfully Returned!" even when the proc fails (`sp()` swallows the SqlException).
   - Fully paid POs can't be returned or credit-memo'd (the Paid tab has no menu).
   - The return tags `TransactionChargeSalesDetails` by product + barcode only, so it tags every line with that product + barcode.
   - `ReturnedOrderSummary` keeps the first return's reason and the latest return's tickets only.
   - At STS receiving, a partial qty is booked as a loss (STS-SHORT), never as stock back at head office.
 - Waiting on the user: decisions D1–D6 in the plan, and the DEV checks in its section 5.
+
+## Feature 18 — Dispatch Per Barcode (STS) review (2026-10-01, review only, nothing changed)
+
+- Review: `docs/reviews/2026-10-01_DispatchPerBarcode_Review.md`. The user plans to replace `AddBranchOrderSTS` with `HOFormsDevEx/DispatchPerBarcode` (08-24, never used; its menu is hidden).
+- **Not on COREX001:** all 8 of its SQL objects are missing in the Atlas snapshot (09-30), so the form fails on open.
+- It predates the 09-29 FIFO standard and the 10-01 STS redesign.
+- Critical:
+  - Destination stock is created at dispatch, and a reverse or an unticked receipt line never removes it.
+  - A reverse on a partly dispatched PO (`isProcess = 0`) leaves In Transit posted.
+  - A non-888 origin posts In Transit on the origin, but the sync counts 888 only.
+- High:
+  - Answering "No" on a PO switch posts under the wrong PO.
+  - Applock is on DeliveryNo, not `STSTRANSIT:<PO>`.
+  - No stock-ledger rows.
+  - The Posted tab lists every delivery, sales orders included.
+  - Barcode is used as a line key.
+  - Eligibility ignores the IsWarehouse rule.
+  - Latent: the positional FIFO insert likely writes the lot VAT flag into `isErrorCorrect`.
+- The user's concern is confirmed: no requested-items panel (`AddBranchOrderSTS` and V2 show the PO's items).
+- **Recommended:** make `Orders/AddBranchOrderSTSV2` (09-29, on DEV, same 3 methods, opens with the PO's items) the replacement. Alignment pass:
+  - `spu_ReverseSTSLineV2` → `spu_STS_SyncInTransit` instead of its own ITR.
+  - `STSTRANSIT:<PO>` lock in both V2 procs.
+  - A guard that refuses changes once received.
+  - FIFO isVat from the product.
+- Waiting on the user: V2 or Dispatch; whether non-888 branches dispatch STS; over-dispatch tolerance; eligibility per branch.
 
 ## Open decisions (ask the user)
 
