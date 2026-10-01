@@ -407,8 +407,9 @@ namespace SalesInventorySystem.Orders
         }
 
         // Cancel Line: restores exactly the lots/qty this line took
-        // (spu_ReverseSTSLineV2), plus the ITR GL reversal if the transfer
-        // was already processed. Works on lines posted by the original form too.
+        // (spu_ReverseSTSLineV2). If the transfer was already saved, the proc
+        // also brings In Transit back in line with the remaining lots
+        // (spu_STS_SyncInTransit, 2026-10-01f). Works on lines posted by the original form too.
         void ReturnLine()
         {
             if (gridView2.FocusedRowHandle < 0 || !gridView2.IsDataRow(gridView2.FocusedRowHandle))

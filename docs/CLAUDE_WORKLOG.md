@@ -42,6 +42,7 @@ Status checked 2026-09-25 by probing each script's actual feature in each databa
 | 21 | `2026-10-01c_STS_InTransit_Correction.sql` (data fix; needs 20) | ✅ 2026-10-01: corrected 11699, 11700, 11702; skipped 11701 (stock never restored, DEV copy only); residuals now empty | — not needed: checked 2026-10-01 after 19/20/23, nothing to correct. The duplicate tickets 18547 / 18554 had been deleted by hand (master + details); each PO's IT-HO-VATEX equals its live FIFO cost |
 | 23 | `2026-10-01e_GL_AllVatExempt.sql` (needs 19 + 20; run before 21) | ✅ 2026-10-01 21:22 (sales A/C/D/E/G + STS S1/S2/S3/S5/S8 re-tested rolled back: no VAT legs, all tie); script 21 (updated) re-run: VAT reclass on 11699/11700/11702 reversed (tickets 15881–15886) | ✅ 2026-10-01 21:53, run by the user; verified same as DEV (all 5 procs carry the patch note) |
 | 22 | `2026-10-01d_SalesCost_SeptemberFinalCost.sql` (data fix for STAGING) | — | ✅ 2026-10-01, user-approved (rehearsed rolled back first): 20 FIFO rows, 16 SI-VATEX tickets, COGS −3,375.36; backups `CostFix_20261001_*` |
+| 24 | `2026-10-01f_STS_V2_Alignment.sql` (needs 13 + 14 + 20 + 23) | ⏳ not run yet (written without DB access); then run `2026-10-01f_STS_V2_Alignment_Test.sql` (rolled back) + the Exception Center | ⏳ after 13 + 14, with the new exe |
 
 - 2026-09-26: the live `sp_rpt_ItemCostingRecon_List` on both DBs was changed by the user (14:13 DEV / 14:18 STAGING): `BranchCode` → `BranchName` via `INNER JOIN dbo.Branches`. The repo copy in script 6 (`2026-09-24b`) still has `BranchCode`.
 - Web reporting handoff for the recon: `docs/handoff/2026-09-26_ItemCostingRecon_WebReporting_Handoff.md`.
@@ -455,12 +456,25 @@ Tested full / partial / two-step on multi-branch and SINGLE invoices. **Status:*
   - Eligibility ignores the IsWarehouse rule.
   - Latent: the positional FIFO insert likely writes the lot VAT flag into `isErrorCorrect`.
 - The user's concern is confirmed: no requested-items panel (`AddBranchOrderSTS` and V2 show the PO's items).
-- **Recommended:** make `Orders/AddBranchOrderSTSV2` (09-29, on DEV, same 3 methods, opens with the PO's items) the replacement. Alignment pass:
-  - `spu_ReverseSTSLineV2` → `spu_STS_SyncInTransit` instead of its own ITR.
-  - `STSTRANSIT:<PO>` lock in both V2 procs.
-  - A guard that refuses changes once received.
-  - FIFO isVat from the product.
-- Waiting on the user: V2 or Dispatch; whether non-888 branches dispatch STS; over-dispatch tolerance; eligibility per branch.
+- **User decision (10-01): V2 (`Orders/AddBranchOrderSTSV2`) replaces `AddBranchOrderSTS`.** Dispatch Per Barcode stays hidden and unused.
+- **Alignment pass = script 24 `SQL/2026-10-01f_STS_V2_Alignment.sql`.** It patches the live text by exact anchors (refuses if the text differs) and keeps backups `_OLD_10012026230000`.
+  - `spu_PostSTSLineV2`:
+    - `STSTRANSIT:<PO>` lock.
+    - Refuses once received (59834).
+    - FIFO and line isVat come from the product flag.
+    - Calls `spu_STS_SyncInTransit` when the PO is already saved.
+  - `spu_ReverseSTSLineV2`:
+    - The same lock and guard.
+    - The sync, dated today, replaces its own ITR-HO-VAT/VATEX tickets.
+  - `sp_ConfirmBranchOrderSTS` (Save, shared with the old form): takes the PO lock first. It used to take it last, inside the sync, which could deadlock with the V2 procs.
+  - No parameter changes; only a comment changed in `AddBranchOrderSTSV2.cs`.
+- **Verified so far:**
+  - Simulated on the repo copies of the 3 procs: every anchor matches once.
+  - The patched procs and both scripts parse cleanly (sqlfluff T-SQL; negative control flagged deliberate errors).
+- **Not yet run on any database.**
+  - Next on DEV: script 24, then `SQL/2026-10-01f_STS_V2_Alignment_Test.sql` (3 rolled-back parts, PASS/FAIL lines), then the Exception Center.
+  - STAGING: after 13 + 14, with the new exe.
+- Still open (Dispatch-only, moot unless revived): non-888 origins; over-dispatch tolerance; eligibility per branch.
 
 ## Open decisions (ask the user)
 

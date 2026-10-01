@@ -103,6 +103,10 @@ Correct.
 
 ## 4. If you go with V2 (recommended): alignment pass
 
+**Decision 2026-10-01: V2.** Items 1–2 below are in `SQL/2026-10-01f_STS_V2_Alignment.sql`. The script also makes
+Save take the PO lock first, which is needed so the shared lock can't deadlock. Item 3 is
+`SQL/2026-10-01f_STS_V2_Alignment_Test.sql`, which hasn't been run on a database yet.
+
 1. `spu_ReverseSTSLineV2`:
    - After restoring the lots, call `spu_STS_SyncInTransit` instead of posting its own ITR-HO
      split by FIFO isVat (it predates the 10-01 rules).
