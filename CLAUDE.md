@@ -156,6 +156,13 @@ The Sales Order and STS cycles (place → process → cancel → confirm → cre
 - **When a new failure mode is found, add a check for it** (next free code in its group: X stock, S sales, T STS, G GL), verify every hit on DEV and STAGING is real, and note it in the work log.
 - The ties it tests are the ones the rolled-back lifecycle tests proved (invoice = client ledger = GL AR; GL inventory = stock movement; In Transit = live FIFO cost until received, then 0; cancelled / returned line ⇒ no live FIFO lot).
 
+## Roadmap: version 2 (web, PostgreSQL, Linux)
+
+The plan (user, 2026-10-02) is to migrate this ERP to a web-based "version 2": PostgreSQL, with all APIs and the database running on Linux. A handoff document and the full v2 project will be requested later; the technical stack is left to Claude. Until then:
+- record every business rule a rewrite must keep (in the work log or `docs/standards/`), not just the code change;
+- prefer portable designs (set-based SQL, no SQL Server-only tricks where an equivalent is easy, logic in clearly named procs);
+- keep the Dependency Atlas, Process Trace and Exception Center current: they are the inventory and the invariants v2 must be re-tested against.
+
 ## Session handoff (work in progress)
 
 The current work log (in-flight features, DEV/STAGING deploy status, open decisions)
