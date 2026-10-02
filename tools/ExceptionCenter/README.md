@@ -38,6 +38,7 @@ Run it:
 | T02 | CRITICAL | Received transfer: In Transit did not clear to 0 |
 | T03 | CRITICAL | Transfer received more than once |
 | T04 | HIGH | Received status and receipt ticket disagree |
+| T05 | CRITICAL | A multi-lot line was received as exactly one lot's qty (receive-screen bug fixed 2026-10-02) |
 | G01 | CRITICAL | Sales / STS ticket out of balance (DR ≠ CR) |
 | G02 | HIGH | VAT ticket posted after the all-VAT-exempt rule (2026-10-02) |
 

@@ -402,7 +402,7 @@ namespace SalesInventorySystem
 
         private void confirmOrderToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            //XtraMessageBox.Show("ILOVEYOU 3000x .. . .. .....");
+             
             try
             {
                 bool isInvoiceUpdated = Database.checkifExist("Select isInvoiceUpdate FROM DeliverySummary WHERE PONumber='" + gridView4.GetRowCellValue(gridView4.FocusedRowHandle, "PONumber").ToString() + "' and isInvoiceUpdate=1");

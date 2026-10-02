@@ -66,7 +66,9 @@ ORDER BY i.Product, i.SequenceNumber;
 SELECT 'il' AS _t, l.SequenceNumber, l.SequenceRefNum, l.OriginBranch, l.DestinationBranch, l.DateProcessed, l.Product,
        l.BegQty, l.QtyIN, l.QtyOut, l.EndQty, l.Cost, l.Remarks, l.ProcessedBy
 FROM dbo.InventoryLedger AS l
-INNER JOIN @PO AS p ON l.Remarks IN ('STS IN-TRANSIT PO#-' + p.PONumber, 'STS CANCEL ITEM PO#' + p.PONumber)
+INNER JOIN @PO AS p ON l.Remarks IN ('STS IN-TRANSIT PO#-' + p.PONumber, 'STS CANCEL ITEM PO#' + p.PONumber,   -- old sales form
+                                     'SO OUT PO#' + p.PONumber, 'SO CANCEL ITEM PO#' + p.PONumber,         -- Sales V2 (2026-10-02c)
+                                     'SO RETURN PO#' + p.PONumber)                                         -- sales return (2026-10-01)
 ORDER BY l.SequenceNumber;
 
 SELECT 'hist' AS _t, h.UserID, h.DateExecute, h.ActionLogs, h.BranchCode

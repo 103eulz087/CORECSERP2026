@@ -93,8 +93,8 @@
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.searchLookUpEdit1.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridview)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.txtcheckdate.Properties.CalendarTimeProperties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtcheckdate.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtcheckdate.Properties.CalendarTimeProperties)).BeginInit();
             this.contextMenuStrip1.SuspendLayout();
             this.contextMenuStrip2.SuspendLayout();
             this.contextMenuStrip3.SuspendLayout();
@@ -114,10 +114,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.repositoryItemSearchLookUpEditdiscountglcode)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView1)).BeginInit();
             this.groupBox6.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dateTo.Properties.CalendarTimeProperties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dateTo.Properties)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dateFrom.Properties.CalendarTimeProperties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dateTo.Properties.CalendarTimeProperties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dateFrom.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dateFrom.Properties.CalendarTimeProperties)).BeginInit();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -146,10 +146,10 @@
             this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Top;
             this.groupBox1.Location = new System.Drawing.Point(0, 0);
-            this.groupBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox1.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.groupBox1.Size = new System.Drawing.Size(1825, 330);
+            this.groupBox1.Padding = new System.Windows.Forms.Padding(4);
+            this.groupBox1.Size = new System.Drawing.Size(1825, 516);
             this.groupBox1.TabIndex = 15;
             this.groupBox1.TabStop = false;
             // 
@@ -158,7 +158,7 @@
             this.simpleButton5.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("simpleButton5.ImageOptions.Image")));
             this.simpleButton5.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.simpleButton5.Location = new System.Drawing.Point(1141, 282);
-            this.simpleButton5.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.simpleButton5.Margin = new System.Windows.Forms.Padding(4);
             this.simpleButton5.Name = "simpleButton5";
             this.simpleButton5.Size = new System.Drawing.Size(197, 32);
             this.simpleButton5.TabIndex = 454;
@@ -170,7 +170,7 @@
             this.btnprint.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnprint.ImageOptions.Image")));
             this.btnprint.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.btnprint.Location = new System.Drawing.Point(1044, 282);
-            this.btnprint.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnprint.Margin = new System.Windows.Forms.Padding(4);
             this.btnprint.Name = "btnprint";
             this.btnprint.Size = new System.Drawing.Size(89, 32);
             this.btnprint.TabIndex = 448;
@@ -182,7 +182,7 @@
             this.btnadd.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnadd.ImageOptions.Image")));
             this.btnadd.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.btnadd.Location = new System.Drawing.Point(899, 282);
-            this.btnadd.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnadd.Margin = new System.Windows.Forms.Padding(4);
             this.btnadd.Name = "btnadd";
             this.btnadd.Size = new System.Drawing.Size(137, 32);
             this.btnadd.TabIndex = 453;
@@ -194,7 +194,7 @@
             this.checkforliquidation.AutoSize = true;
             this.checkforliquidation.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             this.checkforliquidation.Location = new System.Drawing.Point(1096, 84);
-            this.checkforliquidation.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.checkforliquidation.Margin = new System.Windows.Forms.Padding(4);
             this.checkforliquidation.Name = "checkforliquidation";
             this.checkforliquidation.Size = new System.Drawing.Size(132, 21);
             this.checkforliquidation.TabIndex = 452;
@@ -252,7 +252,7 @@
             // searchLookUpEdit1
             // 
             this.searchLookUpEdit1.Location = new System.Drawing.Point(1093, 180);
-            this.searchLookUpEdit1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.searchLookUpEdit1.Margin = new System.Windows.Forms.Padding(4);
             this.searchLookUpEdit1.Name = "searchLookUpEdit1";
             this.searchLookUpEdit1.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 10.25F);
             this.searchLookUpEdit1.Properties.Appearance.Options.UseFont = true;
@@ -322,7 +322,7 @@
             // 
             this.txtremakrs.Font = new System.Drawing.Font("Tahoma", 10.25F);
             this.txtremakrs.Location = new System.Drawing.Point(213, 217);
-            this.txtremakrs.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtremakrs.Margin = new System.Windows.Forms.Padding(4);
             this.txtremakrs.MaxLength = 200;
             this.txtremakrs.Multiline = true;
             this.txtremakrs.Name = "txtremakrs";
@@ -344,7 +344,7 @@
             // 
             this.txtcheckdate.EditValue = null;
             this.txtcheckdate.Location = new System.Drawing.Point(1093, 146);
-            this.txtcheckdate.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtcheckdate.Margin = new System.Windows.Forms.Padding(4);
             this.txtcheckdate.Name = "txtcheckdate";
             this.txtcheckdate.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 10.25F);
             this.txtcheckdate.Properties.Appearance.Options.UseFont = true;
@@ -359,7 +359,7 @@
             // 
             this.txtcheckno.Font = new System.Drawing.Font("Tahoma", 10.25F);
             this.txtcheckno.Location = new System.Drawing.Point(1093, 110);
-            this.txtcheckno.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtcheckno.Margin = new System.Windows.Forms.Padding(4);
             this.txtcheckno.MaxLength = 200;
             this.txtcheckno.Name = "txtcheckno";
             this.txtcheckno.Size = new System.Drawing.Size(243, 28);
@@ -481,10 +481,10 @@
             this.panel1.Controls.Add(this.groupBox7);
             this.panel1.Controls.Add(this.groupBox6);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(0, 330);
-            this.panel1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.panel1.Location = new System.Drawing.Point(0, 516);
+            this.panel1.Margin = new System.Windows.Forms.Padding(4);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(1825, 583);
+            this.panel1.Size = new System.Drawing.Size(1825, 397);
             this.panel1.TabIndex = 18;
             // 
             // groupBox7
@@ -492,20 +492,20 @@
             this.groupBox7.Controls.Add(this.gridControlMaster);
             this.groupBox7.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBox7.Location = new System.Drawing.Point(0, 68);
-            this.groupBox7.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox7.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox7.Name = "groupBox7";
-            this.groupBox7.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.groupBox7.Size = new System.Drawing.Size(1825, 515);
+            this.groupBox7.Padding = new System.Windows.Forms.Padding(4);
+            this.groupBox7.Size = new System.Drawing.Size(1825, 329);
             this.groupBox7.TabIndex = 1;
             this.groupBox7.TabStop = false;
             // 
             // gridControlMaster
             // 
             this.gridControlMaster.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControlMaster.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gridControlMaster.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4);
             this.gridControlMaster.Location = new System.Drawing.Point(4, 19);
             this.gridControlMaster.MainView = this.gridViewMaster;
-            this.gridControlMaster.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gridControlMaster.Margin = new System.Windows.Forms.Padding(4);
             this.gridControlMaster.Name = "gridControlMaster";
             this.gridControlMaster.RepositoryItems.AddRange(new DevExpress.XtraEditors.Repository.RepositoryItem[] {
             this.repositoryItemComboBox5,
@@ -515,7 +515,7 @@
             this.repositoryItemComboBoxVarianceType,
             this.repositoryItemSearchLookUpEditoffsetglcode,
             this.repositoryItemSearchLookUpEditdiscountglcode});
-            this.gridControlMaster.Size = new System.Drawing.Size(1817, 492);
+            this.gridControlMaster.Size = new System.Drawing.Size(1817, 306);
             this.gridControlMaster.TabIndex = 7;
             this.gridControlMaster.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewMaster});
@@ -635,9 +635,9 @@
             this.groupBox6.Controls.Add(this.label10);
             this.groupBox6.Dock = System.Windows.Forms.DockStyle.Top;
             this.groupBox6.Location = new System.Drawing.Point(0, 0);
-            this.groupBox6.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox6.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox6.Name = "groupBox6";
-            this.groupBox6.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox6.Padding = new System.Windows.Forms.Padding(4);
             this.groupBox6.Size = new System.Drawing.Size(1825, 68);
             this.groupBox6.TabIndex = 0;
             this.groupBox6.TabStop = false;
@@ -648,7 +648,7 @@
             this.btnextract.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnextract.ImageOptions.Image")));
             this.btnextract.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.btnextract.Location = new System.Drawing.Point(515, 23);
-            this.btnextract.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnextract.Margin = new System.Windows.Forms.Padding(4);
             this.btnextract.Name = "btnextract";
             this.btnextract.Size = new System.Drawing.Size(119, 32);
             this.btnextract.TabIndex = 447;
@@ -661,7 +661,7 @@
             this.radioButtonFreight.Location = new System.Drawing.Point(915, 31);
             this.radioButtonFreight.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.radioButtonFreight.Name = "radioButtonFreight";
-            this.radioButtonFreight.Size = new System.Drawing.Size(73, 21);
+            this.radioButtonFreight.Size = new System.Drawing.Size(69, 20);
             this.radioButtonFreight.TabIndex = 446;
             this.radioButtonFreight.Text = "Freight";
             this.radioButtonFreight.UseVisualStyleBackColor = true;
@@ -673,7 +673,7 @@
             this.radioButtonButchery.Location = new System.Drawing.Point(824, 31);
             this.radioButtonButchery.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.radioButtonButchery.Name = "radioButtonButchery";
-            this.radioButtonButchery.Size = new System.Drawing.Size(85, 21);
+            this.radioButtonButchery.Size = new System.Drawing.Size(80, 20);
             this.radioButtonButchery.TabIndex = 445;
             this.radioButtonButchery.Text = "Butchery";
             this.radioButtonButchery.UseVisualStyleBackColor = true;
@@ -685,7 +685,7 @@
             this.radioButtonExpense.Location = new System.Drawing.Point(735, 31);
             this.radioButtonExpense.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.radioButtonExpense.Name = "radioButtonExpense";
-            this.radioButtonExpense.Size = new System.Drawing.Size(83, 21);
+            this.radioButtonExpense.Size = new System.Drawing.Size(81, 20);
             this.radioButtonExpense.TabIndex = 444;
             this.radioButtonExpense.Text = "Expense";
             this.radioButtonExpense.UseVisualStyleBackColor = true;
@@ -697,7 +697,7 @@
             this.radioButtonPurchase.Location = new System.Drawing.Point(640, 31);
             this.radioButtonPurchase.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.radioButtonPurchase.Name = "radioButtonPurchase";
-            this.radioButtonPurchase.Size = new System.Drawing.Size(89, 21);
+            this.radioButtonPurchase.Size = new System.Drawing.Size(85, 20);
             this.radioButtonPurchase.TabIndex = 443;
             this.radioButtonPurchase.TabStop = true;
             this.radioButtonPurchase.Text = "Purchase";
@@ -709,9 +709,9 @@
             this.checkBoxFreight.Checked = true;
             this.checkBoxFreight.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBoxFreight.Location = new System.Drawing.Point(955, 75);
-            this.checkBoxFreight.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.checkBoxFreight.Margin = new System.Windows.Forms.Padding(4);
             this.checkBoxFreight.Name = "checkBoxFreight";
-            this.checkBoxFreight.Size = new System.Drawing.Size(74, 21);
+            this.checkBoxFreight.Size = new System.Drawing.Size(70, 20);
             this.checkBoxFreight.TabIndex = 442;
             this.checkBoxFreight.Text = "Freight";
             this.checkBoxFreight.UseVisualStyleBackColor = true;
@@ -722,9 +722,9 @@
             this.checkBoxButchery.Checked = true;
             this.checkBoxButchery.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBoxButchery.Location = new System.Drawing.Point(856, 75);
-            this.checkBoxButchery.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.checkBoxButchery.Margin = new System.Windows.Forms.Padding(4);
             this.checkBoxButchery.Name = "checkBoxButchery";
-            this.checkBoxButchery.Size = new System.Drawing.Size(86, 21);
+            this.checkBoxButchery.Size = new System.Drawing.Size(81, 20);
             this.checkBoxButchery.TabIndex = 441;
             this.checkBoxButchery.Text = "Butchery";
             this.checkBoxButchery.UseVisualStyleBackColor = true;
@@ -735,9 +735,9 @@
             this.checkBoxExpense.Checked = true;
             this.checkBoxExpense.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBoxExpense.Location = new System.Drawing.Point(759, 75);
-            this.checkBoxExpense.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.checkBoxExpense.Margin = new System.Windows.Forms.Padding(4);
             this.checkBoxExpense.Name = "checkBoxExpense";
-            this.checkBoxExpense.Size = new System.Drawing.Size(84, 21);
+            this.checkBoxExpense.Size = new System.Drawing.Size(82, 20);
             this.checkBoxExpense.TabIndex = 440;
             this.checkBoxExpense.Text = "Expense";
             this.checkBoxExpense.UseVisualStyleBackColor = true;
@@ -748,9 +748,9 @@
             this.checkBoxPurchase.Checked = true;
             this.checkBoxPurchase.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBoxPurchase.Location = new System.Drawing.Point(660, 75);
-            this.checkBoxPurchase.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.checkBoxPurchase.Margin = new System.Windows.Forms.Padding(4);
             this.checkBoxPurchase.Name = "checkBoxPurchase";
-            this.checkBoxPurchase.Size = new System.Drawing.Size(90, 21);
+            this.checkBoxPurchase.Size = new System.Drawing.Size(86, 20);
             this.checkBoxPurchase.TabIndex = 439;
             this.checkBoxPurchase.Text = "Purchase";
             this.checkBoxPurchase.UseVisualStyleBackColor = true;
@@ -759,7 +759,7 @@
             // 
             this.dateTo.EditValue = null;
             this.dateTo.Location = new System.Drawing.Point(319, 25);
-            this.dateTo.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.dateTo.Margin = new System.Windows.Forms.Padding(4);
             this.dateTo.Name = "dateTo";
             this.dateTo.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 10.25F);
             this.dateTo.Properties.Appearance.Options.UseFont = true;
@@ -785,7 +785,7 @@
             // 
             this.dateFrom.EditValue = null;
             this.dateFrom.Location = new System.Drawing.Point(85, 25);
-            this.dateFrom.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.dateFrom.Margin = new System.Windows.Forms.Padding(4);
             this.dateFrom.Name = "dateFrom";
             this.dateFrom.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 10.25F);
             this.dateFrom.Properties.Appearance.Options.UseFont = true;
@@ -814,7 +814,7 @@
             this.ClientSize = new System.Drawing.Size(1825, 913);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.groupBox1);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "TransactionPayment";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "TransactionPayment";

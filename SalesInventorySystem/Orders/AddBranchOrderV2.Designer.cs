@@ -1,6 +1,6 @@
 ﻿namespace SalesInventorySystem.Orders
 {
-    partial class AddBranchOrderSTS
+    partial class AddBranchOrderV2
     {
         /// <summary>
         /// Required designer variable.
@@ -29,10 +29,12 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AddBranchOrderSTS));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AddBranchOrderV2));
             this.groupControl2 = new DevExpress.XtraEditors.GroupControl();
             this.groupBox2 = new DevExpress.XtraEditors.PanelControl();
             this.panel4 = new System.Windows.Forms.Panel();
+            this.lblFifoType = new DevExpress.XtraEditors.LabelControl();
+            this.rdoFifoType = new DevExpress.XtraEditors.RadioGroup();
             this.labelControl15 = new DevExpress.XtraEditors.LabelControl();
             this.txtsearchlookupproduct = new DevExpress.XtraEditors.SearchLookUpEdit();
             this.searchLookUpEdit2View = new DevExpress.XtraGrid.Views.Grid.GridView();
@@ -47,6 +49,7 @@
             this.btncancel = new DevExpress.XtraEditors.SimpleButton();
             this.btnadd = new DevExpress.XtraEditors.SimpleButton();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.chkScanFullLot = new DevExpress.XtraEditors.CheckEdit();
             this.txtbarcodescanning = new DevExpress.XtraEditors.TextEdit();
             this.labelControl14 = new DevExpress.XtraEditors.LabelControl();
             this.barcodescanning = new System.Windows.Forms.CheckBox();
@@ -105,9 +108,11 @@
             ((System.ComponentModel.ISupportInitialize)(this.groupBox2)).BeginInit();
             this.groupBox2.SuspendLayout();
             this.panel4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.rdoFifoType.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtsearchlookupproduct.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.searchLookUpEdit2View)).BeginInit();
             this.panel2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.chkScanFullLot.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtbarcodescanning.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txteffectivedate.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.checkBox1.Properties)).BeginInit();
@@ -154,7 +159,7 @@
             this.groupControl2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupControl2.Location = new System.Drawing.Point(2, 2);
             this.groupControl2.Name = "groupControl2";
-            this.groupControl2.Size = new System.Drawing.Size(1707, 462);
+            this.groupControl2.Size = new System.Drawing.Size(1707, 186);
             this.groupControl2.TabIndex = 5;
             this.groupControl2.Text = "Add Order";
             // 
@@ -204,6 +209,8 @@
             // 
             // panel4
             // 
+            this.panel4.Controls.Add(this.lblFifoType);
+            this.panel4.Controls.Add(this.rdoFifoType);
             this.panel4.Controls.Add(this.labelControl15);
             this.panel4.Controls.Add(this.txtsearchlookupproduct);
             this.panel4.Location = new System.Drawing.Point(1, 13);
@@ -211,11 +218,35 @@
             this.panel4.Size = new System.Drawing.Size(444, 77);
             this.panel4.TabIndex = 89;
             // 
+            // lblFifoType
+            // 
+            this.lblFifoType.Appearance.Font = new System.Drawing.Font("Tahoma", 8F, System.Drawing.FontStyle.Bold);
+            this.lblFifoType.Appearance.Options.UseFont = true;
+            this.lblFifoType.Location = new System.Drawing.Point(14, 5);
+            this.lblFifoType.Name = "lblFifoType";
+            this.lblFifoType.Size = new System.Drawing.Size(66, 16);
+            this.lblFifoType.TabIndex = 91;
+            this.lblFifoType.Text = "FIFO TYPE:";
+            // 
+            // rdoFifoType
+            // 
+            this.rdoFifoType.Location = new System.Drawing.Point(131, 1);
+            this.rdoFifoType.Name = "rdoFifoType";
+            this.rdoFifoType.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 8F);
+            this.rdoFifoType.Properties.Appearance.Options.UseFont = true;
+            this.rdoFifoType.Properties.Columns = 2;
+            this.rdoFifoType.Properties.Items.AddRange(new DevExpress.XtraEditors.Controls.RadioGroupItem[] {
+            new DevExpress.XtraEditors.Controls.RadioGroupItem("AUTO", "Auto (By Sequence)"),
+            new DevExpress.XtraEditors.Controls.RadioGroupItem("MANUAL", "Manual (By Shipment)")});
+            this.rdoFifoType.Size = new System.Drawing.Size(309, 31);
+            this.rdoFifoType.TabIndex = 90;
+            this.rdoFifoType.SelectedIndexChanged += new System.EventHandler(this.rdoFifoType_SelectedIndexChanged);
+            // 
             // labelControl15
             // 
             this.labelControl15.Appearance.Font = new System.Drawing.Font("Tahoma", 8F, System.Drawing.FontStyle.Bold);
             this.labelControl15.Appearance.Options.UseFont = true;
-            this.labelControl15.Location = new System.Drawing.Point(14, 29);
+            this.labelControl15.Location = new System.Drawing.Point(14, 38);
             this.labelControl15.Name = "labelControl15";
             this.labelControl15.Size = new System.Drawing.Size(111, 16);
             this.labelControl15.TabIndex = 89;
@@ -223,7 +254,7 @@
             // 
             // txtsearchlookupproduct
             // 
-            this.txtsearchlookupproduct.Location = new System.Drawing.Point(131, 26);
+            this.txtsearchlookupproduct.Location = new System.Drawing.Point(131, 35);
             this.txtsearchlookupproduct.Name = "txtsearchlookupproduct";
             this.txtsearchlookupproduct.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 8F);
             this.txtsearchlookupproduct.Properties.Appearance.Options.UseFont = true;
@@ -231,7 +262,7 @@
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.txtsearchlookupproduct.Properties.NullText = "";
             this.txtsearchlookupproduct.Properties.PopupView = this.searchLookUpEdit2View;
-            this.txtsearchlookupproduct.Size = new System.Drawing.Size(290, 22);
+            this.txtsearchlookupproduct.Size = new System.Drawing.Size(310, 22);
             this.txtsearchlookupproduct.TabIndex = 88;
             this.txtsearchlookupproduct.EditValueChanged += new System.EventHandler(this.txtsearchlookupproduct_EditValueChanged);
             // 
@@ -353,6 +384,7 @@
             // 
             // panel2
             // 
+            this.panel2.Controls.Add(this.chkScanFullLot);
             this.panel2.Controls.Add(this.txtbarcodescanning);
             this.panel2.Controls.Add(this.labelControl14);
             this.panel2.Location = new System.Drawing.Point(1, 13);
@@ -360,6 +392,17 @@
             this.panel2.Size = new System.Drawing.Size(444, 75);
             this.panel2.TabIndex = 65;
             this.panel2.Visible = false;
+            // 
+            // chkScanFullLot
+            // 
+            this.chkScanFullLot.EditValue = true;
+            this.chkScanFullLot.Location = new System.Drawing.Point(120, 35);
+            this.chkScanFullLot.Name = "chkScanFullLot";
+            this.chkScanFullLot.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 8F);
+            this.chkScanFullLot.Properties.Appearance.Options.UseFont = true;
+            this.chkScanFullLot.Properties.Caption = "Scan takes the full lot (untick to enter a partial qty)";
+            this.chkScanFullLot.Size = new System.Drawing.Size(320, 24);
+            this.chkScanFullLot.TabIndex = 70;
             // 
             // txtbarcodescanning
             // 
@@ -767,7 +810,7 @@
             this.groupControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupControl1.Location = new System.Drawing.Point(2, 2);
             this.groupControl1.Name = "groupControl1";
-            this.groupControl1.Size = new System.Drawing.Size(770, 459);
+            this.groupControl1.Size = new System.Drawing.Size(770, 735);
             this.groupControl1.TabIndex = 4;
             this.groupControl1.Text = "Items Requested by Branch";
             // 
@@ -777,7 +820,7 @@
             this.gridControl1.Location = new System.Drawing.Point(2, 28);
             this.gridControl1.MainView = this.gridView1;
             this.gridControl1.Name = "gridControl1";
-            this.gridControl1.Size = new System.Drawing.Size(766, 429);
+            this.gridControl1.Size = new System.Drawing.Size(766, 705);
             this.gridControl1.TabIndex = 2;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1,
@@ -853,7 +896,7 @@
             this.gridControl2.Location = new System.Drawing.Point(2, 2);
             this.gridControl2.MainView = this.gridView2;
             this.gridControl2.Name = "gridControl2";
-            this.gridControl2.Size = new System.Drawing.Size(925, 459);
+            this.gridControl2.Size = new System.Drawing.Size(925, 735);
             this.gridControl2.TabIndex = 3;
             this.gridControl2.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView2,
@@ -951,7 +994,7 @@
             this.panelControl1.Location = new System.Drawing.Point(0, 0);
             this.panelControl1.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.panelControl1.Name = "panelControl1";
-            this.panelControl1.Size = new System.Drawing.Size(1711, 466);
+            this.panelControl1.Size = new System.Drawing.Size(1711, 190);
             this.panelControl1.TabIndex = 8;
             // 
             // tablePanel1
@@ -962,12 +1005,12 @@
             this.tablePanel1.Controls.Add(this.panelControl3);
             this.tablePanel1.Controls.Add(this.panelControl2);
             this.tablePanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tablePanel1.Location = new System.Drawing.Point(0, 466);
+            this.tablePanel1.Location = new System.Drawing.Point(0, 190);
             this.tablePanel1.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.tablePanel1.Name = "tablePanel1";
             this.tablePanel1.Rows.AddRange(new DevExpress.Utils.Layout.TablePanelRow[] {
             new DevExpress.Utils.Layout.TablePanelRow(DevExpress.Utils.Layout.TablePanelEntityStyle.Absolute, 26F)});
-            this.tablePanel1.Size = new System.Drawing.Size(1711, 469);
+            this.tablePanel1.Size = new System.Drawing.Size(1711, 745);
             this.tablePanel1.TabIndex = 0;
             // 
             // panelControl3
@@ -979,7 +1022,7 @@
             this.panelControl3.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.panelControl3.Name = "panelControl3";
             this.tablePanel1.SetRow(this.panelControl3, 0);
-            this.panelControl3.Size = new System.Drawing.Size(968, 579);
+            this.panelControl3.Size = new System.Drawing.Size(968, 924);
             this.panelControl3.TabIndex = 11;
             // 
             // panelControl2
@@ -991,22 +1034,22 @@
             this.panelControl2.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.panelControl2.Name = "panelControl2";
             this.tablePanel1.SetRow(this.panelControl2, 0);
-            this.panelControl2.Size = new System.Drawing.Size(1161, 579);
+            this.panelControl2.Size = new System.Drawing.Size(1161, 924);
             this.panelControl2.TabIndex = 10;
             // 
-            // AddBranchOrderSTS
+            // AddBranchOrderV2
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1711, 935);
             this.Controls.Add(this.tablePanel1);
             this.Controls.Add(this.panelControl1);
-            this.IconOptions.Icon = ((System.Drawing.Icon)(resources.GetObject("AddBranchOrderSTS.IconOptions.Icon")));
-            this.Name = "AddBranchOrderSTS";
+            this.IconOptions.Icon = ((System.Drawing.Icon)(resources.GetObject("AddBranchOrderV2.IconOptions.Icon")));
+            this.Name = "AddBranchOrderV2";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "AddBranchOrderSTS";
+            this.Text = "AddBranchOrderV2";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
-            this.Load += new System.EventHandler(this.AddBranchOrderSTS_Load);
+            this.Load += new System.EventHandler(this.AddBranchOrderV2_Load);
             ((System.ComponentModel.ISupportInitialize)(this.groupControl2)).EndInit();
             this.groupControl2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.groupBox2)).EndInit();
@@ -1014,10 +1057,12 @@
             this.groupBox2.PerformLayout();
             this.panel4.ResumeLayout(false);
             this.panel4.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.rdoFifoType.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtsearchlookupproduct.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.searchLookUpEdit2View)).EndInit();
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.chkScanFullLot.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtbarcodescanning.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txteffectivedate.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.checkBox1.Properties)).EndInit();
@@ -1123,6 +1168,9 @@
         private System.Windows.Forms.Panel panel4;
         private DevExpress.XtraEditors.LabelControl labelControl15;
         public DevExpress.XtraEditors.SearchLookUpEdit txtsearchlookupproduct;
+        private DevExpress.XtraEditors.LabelControl lblFifoType;
+        private DevExpress.XtraEditors.RadioGroup rdoFifoType;
+        private DevExpress.XtraEditors.CheckEdit chkScanFullLot;
         private DevExpress.Utils.Layout.TablePanel tablePanel1;
         private DevExpress.XtraEditors.PanelControl panelControl3;
         private DevExpress.XtraEditors.PanelControl panelControl2;

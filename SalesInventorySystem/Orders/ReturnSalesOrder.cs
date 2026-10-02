@@ -124,7 +124,7 @@ namespace SalesInventorySystem.Orders
 
         // No catch here on purpose: it used to swallow the SqlException, so executeTransfer()
         // showed "Successfully Returned!" and closed the form even when the return had failed.
-        void sp(DataTable lines)
+        void sp(DataTable lines)//new
         {
             using (SqlConnection con = Database.getConnection())
             using (SqlCommand com = new SqlCommand("sp_ReturnSalesOrder", con))

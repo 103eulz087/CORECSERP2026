@@ -2419,6 +2419,12 @@
     <Compile Include="Orders\AddBranchOrderSTSV2.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Orders\AddBranchOrderV2.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Orders\AddBranchOrderV2.Designer.cs">
+      <DependentUpon>AddBranchOrderV2.cs</DependentUpon>
+    </Compile>
     <Compile Include="Orders\AddBranchOrderSTSV2.Designer.cs">
       <DependentUpon>AddBranchOrderSTSV2.cs</DependentUpon>
     </Compile>
@@ -4600,6 +4606,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Orders\AddBranchOrderSTSV2.resx">
       <DependentUpon>AddBranchOrderSTSV2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Orders\AddBranchOrderV2.resx">
+      <DependentUpon>AddBranchOrderV2.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Orders\AddBranchOrderSTSBatchMode.resx">
       <DependentUpon>AddBranchOrderSTSBatchMode.cs</DependentUpon>

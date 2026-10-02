@@ -170,7 +170,7 @@
             this.repositoryItemSearchLookUpEditOffsetCreditGLCode,
             this.repositoryItemSearchLookUpEditEWTDebitGLCode,
             this.repositoryItemSearchLookUpEditEWTCreditGLCode});
-            this.gridControl2.Size = new System.Drawing.Size(1593, 249);
+            this.gridControl2.Size = new System.Drawing.Size(1593, 277);
             this.gridControl2.TabIndex = 7;
             this.gridControl2.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView2,
@@ -316,7 +316,7 @@
             this.repositoryItemSearchLookUpEdit3,
             this.repositoryItemSearchLookUpEdit4,
             this.repositoryItemSearchLookUpEdit5});
-            this.gridControlChargesSum.Size = new System.Drawing.Size(1593, 304);
+            this.gridControlChargesSum.Size = new System.Drawing.Size(1593, 276);
             this.gridControlChargesSum.TabIndex = 7;
             this.gridControlChargesSum.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewChargesSum,
@@ -731,7 +731,7 @@
             this.groupControl2.Location = new System.Drawing.Point(0, 196);
             this.groupControl2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.groupControl2.Name = "groupControl2";
-            this.groupControl2.Size = new System.Drawing.Size(1597, 279);
+            this.groupControl2.Size = new System.Drawing.Size(1597, 307);
             this.groupControl2.TabIndex = 1;
             this.groupControl2.Text = "Delivery Details";
             // 
@@ -739,10 +739,10 @@
             // 
             this.groupControl3.Controls.Add(this.gridControlChargesSum);
             this.groupControl3.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.groupControl3.Location = new System.Drawing.Point(0, 475);
+            this.groupControl3.Location = new System.Drawing.Point(0, 503);
             this.groupControl3.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.groupControl3.Name = "groupControl3";
-            this.groupControl3.Size = new System.Drawing.Size(1597, 334);
+            this.groupControl3.Size = new System.Drawing.Size(1597, 306);
             this.groupControl3.TabIndex = 2;
             this.groupControl3.Text = "Delivery Charges";
             // 

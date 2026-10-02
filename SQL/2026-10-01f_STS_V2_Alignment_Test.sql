@@ -40,6 +40,7 @@
    ================================================================ */
 SET NOCOUNT ON;
 SET XACT_ABORT OFF;
+DECLARE @Out NVARCHAR(4000);   -- PRINT cannot hold a subquery (1046), so each PASS/FAIL line is built here first
 
 DECLARE @PONumber VARCHAR(10) = NULL;     -- required
 DECLARE @User     VARCHAR(30) = NULL;     -- required: a real Login.Fullname
@@ -176,20 +177,25 @@ BEGIN TRY
          @OriginBranch = @Origin, @PreparedBy = @User, @Method = 'AUTO', @Qty = @Qty, @ProductCode = @Product;
     SET @SeqA = (SELECT MAX(CAST(SeqNo AS INT)) FROM dbo.DeliveryDetails WHERE DeliveryNo = @Dev AND PONumber = @PONumber);
 
-    PRINT CASE WHEN APPLOCK_MODE('public', N'STSTRANSIT:' + @PONumber, 'Transaction') = 'Exclusive'
+    SELECT @Out = CASE WHEN APPLOCK_MODE('public', N'STSTRANSIT:' + @PONumber, 'Transaction') = 'Exclusive'
                 AND APPLOCK_MODE('public', N'STSV2_' + @Dev + N'_' + @PONumber, 'Transaction') = 'NoLock'
                THEN 'PASS' ELSE 'FAIL' END + '  1a lock is STSTRANSIT:' + @PONumber + ' (old STSV2_ name not taken)';
+    PRINT @Out;
     SELECT @Bad = COUNT(*) FROM dbo.InventoryDeliveryFIFO
     WHERE DeliveryNo = @Dev AND PONumber = @PONumber AND DevDetSeqNo = @SeqA AND ISNULL(isVat, 0) <> @ProdVat;
-    PRINT CASE WHEN @Bad = 0 AND EXISTS (SELECT 1 FROM dbo.InventoryDeliveryFIFO WHERE DeliveryNo = @Dev AND PONumber = @PONumber AND DevDetSeqNo = @SeqA)
+    SELECT @Out = CASE WHEN @Bad = 0 AND EXISTS (SELECT 1 FROM dbo.InventoryDeliveryFIFO WHERE DeliveryNo = @Dev AND PONumber = @PONumber AND DevDetSeqNo = @SeqA)
                THEN 'PASS' ELSE 'FAIL' END + '  1a FIFO isVat = product flag although the lot flag differs';
-    PRINT CASE WHEN EXISTS (SELECT 1 FROM dbo.DeliveryDetails WHERE DeliveryNo = @Dev AND PONumber = @PONumber AND SeqNo = @SeqA AND ISNULL(isVat, 0) = @ProdVat)
+    PRINT @Out;
+    SELECT @Out = CASE WHEN EXISTS (SELECT 1 FROM dbo.DeliveryDetails WHERE DeliveryNo = @Dev AND PONumber = @PONumber AND SeqNo = @SeqA AND ISNULL(isVat, 0) = @ProdVat)
                THEN 'PASS' ELSE 'FAIL' END + '  1a line isVat = product flag';
-    PRINT CASE WHEN NOT EXISTS (SELECT 1 FROM dbo.TicketMaster WHERE ReferenceKey = @PONumber)
+    PRINT @Out;
+    SELECT @Out = CASE WHEN NOT EXISTS (SELECT 1 FROM dbo.TicketMaster WHERE ReferenceKey = @PONumber)
                THEN 'PASS' ELSE 'FAIL' END + '  1a nothing posted before Save';
+    PRINT @Out;
     SET @AvailNow = (SELECT SUM(i.Available) FROM dbo.Inventory AS i INNER JOIN #Lots AS l ON l.SequenceNumber = i.SequenceNumber);
-    PRINT CASE WHEN @AvailNow = @A0 - @Qty THEN 'PASS' ELSE 'FAIL' END
+    SELECT @Out = CASE WHEN @AvailNow = @A0 - @Qty THEN 'PASS' ELSE 'FAIL' END
           + '  1a stock out by the scanned qty (' + CAST(@A0 AS VARCHAR(30)) + ' -> ' + CAST(@AvailNow AS VARCHAR(30)) + ')';
+    PRINT @Out;
 
     -- 1b. line B, by barcode when a lot has one (the method whose VAT order changed), else by batch
     SET @Step = '1b';
@@ -203,19 +209,22 @@ BEGIN TRY
     SET @SeqB = (SELECT MAX(CAST(SeqNo AS INT)) FROM dbo.DeliveryDetails WHERE DeliveryNo = @Dev AND PONumber = @PONumber);
     SELECT @Bad = COUNT(*) FROM dbo.InventoryDeliveryFIFO
     WHERE DeliveryNo = @Dev AND PONumber = @PONumber AND DevDetSeqNo = @SeqB AND ISNULL(isVat, 0) <> @ProdVat;
-    PRINT CASE WHEN @Bad = 0 AND EXISTS (SELECT 1 FROM dbo.DeliveryDetails WHERE DeliveryNo = @Dev AND PONumber = @PONumber AND SeqNo = @SeqB AND ISNULL(isVat, 0) = @ProdVat)
+    SELECT @Out = CASE WHEN @Bad = 0 AND EXISTS (SELECT 1 FROM dbo.DeliveryDetails WHERE DeliveryNo = @Dev AND PONumber = @PONumber AND SeqNo = @SeqB AND ISNULL(isVat, 0) = @ProdVat)
                THEN 'PASS' ELSE 'FAIL' END + '  1b ' + CASE WHEN @ScanBarcode IS NOT NULL THEN 'SCAN' ELSE 'BATCH' END + ' line: line and FIFO isVat = product flag';
+    PRINT @Out;
 
     -- 1c. cancel line B before Save: stock back, still nothing posted
     SET @Step = '1c';
     EXEC dbo.spu_ReverseSTSLineV2 @DeliveryNo = @Dev, @PONumber = @PONumber, @SeqNo = @SeqB, @OriginBranch = @Origin, @PreparedBy = @User;
     SET @AvailNow = (SELECT SUM(i.Available) FROM dbo.Inventory AS i INNER JOIN #Lots AS l ON l.SequenceNumber = i.SequenceNumber);
-    PRINT CASE WHEN @AvailNow = @A0 - @Qty
+    SELECT @Out = CASE WHEN @AvailNow = @A0 - @Qty
                 AND EXISTS (SELECT 1 FROM dbo.DeliveryDetails WHERE DeliveryNo = @Dev AND PONumber = @PONumber AND SeqNo = @SeqB AND isCancelled = 1)
                 AND NOT EXISTS (SELECT 1 FROM dbo.InventoryDeliveryFIFO WHERE DeliveryNo = @Dev AND PONumber = @PONumber AND DevDetSeqNo = @SeqB AND isErrorCorrect = 0)
                THEN 'PASS' ELSE 'FAIL' END + '  1c cancel before Save: line cancelled, stock back (' + CAST(@AvailNow AS VARCHAR(30)) + ')';
-    PRINT CASE WHEN NOT EXISTS (SELECT 1 FROM dbo.TicketMaster WHERE ReferenceKey = @PONumber)
+    PRINT @Out;
+    SELECT @Out = CASE WHEN NOT EXISTS (SELECT 1 FROM dbo.TicketMaster WHERE ReferenceKey = @PONumber)
                THEN 'PASS' ELSE 'FAIL' END + '  1c cancel before Save posts nothing';
+    PRINT @Out;
 
     -- 1d. line C, then Save
     SET @Step = '1d';
@@ -226,9 +235,10 @@ BEGIN TRY
          @parmbarcode = '', @parmbranchcode = @Dest, @parmorigin = @Origin, @preparedby = @User;
     EXEC sp_executesql @TransitSql, @TransitParams, @PO = @PONumber, @Live = @Live OUTPUT, @Posted = @Posted OUTPUT,
          @Unbalanced = @Unbalanced OUTPUT, @VatTickets = @VatTickets OUTPUT;
-    PRINT CASE WHEN ABS(@Live - @Posted) < 0.01 AND @Live > 0 AND @Unbalanced = 0 AND @VatTickets = 0 THEN 'PASS' ELSE 'FAIL' END
+    SELECT @Out = CASE WHEN ABS(@Live - @Posted) < 0.01 AND @Live > 0 AND @Unbalanced = 0 AND @VatTickets = 0 THEN 'PASS' ELSE 'FAIL' END
           + '  1d after Save: In Transit ' + CAST(@Posted AS VARCHAR(30)) + ' = live lots ' + CAST(@Live AS VARCHAR(30))
           + ', unbalanced tickets ' + CAST(@Unbalanced AS VARCHAR(10)) + ', VAT tickets ' + CAST(@VatTickets AS VARCHAR(10));
+    PRINT @Out;
 
     -- 1e. cancel line A after Save: In Transit follows the live lots (line C stays)
     SET @Step = '1e';
@@ -236,13 +246,15 @@ BEGIN TRY
     EXEC sp_executesql @TransitSql, @TransitParams, @PO = @PONumber, @Live = @Live OUTPUT, @Posted = @Posted OUTPUT,
          @Unbalanced = @Unbalanced OUTPUT, @VatTickets = @VatTickets OUTPUT;
     SET @AvailNow = (SELECT SUM(i.Available) FROM dbo.Inventory AS i INNER JOIN #Lots AS l ON l.SequenceNumber = i.SequenceNumber);
-    PRINT CASE WHEN ABS(@Live - @Posted) < 0.01 AND @Live > 0 AND @Unbalanced = 0 AND @VatTickets = 0 AND @AvailNow = @A0 - @Qty
+    SELECT @Out = CASE WHEN ABS(@Live - @Posted) < 0.01 AND @Live > 0 AND @Unbalanced = 0 AND @VatTickets = 0 AND @AvailNow = @A0 - @Qty
                THEN 'PASS' ELSE 'FAIL' END
           + '  1e cancel after Save: In Transit ' + CAST(@Posted AS VARCHAR(30)) + ' = live lots ' + CAST(@Live AS VARCHAR(30))
           + ', stock ' + CAST(@AvailNow AS VARCHAR(30)) + ' (one line still out)';
-    PRINT CASE WHEN EXISTS (SELECT 1 FROM dbo.TicketMaster WHERE ReferenceKey = @PONumber AND Mnemonic = 'ITR-HO-VATEX'
+    PRINT @Out;
+    SELECT @Out = CASE WHEN EXISTS (SELECT 1 FROM dbo.TicketMaster WHERE ReferenceKey = @PONumber AND Mnemonic = 'ITR-HO-VATEX'
                                                          AND CAST(TicketDate AS DATE) = CAST(GETDATE() AS DATE))
                THEN 'PASS' ELSE 'FAIL' END + '  1e the reversal ticket is ITR-HO-VATEX dated today';
+    PRINT @Out;
 END TRY
 BEGIN CATCH
     PRINT 'FAIL  Part 1 stopped at ' + ISNULL(@Step, '?') + ': ' + CAST(ERROR_NUMBER() AS VARCHAR(10)) + ' ' + ERROR_MESSAGE();
@@ -267,7 +279,8 @@ BEGIN CATCH
     SELECT @Err = ERROR_NUMBER(), @Msg = ERROR_MESSAGE();
 END CATCH
 IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
-PRINT CASE WHEN @Err = 59834 THEN 'PASS' ELSE 'FAIL' END + '  2 cancel on a received transfer refused: ' + ISNULL(CAST(@Err AS VARCHAR(10)) + ' ' + @Msg, 'no error');
+SELECT @Out = CASE WHEN @Err = 59834 THEN 'PASS' ELSE 'FAIL' END + '  2 cancel on a received transfer refused: ' + ISNULL(CAST(@Err AS VARCHAR(10)) + ' ' + @Msg, 'no error');
+PRINT @Out;
 
 -- Part 3: cancel after the branch's first receive call (not yet marked received)
 SELECT @Err = NULL, @Msg = NULL;
@@ -281,7 +294,7 @@ BEGIN TRY
     EXEC dbo.sp_ConfirmBranchOrderSTS @parmdevno = @Dev, @parmrefno = @Ref, @parmeffectivitydate = NULL, @parmpono = @PONumber,
          @parmbarcode = '', @parmbranchcode = @Dest, @parmorigin = @Origin, @preparedby = @User;
     INSERT INTO @RL (SeqNo, DeliveryNo, ProductCode, Barcode, ActualQty, SellingPrice)
-    SELECT SeqNo, DeliveryNo, ProductNo, BarcodeNo, QtyDelivered, SellingPrice
+    SELECT SeqNo, DeliveryNo, ProductNo, ISNULL(BarcodeNo, ''), QtyDelivered, SellingPrice   -- AUTO lines have no barcode; the TVP column is NOT NULL
     FROM dbo.DeliveryDetails WHERE DeliveryNo = @Dev AND PONumber = @PONumber AND SeqNo = @SeqA;
     EXEC dbo.spu_PostSTSReceiveFromFIFO @PONumber = @PONumber, @BranchCode = @Dest, @ReceivedBy = @User, @Lines = @RL;
     IF NOT EXISTS (SELECT 1 FROM dbo.ReceivedOrderDetails WHERE PONumber = @PONumber)
@@ -292,7 +305,8 @@ BEGIN CATCH
     SELECT @Err = ERROR_NUMBER(), @Msg = ERROR_MESSAGE();
 END CATCH
 IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
-PRINT CASE WHEN @Err = 59834 THEN 'PASS' ELSE 'FAIL' END + '  3 cancel during receiving refused: ' + ISNULL(CAST(@Err AS VARCHAR(10)) + ' ' + @Msg, 'no error');
+SELECT @Out = CASE WHEN @Err = 59834 THEN 'PASS' ELSE 'FAIL' END + '  3 cancel during receiving refused: ' + ISNULL(CAST(@Err AS VARCHAR(10)) + ' ' + @Msg, 'no error');
+PRINT @Out;
 
 -- Part 4: new line on a received transfer
 SELECT @Err = NULL, @Msg = NULL;
@@ -309,7 +323,8 @@ BEGIN CATCH
     SELECT @Err = ERROR_NUMBER(), @Msg = ERROR_MESSAGE();
 END CATCH
 IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
-PRINT CASE WHEN @Err = 59834 THEN 'PASS' ELSE 'FAIL' END + '  4 new line on a received transfer refused: ' + ISNULL(CAST(@Err AS VARCHAR(10)) + ' ' + @Msg, 'no error');
+SELECT @Out = CASE WHEN @Err = 59834 THEN 'PASS' ELSE 'FAIL' END + '  4 new line on a received transfer refused: ' + ISNULL(CAST(@Err AS VARCHAR(10)) + ' ' + @Msg, 'no error');
+PRINT @Out;
 
 -- Part 5: new line on a saved transfer
 SELECT @Err = NULL, @Msg = NULL;
@@ -327,7 +342,8 @@ BEGIN CATCH
     SELECT @Err = ERROR_NUMBER(), @Msg = ERROR_MESSAGE();
 END CATCH
 IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
-PRINT CASE WHEN @Err = 59835 THEN 'PASS' ELSE 'FAIL' END + '  5 new line on a saved transfer refused: ' + ISNULL(CAST(@Err AS VARCHAR(10)) + ' ' + @Msg, 'no error');
+SELECT @Out = CASE WHEN @Err = 59835 THEN 'PASS' ELSE 'FAIL' END + '  5 new line on a saved transfer refused: ' + ISNULL(CAST(@Err AS VARCHAR(10)) + ' ' + @Msg, 'no error');
+PRINT @Out;
 
 -- Part 6: a second delivery number for the same transfer
 SELECT @Err = NULL, @Msg = NULL;
@@ -343,7 +359,8 @@ BEGIN CATCH
     SELECT @Err = ERROR_NUMBER(), @Msg = ERROR_MESSAGE();
 END CATCH
 IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
-PRINT CASE WHEN @Err = 59836 THEN 'PASS' ELSE 'FAIL' END + '  6 second delivery for the transfer refused: ' + ISNULL(CAST(@Err AS VARCHAR(10)) + ' ' + @Msg, 'no error');
+SELECT @Out = CASE WHEN @Err = 59836 THEN 'PASS' ELSE 'FAIL' END + '  6 second delivery for the transfer refused: ' + ISNULL(CAST(@Err AS VARCHAR(10)) + ' ' + @Msg, 'no error');
+PRINT @Out;
 
 -- Part 7: the In Transit sync refuses while a cancelled line still holds stock; nothing may stick
 SELECT @Err = NULL, @Msg = NULL;
@@ -368,14 +385,15 @@ END CATCH
 DECLARE @TranAfter INT = @@TRANCOUNT;
 IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
 SET @AvailNow = (SELECT SUM(i.Available) FROM dbo.Inventory AS i INNER JOIN #Lots AS l ON l.SequenceNumber = i.SequenceNumber);
-PRINT CASE WHEN @Err = 59605 AND @TranAfter = 0 AND @AvailNow = @A0 THEN 'PASS' ELSE 'FAIL' END
+SELECT @Out = CASE WHEN @Err = 59605 AND @TranAfter = 0 AND @AvailNow = @A0 THEN 'PASS' ELSE 'FAIL' END
       + '  7 sync refusal surfaces as 59605 and rolls everything back (open transactions ' + CAST(@TranAfter AS VARCHAR(5))
       + ', stock ' + CAST(@AvailNow AS VARCHAR(30)) + '): ' + ISNULL(CAST(@Err AS VARCHAR(10)) + ' ' + @Msg, 'no error');
+PRINT @Out;
 
 ------------------------------------------------------------------
 -- Nothing may remain
 ------------------------------------------------------------------
-PRINT CASE WHEN NOT EXISTS (SELECT 1 FROM dbo.DeliverySummary WHERE DeliveryNo IN (@Dev, @Dev2) OR PONumber = @PONumber)
+SELECT @Out = CASE WHEN NOT EXISTS (SELECT 1 FROM dbo.DeliverySummary WHERE DeliveryNo IN (@Dev, @Dev2) OR PONumber = @PONumber)
             AND NOT EXISTS (SELECT 1 FROM dbo.DeliveryDetails WHERE DeliveryNo IN (@Dev, @Dev2) OR PONumber = @PONumber)
             AND NOT EXISTS (SELECT 1 FROM dbo.InventoryDeliveryFIFO WHERE DeliveryNo IN (@Dev, @Dev2) OR PONumber = @PONumber)
             AND NOT EXISTS (SELECT 1 FROM dbo.ReceivedOrderDetails WHERE PONumber = @PONumber)
@@ -384,3 +402,4 @@ PRINT CASE WHEN NOT EXISTS (SELECT 1 FROM dbo.DeliverySummary WHERE DeliveryNo I
             AND NOT EXISTS (SELECT 1 FROM dbo.Inventory AS i INNER JOIN #Lots AS l ON l.SequenceNumber = i.SequenceNumber
                             WHERE i.Available <> l.Available0 OR ISNULL(i.IsVat, 0) <> l.IsVat0)
            THEN 'PASS' ELSE 'FAIL' END + '  nothing left behind (request ' + @PONumber + ', deliveries ' + @Dev + ' / ' + @Dev2 + ', lots as before)';
+PRINT @Out;

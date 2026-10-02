@@ -63,11 +63,13 @@ WHERE f.isErrorCorrect = 0 AND (dd.isCancelled = 1 OR dd.isReturned = 1);
     WHERE f.isErrorCorrect = 1 AND dd.isCancelled = 1
       AND dd.DateTimeUpdated >= @FromDate
     GROUP BY dd.PONumber),
-Led AS (
-    SELECT SUBSTRING(l.Remarks, LEN('STS CANCEL ITEM PO#') + 1, 20) AS PONumber, SUM(l.QtyIN) AS InQty
-    FROM dbo.InventoryLedger l
-    WHERE l.Remarks LIKE 'STS CANCEL ITEM PO#%' AND l.DateProcessed >= @FromDate
-    GROUP BY SUBSTRING(l.Remarks, LEN('STS CANCEL ITEM PO#') + 1, 20))
+Led AS (   -- old cancel 'STS CANCEL ITEM PO#' (sales and STS), Sales V2 cancel 'SO CANCEL ITEM PO#' (2026-10-02c)
+    SELECT x.PONumber, SUM(x.QtyIN) AS InQty
+    FROM (SELECT CASE WHEN l.Remarks LIKE 'STS CANCEL ITEM PO#%' THEN SUBSTRING(l.Remarks, LEN('STS CANCEL ITEM PO#') + 1, 20)
+                      ELSE SUBSTRING(l.Remarks, LEN('SO CANCEL ITEM PO#') + 1, 20) END AS PONumber, l.QtyIN
+          FROM dbo.InventoryLedger l
+          WHERE (l.Remarks LIKE 'STS CANCEL ITEM PO#%' OR l.Remarks LIKE 'SO CANCEL ITEM PO#%') AND l.DateProcessed >= @FromDate) AS x
+    GROUP BY x.PONumber)
 INSERT #X (CheckCode, PONumber, Ref, Expected, Actual, Detail)
 SELECT 'X02', b.PONumber, 'cancel', b.LeftQty, ISNULL(l.InQty, 0), 'cancelled lines: qty taken from lots vs qty put back (stock ledger)'
 FROM Back b LEFT JOIN Led l ON l.PONumber = b.PONumber
@@ -225,6 +227,32 @@ SELECT 'T04', PONumber, DevStatus, NULL, nReceipts,
 FROM #Tr
 WHERE (DevStatus = 'DELIVERED' AND nReceipts = 0 AND LiveCost > 0) OR (ISNULL(DevStatus, '') <> 'DELIVERED' AND nReceipts > 0);
 
+-- T05 a line taken from several lots was received as exactly one lot's qty
+--     (the receive screen listed one row per lot and skipped the rest as duplicates; fixed 2026-10-02)
+;WITH L AS (
+    SELECT dd.PONumber, dd.SeqNo, dd.ProductNo, dd.BarcodeNo,
+           SUM(f.QtyDelivered) AS ShipQty, SUM(f.TotalCost) AS ShipCost, COUNT(*) AS nLots
+    FROM dbo.DeliveryDetails dd
+    INNER JOIN dbo.InventoryDeliveryFIFO f ON f.DeliveryNo = dd.DeliveryNo AND f.PONumber = dd.PONumber AND f.DevDetSeqNo = dd.SeqNo AND f.isErrorCorrect = 0
+    INNER JOIN #ST s ON s.PONumber = dd.PONumber
+    WHERE dd.isCancelled = 0 AND dd.isReturned = 0
+    GROUP BY dd.PONumber, dd.SeqNo, dd.ProductNo, dd.BarcodeNo
+    HAVING COUNT(*) > 1)
+INSERT #X (CheckCode, PONumber, Ref, Expected, Actual, Detail)
+SELECT 'T05', L.PONumber, 'line ' + CAST(L.SeqNo AS VARCHAR(10)) + ' ' + L.ProductNo, L.ShipQty, r.RcvQty,
+       CAST(L.nLots AS VARCHAR(10)) + ' lots shipped, received qty = one lot''s qty; not booked: '
+       + CAST(CAST(L.ShipQty - r.RcvQty AS DECIMAL(18,3)) AS VARCHAR(30)) + ' qty'
+FROM L
+CROSS APPLY (SELECT SUM(x.Qty) AS RcvQty FROM dbo.ReceivedOrderDetails x
+             WHERE x.PONumber = L.PONumber AND x.ProductCode = L.ProductNo AND ISNULL(x.Barcode, '') = ISNULL(L.BarcodeNo, '')) r
+WHERE r.RcvQty < L.ShipQty - 0.001
+  -- receipts by the fixed proc (2026-10-02b) write 'STS RCVD ITEM' ledger rows; the buggy ones never did,
+  -- so a genuine short that happens to equal one lot is not flagged
+  AND NOT EXISTS (SELECT 1 FROM dbo.InventoryLedger lg WHERE lg.Remarks = 'STS RCVD ITEM PO#' + L.PONumber AND lg.Product = L.ProductNo)
+  AND EXISTS (SELECT 1 FROM dbo.InventoryDeliveryFIFO f2
+              WHERE f2.PONumber = L.PONumber AND f2.DevDetSeqNo = L.SeqNo AND f2.isErrorCorrect = 0
+                AND ABS(f2.QtyDelivered - r.RcvQty) < 0.001);
+
 ------------------------------------------------------------------
 -- G. GL tickets of these modules
 ------------------------------------------------------------------
@@ -266,6 +294,7 @@ INSERT @Info VALUES
 ('T02', 'STS',    'CRITICAL', 'Received transfer: In Transit did not clear to 0.', 'Look for a missing receipt, short/over ticket or a receipt on the wrong PO.'),
 ('T03', 'STS',    'CRITICAL', 'Transfer received more than once (two IT-BR tickets).', 'Reverse the duplicate receipt and its branch stock.'),
 ('T04', 'STS',    'HIGH',     'Received status and receipt ticket disagree.', 'Check the receive screen''s three calls finished (they are not atomic).'),
+('T05', 'STS',    'CRITICAL', 'A multi-lot line was received as exactly one lot''s qty (the rest skipped as duplicates).', 'Complete the receipt for the remaining qty (branch stock, IT-BR); the 2026-10-02 fix stops new cases.'),
 ('G01', 'GL',     'CRITICAL', 'A Sales / STS ticket does not balance (DR <> CR).', 'Check the mnemonic''s mapping rows.'),
 ('G02', 'GL',     'HIGH',     'A VAT ticket was posted after the all-VAT-exempt rule.', 'Something is still on an old procedure version or a manual entry.');
 

@@ -1896,3 +1896,4 @@ D:\GITHUB\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.exe.
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.exe.config
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.Orders.AddBranchOrderSTSV2.resources
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.Reporting.ItemCostingReport.resources
+D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.Orders.AddBranchOrderV2.resources
