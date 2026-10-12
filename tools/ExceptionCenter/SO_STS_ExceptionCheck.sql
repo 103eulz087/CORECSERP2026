@@ -107,6 +107,18 @@ FROM dbo.InventoryDeliveryFIFO f
 INNER JOIN dbo.Inventory i ON i.SequenceNumber = f.SequenceReferenceNumber
 WHERE f.isErrorCorrect = 0 AND f.Cost <> i.Cost AND f.DateProcessed >= @FromDate;
 
+-- X05 a partly returned line (2026-10-04 split) whose live lot qty no longer equals its delivered qty
+IF OBJECT_ID('dbo.SalesReturnLog', 'U') IS NOT NULL
+INSERT #X (CheckCode, PONumber, Ref, Expected, Actual, Detail)
+SELECT 'X05', dd.PONumber, 'line ' + CAST(dd.SeqNo AS VARCHAR(10)), dd.QtyDelivered, ISNULL(f.Qty, 0),
+       dd.ProductNo + ': delivered qty vs live lot qty after a partial return'
+FROM dbo.DeliveryDetails dd
+OUTER APPLY (SELECT SUM(CAST(x.QtyDelivered AS DECIMAL(18,3))) AS Qty FROM dbo.InventoryDeliveryFIFO x
+             WHERE x.PONumber = dd.PONumber AND x.DeliveryNo = dd.DeliveryNo AND x.DevDetSeqNo = dd.SeqNo AND x.isErrorCorrect = 0) f
+WHERE dd.isCancelled = 0 AND dd.isReturned = 0
+  AND EXISTS (SELECT 1 FROM dbo.SalesReturnLog l WHERE l.IsPartial = 1 AND l.PONumber = dd.PONumber AND l.DeliveryNo = dd.DeliveryNo AND l.SourceSeqNo = dd.SeqNo)
+  AND ABS(dd.QtyDelivered - ISNULL(f.Qty, 0)) > 0.001;
+
 ------------------------------------------------------------------
 -- S. SALES ORDER
 ------------------------------------------------------------------
@@ -171,7 +183,10 @@ INSERT #X (CheckCode, PONumber, Ref, Expected, Actual, Detail)
 SELECT 'S05', s.PONumber, d.DeliveryNo, NULL, NULL, 'order status ' + ISNULL(s.Status, '') + ' but delivery status ' + ISNULL(d.Status, '')
 FROM #SO s
 INNER JOIN dbo.DeliverySummary d ON d.PONumber = s.PONumber
-WHERE CASE WHEN s.Status = 'DELIVERED' THEN 1 ELSE 0 END <> CASE WHEN d.Status IN ('DELIVERED', 'RETURNED') THEN 1 ELSE 0 END;   -- a fully returned order keeps PO DELIVERED
+WHERE CASE WHEN s.Status = 'DELIVERED' THEN 1 ELSE 0 END <> CASE WHEN d.Status IN ('DELIVERED', 'RETURNED') THEN 1 ELSE 0 END   -- a fully returned order keeps PO DELIVERED
+  -- 2026-10-05: fully returned BEFORE confirm (never invoiced) is valid: delivery RETURNED, order keeps its pre-confirm status
+  AND NOT (d.Status = 'RETURNED' AND ISNULL(s.Status, '') <> 'DELIVERED'
+           AND NOT EXISTS (SELECT 1 FROM dbo.TransactionChargeSales c WHERE c.ReferenceNo = s.PONumber));
 
 ------------------------------------------------------------------
 -- T. STS (transfers)
@@ -285,6 +300,7 @@ INSERT @Info VALUES
 ('X02', 'Stock', 'CRITICAL', 'Qty put back by a cancel or return differs from what was taken / billed.', 'Compare the line''s FIFO rows with the stock-ledger rows for that PO.'),
 ('X03', 'Stock', 'CRITICAL', 'A lot shows Available below 0 or above its Quantity.', 'Trace the lot''s stock ledger; usually a double restore or a missed deduction.'),
 ('X04', 'Stock', 'INFO',     'A sold / shipped lot''s cost changed after the sale (cost finalized later).', 'Decide: re-cost the sale (like 2026-10-01d) or leave for a manual month-end entry.'),
+('X05', 'Stock', 'CRITICAL', 'A partly returned line''s live lot qty differs from its delivered qty (the split went wrong).', 'Compare the line and its split-off twin (SalesReturnLog) with their InventoryDeliveryFIFO rows.'),
 ('S01', 'Sales',  'CRITICAL', 'Confirmed order without exactly one invoice, or without a sales ticket.', 'Check sp_ConfirmOrder ran fully for that PO.'),
 ('S02', 'Sales',  'HIGH',     'Invoice Balance does not follow its own columns.', 'The next payment will compute a wrong balance; fix AmountPaid / Balance first.'),
 ('S03', 'Sales',  'HIGH',     'AR in the GL for the order (sale - credit memo - return) differs from the invoice.', 'Look for a missing / duplicate SI, SO-CM or SO-RET ticket.'),

@@ -110,7 +110,7 @@
             this.groupBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.groupBox1.Size = new System.Drawing.Size(1216, 648);
+            this.groupBox1.Size = new System.Drawing.Size(1520, 810);
             this.groupBox1.TabIndex = 9;
             this.groupBox1.TabStop = false;
             // 
@@ -118,11 +118,11 @@
             // 
             this.gridControlForReceiving.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gridControlForReceiving.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.gridControlForReceiving.Location = new System.Drawing.Point(3, 96);
+            this.gridControlForReceiving.Location = new System.Drawing.Point(3, 115);
             this.gridControlForReceiving.MainView = this.gridViewForReceiving;
             this.gridControlForReceiving.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.gridControlForReceiving.Name = "gridControlForReceiving";
-            this.gridControlForReceiving.Size = new System.Drawing.Size(1210, 548);
+            this.gridControlForReceiving.Size = new System.Drawing.Size(1514, 691);
             this.gridControlForReceiving.TabIndex = 3;
             this.gridControlForReceiving.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewForReceiving});
@@ -157,7 +157,7 @@
             this.groupBox3.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.groupBox3.Size = new System.Drawing.Size(1210, 76);
+            this.groupBox3.Size = new System.Drawing.Size(1514, 95);
             this.groupBox3.TabIndex = 8;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Filter Date";
@@ -228,11 +228,11 @@
             // 
             this.groupBox2.Controls.Add(this.gridControlMyReq);
             this.groupBox2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox2.Location = new System.Drawing.Point(0, 53);
+            this.groupBox2.Location = new System.Drawing.Point(0, 66);
             this.groupBox2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.groupBox2.Size = new System.Drawing.Size(1216, 595);
+            this.groupBox2.Size = new System.Drawing.Size(1520, 744);
             this.groupBox2.TabIndex = 8;
             this.groupBox2.TabStop = false;
             // 
@@ -244,7 +244,7 @@
             this.gridControlMyReq.MainView = this.gridViewMyReq;
             this.gridControlMyReq.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.gridControlMyReq.Name = "gridControlMyReq";
-            this.gridControlMyReq.Size = new System.Drawing.Size(1210, 571);
+            this.gridControlMyReq.Size = new System.Drawing.Size(1514, 720);
             this.gridControlMyReq.TabIndex = 3;
             this.gridControlMyReq.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewMyReq});
@@ -278,7 +278,7 @@
             this.panelControl7.Location = new System.Drawing.Point(0, 0);
             this.panelControl7.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.panelControl7.Name = "panelControl7";
-            this.panelControl7.Size = new System.Drawing.Size(1216, 53);
+            this.panelControl7.Size = new System.Drawing.Size(1520, 53);
             this.panelControl7.TabIndex = 7;
             // 
             // btnMyReqExcel
@@ -352,7 +352,7 @@
             this.showForReceivingItemsToolStripMenuItem,
             this.showForReceivingItemsFIFOToolStripMenuItem});
             this.contextMenuStripForReceiving.Name = "contextMenuStripForReceiving";
-            this.contextMenuStripForReceiving.Size = new System.Drawing.Size(370, 52);
+            this.contextMenuStripForReceiving.Size = new System.Drawing.Size(370, 80);
             // 
             // showForReceivingItemsToolStripMenuItem
             // 

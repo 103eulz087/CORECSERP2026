@@ -82,10 +82,10 @@
             // 
             this.groupControl4.Controls.Add(this.gridControl2);
             this.groupControl4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupControl4.Location = new System.Drawing.Point(0, 194);
+            this.groupControl4.Location = new System.Drawing.Point(0, 304);
             this.groupControl4.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.groupControl4.Name = "groupControl4";
-            this.groupControl4.Size = new System.Drawing.Size(1589, 659);
+            this.groupControl4.Size = new System.Drawing.Size(1589, 549);
             this.groupControl4.TabIndex = 3;
             // 
             // gridControl2
@@ -96,7 +96,7 @@
             this.gridControl2.MainView = this.gridView3;
             this.gridControl2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.gridControl2.Name = "gridControl2";
-            this.gridControl2.Size = new System.Drawing.Size(1585, 629);
+            this.gridControl2.Size = new System.Drawing.Size(1585, 519);
             this.gridControl2.TabIndex = 1;
             this.gridControl2.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView3});
@@ -150,7 +150,7 @@
             this.groupControl3.Location = new System.Drawing.Point(0, 0);
             this.groupControl3.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.groupControl3.Name = "groupControl3";
-            this.groupControl3.Size = new System.Drawing.Size(1589, 194);
+            this.groupControl3.Size = new System.Drawing.Size(1589, 304);
             this.groupControl3.TabIndex = 4;
             // 
             // simpleButton2

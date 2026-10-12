@@ -24,13 +24,13 @@ namespace SalesInventorySystem
 
             // Sales Order V2 (FIFO engine) test entry, 2026-10-02 -- admins only while it's
             // being tested, as STS V2. Added in code so the designer file stays untouched.
-            bool isAdmin;
-            if (bool.TryParse(Login.isglobalAdmin, out isAdmin) && isAdmin)
-            {
-                var fifoV2 = new ToolStripMenuItem("FIFO V2 (Test)");
-                fifoV2.Click += (s, e) => openBranchOrderV2();
-                processThisOrderToolStripMenuItem.DropDownItems.Add(fifoV2);
-            }
+            //bool isAdmin;
+            //if (bool.TryParse(Login.isglobalAdmin, out isAdmin) && isAdmin)
+            //{
+            //    var fifoV2 = new ToolStripMenuItem("FIFO V2 (Test)");
+            //    fifoV2.Click += (s, e) => openBranchOrderV2();
+            //    processThisOrderToolStripMenuItem.DropDownItems.Add(fifoV2);
+            //}
         }
 
         // Opens Orders/AddBranchOrderV2 (spu_PostSOLineV2 / spu_ReverseSOLineV2) modally
@@ -169,7 +169,15 @@ namespace SalesInventorySystem
 
         private void gridView1_DoubleClick(object sender, EventArgs e)
         {
-            openBranchOrder();
+             
+            if (GlobalCache.CompanyName == "JFC")
+            {
+                openBranchOrderV2();
+            }
+            else
+            {
+                openBranchOrder();
+            }
         }
 
         void openBranchOrder()
@@ -244,7 +252,16 @@ namespace SalesInventorySystem
 
         private void processThisOrderToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            openBranchOrder();
+            if(GlobalCache.CompanyName=="JFC")
+            {
+                openBranchOrderV2();
+            }
+            else
+            {
+                openBranchOrder();
+            }
+
+
         }
 
         private void confirmOrderToolStripMenuItem_Click(object sender, EventArgs e)

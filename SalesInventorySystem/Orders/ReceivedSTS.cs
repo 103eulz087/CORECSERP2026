@@ -209,7 +209,9 @@ namespace SalesInventorySystem.Orders
             HOFormsDevEx.ReceivedSTSBatchModeFIFO askdh = new HOFormsDevEx.ReceivedSTSBatchModeFIFO();
 
             askdh.txtshipmentno.Text = pono;
-            string query = $"SELECT * FROM dbo.[funcview_InventoryDeliveryFIFOForReceiving]('{pono}') ";
+            // 2026-10-03: V2 = one row per group (FIFO lines of one product added up);
+            // ReceivedSTSBatchModeFIFO posts it with @GroupedRows = 1.
+            string query = $"SELECT * FROM dbo.[funcview_InventoryDeliveryFIFOForReceivingV2]('{pono.Replace("'", "''")}') ";
             HelperFunction.ShowWaitAndDisplayNonAsync(query, askdh.gridControlRcvd, askdh.gridViewRcvd, "Please wait", "Populating data into the database...");
 
             askdh.gridViewRcvd.Focus();

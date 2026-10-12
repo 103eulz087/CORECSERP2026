@@ -71,6 +71,21 @@ namespace SalesInventorySystem.AccountingDevEx
         {
             InitializeComponent();
             BuildPostedTab();
+            // 2026-10-10 (user): Outstanding Invoices 60% / Additional GL Entry 40% of the space between the header
+            // and the buttons. grpInvoices is docked Top with a fixed height and grpGLEntry fills the rest, so on a
+            // larger window all the extra height went to the GL entry; it is now re-split on every resize.
+            tabNewVoucher.Resize += (s, e) => KeepInvoiceGLRatio();
+            KeepInvoiceGLRatio();
+        }
+
+        private void KeepInvoiceGLRatio()
+        {
+            int free = tabNewVoucher.ClientSize.Height
+                       - (grpHeader.Visible ? grpHeader.Height : 0)
+                       - (panelControl1.Visible ? panelControl1.Height : 0);
+            if (free <= 0) return;
+            int h = (int)Math.Round(free * 0.60);
+            if (grpInvoices.Height != h) grpInvoices.Height = h;
         }
         private void BuildPostedTab()
         {

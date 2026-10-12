@@ -1,8 +1,8 @@
 {
   "id": "supplier-payment",
   "order": 3,
-  "title": "Supplier Payment",
-  "subtitle": "Expense payable → voucher → GL, ledger and balances → reversal",
+  "title": "Vouchering: Cash / Check",
+  "subtitle": "Supplier Payment (cash and cheque vouchers): expense payable → voucher → GL, ledger and balances → reversal",
   "form": "AccountingDevEx/AddExpenseDevExFrm.cs → AccountingDevEx/SupplierPaymentDevEx.cs → AccountingDevEx/SupplierVoucherReversalFrm.cs",
   "idLabel": "Voucher",
   "maskLabel": "Supplier",

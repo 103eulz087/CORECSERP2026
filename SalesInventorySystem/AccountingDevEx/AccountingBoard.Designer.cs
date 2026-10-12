@@ -70,19 +70,19 @@ namespace SalesInventorySystem.AccountingDevEx
             // fluentDesignFormContainer1
             // 
             this.fluentDesignFormContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.fluentDesignFormContainer1.Location = new System.Drawing.Point(223, 31);
-            this.fluentDesignFormContainer1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.fluentDesignFormContainer1.Location = new System.Drawing.Point(307, 39);
+            this.fluentDesignFormContainer1.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.fluentDesignFormContainer1.Name = "fluentDesignFormContainer1";
-            this.fluentDesignFormContainer1.Size = new System.Drawing.Size(1052, 588);
+            this.fluentDesignFormContainer1.Size = new System.Drawing.Size(1181, 723);
             this.fluentDesignFormContainer1.TabIndex = 0;
             // 
             // fluentDesignFormControl1
             // 
             this.fluentDesignFormControl1.FluentDesignForm = this;
             this.fluentDesignFormControl1.Location = new System.Drawing.Point(0, 0);
-            this.fluentDesignFormControl1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.fluentDesignFormControl1.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.fluentDesignFormControl1.Name = "fluentDesignFormControl1";
-            this.fluentDesignFormControl1.Size = new System.Drawing.Size(1275, 31);
+            this.fluentDesignFormControl1.Size = new System.Drawing.Size(1488, 39);
             this.fluentDesignFormControl1.TabIndex = 2;
             this.fluentDesignFormControl1.TabStop = false;
             // 
@@ -97,10 +97,10 @@ namespace SalesInventorySystem.AccountingDevEx
             this.menuManualTicket,
             this.menuBankRecon,
             this.menuGLTicketEntries});
-            this.accordionControl1.Location = new System.Drawing.Point(0, 31);
-            this.accordionControl1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.accordionControl1.Location = new System.Drawing.Point(0, 39);
+            this.accordionControl1.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.accordionControl1.Name = "accordionControl1";
-            this.accordionControl1.Size = new System.Drawing.Size(223, 588);
+            this.accordionControl1.Size = new System.Drawing.Size(307, 723);
             this.accordionControl1.TabIndex = 1;
             this.accordionControl1.ViewType = DevExpress.XtraBars.Navigation.AccordionControlViewType.HamburgerMenu;
             this.accordionControl1.ElementClick += new DevExpress.XtraBars.Navigation.ElementClickEventHandler(this.AccordionMain_ElementClick);
@@ -205,15 +205,15 @@ namespace SalesInventorySystem.AccountingDevEx
             // 
             // AccountingBoard
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1275, 619);
+            this.ClientSize = new System.Drawing.Size(1488, 762);
             this.ControlContainer = this.fluentDesignFormContainer1;
             this.Controls.Add(this.fluentDesignFormContainer1);
             this.Controls.Add(this.accordionControl1);
             this.Controls.Add(this.fluentDesignFormControl1);
             this.FluentDesignFormControl = this.fluentDesignFormControl1;
-            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.Name = "AccountingBoard";
             this.NavigationControl = this.accordionControl1;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

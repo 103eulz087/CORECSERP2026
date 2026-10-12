@@ -5,7 +5,7 @@ Two read-only tools that turn the source code and the database into a browsable 
 | Tool | What it shows | Builder | Output page |
 |---|---|---|---|
 | **Dependency Atlas** | Every form, report and class, and the stored procedures, views, functions, tables and table types it uses, directly and through SQL. | `tools\DependencyAtlas\Build-DependencyAtlas.ps1` | `docs\atlas\DependencyAtlas.html` |
-| **Process Trace** | One real transaction followed step by step through every table a module writes, with the linking keys color-coded. Modules: Sales Order, AR Payment, Supplier Payment. | `tools\ProcessTrace\Build-ProcessTrace.ps1` | `docs\process-trace\ProcessTrace.html` |
+| **Process Trace** | One real transaction followed step by step through every table a module writes, with the linking keys color-coded. Modules: Sales Order, AR Payment, Vouchering: Cash / Check, Vouchering: Telegraphic. | `tools\ProcessTrace\Build-ProcessTrace.ps1` | `docs\process-trace\ProcessTrace.html` |
 
 Neither tool ever writes to the database. They only run `SELECT` queries.
 
@@ -70,7 +70,7 @@ Before every rebuild, run `git pull origin laptopdell` so your copy has the late
 3. **Database rights:** read access to the database. The Dependency Atlas also needs **View Definition**, so it can read which procedures use which tables.
 4. **Windows PowerShell 5.1** is already part of Windows 10/11. Nothing else to install.
 
-Which database you build from: DEV is `COREX001` (normally what the saved connection points to); STAGING is `CORECSJFC2026_STAGING`.
+Which database you build from: DEV is `COREX001` (default instance of `corex.itcoreapps.com`). STAGING is `CORECSJFC2026_STAGING` on the same instance, moving to a new instance, `corex.itcoreapps.com,6601` (same database name). Production is `PRODJFC_COREX` on `corex.itcoreapps.com,7701`. `-Catalog` only changes the database, not the instance, so to reach another instance save a connection to it or use `-ConnectionString`. Check which server and database your saved connection points to before building.
 
 ---
 
@@ -89,6 +89,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools\DependencyAtlas\Build-
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\ProcessTrace\Build-ProcessTrace.ps1 -RegistryKey "AAITCRE\ConnSettingsMain"
 ```
+
+The telegraphic samples are production vouchers, so build the page from the STAGING key (the production copy): `-RegistryKey "AAITCRE\ConnSettingsStaging"` (2026-10-08).
 
 Each takes about a minute and ends with a `Wrote ...html` line. Open that file in a browser.
 

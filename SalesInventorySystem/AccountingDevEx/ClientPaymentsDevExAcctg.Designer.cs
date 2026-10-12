@@ -255,7 +255,7 @@
             this.repositoryItemSearchLookUpEditEWTDebitGLCode,
             this.repositoryItemSearchLookUpEditEWTCreditGLCode,
             this.repositoryItemCheckEditPayCharge});
-            this.gridControl2.Size = new System.Drawing.Size(1979, 548);
+            this.gridControl2.Size = new System.Drawing.Size(1978, 628);
             this.gridControl2.TabIndex = 6;
             this.gridControl2.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView2,
@@ -407,7 +407,7 @@
             this.repositoryItemSearchLookUpEdit3,
             this.repositoryItemSearchLookUpEdit4,
             this.repositoryItemSearchLookUpEdit5});
-            this.gridControl1.Size = new System.Drawing.Size(1981, 450);
+            this.gridControl1.Size = new System.Drawing.Size(2476, 450);
             this.gridControl1.TabIndex = 7;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView9,
@@ -534,7 +534,7 @@
             this.gridControlPaymentDetails.MainView = this.gridViewPaymentDetails;
             this.gridControlPaymentDetails.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.gridControlPaymentDetails.Name = "gridControlPaymentDetails";
-            this.gridControlPaymentDetails.Size = new System.Drawing.Size(1981, 356);
+            this.gridControlPaymentDetails.Size = new System.Drawing.Size(2476, 415);
             this.gridControlPaymentDetails.TabIndex = 8;
             this.gridControlPaymentDetails.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewPaymentDetails});
@@ -588,11 +588,11 @@
             this.groupBox2.BackColor = System.Drawing.Color.White;
             this.groupBox2.Controls.Add(this.gridControl2);
             this.groupBox2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox2.Location = new System.Drawing.Point(0, 389);
+            this.groupBox2.Location = new System.Drawing.Point(0, 308);
             this.groupBox2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.groupBox2.Size = new System.Drawing.Size(1985, 572);
+            this.groupBox2.Size = new System.Drawing.Size(1984, 652);
             this.groupBox2.TabIndex = 20;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Transaction with Balances";
@@ -640,7 +640,7 @@
             this.groupBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.groupBox1.Size = new System.Drawing.Size(1985, 389);
+            this.groupBox1.Size = new System.Drawing.Size(1984, 308);
             this.groupBox1.TabIndex = 19;
             this.groupBox1.TabStop = false;
             this.groupBox1.Enter += new System.EventHandler(this.groupBox1_Enter);
@@ -1454,10 +1454,10 @@
             this.groupControl2.Controls.Add(this.gridControlPaymentDetails);
             this.groupControl2.Controls.Add(this.gridControl1);
             this.groupControl2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupControl2.Location = new System.Drawing.Point(0, 125);
+            this.groupControl2.Location = new System.Drawing.Point(0, 305);
             this.groupControl2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.groupControl2.Name = "groupControl2";
-            this.groupControl2.Size = new System.Drawing.Size(1985, 836);
+            this.groupControl2.Size = new System.Drawing.Size(2480, 895);
             this.groupControl2.TabIndex = 1;
             // 
             // groupControl1
@@ -1474,7 +1474,7 @@
             this.groupControl1.Location = new System.Drawing.Point(0, 0);
             this.groupControl1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.groupControl1.Name = "groupControl1";
-            this.groupControl1.Size = new System.Drawing.Size(1985, 125);
+            this.groupControl1.Size = new System.Drawing.Size(2480, 244);
             this.groupControl1.TabIndex = 0;
             // 
             // simpleButton5

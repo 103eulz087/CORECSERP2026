@@ -151,6 +151,9 @@ namespace SalesInventorySystem.Reporting
                 {
                     SetCaption(detailView, "MovementDate", "Date");
                     SetCaption(detailView, "MovementType", "Type");
+                    // 2026-10-10 (user): Branch hidden; a sale's Reference now carries the invoice no. and the
+                    // customer as "branch-name", a transfer's the PO no. (SQL/2026-10-10_ItemCostingReport_Detail_SoldReference.sql)
+                    HideColumn(detailView, "BranchName");
                     AddSumFooter(detailView, "QtyIn", "N3");
                     AddSumFooter(detailView, "QtyOut", "N3");
                     AddSumFooter(detailView, "AmountIn", "N2");

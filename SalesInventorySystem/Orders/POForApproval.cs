@@ -455,12 +455,13 @@ namespace SalesInventorySystem
             refno1 = gridView4.GetRowCellValue(gridView4.FocusedRowHandle, "PONumber").ToString();
             //invoiceno = gridView4.GetRowCellValue(gridView4.FocusedRowHandle, "PONumber").ToString();
             Orders.ReturnSalesOrder salesret = new Orders.ReturnSalesOrder();
-            salesret.Show();
-            Database.display("SELECT * FROM view_BranchOrderDetails WHERE PONumber='" + refno1 + "' and isReturned=0", salesret.gridControl1, salesret.gridView1);
             salesret.txtpono.Text = refno1;
             salesret.txtdevno.Text = devno;
             salesret.txtbrcode.Text = gridView4.GetRowCellValue(gridView4.FocusedRowHandle, "BranchCode").ToString();
             salesret.txtstatus.Text = "FOR DELIVERY";
+            salesret.ShowReturned = false;
+            salesret.Show();
+            salesret.LoadData();   // 2026-10-04: the form loads its own lines (Kind / Return Qty for partial returns)
         }
 
         private void printDeliveryReceiptToolStripMenuItem1_Click(object sender, EventArgs e)
@@ -485,7 +486,6 @@ namespace SalesInventorySystem
                 string InvoiceNo = Database.getSingleQuery("DeliverySummary", "PONumber='" + viewdet.txtpono.Text + "'", "InvoiceNo");
                 viewdet.txtsino.Text = InvoiceNo;
             }
-           
         }
 
         private void editOrderDetailsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1215,12 +1215,13 @@ namespace SalesInventorySystem
             refno1 = gridView5.GetRowCellValue(gridView5.FocusedRowHandle, "PONumber").ToString();
             invoiceno = gridView5.GetRowCellValue(gridView5.FocusedRowHandle, "PONumber").ToString();
             Orders.ReturnSalesOrder salesret = new Orders.ReturnSalesOrder();
-            salesret.Show();
-            Database.display("SELECT * FROM view_BranchOrderDetails WHERE PONumber='" + refno1 + "' ", salesret.gridControl1, salesret.gridView1);
             salesret.txtpono.Text = refno1;
             salesret.txtdevno.Text = devno;
             salesret.txtbrcode.Text = gridView5.GetRowCellValue(gridView5.FocusedRowHandle, "BranchCode").ToString();
             salesret.txtstatus.Text = "DELIVERED";
+            salesret.ShowReturned = true;   // already-returned lines show red, can't be ticked
+            salesret.Show();
+            salesret.LoadData();   // 2026-10-04: the form loads its own lines (Kind / Return Qty for partial returns)
         }
 
         private void toolStripMenuItem14_Click(object sender, EventArgs e)

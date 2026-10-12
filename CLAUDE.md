@@ -77,12 +77,19 @@ SP Backup Renaming: add suffix timestamp in sp name for backup before creating n
 - Connection strings are **not** primarily read from `app.config` (that file only holds a few stale/legacy entries with placeholder credentials — never trust it as the source of truth, and never hardcode real credentials into source in this repo). The real connection strings are stored per-machine in the **Windows Registry** under `HKCU\...` keys such as `AAITCRE\ConnSettingsMain` (main SalesAndInventory DB), plus other keys for accounting/HRM/Postgres/cloud-upload targets. See `Classes/Database.cs` (`getConnection()`, `getConnection(string regkeyname)`, `getConnectionString(string regkeypath)`, `getPgConnection()`) and `Connection.cs` (the UI that writes these registry keys via `btnsave_Click`).
 - `GlobalCache.InitializeCompanyData()` is called first thing in `Program.Main` and opens a DB connection immediately at startup to load company info — DB connectivity (registry key configured) is a hard prerequisite for the app to even start.
 - `Classes/GlobalVariables.cs` holds static, process-wide mutable state (current user, session flags, shared `SqlConnection`/`OleDbConnection`/`DataSet` instances) that most forms read/write directly instead of passing state explicitly. Many other classes (e.g. `Database`) inherit from `GlobalVariables` to get this state in scope.
-- **Databases (as of 2026-09-25):**
-  - **`COREX001` = DEV.** It is the new DEV database, a live replica of STAGING, and it is what `HKCU\AAITCRE\ConnSettingsMain` points to. Make and test all changes here first.
-  - **`CORECSJFC2026_STAGING` = STAGING.** Apply a change here only after the user confirms.
-  - **`CORECSERP_002_DEV` = the old DEV.** No longer the target. Don't deploy to it or treat its data as current. Its data differs from COREX001; e.g. it has telegraphic vouchers that COREX001 and STAGING don't.
-- All three are hosted on `corex.itcoreapps.com` (a single server, connected to directly by database name — no named instance/port needed). Credentials for this server are stored in the registry per the mechanism above (`HKCU\AAITCRE\ConnSettingsMain` for DEV/COREX001, `ConnSettingsServer` for STAGING) — never in this file or any other checked-in source.
-- Before any DB check or deploy, read the `Initial Catalog` from the registry connection string instead of assuming a database name. A helper that forces a different catalog will silently query a database the app isn't using. That happened on 2026-09-25: checks against `CORECSERP_002_DEV` showed data the app, on COREX001, never saw.
+- **Databases (as of 2026-10-04).** All are on the server `corex.itcoreapps.com`, in three SQL Server instances:
+
+  | Role | Instance (Server Name) | Database | Notes |
+  |---|---|---|---|
+  | **DEV** | `corex.itcoreapps.com` (default instance, port 1433) | `COREX001` | Unchanged. Make and test all changes here first. |
+  | **STAGING** | `corex.itcoreapps.com,6601` (instance named `DEV_6601`, despite being STAGING) | `CORECSJFC2026_STAGING` | The STAGING target (confirmed 2026-10-07: the user tests here). Apply a change only after the user confirms. Dev laptop key: `HKCU\AAITCRE\ConnSettingsStaging`. |
+  | old STAGING | `corex.itcoreapps.com` (default instance) | `CORECSJFC2026_STAGING` | Before the move. Not the target. Same database name, so check the server, not just the name. |
+  | **PRODUCTION** | `corex.itcoreapps.com,7701` (instance `STAGING_7701`) | `PRODJFC_COREX` | Created 2026-10-03. Never write to it unless the user explicitly asks; read-only checks only. The app opens in the WXICompact skin only here; any other database opens in Black (`Program.cs`). |
+  | old DEV | `corex.itcoreapps.com` (default instance) | `CORECSERP_002_DEV` | No longer a target. Its data differs from COREX001 (e.g. telegraphic vouchers COREX001 and STAGING don't have). |
+
+- **Credentials are never written in this file or any checked-in source.** They live in the registry per machine, DPAPI-protected, via the mechanism above. Which registry key points where is per machine and changes. On the dev laptop, `ConnSettingsMain` normally points to DEV (`COREX001`). The user sometimes switches it to another instance on purpose, e.g. to PRODUCTION (7701) on 2026-10-04 to test the skin. `ConnSettingsServer` points to the default instance: it reads COREX001 (DEV), but its login can't open the old STAGING. `ConnSettingsStaging` (saved 2026-10-07 for Claude, db_owner) points to STAGING on 6601.
+- **Before any DB check or deploy, read both the `Data Source` and the `Initial Catalog` from the registry connection string you are about to use.** Don't assume a key means DEV. Swapping only `Initial Catalog` keeps the instance: a catalog swap on a 7701 connection never reaches DEV, and a swap on a default-instance connection never reaches the new STAGING. A helper that forces a different catalog can also silently query a database the app isn't using: on 2026-09-25, checks against `CORECSERP_002_DEV` showed data the app, on COREX001, never saw.
+
 
 ## Module / folder structure
 
@@ -136,7 +143,8 @@ Setup and run steps for other people (branch, prerequisites, commands, common er
 - Modules so far, in business-flow order (the JSON `order` field sets the menu order):
   1. **Sales Order**: `AddOrder` (`sp_AddSalesOrderRequest`) → approval (`POForApprovalDetails`) → `AddBranchOrder` (`sp_AddBranchOrderHRI_JFC` → FIFO deduction, `sp_ConfirmBranchOrder`) → invoice no. (`ViewForDeliveryDetails`) → `ConfirmOrderDevEx` (`sp_ConfirmOrder`).
   2. **AR Payment** (`ClientPaymentsDevExAcctg`: form inserts → `sp_AddPaymentClient` → `sp_ReversePaymentClient`).
-  3. **Supplier Payment**: expense payable (`spu_PostExpenseV2` / `sp_PostExpenseManualMultiBranch`) → `SupplierPaymentDevEx` (`sp_PostSupplierPaymentWithManualLines` → `sp_AddPaymentSupplierCompound_V2`) → `SupplierVoucherReversalFrm` (`sp_ReverseCombinedSupplierVoucher` → `sp_CancelledChequesCS`). Expense mode only; PURCHASE mode not traced yet.
+  3. **Vouchering: Cash / Check** (file `SupplierPayment.json`): expense payable (`spu_PostExpenseV2` / `sp_PostExpenseManualMultiBranch`) → `SupplierPaymentDevEx` (`sp_PostSupplierPaymentWithManualLines` → `sp_AddPaymentSupplierCompound_V2`) → `SupplierVoucherReversalFrm` (`sp_ReverseCombinedSupplierVoucher` → `sp_CancelledChequesCS`). Expense mode only; PURCHASE mode not traced yet.
+  4. **Vouchering: Telegraphic** (file `VoucheringTelegraphic.json`, added 2026-10-08): purchase payable (`APAccounts`) → `VoucheringManualFrm` (`sp_PostVoucherManual`: telegraphic voucher, payment lines with FX variance, one netted `VOUCHER-MANUAL` ticket, ledger, bank recon). Samples are production vouchers 897, 896 + 906, 799, so the page is now built from STAGING (the production copy, `-RegistryKey AAITCRE\ConnSettingsStaging`); the other modules' samples give the same tables there. No reversed telegraphic voucher exists yet.
 - Each module is a pair in `tools/ProcessTrace/modules/`:
   - `<Name>.json`: steps (who writes what), table instances with their key-column → key-family map, money/qty columns, columns to mask, sample transactions (`ids`), findings.
   - `<Name>.sql`: read-only trace query taking `@Ids`; every result set starts with `_t` = the table-instance id. Scope rows by the same keys the procs use.
@@ -156,12 +164,13 @@ The Sales Order and STS cycles (place → process → cancel → confirm → cre
 - **When a new failure mode is found, add a check for it** (next free code in its group: X stock, S sales, T STS, G GL), verify every hit on DEV and STAGING is real, and note it in the work log.
 - The ties it tests are the ones the rolled-back lifecycle tests proved (invoice = client ledger = GL AR; GL inventory = stock movement; In Transit = live FIFO cost until received, then 0; cancelled / returned line ⇒ no live FIFO lot).
 
-## Roadmap: version 2 (web, PostgreSQL, Linux)
+## Roadmap: version 2 (web, same MSSQL database)
 
-The plan (user, 2026-10-02) is to migrate this ERP to a web-based "version 2": PostgreSQL, with all APIs and the database running on Linux. A handoff document and the full v2 project will be requested later; the technical stack is left to Claude. Until then:
-- record every business rule a rewrite must keep (in the work log or `docs/standards/`), not just the code change;
-- prefer portable designs (set-based SQL, no SQL Server-only tricks where an equivalent is easy, logic in clearly named procs);
-- keep the Dependency Atlas, Process Trace and Exception Center current: they are the inventory and the invariants v2 must be re-tested against.
+The plan (user, 2026-10-07; replaces the 2026-10-02 PostgreSQL / Linux idea) is a web-based "version 2". It is built in a separate Claude session and **reuses this MSSQL database as it is**: the same tables, procs, triggers and types, already in production with real data. v2 has the same functions plus new features. So:
+- The database is shared. A change here must keep working for the WinForms exe AND v2. Keep using the backward-compatible patterns: optional TVPs / parameters, opt-in flags, rename-to-`_OLD_` backups.
+- Posting logic lives in the procs; v2 should call the same procs, not re-implement them. The per-PO / per-order applocks, ledger triggers and period-lock triggers only protect writers that go through them.
+- Record every business rule (in the work log or `docs/standards/`), not just the code change; the v2 session depends on it.
+- Keep the Dependency Atlas, Process Trace and Exception Center current: they are the map and the invariants v2 is checked against.
 
 ## Session handoff (work in progress)
 

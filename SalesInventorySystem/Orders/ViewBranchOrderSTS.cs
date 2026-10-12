@@ -28,18 +28,26 @@ namespace SalesInventorySystem.Orders
 
             // STS V2 (FIFO engine) test entry, 2026-09-29 -- admins only while it's
             // being tested. Added in code so the designer file stays untouched.
-            bool isAdmin;
-            if (bool.TryParse(Login.isglobalAdmin, out isAdmin) && isAdmin)
-            {
-                var fifoV2 = new ToolStripMenuItem("FIFO V2 (Test)");
-                fifoV2.Click += (s, e) => openBranchOrderV2();
-                processThisOrderToolStripMenuItem.DropDownItems.Add(fifoV2);
-            }
+            //bool isAdmin;
+            //if (bool.TryParse(Login.isglobalAdmin, out isAdmin) && isAdmin)
+            //{
+            //    var fifoV2 = new ToolStripMenuItem("FIFO V2 (Test)");
+            //    fifoV2.Click += (s, e) => openBranchOrderV2();
+            //    processThisOrderToolStripMenuItem.DropDownItems.Add(fifoV2);
+            //}
         }
 
         private void gridView1_DoubleClick(object sender, EventArgs e)
         {
-            openBranchOrder("STS");
+            if (GlobalCache.CompanyName == "JFC")
+            {
+                openBranchOrderV2();
+            }
+            else
+            {
+                openBranchOrder("STS");
+            }
+               
         }
 
         private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
@@ -113,7 +121,7 @@ namespace SalesInventorySystem.Orders
             }
             catch (Exception ex)
             {
-                XtraMessageBox.Show(ex.Message.ToString());
+                XtraMessageBox.Show(ex.Message.ToString()); //new
             }
             finally
             {
@@ -342,7 +350,16 @@ namespace SalesInventorySystem.Orders
 
         private void singleModeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            openBranchOrder("STS");
+            if (GlobalCache.CompanyName == "JFC")
+            {
+                openBranchOrderV2();
+            }
+            else
+            {
+                openBranchOrder("STS");
+            }
+           
+            //openBranchOrder("STS");
         }
 
         //private void tabfilter()

@@ -89,10 +89,10 @@ namespace SalesInventorySystem
                 Database.RunLocalDatabaseMigrations();
           
             }
-            if(GlobalConfig.Token== "ODM1NTI0ODYz" || GlobalConfig.Token == "1234567890XX")//VROSS STORE
-            {
-                Database.ExecuteQuery("UPDATE POSType set isAutoSystemDeduct=1");
-            }
+            //if(GlobalConfig.Token== "ODM1NTI0ODYz" || GlobalConfig.Token == "1234567890XX")//VROSS STORE
+            //{
+            //    Database.ExecuteQuery("UPDATE POSType set isAutoSystemDeduct=1");
+            //}
             tryCheckUpdate(); //#tryCheckUpdateV1();
             //labelversion.Text= HelperFunction.readFileVersion();
 
@@ -110,7 +110,27 @@ namespace SalesInventorySystem
                     this.Opacity = 0;
                     return;
                 }
+                //JFC AND ENZOSTAGING AND ITCORE
+                if (GlobalConfig.Token == "NTE5MTYwNDY4"
+                            || GlobalConfig.Token == "Nzc0Njk4NjY0")
+                {
+                    //migratedStamp = "";
+                    //targetStamp = "";
+                    ConnRegistry.SetTarget(
+                        serverNameWithPort: "corex.itcoreapps.com,7701",
+                        dbName: "PRODJFC_COREX",
+                        userId: "prodjfcuser",
+                        password: "1tc0r3_0365_PRODJFC_COREX"
+                    );
+                    ConnRegistry.SetTargetConnSettingsServer(
+                        serverNameWithPort: "corex.itcoreapps.com,7701",
+                        dbName: "PRODJFC_COREX",
+                        userId: "prodjfcuser",
+                        password: "1tc0r3_0365_PRODJFC_COREX"
+                    );
 
+                    //ConnRegistry.Set("db_migrated_to", targetStamp);
+                }
                 userid = regkey.GetValue("serverid").ToString();
                 serverpassword = regkey.GetValue("serverpassword").ToString();
                 dbname = regkey.GetValue("dbname").ToString();

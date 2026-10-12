@@ -103,7 +103,10 @@ namespace SalesInventorySystem.AccountingDevEx
 
         void populateCustname()
         {
-            Database.displaySearchlookupEdit("SELECT BranchName,CustomerKey,CustomerName FROM view_Customers", txtcustname, "CustomerName", "CustomerName");
+            // 2026-10-10: ValueMember = CustomerKey (unique). It was CustomerName, which 938 customers share
+            // (e.g. DAQUIZ, ARNOLD at 009 and at 001): picking the second one didn't change the value, so the
+            // first customer stayed. The name is still what the box shows.
+            Database.displaySearchlookupEdit("SELECT BranchName,CustomerKey,CustomerName FROM view_Customers", txtcustname, "CustomerName", "CustomerKey");
         }
 
         // ── AVAILABLE CREDIT (unapplied OverPay balance) ───────────────────
@@ -1433,8 +1436,10 @@ namespace SalesInventorySystem.AccountingDevEx
 
         private void txtcustname_EditValueChanged(object sender, EventArgs e)
         {
-            objcustid = SearchLookUpClass.getSingleValue(txtcustname, "CustomerKey");
-            if (objcustid == null || objcustid == DBNull.Value)
+            // 2026-10-10: the picked customer is the EditValue itself (ValueMember = CustomerKey). It used to be read
+            // from the popup grid's focused row, which on the first pick after load isn't the picked row yet.
+            objcustid = txtcustname.EditValue;
+            if (objcustid == null || objcustid == DBNull.Value || string.IsNullOrWhiteSpace(objcustid.ToString()))
                 return;
 
             txtcustid.Text = objcustid.ToString();

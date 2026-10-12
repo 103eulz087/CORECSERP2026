@@ -191,10 +191,10 @@
             // 
             this.xrBarCode2.AutoModule = true;
             this.xrBarCode2.Font = new DevExpress.Drawing.DXFont("Arial", 8.75F);
-            this.xrBarCode2.LocationFloat = new DevExpress.Utils.PointFloat(17.70833F, 50.66668F);
+            this.xrBarCode2.LocationFloat = new DevExpress.Utils.PointFloat(17.70833F, 50.66671F);
             this.xrBarCode2.Name = "xrBarCode2";
             this.xrBarCode2.Padding = new DevExpress.XtraPrinting.PaddingInfo(0F, 0F, 0F, 0F, 100F);
-            this.xrBarCode2.SizeF = new System.Drawing.SizeF(106.25F, 90.91666F);
+            this.xrBarCode2.SizeF = new System.Drawing.SizeF(94.58333F, 80.08333F);
             this.xrBarCode2.StylePriority.UseFont = false;
             this.xrBarCode2.StylePriority.UsePadding = false;
             this.xrBarCode2.StylePriority.UseTextAlignment = false;

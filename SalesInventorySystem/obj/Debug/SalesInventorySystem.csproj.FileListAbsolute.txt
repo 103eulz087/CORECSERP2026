@@ -1897,3 +1897,5 @@ D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.ex
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.Orders.AddBranchOrderSTSV2.resources
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.Reporting.ItemCostingReport.resources
 D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.Orders.AddBranchOrderV2.resources
+D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.HOFormsDevEx.ReceivedSTSBatchModeFIFO.resources
+D:\MYGDRIVE\CORECSERP2026\SalesInventorySystem\obj\Debug\SalesInventorySystem.Reporting.ItemCostingReconReport.resources

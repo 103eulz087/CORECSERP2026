@@ -47,12 +47,12 @@
             this.label8 = new System.Windows.Forms.Label();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.manualInventoryEntryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.singleModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.batchModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.uploadBatchInventoryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.localConnectionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.liveConnectionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.fromLocalConnectionWithoutPOToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.singleModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.batchModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabControl1.SuspendLayout();
             this.NewShipment.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl2)).BeginInit();
@@ -62,10 +62,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView1)).BeginInit();
             this.groupBox1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.txtdateto.Properties.CalendarTimeProperties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtdateto.Properties)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.txtdatefrom.Properties.CalendarTimeProperties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtdateto.Properties.CalendarTimeProperties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtdatefrom.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtdatefrom.Properties.CalendarTimeProperties)).BeginInit();
             this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -283,7 +283,7 @@
             this.manualInventoryEntryToolStripMenuItem,
             this.uploadBatchInventoryToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(234, 80);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(234, 52);
             // 
             // manualInventoryEntryToolStripMenuItem
             // 
@@ -294,6 +294,20 @@
             this.manualInventoryEntryToolStripMenuItem.Size = new System.Drawing.Size(233, 24);
             this.manualInventoryEntryToolStripMenuItem.Text = "Manual Inventory Entry";
             this.manualInventoryEntryToolStripMenuItem.Click += new System.EventHandler(this.manualInventoryEntryToolStripMenuItem_Click);
+            // 
+            // singleModeToolStripMenuItem
+            // 
+            this.singleModeToolStripMenuItem.Name = "singleModeToolStripMenuItem";
+            this.singleModeToolStripMenuItem.Size = new System.Drawing.Size(176, 26);
+            this.singleModeToolStripMenuItem.Text = "Single Mode";
+            this.singleModeToolStripMenuItem.Click += new System.EventHandler(this.singleModeToolStripMenuItem_Click);
+            // 
+            // batchModeToolStripMenuItem
+            // 
+            this.batchModeToolStripMenuItem.Name = "batchModeToolStripMenuItem";
+            this.batchModeToolStripMenuItem.Size = new System.Drawing.Size(176, 26);
+            this.batchModeToolStripMenuItem.Text = "Batch Mode";
+            this.batchModeToolStripMenuItem.Click += new System.EventHandler(this.batchModeToolStripMenuItem_Click);
             // 
             // uploadBatchInventoryToolStripMenuItem
             // 
@@ -308,37 +322,23 @@
             // localConnectionToolStripMenuItem
             // 
             this.localConnectionToolStripMenuItem.Name = "localConnectionToolStripMenuItem";
-            this.localConnectionToolStripMenuItem.Size = new System.Drawing.Size(316, 26);
+            this.localConnectionToolStripMenuItem.Size = new System.Drawing.Size(324, 26);
             this.localConnectionToolStripMenuItem.Text = "From Local Connection";
             this.localConnectionToolStripMenuItem.Click += new System.EventHandler(this.localConnectionToolStripMenuItem_Click);
             // 
             // liveConnectionToolStripMenuItem
             // 
             this.liveConnectionToolStripMenuItem.Name = "liveConnectionToolStripMenuItem";
-            this.liveConnectionToolStripMenuItem.Size = new System.Drawing.Size(316, 26);
+            this.liveConnectionToolStripMenuItem.Size = new System.Drawing.Size(324, 26);
             this.liveConnectionToolStripMenuItem.Text = "From Live Connection";
             this.liveConnectionToolStripMenuItem.Click += new System.EventHandler(this.liveConnectionToolStripMenuItem_Click);
             // 
             // fromLocalConnectionWithoutPOToolStripMenuItem
             // 
             this.fromLocalConnectionWithoutPOToolStripMenuItem.Name = "fromLocalConnectionWithoutPOToolStripMenuItem";
-            this.fromLocalConnectionWithoutPOToolStripMenuItem.Size = new System.Drawing.Size(316, 26);
+            this.fromLocalConnectionWithoutPOToolStripMenuItem.Size = new System.Drawing.Size(324, 26);
             this.fromLocalConnectionWithoutPOToolStripMenuItem.Text = "From Local Connection Without PO";
             this.fromLocalConnectionWithoutPOToolStripMenuItem.Click += new System.EventHandler(this.fromLocalConnectionWithoutPOToolStripMenuItem_Click);
-            // 
-            // singleModeToolStripMenuItem
-            // 
-            this.singleModeToolStripMenuItem.Name = "singleModeToolStripMenuItem";
-            this.singleModeToolStripMenuItem.Size = new System.Drawing.Size(216, 26);
-            this.singleModeToolStripMenuItem.Text = "Single Mode";
-            this.singleModeToolStripMenuItem.Click += new System.EventHandler(this.singleModeToolStripMenuItem_Click);
-            // 
-            // batchModeToolStripMenuItem
-            // 
-            this.batchModeToolStripMenuItem.Name = "batchModeToolStripMenuItem";
-            this.batchModeToolStripMenuItem.Size = new System.Drawing.Size(216, 26);
-            this.batchModeToolStripMenuItem.Text = "Batch Mode";
-            this.batchModeToolStripMenuItem.Click += new System.EventHandler(this.batchModeToolStripMenuItem_Click);
             // 
             // ReceivedInventoryDevEx
             // 

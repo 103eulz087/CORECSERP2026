@@ -133,9 +133,9 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.pnlTopParams.Controls.Add(this.lblSpName);
             this.pnlTopParams.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlTopParams.Location = new System.Drawing.Point(0, 0);
-            this.pnlTopParams.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.pnlTopParams.Margin = new System.Windows.Forms.Padding(4);
             this.pnlTopParams.Name = "pnlTopParams";
-            this.pnlTopParams.Size = new System.Drawing.Size(1631, 206);
+            this.pnlTopParams.Size = new System.Drawing.Size(1631, 132);
             this.pnlTopParams.TabIndex = 1;
             // 
             // lblReportTitle
@@ -145,7 +145,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.lblReportTitle.Appearance.Options.UseFont = true;
             this.lblReportTitle.Appearance.Options.UseForeColor = true;
             this.lblReportTitle.Location = new System.Drawing.Point(1147, 10);
-            this.lblReportTitle.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.lblReportTitle.Margin = new System.Windows.Forms.Padding(4);
             this.lblReportTitle.Name = "lblReportTitle";
             this.lblReportTitle.Size = new System.Drawing.Size(151, 28);
             this.lblReportTitle.TabIndex = 21;
@@ -158,7 +158,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.lblReportSubtitle.Appearance.Options.UseFont = true;
             this.lblReportSubtitle.Appearance.Options.UseForeColor = true;
             this.lblReportSubtitle.Location = new System.Drawing.Point(1147, 44);
-            this.lblReportSubtitle.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.lblReportSubtitle.Margin = new System.Windows.Forms.Padding(4);
             this.lblReportSubtitle.Name = "lblReportSubtitle";
             this.lblReportSubtitle.Size = new System.Drawing.Size(224, 17);
             this.lblReportSubtitle.TabIndex = 22;
@@ -171,7 +171,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.lblReportTypeCaption.Appearance.Options.UseFont = true;
             this.lblReportTypeCaption.Appearance.Options.UseForeColor = true;
             this.lblReportTypeCaption.Location = new System.Drawing.Point(16, 10);
-            this.lblReportTypeCaption.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.lblReportTypeCaption.Margin = new System.Windows.Forms.Padding(4);
             this.lblReportTypeCaption.Name = "lblReportTypeCaption";
             this.lblReportTypeCaption.Size = new System.Drawing.Size(82, 14);
             this.lblReportTypeCaption.TabIndex = 0;
@@ -180,7 +180,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             // cboReportType
             // 
             this.cboReportType.Location = new System.Drawing.Point(16, 28);
-            this.cboReportType.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cboReportType.Margin = new System.Windows.Forms.Padding(4);
             this.cboReportType.Name = "cboReportType";
             this.cboReportType.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;
             this.cboReportType.Size = new System.Drawing.Size(266, 22);
@@ -194,7 +194,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.lblBranchCode.Appearance.Options.UseFont = true;
             this.lblBranchCode.Appearance.Options.UseForeColor = true;
             this.lblBranchCode.Location = new System.Drawing.Point(299, 10);
-            this.lblBranchCode.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.lblBranchCode.Margin = new System.Windows.Forms.Padding(4);
             this.lblBranchCode.Name = "lblBranchCode";
             this.lblBranchCode.Size = new System.Drawing.Size(80, 14);
             this.lblBranchCode.TabIndex = 2;
@@ -203,7 +203,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             // cboBranchCode
             // 
             this.cboBranchCode.Location = new System.Drawing.Point(299, 28);
-            this.cboBranchCode.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cboBranchCode.Margin = new System.Windows.Forms.Padding(4);
             this.cboBranchCode.Name = "cboBranchCode";
             this.cboBranchCode.Properties.NullText = "";
             this.cboBranchCode.Size = new System.Drawing.Size(198, 22);
@@ -216,7 +216,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.lblAccountCode.Appearance.Options.UseFont = true;
             this.lblAccountCode.Appearance.Options.UseForeColor = true;
             this.lblAccountCode.Location = new System.Drawing.Point(511, 10);
-            this.lblAccountCode.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.lblAccountCode.Margin = new System.Windows.Forms.Padding(4);
             this.lblAccountCode.Name = "lblAccountCode";
             this.lblAccountCode.Size = new System.Drawing.Size(90, 14);
             this.lblAccountCode.TabIndex = 4;
@@ -225,7 +225,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             // txtAccountCode
             // 
             this.txtAccountCode.Location = new System.Drawing.Point(511, 28);
-            this.txtAccountCode.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtAccountCode.Margin = new System.Windows.Forms.Padding(4);
             this.txtAccountCode.Name = "txtAccountCode";
             this.txtAccountCode.Properties.NullText = "";
             this.txtAccountCode.Size = new System.Drawing.Size(233, 22);
@@ -238,7 +238,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.lblAsOfDate.Appearance.Options.UseFont = true;
             this.lblAsOfDate.Appearance.Options.UseForeColor = true;
             this.lblAsOfDate.Location = new System.Drawing.Point(768, 10);
-            this.lblAsOfDate.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.lblAsOfDate.Margin = new System.Windows.Forms.Padding(4);
             this.lblAsOfDate.Name = "lblAsOfDate";
             this.lblAsOfDate.Size = new System.Drawing.Size(69, 14);
             this.lblAsOfDate.TabIndex = 6;
@@ -248,7 +248,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             // 
             this.dteAsOfDate.EditValue = null;
             this.dteAsOfDate.Location = new System.Drawing.Point(768, 28);
-            this.dteAsOfDate.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.dteAsOfDate.Margin = new System.Windows.Forms.Padding(4);
             this.dteAsOfDate.Name = "dteAsOfDate";
             this.dteAsOfDate.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
@@ -264,7 +264,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.lblDateFrom.Appearance.Options.UseFont = true;
             this.lblDateFrom.Appearance.Options.UseForeColor = true;
             this.lblDateFrom.Location = new System.Drawing.Point(768, 10);
-            this.lblDateFrom.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.lblDateFrom.Margin = new System.Windows.Forms.Padding(4);
             this.lblDateFrom.Name = "lblDateFrom";
             this.lblDateFrom.Size = new System.Drawing.Size(66, 14);
             this.lblDateFrom.TabIndex = 8;
@@ -274,7 +274,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             // 
             this.dteDateFrom.EditValue = null;
             this.dteDateFrom.Location = new System.Drawing.Point(768, 28);
-            this.dteDateFrom.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.dteDateFrom.Margin = new System.Windows.Forms.Padding(4);
             this.dteDateFrom.Name = "dteDateFrom";
             this.dteDateFrom.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
@@ -290,7 +290,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.lblDateTo.Appearance.Options.UseFont = true;
             this.lblDateTo.Appearance.Options.UseForeColor = true;
             this.lblDateTo.Location = new System.Drawing.Point(954, 10);
-            this.lblDateTo.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.lblDateTo.Margin = new System.Windows.Forms.Padding(4);
             this.lblDateTo.Name = "lblDateTo";
             this.lblDateTo.Size = new System.Drawing.Size(52, 14);
             this.lblDateTo.TabIndex = 10;
@@ -300,7 +300,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             // 
             this.dteDateTo.EditValue = null;
             this.dteDateTo.Location = new System.Drawing.Point(954, 28);
-            this.dteDateTo.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.dteDateTo.Margin = new System.Windows.Forms.Padding(4);
             this.dteDateTo.Name = "dteDateTo";
             this.dteDateTo.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
@@ -312,7 +312,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             // rgConsolidatedMode
             // 
             this.rgConsolidatedMode.Location = new System.Drawing.Point(299, 58);
-            this.rgConsolidatedMode.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.rgConsolidatedMode.Margin = new System.Windows.Forms.Padding(4);
             this.rgConsolidatedMode.Name = "rgConsolidatedMode";
             this.rgConsolidatedMode.Properties.Appearance.ForeColor = System.Drawing.Color.Black;
             this.rgConsolidatedMode.Properties.Appearance.Options.UseForeColor = true;
@@ -326,7 +326,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             // chkAllBranches
             // 
             this.chkAllBranches.Location = new System.Drawing.Point(16, 66);
-            this.chkAllBranches.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.chkAllBranches.Margin = new System.Windows.Forms.Padding(4);
             this.chkAllBranches.Name = "chkAllBranches";
             this.chkAllBranches.Properties.Appearance.ForeColor = System.Drawing.Color.Black;
             this.chkAllBranches.Properties.Appearance.Options.UseForeColor = true;
@@ -338,7 +338,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             // chkAllAccounts
             // 
             this.chkAllAccounts.Location = new System.Drawing.Point(16, 94);
-            this.chkAllAccounts.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.chkAllAccounts.Margin = new System.Windows.Forms.Padding(4);
             this.chkAllAccounts.Name = "chkAllAccounts";
             this.chkAllAccounts.Properties.Appearance.ForeColor = System.Drawing.Color.Black;
             this.chkAllAccounts.Properties.Appearance.Options.UseForeColor = true;
@@ -350,7 +350,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             // chkIncludeZeroActivity
             // 
             this.chkIncludeZeroActivity.Location = new System.Drawing.Point(328, 94);
-            this.chkIncludeZeroActivity.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.chkIncludeZeroActivity.Margin = new System.Windows.Forms.Padding(4);
             this.chkIncludeZeroActivity.Name = "chkIncludeZeroActivity";
             this.chkIncludeZeroActivity.Properties.Appearance.ForeColor = System.Drawing.Color.Black;
             this.chkIncludeZeroActivity.Properties.Appearance.Options.UseForeColor = true;
@@ -367,7 +367,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.btnGenerate.Appearance.Options.UseFont = true;
             this.btnGenerate.Appearance.Options.UseForeColor = true;
             this.btnGenerate.Location = new System.Drawing.Point(768, 58);
-            this.btnGenerate.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnGenerate.Margin = new System.Windows.Forms.Padding(4);
             this.btnGenerate.Name = "btnGenerate";
             this.btnGenerate.Size = new System.Drawing.Size(175, 39);
             this.btnGenerate.TabIndex = 16;
@@ -381,7 +381,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.btnExport.Appearance.Options.UseBackColor = true;
             this.btnExport.Appearance.Options.UseForeColor = true;
             this.btnExport.Location = new System.Drawing.Point(954, 58);
-            this.btnExport.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnExport.Margin = new System.Windows.Forms.Padding(4);
             this.btnExport.Name = "btnExport";
             this.btnExport.Size = new System.Drawing.Size(175, 39);
             this.btnExport.TabIndex = 17;
@@ -393,7 +393,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.lblStatus.Appearance.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(140)))), ((int)(((byte)(148)))), ((int)(((byte)(165)))));
             this.lblStatus.Appearance.Options.UseForeColor = true;
             this.lblStatus.Location = new System.Drawing.Point(973, 102);
-            this.lblStatus.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.lblStatus.Margin = new System.Windows.Forms.Padding(4);
             this.lblStatus.Name = "lblStatus";
             this.lblStatus.Size = new System.Drawing.Size(35, 16);
             this.lblStatus.TabIndex = 18;
@@ -406,7 +406,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.lblSpName.Appearance.Options.UseFont = true;
             this.lblSpName.Appearance.Options.UseForeColor = true;
             this.lblSpName.Location = new System.Drawing.Point(16, 150);
-            this.lblSpName.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.lblSpName.Margin = new System.Windows.Forms.Padding(4);
             this.lblSpName.Name = "lblSpName";
             this.lblSpName.Size = new System.Drawing.Size(0, 14);
             this.lblSpName.TabIndex = 20;
@@ -416,10 +416,10 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.pnlReportArea.Controls.Add(this.pnlReportGrid);
             this.pnlReportArea.Controls.Add(this.pnlSummaryContainer);
             this.pnlReportArea.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnlReportArea.Location = new System.Drawing.Point(0, 206);
-            this.pnlReportArea.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.pnlReportArea.Location = new System.Drawing.Point(0, 132);
+            this.pnlReportArea.Margin = new System.Windows.Forms.Padding(4);
             this.pnlReportArea.Name = "pnlReportArea";
-            this.pnlReportArea.Size = new System.Drawing.Size(1631, 739);
+            this.pnlReportArea.Size = new System.Drawing.Size(1631, 813);
             this.pnlReportArea.TabIndex = 2;
             // 
             // pnlReportGrid
@@ -427,20 +427,20 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.pnlReportGrid.Controls.Add(this.gridControlReport);
             this.pnlReportGrid.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnlReportGrid.Location = new System.Drawing.Point(2, 2);
-            this.pnlReportGrid.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.pnlReportGrid.Margin = new System.Windows.Forms.Padding(4);
             this.pnlReportGrid.Name = "pnlReportGrid";
-            this.pnlReportGrid.Size = new System.Drawing.Size(1627, 464);
+            this.pnlReportGrid.Size = new System.Drawing.Size(1627, 538);
             this.pnlReportGrid.TabIndex = 0;
             // 
             // gridControlReport
             // 
             this.gridControlReport.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControlReport.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gridControlReport.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4);
             this.gridControlReport.Location = new System.Drawing.Point(2, 2);
             this.gridControlReport.MainView = this.gridViewReport;
-            this.gridControlReport.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gridControlReport.Margin = new System.Windows.Forms.Padding(4);
             this.gridControlReport.Name = "gridControlReport";
-            this.gridControlReport.Size = new System.Drawing.Size(1623, 460);
+            this.gridControlReport.Size = new System.Drawing.Size(1623, 534);
             this.gridControlReport.TabIndex = 0;
             this.gridControlReport.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewReport});
@@ -458,8 +458,8 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.pnlSummaryContainer.Controls.Add(this.gridControlSummary);
             this.pnlSummaryContainer.Controls.Add(this.lblSummaryCaption);
             this.pnlSummaryContainer.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.pnlSummaryContainer.Location = new System.Drawing.Point(2, 466);
-            this.pnlSummaryContainer.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.pnlSummaryContainer.Location = new System.Drawing.Point(2, 540);
+            this.pnlSummaryContainer.Margin = new System.Windows.Forms.Padding(4);
             this.pnlSummaryContainer.Name = "pnlSummaryContainer";
             this.pnlSummaryContainer.Size = new System.Drawing.Size(1627, 271);
             this.pnlSummaryContainer.TabIndex = 1;
@@ -467,10 +467,10 @@ namespace SalesInventorySystem.HOFormsDevEx
             // gridControlSummary
             // 
             this.gridControlSummary.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControlSummary.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gridControlSummary.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4);
             this.gridControlSummary.Location = new System.Drawing.Point(2, 30);
             this.gridControlSummary.MainView = this.gridViewSummary;
-            this.gridControlSummary.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gridControlSummary.Margin = new System.Windows.Forms.Padding(4);
             this.gridControlSummary.Name = "gridControlSummary";
             this.gridControlSummary.Size = new System.Drawing.Size(1623, 239);
             this.gridControlSummary.TabIndex = 1;
@@ -493,7 +493,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.lblSummaryCaption.Appearance.Options.UseForeColor = true;
             this.lblSummaryCaption.Dock = System.Windows.Forms.DockStyle.Top;
             this.lblSummaryCaption.Location = new System.Drawing.Point(2, 2);
-            this.lblSummaryCaption.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.lblSummaryCaption.Margin = new System.Windows.Forms.Padding(4);
             this.lblSummaryCaption.Name = "lblSummaryCaption";
             this.lblSummaryCaption.Padding = new System.Windows.Forms.Padding(2, 7, 2, 7);
             this.lblSummaryCaption.Size = new System.Drawing.Size(68, 28);
@@ -507,7 +507,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.ClientSize = new System.Drawing.Size(1631, 945);
             this.Controls.Add(this.pnlReportArea);
             this.Controls.Add(this.pnlTopParams);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "AccountingReportsFormV2";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Financial Report";

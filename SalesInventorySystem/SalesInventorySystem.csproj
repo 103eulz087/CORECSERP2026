@@ -4061,6 +4061,9 @@
     <EmbeddedResource Include="HOFormsDevEx\DispatchPerBarcode.resx">
       <DependentUpon>DispatchPerBarcode.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="HOFormsDevEx\ReceivedSTSBatchModeFIFO.resx">
+      <DependentUpon>ReceivedSTSBatchModeFIFO.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="HOFormsDevEx\StockOutPerBarcode.resx">
       <DependentUpon>StockOutPerBarcode.cs</DependentUpon>
     </EmbeddedResource>
@@ -5061,6 +5064,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Reporting\InventoryUnitActivity.resx">
       <DependentUpon>InventoryUnitActivity.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reporting\ItemCostingReconReport.resx">
+      <DependentUpon>ItemCostingReconReport.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Reporting\ItemCostingReport.resx">
       <DependentUpon>ItemCostingReport.cs</DependentUpon>

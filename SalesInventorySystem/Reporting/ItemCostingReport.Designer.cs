@@ -72,15 +72,15 @@ namespace SalesInventorySystem.Reporting
             this.pnlFilters.Controls.Add(this.cmbBranch);
             this.pnlFilters.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlFilters.Location = new System.Drawing.Point(0, 0);
-            this.pnlFilters.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.pnlFilters.Margin = new System.Windows.Forms.Padding(4);
             this.pnlFilters.Name = "pnlFilters";
-            this.pnlFilters.Size = new System.Drawing.Size(1342, 139);
+            this.pnlFilters.Size = new System.Drawing.Size(1342, 51);
             this.pnlFilters.TabIndex = 0;
             // 
             // btnExport
             // 
             this.btnExport.Location = new System.Drawing.Point(1234, 10);
-            this.btnExport.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnExport.Margin = new System.Windows.Forms.Padding(4);
             this.btnExport.Name = "btnExport";
             this.btnExport.Size = new System.Drawing.Size(93, 34);
             this.btnExport.TabIndex = 11;
@@ -92,7 +92,7 @@ namespace SalesInventorySystem.Reporting
             this.btnLoad.Appearance.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(140)))), ((int)(((byte)(20)))));
             this.btnLoad.Appearance.Options.UseBackColor = true;
             this.btnLoad.Location = new System.Drawing.Point(1118, 10);
-            this.btnLoad.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnLoad.Margin = new System.Windows.Forms.Padding(4);
             this.btnLoad.Name = "btnLoad";
             this.btnLoad.Size = new System.Drawing.Size(105, 34);
             this.btnLoad.TabIndex = 10;
@@ -102,7 +102,7 @@ namespace SalesInventorySystem.Reporting
             // lblReferenceCode
             // 
             this.lblReferenceCode.Location = new System.Drawing.Point(846, 15);
-            this.lblReferenceCode.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.lblReferenceCode.Margin = new System.Windows.Forms.Padding(4);
             this.lblReferenceCode.Name = "lblReferenceCode";
             this.lblReferenceCode.Size = new System.Drawing.Size(96, 16);
             this.lblReferenceCode.TabIndex = 8;
@@ -111,7 +111,7 @@ namespace SalesInventorySystem.Reporting
             // txtReferenceCode
             // 
             this.txtReferenceCode.Location = new System.Drawing.Point(943, 12);
-            this.txtReferenceCode.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtReferenceCode.Margin = new System.Windows.Forms.Padding(4);
             this.txtReferenceCode.Name = "txtReferenceCode";
             this.txtReferenceCode.Size = new System.Drawing.Size(163, 22);
             this.txtReferenceCode.TabIndex = 9;
@@ -119,7 +119,7 @@ namespace SalesInventorySystem.Reporting
             // lblShipmentNo
             // 
             this.lblShipmentNo.Location = new System.Drawing.Point(648, 15);
-            this.lblShipmentNo.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.lblShipmentNo.Margin = new System.Windows.Forms.Padding(4);
             this.lblShipmentNo.Name = "lblShipmentNo";
             this.lblShipmentNo.Size = new System.Drawing.Size(78, 16);
             this.lblShipmentNo.TabIndex = 6;
@@ -128,7 +128,7 @@ namespace SalesInventorySystem.Reporting
             // txtShipmentNo
             // 
             this.txtShipmentNo.Location = new System.Drawing.Point(729, 12);
-            this.txtShipmentNo.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtShipmentNo.Margin = new System.Windows.Forms.Padding(4);
             this.txtShipmentNo.Name = "txtShipmentNo";
             this.txtShipmentNo.Size = new System.Drawing.Size(105, 22);
             this.txtShipmentNo.TabIndex = 7;
@@ -136,7 +136,7 @@ namespace SalesInventorySystem.Reporting
             // lblTo
             // 
             this.lblTo.Location = new System.Drawing.Point(490, 15);
-            this.lblTo.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.lblTo.Margin = new System.Windows.Forms.Padding(4);
             this.lblTo.Name = "lblTo";
             this.lblTo.Size = new System.Drawing.Size(20, 16);
             this.lblTo.TabIndex = 4;
@@ -146,7 +146,7 @@ namespace SalesInventorySystem.Reporting
             // 
             this.dtTo.EditValue = null;
             this.dtTo.Location = new System.Drawing.Point(519, 12);
-            this.dtTo.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.dtTo.Margin = new System.Windows.Forms.Padding(4);
             this.dtTo.Name = "dtTo";
             this.dtTo.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
@@ -158,7 +158,7 @@ namespace SalesInventorySystem.Reporting
             // lblFrom
             // 
             this.lblFrom.Location = new System.Drawing.Point(321, 15);
-            this.lblFrom.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.lblFrom.Margin = new System.Windows.Forms.Padding(4);
             this.lblFrom.Name = "lblFrom";
             this.lblFrom.Size = new System.Drawing.Size(35, 16);
             this.lblFrom.TabIndex = 2;
@@ -168,7 +168,7 @@ namespace SalesInventorySystem.Reporting
             // 
             this.dtFrom.EditValue = null;
             this.dtFrom.Location = new System.Drawing.Point(370, 12);
-            this.dtFrom.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.dtFrom.Margin = new System.Windows.Forms.Padding(4);
             this.dtFrom.Name = "dtFrom";
             this.dtFrom.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
@@ -180,7 +180,7 @@ namespace SalesInventorySystem.Reporting
             // lblBranch
             // 
             this.lblBranch.Location = new System.Drawing.Point(12, 15);
-            this.lblBranch.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.lblBranch.Margin = new System.Windows.Forms.Padding(4);
             this.lblBranch.Name = "lblBranch";
             this.lblBranch.Size = new System.Drawing.Size(44, 16);
             this.lblBranch.TabIndex = 0;
@@ -189,7 +189,7 @@ namespace SalesInventorySystem.Reporting
             // cmbBranch
             // 
             this.cmbBranch.Location = new System.Drawing.Point(76, 12);
-            this.cmbBranch.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cmbBranch.Margin = new System.Windows.Forms.Padding(4);
             this.cmbBranch.Name = "cmbBranch";
             this.cmbBranch.Properties.NullText = "(All Branches)";
             this.cmbBranch.Size = new System.Drawing.Size(233, 22);
@@ -198,12 +198,12 @@ namespace SalesInventorySystem.Reporting
             // gridItemCosting
             // 
             this.gridItemCosting.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridItemCosting.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.gridItemCosting.Location = new System.Drawing.Point(0, 139);
+            this.gridItemCosting.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4);
+            this.gridItemCosting.Location = new System.Drawing.Point(0, 51);
             this.gridItemCosting.MainView = this.gridView1;
-            this.gridItemCosting.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gridItemCosting.Margin = new System.Windows.Forms.Padding(4);
             this.gridItemCosting.Name = "gridItemCosting";
-            this.gridItemCosting.Size = new System.Drawing.Size(1342, 661);
+            this.gridItemCosting.Size = new System.Drawing.Size(1342, 749);
             this.gridItemCosting.TabIndex = 1;
             this.gridItemCosting.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1});
@@ -222,7 +222,7 @@ namespace SalesInventorySystem.Reporting
             this.ClientSize = new System.Drawing.Size(1342, 800);
             this.Controls.Add(this.gridItemCosting);
             this.Controls.Add(this.pnlFilters);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "ItemCostingReport";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Item Costing Report";

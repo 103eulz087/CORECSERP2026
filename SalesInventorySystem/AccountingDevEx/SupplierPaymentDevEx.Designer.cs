@@ -56,6 +56,8 @@
             this.txtremakrs = new DevExpress.XtraEditors.MemoEdit();
             this.txtsupplierid = new System.Windows.Forms.Label();
             this.txtamounttopay = new System.Windows.Forms.Label();
+            this.lblAvailableCreditCaption = new DevExpress.XtraEditors.LabelControl();
+            this.lblAvailableCredit = new DevExpress.XtraEditors.LabelControl();
             this.btnprint = new DevExpress.XtraEditors.SimpleButton();
             this.searchLookUpEdit1 = new DevExpress.XtraEditors.SearchLookUpEdit();
             this.gridview = new DevExpress.XtraGrid.Views.Grid.GridView();
@@ -109,8 +111,6 @@
             this.panelControl7 = new DevExpress.XtraEditors.PanelControl();
             this.lblTotalCaption = new DevExpress.XtraEditors.LabelControl();
             this.lblTotal = new DevExpress.XtraEditors.LabelControl();
-            this.lblAvailableCreditCaption = new DevExpress.XtraEditors.LabelControl();
-            this.lblAvailableCredit = new DevExpress.XtraEditors.LabelControl();
             this.btnAddLine = new DevExpress.XtraEditors.SimpleButton();
             this.btnRemoveLine = new DevExpress.XtraEditors.SimpleButton();
             this.lblBalanceStatus = new DevExpress.XtraEditors.LabelControl();
@@ -512,27 +512,27 @@
             this.txtamounttopay.Size = new System.Drawing.Size(52, 23);
             this.txtamounttopay.TabIndex = 460;
             this.txtamounttopay.Text = "0.00";
-            //
+            // 
             // lblAvailableCreditCaption
-            //
+            // 
             this.lblAvailableCreditCaption.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F);
             this.lblAvailableCreditCaption.Appearance.Options.UseFont = true;
             this.lblAvailableCreditCaption.Location = new System.Drawing.Point(240, 128);
             this.lblAvailableCreditCaption.Margin = new System.Windows.Forms.Padding(2, 5, 2, 5);
             this.lblAvailableCreditCaption.Name = "lblAvailableCreditCaption";
-            this.lblAvailableCreditCaption.Size = new System.Drawing.Size(70, 18);
+            this.lblAvailableCreditCaption.Size = new System.Drawing.Size(77, 18);
             this.lblAvailableCreditCaption.TabIndex = 480;
             this.lblAvailableCreditCaption.Text = "Adv. Credit:";
             this.lblAvailableCreditCaption.ToolTip = "Unapplied supplier overpayment credit (OverPay minus Advance Applied)";
-            //
+            // 
             // lblAvailableCredit
-            //
+            // 
             this.lblAvailableCredit.Appearance.Font = new System.Drawing.Font("Tahoma", 9.25F, System.Drawing.FontStyle.Bold);
             this.lblAvailableCredit.Appearance.Options.UseFont = true;
             this.lblAvailableCredit.Location = new System.Drawing.Point(312, 128);
             this.lblAvailableCredit.Margin = new System.Windows.Forms.Padding(2, 5, 2, 5);
             this.lblAvailableCredit.Name = "lblAvailableCredit";
-            this.lblAvailableCredit.Size = new System.Drawing.Size(28, 18);
+            this.lblAvailableCredit.Size = new System.Drawing.Size(35, 18);
             this.lblAvailableCredit.TabIndex = 481;
             this.lblAvailableCredit.Text = "0.00";
             // 
@@ -664,10 +664,10 @@
             this.tablePanel3.SetColumn(this.panelControl2, 0);
             this.panelControl2.Controls.Add(this.tablePanel4);
             this.panelControl2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelControl2.Location = new System.Drawing.Point(3, 3);
+            this.panelControl2.Location = new System.Drawing.Point(4, 4);
             this.panelControl2.Name = "panelControl2";
             this.tablePanel3.SetRow(this.panelControl2, 0);
-            this.panelControl2.Size = new System.Drawing.Size(1113, 1140);
+            this.panelControl2.Size = new System.Drawing.Size(1391, 1425);
             this.panelControl2.TabIndex = 0;
             // 
             // tablePanel4
@@ -682,7 +682,7 @@
             this.tablePanel4.Rows.AddRange(new DevExpress.Utils.Layout.TablePanelRow[] {
             new DevExpress.Utils.Layout.TablePanelRow(DevExpress.Utils.Layout.TablePanelEntityStyle.Absolute, 251.9999F),
             new DevExpress.Utils.Layout.TablePanelRow(DevExpress.Utils.Layout.TablePanelEntityStyle.Absolute, 26F)});
-            this.tablePanel4.Size = new System.Drawing.Size(1109, 1136);
+            this.tablePanel4.Size = new System.Drawing.Size(1387, 1421);
             this.tablePanel4.TabIndex = 0;
             // 
             // panelControl13
@@ -690,10 +690,10 @@
             this.tablePanel4.SetColumn(this.panelControl13, 0);
             this.panelControl13.Controls.Add(this.panelControl8);
             this.panelControl13.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelControl13.Location = new System.Drawing.Point(3, 3);
+            this.panelControl13.Location = new System.Drawing.Point(4, 4);
             this.panelControl13.Name = "panelControl13";
             this.tablePanel4.SetRow(this.panelControl13, 0);
-            this.panelControl13.Size = new System.Drawing.Size(1103, 246);
+            this.panelControl13.Size = new System.Drawing.Size(1726, 308);
             this.panelControl13.TabIndex = 1;
             // 
             // panelControl12
@@ -701,10 +701,10 @@
             this.tablePanel4.SetColumn(this.panelControl12, 0);
             this.panelControl12.Controls.Add(this.xtraTabControl1);
             this.panelControl12.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelControl12.Location = new System.Drawing.Point(3, 255);
+            this.panelControl12.Location = new System.Drawing.Point(4, 319);
             this.panelControl12.Name = "panelControl12";
             this.tablePanel4.SetRow(this.panelControl12, 1);
-            this.panelControl12.Size = new System.Drawing.Size(1103, 878);
+            this.panelControl12.Size = new System.Drawing.Size(1726, 1454);
             this.panelControl12.TabIndex = 0;
             // 
             // xtraTabControl1
@@ -715,7 +715,7 @@
             this.xtraTabControl1.Location = new System.Drawing.Point(2, 2);
             this.xtraTabControl1.Name = "xtraTabControl1";
             this.xtraTabControl1.SelectedTabPage = this.xtraTabPage1;
-            this.xtraTabControl1.Size = new System.Drawing.Size(1099, 874);
+            this.xtraTabControl1.Size = new System.Drawing.Size(1722, 1450);
             this.xtraTabControl1.TabIndex = 0;
             this.xtraTabControl1.TabPages.AddRange(new DevExpress.XtraTab.XtraTabPage[] {
             this.xtraTabPage1,
@@ -726,16 +726,16 @@
             this.xtraTabPage1.Controls.Add(this.panelControl5);
             this.xtraTabPage1.Controls.Add(this.panelControl10);
             this.xtraTabPage1.Name = "xtraTabPage1";
-            this.xtraTabPage1.Size = new System.Drawing.Size(1097, 841);
+            this.xtraTabPage1.Size = new System.Drawing.Size(1720, 1417);
             this.xtraTabPage1.Text = "INVOICES";
             // 
             // panelControl5
             // 
             this.panelControl5.Controls.Add(this.gridControlMaster);
             this.panelControl5.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelControl5.Location = new System.Drawing.Point(0, 46);
+            this.panelControl5.Location = new System.Drawing.Point(0, 58);
             this.panelControl5.Name = "panelControl5";
-            this.panelControl5.Size = new System.Drawing.Size(1097, 795);
+            this.panelControl5.Size = new System.Drawing.Size(2150, 1714);
             this.panelControl5.TabIndex = 0;
             // 
             // gridControlMaster
@@ -756,7 +756,7 @@
             this.repositoryItemSearchLookUpEditdiscountglcode,
             this.repDiscountAccount,
             this.repositoryItemSearchLookUpEditoffsetCreditGLCode});
-            this.gridControlMaster.Size = new System.Drawing.Size(1093, 791);
+            this.gridControlMaster.Size = new System.Drawing.Size(2146, 1710);
             this.gridControlMaster.TabIndex = 8;
             this.gridControlMaster.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewMaster});
@@ -909,7 +909,7 @@
             this.panelControl10.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelControl10.Location = new System.Drawing.Point(0, 0);
             this.panelControl10.Name = "panelControl10";
-            this.panelControl10.Size = new System.Drawing.Size(1097, 46);
+            this.panelControl10.Size = new System.Drawing.Size(2150, 46);
             this.panelControl10.TabIndex = 3;
             // 
             // xtraTabPage2
@@ -924,9 +924,9 @@
             // 
             this.panelControl6.Controls.Add(this.gridControlLines);
             this.panelControl6.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelControl6.Location = new System.Drawing.Point(0, 46);
+            this.panelControl6.Location = new System.Drawing.Point(0, 58);
             this.panelControl6.Name = "panelControl6";
-            this.panelControl6.Size = new System.Drawing.Size(1097, 795);
+            this.panelControl6.Size = new System.Drawing.Size(1371, 994);
             this.panelControl6.TabIndex = 1;
             // 
             // gridControlLines
@@ -941,7 +941,7 @@
             this.repAmount,
             this.repParticulars,
             this.repBranchLine});
-            this.gridControlLines.Size = new System.Drawing.Size(1093, 791);
+            this.gridControlLines.Size = new System.Drawing.Size(1367, 990);
             this.gridControlLines.TabIndex = 1;
             this.gridControlLines.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewLines});
@@ -1072,7 +1072,7 @@
             this.panelControl7.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelControl7.Location = new System.Drawing.Point(0, 0);
             this.panelControl7.Name = "panelControl7";
-            this.panelControl7.Size = new System.Drawing.Size(1097, 46);
+            this.panelControl7.Size = new System.Drawing.Size(1371, 46);
             this.panelControl7.TabIndex = 2;
             // 
             // lblTotalCaption

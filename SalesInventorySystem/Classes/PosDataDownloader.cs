@@ -104,6 +104,12 @@ namespace SalesInventorySystem.Classes
                 "isMaker", "isChecker", "isApprover", "isAccounting", "DateRegister",
                 "LastUpdated", "CashEndLimit", "CashInLimit", "ReceivableLimit", "GLAccount"
             }, null, progress, status);
+
+                    // Also sync the UserMenuAccess table whenever Users are synced
+                    await SyncTableAsync("UserMenuAccess", new[] { "UserID" }, new[] {
+                "UserID", "isAdmin", "isSales", "isInventory", "isAccounting", "isHotel",
+                "isPayroll", "isReporting", "isForwarding", "isClientDataSheet"
+            }, null, progress, status);
                     break;
 
                 case "Customers":

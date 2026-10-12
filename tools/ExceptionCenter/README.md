@@ -29,11 +29,12 @@ Run it:
 | X02 | CRITICAL | Qty put back by a cancel / return differs from what was taken / billed (stock ledger) |
 | X03 | CRITICAL | Lot `Available` below 0 or above `Quantity` |
 | X04 | INFO | A sold / shipped lot's cost changed after the sale (cost finalized later) |
+| X05 | CRITICAL | A partly returned sales line's live lot qty differs from its delivered qty (bad split; lines listed in `SalesReturnLog`, 2026-10-04) |
 | S01 | CRITICAL | Confirmed order without exactly one invoice, or without a sales ticket |
 | S02 | HIGH | Invoice `Balance` doesn't follow its own columns (the next payment will compute it wrong) |
 | S03 | HIGH | Order's AR in the GL (sale − credit memo − return) ≠ invoice |
 | S04 | HIGH | Sales ticket cost of sales ≠ invoice COGS rows |
-| S05 | MEDIUM | Order and delivery header disagree on DELIVERED |
+| S05 | MEDIUM | Order and delivery header disagree on DELIVERED (a delivery fully returned before confirm, never invoiced, is valid and not flagged) |
 | T01 | CRITICAL | Saved transfer: head-office In Transit ≠ cost of the stock actually shipped |
 | T02 | CRITICAL | Received transfer: In Transit did not clear to 0 |
 | T03 | CRITICAL | Transfer received more than once |
@@ -56,3 +57,12 @@ When a new failure mode is found: add it to the script under its group (X stock,
 T STS, G GL) with the next free code, add its line to the `@Info` table, list it above,
 and note it in `docs/CLAUDE_WORKLOG.md`. Check a new rule against DEV and STAGING and
 confirm every hit is real before relying on it (a check that cries wolf gets ignored).
+
+## Bank Recon: GL vs recon items (`BankRecon_GLvsRecon_Check.sql`)
+
+A separate read-only script, run before each month's bank reconciliation. For every
+cash-in-bank account it matches each GL reference posted since 2026-08-01 with its
+Bank Recon item (DIT / OC) and lists every recon period with its figures.
+Set 1 = per account, set 2 = exceptions (should be empty), set 3 = recon periods.
+Codes: GL ONLY (bank moved, nothing to tick), RECON ONLY (item without GL),
+AMOUNT DIFFERS (e.g. Known Bug #9), OTHER MONTH (item filed under another period).

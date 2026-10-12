@@ -114,6 +114,12 @@ Severity: 🔴 wrong stock/cost possible · 🟠 integrity/UX gap · 🟡 cleanu
 2. **Oldest first.** FIFO means oldest `SequenceNumber` first, within **Branch + Product** (Auto) or **Branch + Product + ShipmentNo + ReferenceCode** (Manual/Batch). Never scope by `ShipmentNo` alone.
 3. **One definition of an eligible lot**, in one inline TVF used everywhere (`dbo.fn_InvEligibleLots`): `Branch = @Branch AND Available > 0 AND IsWarehouse = 1`.
    - `IsWarehouse = 1` is required *(decided 2026-09-29)*: at ENZO, head-office stock held in third-party storage is `IsWarehouse = 0` until it's pulled into the commissary. At JFC every lot is `1`, so it changes nothing there.
+   - **FIFO never takes part of a stickered lot** *(2026-10-05, replaces the 10-03 "blank barcode only" rule)*. FIFO here means Auto and By Shipment; scanning (LOT) is unaffected.
+     - A sticker is a physical label that staff scan:
+       - `Inventory.Barcode` starting `A01` (received from the supplier);
+       - exactly 19 characters, all digits (received in the offline app).
+     - `B01` (STS receipt / primal), `C01` (conversion output), `D01` and blank barcodes are tags with no sticker, so FIFO may take them.
+     - The rule is defined once, in `dbo.fn_InvIsStickerBarcode`. It's used by the engine (`sp_InvFIFO_Allocate`, AUTO / BATCH lines with `@SkipBarcodedLots = 1`) and by the STS V2 / Sales V2 dropdowns.
    - `IsStock` is **not** a filter (the legacy procs never cleared it), but the engine keeps it right: `0` when a lot empties, `1` when one is restored.
    - `ISNULL(Available, Quantity)` is dropped: 0 lots have a NULL `Available`.
 4. **All or nothing.** A shortfall **throws**; it never `BREAK`s and never posts part of a quantity. Checking and deducting happen **under the same lock** (`UPDLOCK, HOLDLOCK`), in the caller's transaction. A `NOLOCK` pre-check is allowed only as a fast, user-friendly early error, never as the real check.

@@ -21,7 +21,7 @@ namespace SalesInventorySystem
             // log the real exception to a text file before .NET's own dialog machinery gets a
             // chance to run and potentially fail the same way.
 
-            //Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
+            //Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException); ss
             //Application.ThreadException += (s, e) => HandleFatalException(e.Exception, "UI Thread");
             //AppDomain.CurrentDomain.UnhandledException += (s, e) => HandleFatalException(e.ExceptionObject as Exception, "Background Thread");
 
@@ -31,8 +31,14 @@ namespace SalesInventorySystem
 
             DevExpress.UserSkins.BonusSkins.Register();
             //UserLookAndFeel.Default.SetSkinStyle(SkinStyle.);
-            UserLookAndFeel.Default.SetSkinStyle(SkinStyle.WXICompact);
-             
+            // Black skin = NOT production, so users can tell at a glance where they are connected.
+            // Same value as Main's dbname label (registry "dbname" under ConnSettingsMain).
+            string dbName = Database.getConnectionServerName("dbname").Trim();
+            if (string.Equals(dbName, "PRODJFC_COREX", StringComparison.OrdinalIgnoreCase))
+                UserLookAndFeel.Default.SetSkinStyle(SkinStyle.WXICompact);
+            else
+                UserLookAndFeel.Default.SetSkinStyle(SkinStyle.Black);
+
 
             // 1. Load your global cache first!
             GlobalCache.InitializeCompanyData();

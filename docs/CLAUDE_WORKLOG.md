@@ -5,14 +5,16 @@ machine picks up where the last one stopped. **Keep it short and current:** upda
 the Status / Open items when something changes; move finished items to "Done" in one
 line. Durable rules belong in `CLAUDE.md` itself, not here.
 
-Last updated: **2026-10-01** (Feature 17 plan added)
+Last updated: **2026-10-03** (scripts 13, 14, 24–27, 34, 35 deployed to STAGING)
 
 ---
 
 ## Deployment status
 
-**DEV = `COREX001`** (new DEV, live replica of STAGING; what the registry points to).
-STAGING = `CORECSJFC2026_STAGING`. The old DEV, `CORECSERP_002_DEV`, is no longer a target. See CLAUDE.md.
+**DEV = `COREX001`** on `corex.itcoreapps.com` (default instance). Unchanged.
+STAGING = `CORECSJFC2026_STAGING` (default instance; the "STAGING" column below).
+**Moving (2026-10-04)** to a new instance: `corex.itcoreapps.com,6601`, database `CORECSJFC2026_STAGING` (same name as today's, on the new instance). Not live yet; once it exists, re-check every script below on it.
+PRODUCTION = `PRODJFC_COREX` on `corex.itcoreapps.com,7701`. The old DEV, `CORECSERP_002_DEV`, is no longer a target. See CLAUDE.md.
 Per CLAUDE.md, STAGING changes need the user's confirmation first.
 
 Status checked 2026-09-25 by probing each script's actual feature in each database:
@@ -31,8 +33,8 @@ Status checked 2026-09-25 by probing each script's actual feature in each databa
 | 10 | `2026-09-25f_IncomeStatementPivot_HeadOfficeFirst.sql` | ✅ | ✅ found applied 2026-09-26 00:54 (same as DEV) |
 | 11 | `2026-09-26_ItemCostingRecon_ExpenseTickets.sql` | ✅ (by user, 14:24) | ✅ (by user, 14:56) |
 | 12 | `2026-09-29_EditSingleExpense_NoDoubleCosting.sql` | ✅ already applied 2026-09-29 14:50 (outside this log); matches the script, backup = original; smoke-tested 2026-09-30 | ✅ found applied 2026-09-29 22:30 (same as DEV) |
-| 13 | `2026-09-29b_InvFIFO_Engine.sql` | ✅ 2026-09-30 13:33 (smoke-tested, rolled back) | ⏳ |
-| 14 | `2026-09-29c_STS_V2_FIFOEngine.sql` (needs 13) | ✅ 2026-09-30 13:33 | ⏳ ship with the new exe |
+| 13 | `2026-09-29b_InvFIFO_Engine.sql` | ✅ 2026-09-30 13:33 (smoke-tested, rolled back) | ✅ 2026-10-03 22:56, user-approved: all 8 (35, 13, 14, 24, 25, 26, 27, 34) in ONE transaction; the 2 table types were created committed first. Rehearsed rolled back first; definitions = DEV (whitespace only). Rolled-back tests on the live procs, with in-transaction fixture lots copied from DEV (scratchpad `h/stg_*.ps1`): STS V2 V1–V10, Sales V2 V1–V11, old-form SO A–H, old-form STS S1–S11 all tie or PASS. Exception Center: only the known 11911 / 11913 / 14100 (T02, T05) and SO 13902 (X01). Works with the current exe; the new exe adds the V2 screens and the summed receive screen |
+| 14 | `2026-09-29c_STS_V2_FIFOEngine.sql` (needs 13) | ✅ 2026-09-30 13:33 | ✅ 2026-10-03 22:56 (see 13) |
 | 15 | `2026-09-30_GL_RealTime_Reports.sql` | ✅ 2026-09-30 23:08 (smoke-tested) | ✅ found applied 2026-09-30 23:34 (same as DEV) |
 | 16 | `2026-09-30_GL_PeriodLock.sql` | ✅ 2026-09-30 23:08; nothing closed yet; two-session race test passed | ✅ found applied 2026-09-30 23:34 (same as DEV); no month closed yet |
 | 17 | `2026-09-30b_SupplierLedger_Rebuild.sql` | ✅ 2026-09-30 23:24 (829 rows / 33 accounts fixed; audit now 0/0/0) | ✅ 2026-09-30 23:26, user-approved (801 rows / 38 accounts fixed; rehearsed rolled back first; audit now 0/0/0) |
@@ -42,16 +44,37 @@ Status checked 2026-09-25 by probing each script's actual feature in each databa
 | 21 | `2026-10-01c_STS_InTransit_Correction.sql` (data fix; needs 20) | ✅ 2026-10-01: corrected 11699, 11700, 11702; skipped 11701 (stock never restored, DEV copy only); residuals now empty | — not needed: checked 2026-10-01 after 19/20/23, nothing to correct. The duplicate tickets 18547 / 18554 had been deleted by hand (master + details); each PO's IT-HO-VATEX equals its live FIFO cost |
 | 23 | `2026-10-01e_GL_AllVatExempt.sql` (needs 19 + 20; run before 21) | ✅ 2026-10-01 21:22 (sales A/C/D/E/G + STS S1/S2/S3/S5/S8 re-tested rolled back: no VAT legs, all tie); script 21 (updated) re-run: VAT reclass on 11699/11700/11702 reversed (tickets 15881–15886) | ✅ 2026-10-01 21:53, run by the user; verified same as DEV (all 5 procs carry the patch note) |
 | 22 | `2026-10-01d_SalesCost_SeptemberFinalCost.sql` (data fix for STAGING) | — | ✅ 2026-10-01, user-approved (rehearsed rolled back first): 20 FIFO rows, 16 SI-VATEX tickets, COGS −3,375.36; backups `CostFix_20261001_*` |
-| 24 | `2026-10-01f_STS_V2_Alignment.sql` (needs 13 + 14 + 20 + 23; patches 4 procs) | ✅ 2026-10-02 09:5x (rehearsed rolled back first). Test script fixed (PRINT with a subquery doesn't compile, 1046; NULL barcode on AUTO lines) and run on request 13435 as anthony: 18/18 PASS, nothing left behind. Old-form STS scenarios S1/S2/S3/S5/S8/S9 re-run on the live procs: all tie. Exception Center: only the known 11701 |
-| 25 | `2026-10-02_STS_ReceiveFIFO_OneRowPerLine.sql` | ✅ 2026-10-02 11:12 (bug reproduced, then fixed; S1/S8/S10/S11 rolled back, all tie) | ⏳ needs the user's go; no exe change |
+| 24 | `2026-10-01f_STS_V2_Alignment.sql` (needs 13 + 14 + 20 + 23; patches 4 procs) | ✅ 2026-10-02 09:5x (rehearsed rolled back first). Test script fixed (PRINT with a subquery doesn't compile, 1046; NULL barcode on AUTO lines) and run on request 13435 as anthony: 18/18 PASS, nothing left behind. Old-form STS scenarios S1/S2/S3/S5/S8/S9 re-run on the live procs: all tie. Exception Center: only the known 11701 | ✅ 2026-10-03 22:56 (see 13) |
+| 25 | `2026-10-02_STS_ReceiveFIFO_OneRowPerLine.sql` | ✅ 2026-10-02 11:12 (bug reproduced, then fixed; S1/S8/S10/S11 rolled back, all tie) | ✅ 2026-10-03 22:56 (see 13) |
 | 33 | `2026-10-02i_CheckVoucher_CVNo.sql` (needs 31; `CheckVoucher.CVNo` backfilled from NotedBy; `sp_Payment_CreateVoucherHeader` / `sp_PostCashAdvance` / `sp_AddPaymentSupplierCompound` write it; `sp_BankRecon_GetPeriod` recreated: OC CV # from CVNo, reversed items (REVERSED / VOIDED%) not listed; removes 32) | ✅ 2026-10-02 (65 vouchers) | ✅ 2026-10-02, user-approved (rehearsed rolled back first: 176 vouchers; new voucher gets CVNo; 84 reversed rows hidden). Works with the current exe; new exe 2026-10-03 |
 | 32 | `2026-10-02h_VoucherCVNo.sql` — **superseded by 33, never on STAGING; removed from DEV by 33** | (removed) | — do not run |
 | 31 | `2026-10-02g_BankRecon_OC_CVNo.sql` (needs 30; OC rows add CV #: cheque = CheckVoucher.NotedBy, telegraphic / cash = ControlNo) | ✅ 2026-10-02 | ✅ 2026-10-02, user-approved (rehearsed rolled back first). No exe needed |
 | 30 | `2026-10-02f_BankRecon_OC_ControlNo.sql` (needs 29; OC grid: ControlNo / CheckNo / voucher no. / source from the issuing voucher; patches the OC block only) | ✅ 2026-10-02 | ✅ 2026-10-02, user-approved (rehearsed rolled back first: AP 140 / 143 with control no.; 174 with cheque no.). No exe needed |
 | 29 | `2026-10-02e_BankRecon_ControlNo.sql` (Bank Recon control no.; `@ItemType` optional = 'DIT' so any exe works) | ✅ 2026-10-02 (2,663 rows filled) | ✅ 2026-10-02, user-approved (4,980 rows filled; rehearsed rolled back incl. old- and new-exe Bulk Resolve calls). No exe needed; new exe only adds captions |
 | 28 | `2026-10-02d_SalesViews_OneRowPerLine.sql` (fixes the user's 10-02 edits of `funcview_ForDeliveryDetails` / `funcview_ProcessOrderItemsSales`: keeps their one-row-per-line fix; puts `BarcodeNo` back — old sales and STS forms print / cancel / return by it; shows returned lines again; OUTER APPLY for the lot ReferenceCode) | ✅ 2026-10-02 15:20 | ✅ 2026-10-02 15:20, user-approved (rehearsed rolled back: 342 → 351 rows = +9 returned lines, all of the user's rows identical, no duplicates) |
-| 27 | `2026-10-02c_SalesOrder_V2_FIFOEngine.sql` (needs 13 + 19 + 23) | ✅ 2026-10-02 (rehearsed rolled back; old-form A–H + V2 harness pass) | ⏳ after STS V2 is on STAGING, with the new exe |
-| 26 | `2026-10-02b_STS_ReceiveFIFO_PerLot.sql` (needs 25) | ✅ 2026-10-02 13:06 (S1/S5/S6/S8/S10/S11 rolled back, all tie) | ⏳ with 25 | ⏳ after 13 + 14, with the new exe |
+| 27 | `2026-10-02c_SalesOrder_V2_FIFOEngine.sql` (needs 13 + 19 + 23) | ✅ 2026-10-02 (rehearsed rolled back; old-form A–H + V2 harness pass) | ✅ 2026-10-03 22:56 (see 13) |
+| 26 | `2026-10-02b_STS_ReceiveFIFO_PerLot.sql` (needs 25) | ✅ 2026-10-02 13:06 (S1/S5/S6/S8/S10/S11 rolled back, all tie) | ✅ 2026-10-03 22:56 (see 13) |
+| 35 | `2026-10-03b_SalesInvoiceJFC_NoLotDuplication.sql` (Sales Invoice view: a line taken from N lots showed N × its qty / amount; discount once per product) | ✅ 2026-10-03 (rehearsed: new output = delivery lines on all 4,532 POs; 6 POs change) | ✅ 2026-10-03 22:56 (see 13) |
+| 34 | `2026-10-03_STS_V2_NoBarcodeFIFO_ReceiveGrouped.sql` (needs 13, 14, 24, 26, 27; Feature 22) | ✅ 2026-10-03 14:11 (one transaction; V1–V10, S1–S11, Sales V2 harness rolled back first; Exception Center: nothing new) | ✅ 2026-10-03 22:56 (see 13) |
+| 36 | `2026-10-04_SalesOrder_PartialReturn.sql` (Feature 17; type `tt_ReturnSalesOrderQty` created committed first) | ✅ 2026-10-04 14:33 (one transaction with post-check; sp-reviewer fixes in; P1–P17 + old A–H rolled back on the live procs = identical to the rehearsal; Exception Center: nothing new, X05 = 0) | ✅ 2026-10-07 10:43 by Claude on 6601, user-approved. The type was created committed first. Rehearsed rolled back with in-transaction fixture lots: P1–P17 and old A–H identical to DEV. Live rerun = rehearsal (only lot IDs differ). Exception Center: only the known 11911 / 11913 / 14100 / 13902. The new exe adds the Return Qty column |
+| 37 | `2026-10-05_InvFIFO_StickerRule.sql` (FIFO skips stickered lots only, A01 / 19-digit; new `fn_InvIsStickerBarcode`; Feature 22) | ✅ 2026-10-05 18:19 (one transaction with post-check; rehearsed rolled back; STS V2 + Sales V2 harnesses live = rehearsal). sp-reviewer: no blocker; its hardening (strip CR/LF/TAB/NBSP, case-insensitive A01) is in script 37 now and reached DEV via `2026-10-05b_StickerRule_Hardening_DEVonly.sql` (19:xx, backup `_OLD_10052026190000`) | ✅ by the user 2026-10-05; verified 2026-10-07 on 6601 (same content as DEV, hardening included) |
+| 38 | `2026-10-06_BankRecon_PeriodSummary.sql` (new read-only `sp_BankRecon_GetPeriodSummary`, Bank Recon summary view) | ✅ 2026-10-06; parity with `sp_BankRecon_GetPeriod` on all 25 DEV periods (items, Debit = DIT total, Credit = OC total, batch counts, uncleared IDs) | ✅ by the user; verified 2026-10-07 on 6601 (identical to DEV) |
+| 39 | `2026-10-07_BankRecon_GLBalance_Header.sql` (Bank Recon: this month's header, GL ending balance across all branches, one set of figures; new `fn_BankRecon_GLBalance` + `fn_BankRecon_Figures`) | ✅ 2026-10-07. Rehearsed rolled back. GL = an independent ledger sum on all 25 headers. Screen math = proc = lock check on all 25. Rolled-back Save -> reconcile -> Lock stored the GL snapshot; a locked period refuses Save (93001); an out-of-balance period refuses Lock (93005) | ✅ by the user; verified 2026-10-07 on 6601 (same content as DEV; BDO Aug GL −15,933,885.11 = ledger). The new exe snaps Period End to month end |
+| 40 | `2026-10-07b_GLConsolidated_AllLinesOnce.sql` (GL Consolidated report `sp_rpt_GeneralLedger_WithRunningBal`: each ticket line once, reversals included) | ✅ 2026-10-07 10:31. Rehearsed rolled back: ENDING = ledger on all 196 accounts for Jul / Aug / Sep / Jan–Oct, all branches and branches 888 / 001; Aug lists 36,345 lines = ledger | ✅ 2026-10-07 10:40 by Claude on 6601, user-approved (rehearsed rolled back first). Live: Aug ENDING = ledger on all 196 accounts; BDO PESO1 −15,933,885.11 = Bank Recon |
+| 41 | `2026-10-07c_BankReconReport_SameAsScreen.sql` (Bank Reconciliation report = the Bank Recon screen: GL across all branches, bank-side items, open items by recon period, difference = bank − book) | ✅ 2026-10-07; report summary = `fn_BankRecon_Figures` on all 25 headers (rehearsed, then committed only if still 0 mismatches) | ✅ 2026-10-07, same test (25 / 25), user-approved |
+| 42 | `2026-10-07d_BankRecon_July_PeachtreeBF.sql` (data only: Peachtree July uncleared items as a balance forward; see Feature 21) | ✅ 2026-10-07 14:55, run by the user; verified same as STAGING |
+| 43 | `2026-10-07e_AR_BalanceForward_PartPaidFix.sql` (data only: AR balance-forward rows loaded at the invoice amount; see Feature 9 "⚠️ Urgent") | ⏳ rehearsed rolled back: 760 rows; all 671 BF customers then tie (account = ledger = open invoices) | ✅ run by the user (DEV 19:08, STAGING 19:09); 671 / 671 tie. Report for the accountants: `docs/reports/2026-10-07_AR_BalanceForward_Correction_STAGING.xlsx` (not in git) |
+| 44 | `2026-10-08_BankRecon_DataFix_DupTransfer_AugCheques_JV32412.sql` (data only; ReconIDs are PRODUCTION's) | — (DEV has different data) | ✅ 2026-10-08 by Claude, user-approved (rehearsed rolled back first). 14 rows: duplicate transfer 13157 voided (BDO1 OC / BDO2 DIT 1,294,034.25), 11 BDO2 cheques (2,469,007.48) moved to the August period, JV 32412 OC 3,746.25 → 383,499.06. ⏳ PRODUCTION: the user runs the same script |
+| 45 | `2026-10-08b_JV_BankRecon_OneItemPerAccount.sql` (`sp_JV_PostBankReconForLines`: one item per JV, bank account and side; Known Bug #9) | ✅ 2026-10-08 (old vs new on all 19 bank JVs: 29 items identical) | ✅ 2026-10-08 (25 JVs: 47 identical, 32412 now full). ⏳ PRODUCTION: the user runs it; no exe change |
+| 46 | `2026-10-08c_BankRecon_ClearedPeriod.sql` (new column `BankStatementRecon.ClearedPeriodEnd`; open for P = uncleared OR cleared after P; lock check over the periods that would change; patched fn_BankRecon_Figures / GetPeriod / GetPeriodSummary / report / AutoMatch; ResolveItem / BulkResolve / ResolveAutoDebitItem get optional `@PeriodEnd`; backups `_OLD_10082026180000`) | ✅ 2026-10-08 21:5x. Rolled-back S1–S14 + parity (29 periods / 6,806 screen rows identical) all PASS first | ✅ 2026-10-08, user-approved (rehearsed rolled back first: S1–S14 + parity 34 periods / 19,759 rows PASS). ⏳ PRODUCTION: user's option A = run 44, 45, 46 and give the accountant the new exe before the BDO PESO 1 August work. Works with the current exe too (ticks go to the item's own period, as before) |
+| 48 | `2026-10-08e_BankRecon_ClearedPeriod_NoSilentMove.sql` (needs 46; from the 10-08 reviews: ticking an item already cleared in a later month is refused, 93013; Bulk leaves already-cleared items alone; old-exe stamp = own period as stored; backups `_OLD_10082026220000`) | ✅ 2026-10-08 (S1–S14 + parity pass; S11 now refused 93013 as intended; S15 bulk skip PASS) | ✅ 2026-10-08 by Claude, user-approved; verify script 08z all OK. PRODUCTION: run by the user 10-08 (with 44, 45, 46), verification with 08z pending |
+| 49 | `2026-10-09_BankRecon_BulkUnresolve.sql` (new `sp_BankRecon_BulkUnresolveItems`, all or nothing: unclears hand-cleared items of the month on screen; skips + counts other-month / not cleared / system-closed; 93113 if a locked period would change) | ✅ 2026-10-09 (U1–U7 rolled back first, all PASS) | ✅ run by the user on STAGING and PRODUCTION (2026-10-09); needs the new exe (10:32) to be used |
+| 50 | `2026-10-09b_BankRecon_ReversalInSourceMonth_DataFix.sql` (data only, production's tickets: 18 reversal tickets of 12 references re-dated to their source entry's date, + ledger reversal rows + 16 recon items; 5 `_RevDate_Backup_20261009` tables) | — (DEV has different data) | ✅ 2026-10-09 14:3x by Claude, user-approved (rehearsed rolled back first; live = rehearsal: 18 tickets / 38 lines, 12 SL + 1 CL rows, 16 recon items; later-month reversals 0). ✅ PRODUCTION: run by the user 2026-10-09 |
+| 51 | `2026-10-09c_Reversal_SourceMonthDate.sql` (reversals dated like their source entry: `sp_ReverseTicketsAP`, `sp_ReverseCashAdvanceEntry`, ledger rows in `sp_CancelledChequesCS` / `sp_ReversePaymentClient`; backups `_OLD_10092026150000`; no exe change) | ✅ 2026-10-09. Rolled back first: cheque 690, cash advance 712 and AR 6883 reversed with the source dates; a closed August refuses (59900) | ✅ 2026-10-09 14:34 by Claude, user-approved (rehearsed rolled back first). ✅ PRODUCTION: run by the user 2026-10-09 |
+| 52 | `2026-10-09d_ReverseApprovedExpense_SourceDate.sql` (same rule for `sp_ReverseApprovedExpense`, ViewExpenseDevEx: reversal ticket + lines dated like the expense, supplier-ledger reversal row = the reversed row's TransactionDate; backup `_OLD_10092026170000`; no exe change) | ✅ 2026-10-09. Rolled back first: expense 32475 reversed dated 09-29, ledger txdate 09-29; a closed September refuses (59900) | ✅ 2026-10-09 14:45 by Claude, user-approved (rehearsed rolled back first). ✅ PRODUCTION: run by the user 2026-10-09 |
+| 53 | `2026-10-10_ItemCostingReport_Detail_SoldReference.sql` (`sp_rpt_ItemCostingReport_Detail`, Item Costing Report movement ledger: Sold Reference = DeliverySummary.InvoiceNo + " | " + customer BranchCode-CustomerName (PurchaseOrderSummary.Customer -> Customers); Transfer = PO no.; anchor patch, backup `_OLD_10102026120000`. C#: `Reporting/ItemCostingReport.cs` hides BranchName) | ✅ 2026-10-10 (old vs new rolled back first: 13,824 rows, same totals and lot endings) | ✅ 2026-10-10 14:58 by Claude, user-approved (rehearsed rolled back first; live: 15,626 rows, same totals as before, 13,931 / 13,963 sales with a customer). ⏳ PRODUCTION: the user runs it; the new exe hides BranchName |
+| 54 | `2026-10-10b_Inventory_CostFix_Lots1109_1110.sql` (data only, production lots: 1109 / 1110 back to their cost at the 09-11 sale, 229.87 / 109.50. They had +54,922,375.00 = expense 17959's inventory leg 2,746,118.75 / 0.05 kg remaining, a second application of a cost already in lot 1112 / shipment 10955. Nothing moved since, so no GL; backup `Inventory_CostFix_Backup_20261010`) | — (DEV has different data) | ✅ 2026-10-10 by Claude, user-approved (rehearsed rolled back first): 1109 = 229.87, 1110 = 109.50, backup table created, no lot above 100,000. ⏳ PRODUCTION: the user runs it (before the 0.05 kg on lot 1109 moves) |
+| 47 | `2026-10-08d_BankRecon_StampClearedMonth.sql` (data; after 46: moves old-exe ticks of earlier-period items to the month that was on screen; set branch / account / month / tick dates) | — | rehearsed on STAGING with 46 (old-exe ticks → July 0.00 again, Aug unchanged). For PRODUCTION if the accountant ticks BDO PESO 1 Aug with the old exe from 10-09 | ✅ 2026-10-07 14:46, run by the user; verified: 34 rows, July 31 differences = Peachtree's, no duplicates |
 
 - 2026-09-26: the live `sp_rpt_ItemCostingRecon_List` on both DBs was changed by the user (14:13 DEV / 14:18 STAGING): `BranchCode` → `BranchName` via `INNER JOIN dbo.Branches`. The repo copy in script 6 (`2026-09-24b`) still has `BranchCode`.
 - Web reporting handoff for the recon: `docs/handoff/2026-09-26_ItemCostingRecon_WebReporting_Handoff.md`.
@@ -291,6 +314,12 @@ Tested full / partial / two-step on multi-branch and SINGLE invoices. **Status:*
   - `sp_AddPaymentClient` recomputes `Balance = TotalAmount − (AmountPaid + EWT + Discount + Offset)`, so the first payment leaves a wrong balance. Example: D_122462, total 3,450, balance 1,150 → paying 1,150 leaves 2,300.
   - None touched yet. Same trap for any negative row sent through today's post (C-000900 would become +295,319.20).
   - Fix choice: one-time `AmountPaid = TotalAmount − Balance` on inconsistent balance-forward rows, with a backup table first (recommended), OR incremental balance math in post + `sp_ReversePaymentClient`.
+  - **2026-10-07, script 43 built (user's choice: TotalAmount = the Peachtree balance).** Source `ARAGING3$` (INVOICEAMOUNT / BALANCE), matched on InvoiceNo + TransactionDate. 760 rows on DEV and on STAGING, the same ones as the user's `TransactionChargeSalesForCorrection10072026` (on DEV).
+    - TotalAmount = BALANCE; Balance = BALANCE − what was settled here; PayStatus FULLYPAID / PARTIAL.
+    - The ClientLedger BF rows were also at INVOICEAMOUNT (DEV +33,996,341.98). Negatives were posted as a debit of the full invoice (B_045745: Debit 65,894.50 for a −2,138.60 credit). They now carry the balance; negatives go to Credit. `trg_ClientLedger_Recalc` recomputes the chains.
+    - The GL is untouched: the opening ticket was built from the balances.
+    - Paid more than the Peachtree balance (left negative, for the accountant): 3 × 0.01 (00009542), DR 2607-059 −1,157.80 (00003902), and on STAGING also R-005414 −500.70 (00009053). Each one paid the full invoice amount, so either the customer overpaid or the Peachtree payment was counted twice.
+    - Not checked yet: PRODUCTION (7701), which most likely has the same rows.
 - **Questions for the user / accountant:**
   1. Is the opening AR net of these credits?
   2. The Peachtree entry that created the EWT negatives, and the entry when the 2307 arrives (DR Creditable Withholding Tax / CR ?).
@@ -327,6 +356,11 @@ Tested full / partial / two-step on multi-branch and SINGLE invoices. **Status:*
     - PURCHASE mode not traced yet (only 3 vouchers on DEV).
   - Static bundle for colleagues: `CORECS_Tools_Static.zip` in the repo root (not committed). Rebuild it after republishing.
   - **Next module: user to pick** (Expense / STS / Conversion / …).
+- **2026-10-08: Vouchering: Telegraphic added** (`modules/VoucheringTelegraphic.json/.sql`: `VoucheringManualFrm` → `sp_PostVoucherManual`). The old "Supplier Payment" module is renamed "Vouchering: Cash / Check".
+  - Samples are production vouchers 897 (FX gain), 896 + 906 (partial, then final with FX loss) and 799 (13 invoices). All telegraphic vouchers pay PURCHASE invoices (APAccounts).
+  - The page is now built from STAGING (production copy), names masked. The other modules give identical tables there. Republished as version 4.
+  - Findings on the page: TelegraphicVoucher.CreditGLCode is blank (the bank account is in OfficialReceiptNo); APAccounts.AmountPaid = cash (an FX loss makes it exceed ActualCost); TransactionPaymentAP.DatePaid = the posting date. No reversed telegraphic voucher yet.
+  - `CORECS_Tools_Static.zip` not rebuilt yet.
 - `tools/ProcessTrace/` and `docs/process-trace/` were not committed yet as of this entry.
 - Git: on 10-01 `main`'s uncommitted `ClientPaymentsDevExAcctg.Designer.cs` / `.resx` + build output were stashed (`stash@{0}`, "main WIP …") before switching back to `laptopdell`. They're still in the stash; nothing is applied.
 
@@ -447,6 +481,59 @@ Tested full / partial / two-step on multi-branch and SINGLE invoices. **Status:*
   - At STS receiving, a partial qty is booked as a loss (STS-SHORT), never as stock back at head office.
 - Waiting on the user: decisions D1–D6 in the plan, and the DEV checks in its section 5.
 
+### 2026-10-04 — Sales Order partial return BUILT (script 36 on DEV 14:33; C# compiles)
+
+- **User decisions (10-04):**
+  - FIFO lines only. A barcode-scanned line is one labelled box: whole return only, never partial (otherwise staff open a 10 kg box and send back part of it).
+  - Both tabs: For Delivery (before confirm) and Delivered.
+  - Return cost = cost of the lots put back.
+  - GL return dated today; the original order's sales rows are adjusted, as with whole-line returns.
+  - STS, the Paid tab and credit memo are out of scope.
+- **How a line is classified:** no flag exists. A barcode-scanned line's `BarcodeNo` is the source lot's own `Inventory.Barcode`; a FIFO line carries a generated sticker. On DEV: 11,763 delivered FIFO lines, 7 scanned.
+- **SQL `SQL/2026-10-04_SalesOrder_PartialReturn.sql`:**
+  - New type `tt_ReturnSalesOrderQty`; it must be created committed first (done on DEV).
+  - New table `SalesReturnLog`: one row per returned line, with source → twin, qty, amount, lot cost, ticket and reason.
+  - New `spu_SO_SplitDeliveryLine` (59110–59118):
+    - Splits a live FIFO line into kept + twin (next SeqNo of the PO; max 99, because `ReturnedOrderDetails.SeqNo` is DECIMAL(2,0)).
+    - The newest lot qty moves to the twin; a boundary lot row is split.
+    - After confirm, the `BatchSalesDetails` row and the `TransactionChargeSalesDetails` rows are split too. Totals are preserved; the returned part is written already cancelled / ErrorTag = 1.
+  - `sp_ReturnSalesOrder` gets an optional `@ReturnQty` (backup `_OLD_10042026120000`). An old exe that omits it gets whole-line returns as before.
+    - New checks: stale screen 59107, qty above billed 59106, qty ≤ 0 59105.
+    - Fixed: whole-line ErrorTag tagging now covers one set per cancelled sales row (product + barcode + qty), not every row of the product + barcode.
+- **C#:**
+  - `Orders/ReturnSalesOrder.cs` loads its own grid (parameterized) and adds:
+    - a Kind column (FIFO / SCAN);
+    - an editable Return Qty (ticked FIFO rows only; ticking fills ActualQty);
+    - a Return Amount column with footer sums and N3 / N2 formats;
+    - a confirm dialog.
+  - `POForApproval` (both menus) sets the header fields, then calls `LoadData()`. Compiles; the bin copy was blocked because the app was running.
+- **Tests (rolled back, scratchpad `pr/test_pr.ps1`, script applied in-tx):**
+  - Partial scenarios all tie: P1–P4, P6, P7, P8a–d, P10, P13a/b. Checked each time: invoice = client ledger = GL AR; returned stock-ledger cost = GL inventory put back; all TCSD COGS = SI cost; no unbalanced ticket.
+  - Old A–H scenarios are unchanged.
+  - Harness note: a refusal rolls back the whole test transaction, so each refusal test has to be its own scenario.
+- **Exception Center:** X05 added (a split line's live lot qty ≠ its qty; it is skipped until `SalesReturnLog` exists).
+- **Exception Center S05 (2026-10-05):** a delivery fully returned before confirm (never invoiced) is no longer flagged. It had flagged POs 13747 and 13775, valid pre-confirm returns; DEV now shows S05 = 0.
+- **Found, not fixed (pre-existing):** `spu_SO_PostInvoiceReduction` returns early when the gross is 0. A zero-priced line's return puts the stock back but never reverses its cost in the GL.
+- **Reviews:**
+  - sp-reviewer: no proven blocker. Taken:
+    - The partial's sales amount = the split-off sales row (fixes a 1-cent drift on fractional weights).
+    - Its invoice COGS row = the lot cost (same as the GL).
+    - 59119 when a partial has no invoice rows; whole-line tagging falls back to the old match.
+    - 59108 for a line that is no longer open.
+    - No HOLDLOCK.
+    - One transaction with a post-check; no grants exist.
+  - sp-reviewer, not taken: S8 (variable types already match the columns). S7 / S9 are existing patterns and moot with one sticker barcode per line.
+  - ui-form-reviewer: no blocker. Fixed:
+    - CloseEditor in SelectionChanged;
+    - rows with ActualQty 0 can't be ticked;
+    - Return Qty rounded to 3 decimals;
+    - grouping off;
+    - the stray SortInfo.Clear removed.
+  - ui-form-reviewer, not done (cosmetic): hide internal columns (isSettled, ProcessedBy...).
+- New tests P14 (10.005 kg at 1.50: the invoice ends exactly at the remaining line) and P15 (lots at 193.29 / 250: returned COGS row = GL = 1,829.87) pass.
+- Dependency Atlas rebuilt from DEV (`-RegistryKey AAITCRE\ConnSettingsServer -Catalog COREX001`) and republished.
+- **Next:** user UI test on DEV with the new exe (close the running app, then rebuild); then STAGING on the user's go.
+
 ## Feature 18 — Dispatch Per Barcode (STS) review (2026-10-01, review only, nothing changed)
 
 - Review: `docs/reviews/2026-10-01_DispatchPerBarcode_Review.md`. The user plans to replace `AddBranchOrderSTS` with `HOFormsDevEx/DispatchPerBarcode` (08-24, never used; its menu is hidden).
@@ -533,7 +620,210 @@ Tested full / partial / two-step on multi-branch and SINGLE invoices. **Status:*
 - **Script 30 (`2026-10-02f`, DEV + STAGING):** OC grid shows ControlNo / CheckNo / voucher no. / source from the issuing voucher (STAGING AP 140 / 143 with control no.; 174 cheques with cheque no.; manual JV has no voucher).
 - **Combined grid (C#, needs the new exe):** one grid on the tab replaces the side-by-side DIT / OC grids (built in code; `tablePanel1` / `panelControl6` hidden): Kind column, grouped Kind → Control No with count + Amount total (user: no cross-kind grand total), one button bar reusing the existing methods, Bulk Resolve shows counts by kind and control numbers (warning icon when > 1). ui-form-reviewer: no blocker (its GroupFormat finding was wrong — the string was DevExpress's default; the line was removed).
 - **CV # (scripts 31–32):** the CV number is kept in the vouchers' `NotedBy` as a stopgap (`sp_Payment_CreateVoucherHeader` writes `@CheckCoding` there). A new column on `CheckVoucher` is NOT safe: `Accounting/AddCheckVoucher.cs` and `HOForms/TransactionPayment.cs` (still on the menu) insert positionally. User first chose a separate table (script 32), then confirmed both screens are retired, so: `CheckVoucher.CVNo` (script 33), filled by the three in-use writers from the CV number they already receive; NotedBy still written for now (printouts may read it). Telegraphic / cash CV # = ControlNo. The retired screens (AddCheckVoucher, TransactionPayment → `sp_AddPaymentSupplier`) will fail if opened — consider hiding their menu entries. Bank Recon no longer lists reversed items (ResolvedReason REVERSED / VOIDED%).
+- **2026-10-06, combined grid (C# only, built):**
+  - Hidden (user): Check No, Pay Type, Source, Payment Ref / Voucher No. The data is still loaded; Bulk Resolve is unchanged.
+  - On load, Kind groups are open and Control No groups closed (user changed it the same day; it had been all open).
+  - Highlights (user): Kind rows bold on a light-blue band (214,228,245, navy text); a Control No row whose items are all cleared is soft green (226,239,218 with dark-green text, readable in the Black skin too), "(no control no.)" included. A fully cleared batch has no check box.
+  - Right-click menu: "Clear Entire Batch (Control No)" added. It runs the same code as the "Resolve Entire Batch" button and is enabled on a row or Control No group that has a control number.
+  - Fixed: a selected auto-inserted row showed white text on its light row colour (`View_RowCellStyle` overrode the skin's selection background). The focused row is now left to the skin.
+  - Period End (`dtPeriod`) now has its calendar drop-down: the designer had no `Properties.Buttons` Combo button (same as Feature 6).
+  - **2026-10-07, AccountingReportsFormV2 audit (STAGING, every account vs TicketDetails, Aug all / Aug 888 / Sep).**
+    - All ledger-based ("Real-Time") reports tie: TB, BS (current earnings = net of the P&L accounts; A = L + E), IS + pivot, GL Detail Ledger, GL Detail Transaction, Consolidated GL, General Ledger (after 40).
+    - All GLSummary-based ones are wrong (up to 90 of 167 accounts; BDO stuck at the July opening).
+    - Bank Reconciliation (Real-Time) used the branch's GL only and no bank items: fixed by script 41.
+    - C# (user): the 7 GLSummary entries are commented out; the ledger-based ones are renamed to the plain names ("Trial Balance", ...). Built. The old `Reporting.AccountingReportsForm` is only behind a hidden button.
+    - Note for the accountant: a single-branch TB doesn't balance (888 Aug −780.46M), because cross-branch entries have no due-to / due-from.
+    - 2026-10-08 (user): the description column (TransDescription / Trans Description / Particulars) of General Ledger, GL Detail Ledger and GL Detail Transaction opens at most 260 px (`TransDescriptionWidth`) after the best-fit. It is still resizable and cut-off text shows as a hint. PDF / print use the same width (offered: wrap in exports only). Built 22:36.
+  - **2026-10-07, GL Consolidated report wrong (script 40).** Found while checking the recon's GL (STAGING BDO Aug: report −15,779,218.29 vs recon −15,933,885.11).
+    - The report joined lines to TicketMaster without BranchCode, so a cross-branch JV with 13 branch masters (e.g. 13243) counted each line 13×. Salaries Aug 34.8M vs a true 20.7M; 20103 off by 20.9M; BPI bank by 12.5M.
+    - It also excluded Status REVERSED, which is on the reversal entry, so reversed OR payments kept counting.
+    - Fixed: amounts from TicketDetails alone, the same rule as the real-time Trial Balance and the recon. The recon figure was right.
+  - **2026-10-07, figures fixed (script 39).** User: GL Book Balance = cumulative GL ending balance, all branches.
+    - Bugs (DEV):
+      - the header query returned every header up to the picked period and the form took the first, so picking September used July's header for Save, figures and Lock;
+      - GL Book Balance was the month's net movement, computed only on Save, own branch only;
+      - Lock compared a stale GL figure, this month's items only, without bank-side items.
+    - Now:
+      - one function (`fn_BankRecon_Figures`) gives every figure, the same formula as the screen;
+      - GL is live while open and a snapshot once locked;
+      - the form snaps Period End to month end.
+    - The accountant's procedure was written for the user in chat (2026-10-07).
+  - **Summary view (user, 2026-10-06), a second display beside the grouped one.** A View switch (Summary default / Detailed) sits on the button bar.
+    - No Kind grouping and no expandable details: one row per deposit-in-transit Control No (amount in Debit) and per outstanding-check CV # (Credit). An item without one is its own row.
+    - Status per row: CLEARED (green) / PARTLY CLEARED / OPEN. Footer sums Debit and Credit.
+    - Clearing by row: Bulk Resolve (ticked rows), Clear Entire Batch (button and right-click), Select All. Detail-only buttons are hidden in this view.
+    - Data: `sp_BankRecon_GetPeriodSummary` (script 38). Its DIT / OC rows are copied from `sp_BankRecon_GetPeriod`; keep the two in step.
+    - ui-form-reviewer: no blocker. Fixed:
+      - any load error falls back once to Detailed (Summary disabled, one message) without skipping the lock state;
+      - a DIT + OC clear is one reload with one message and stops at the first failure (`ResolveReconIDsNoReload`);
+      - Bulk Resolve uses visible ticked rows only;
+      - display-text guard.
+  - The first group under each Kind is "(no control no.)" (blanks sort first), so it has no check box, by design (user agreed).
+  - Each Control No group row has a check box. It ticks or unticks every uncleared item of that batch, collapsed rows included, and shows grey when only part of the batch is ticked.
+  - No box on Kind rows, on the "(no control no.)" group, or while the period is locked.
+  - Groups open by default: `ExpandAllGroups` now runs after `EndUpdate`; inside `BeginUpdate` it never took effect.
+  - ui-form-reviewer: no blocker. Fixed:
+    - a box click no longer re-opens collapsed groups (no `RefreshData`);
+    - the tick state is cached, not rescanned on every paint;
+    - the gap before the text is sized from the font;
+    - the box has a transparent background;
+    - a double-click on the box doesn't fold the group.
+- **2026-10-07, July balance forward from Peachtree (script 42).** Source: the accountant's July Peachtree recon workbook (sheets BDO PESO 1 / BDO PESO 2 / WB / MBTC 1-1 / MBTC 2 → 101020101 / 102 / 104 / 107 / 108).
+  - Each account gets a July 31 header on 888 with Peachtree's ending bank balance. DIT → DIT, outstanding checks → OC, and "Add (Less) Other" GJ items → DIT if positive, OC if negative. Every row is `SourceModule = 'BF-PEACHTREE'`, keeps its original date, and has `ControlNo` = the Peachtree reference. The items carry forward until cleared.
+  - July 31 differences: 0 on 101 / 107 / 108; −1,978,452.67 (BDO PESO 2) and −1,000,050.00 (WB). Both are Peachtree's own unreconciled differences, for the accountant to explain. The BDO PESO 2 sheet's Cash Disbursements is entered as a positive 9,363,742.65.
+  - Left out: BDO PESO 2 OC X2607-067 (15,898.47). Our July 31 GL is exactly that much above the sheet, because the opening ticket doesn't include the check. If it was really issued, book it with a Manual JV, whose auto-OC creates the item.
+  - August differences move until staff tick the July items that cleared in August (e.g. BDO PESO 1 Aug 250,535.38 → −6,973,407.99).
+- **2026-10-08, GL vs recon check (STAGING = a restore of PRODUCTION, 19:21).** New read-only `tools/ExceptionCenter/BankRecon_GLvsRecon_Check.sql`: every GL reference on a bank account since 08-01 has its DIT / OC item, except 3 findings, which scripts 44 / 45 fixed. It is clean now.
+  - No August or later period is reconciled: only 2 statement balances are entered (BDO PESO 1, PNB PESO Aug), and no item is ticked.
+  - **No July opening list** for PNB PESO, PNB PESO 2, BPI PESO 1, UNION PESO 1 and the USD / EUR accounts. The Peachtree workbook had 5 accounts only, so their August can't reach 0. Asked for their July Peachtree reconciliations.
+  - USD / EUR: the GL is in pesos and the statements aren't. Open: what to type as the statement balance.
+  - Cash advance 133 (ref 13157, the duplicate of 694) still shows 1,294,034.25 to liquidate; left for the accountant.
+  - **Design gap fixed by script 46 (DEV 10-08):** before it, an item had no "cleared in which month", so a July item ticked in August also left July, and a locked July's items could never be cleared in August.
+    - C# `BankReconFormV2`: passes `@PeriodEnd` on Mark Cleared / Uncleared, Bulk / Batch / summary and Post Payment.
+    - New "Cleared In" column; "(later)" when the month on screen is earlier.
+    - An auto-debit cleared in a later month can't be posted or deleted again from an earlier month: the payment posts before the item is marked, so this would double-pay.
+    - Built 22:07 (bin). Reviews 10-08:
+      - ui-form-reviewer: fixed: `_period` only moves after a successful load; Post Payment re-reads the row before paying.
+      - sp-reviewer: fixed: script 48 (no silent move; old-exe stamp); lock guard (93411) added to script 44 before production.
+      - Checked on the production copy: RCSI off; no non-month-end headers; nothing locked.
+      - Not fixed (pre-existing, noted): `sp_BankRecon_UpdateItem` (old forms, not on the menu) doesn't stamp the month; lock-vs-clear can deadlock (1205, the victim rolls back; retry).
+      - Not fixed: DeleteItem / SaveItem have no lock check.
+      - Not fixed: JV / multi-branch expense edit deletes and re-posts recon rows, so a cleared JV item comes back open after an edit.
+      - Not fixed: `sp_PostSupplierPaymentWithManualLines` updates an OC amount without checking cleared / locked.
+      - Not fixed: the old GLSummary bank recon reports aren't period-aware (retired).
+  - **⚠️ Auto-Match Cleared Checks (`sp_BankRecon_AutoMatch`) clears outstanding checks from their own GL credit, not from the bank.** Rolled back on STAGING Aug: BDO PESO 1 21 cheques (3.57M), BDO PESO 2 37 (15.96M), MBTC PESO 2 20 (28.07M) ... cleared with no bank evidence. User 10-08: both Auto-Match buttons hidden in `BankReconFormV2` (new exe); the proc is kept.
+- **⏰ REMIND THE USER (open since 2026-10-09):** the reversal answer came 10-09 (scripts 50 / 51 below). Still waiting: July Peachtree lists for PNB PESO / PNB PESO 2 / BPI PESO 1 / UNION PESO 1 / USD-EUR accounts; USD / EUR statement-balance rule; cancel cash advance 133.
+- **2026-10-09, Export to Excel (C# only, built 10:22).** `BankReconFormV2`: an "Export to Excel" button next to Print.
+  - It exports what is on screen: Summary or Detailed list, or Bank-Side Items.
+  - Data-aware .xlsx: real numbers, groups exported open, footer sums kept, the tick-box column left out.
+  - Above the table: account, branch, period, status, who / when, and the summary-box figures (Difference signed, with RECONCILED / OUT OF BALANCE).
+  - Runtime-checked in a harness (header rows, open groups, Selected column restored). Not yet clicked in the app.
+- **2026-10-09, undo a clear in one step (user: accidental clears).** Before this, Mark Uncleared was one item at a time and existed in the Detailed view only.
+  - New: "Unclear Entire Batch (Control No)" (Detailed right-click + button), "Unclear Entire Batch" (Summary right-click + button) and "Bulk Unclear" (ticked cleared rows, Detailed view). All go through script 49.
+  - Summary rows find their cleared items client-side (Control No for DIT, CV # for OC, else the row's own item). Checked against the server's ClearedItems: DEV 43 / STAGING 33 rows, 0 mismatches.
+  - Built 10:32.
+- **2026-10-10, tick = cleared at once (user: "if they ticked it just update immediately").** C# only, `BankReconFormV2`; no SQL change.
+  - Detailed view: the **Cleared** column is the editable box. A tick calls `sp_BankRecon_ResolveItem` with the month on screen; an untick uncleares it. The row and figures update in place, with no reload and no confirmation (an untick undoes a tick).
+  - Detailed view: the box on a Control No group row now shows the batch's cleared state (ticked = all cleared, grey = part). A click clears the rest of the batch (`sp_BankRecon_BulkResolveItems`); on a fully cleared batch it uncleares it (`sp_BankRecon_BulkUnresolveItems`). The reload keeps the open groups, the scroll position and the focus.
+  - Summary view: a **Cleared** box per batch row, same rules (tick clears the row's open items, untick uncleares its cleared items).
+  - Hidden: the Selected column, Select All, Check Control No, Mark Cleared / Uncleared (buttons and right-click), Bulk Resolve, Bulk Unclear. Kept: Clear / Unclear Entire Batch (buttons and right-click), Delete, Add.
+  - The procs' rules are unchanged: an item cleared in a later month is refused (93013, message shown, box unchanged), a locked period can't be edited, and system-closed items are skipped.
+  - **Made seamless the same day (user: a tick felt delayed; "the user will tick fast").**
+    - A click changes the box, the group / summary row and the figures at once. The save goes into a queue that a background worker sends in click order, so ticking never waits for the database. The status bar shows "Saving n change(s)…", then "All changes saved."
+    - If anything is refused or skipped, the period reloads when the queue is empty (open groups, scroll and focus kept) and a message says why.
+    - `LoadPeriod` and closing the screen wait for the queue first. The worker only runs SQL and posts back (Known Bug #8).
+    - The boxes are no longer grid editors: the click is caught in MouseDown, so there's no editor delay. Space toggles the focused row too.
+    - An item cleared in a later month ("(later)") is refused on the click, before anything is queued.
+  - Built 10:33 (bin). Not yet clicked in the app.
+- **2026-10-09, reversals in a later month (found; fix built, scripts 50 + 51).**
+  - Reversed / voided items are hidden in every month. For 16 items (14.87M, mostly Aug → Sep) that hid them from their original month, while the GL still had the original entry there. Example: BDO PESO 2 X2608-023, 5,914,761.28, voided Sep 26.
+  - Sent to the accountants: `docs/reports/2026-10-09_BankRecon_ReversedInLaterMonth_STAGING.xlsx`.
+  - **Accountants' rule (2026-10-09): a reversal falls into the month of its source entry, dated like the source entry.** So the GL moves, not the recon. A reversed item stays hidden in every month, and the reversal ticket carries the source date. (The rejected alternative was a reversal "cleared in its reversal month".)
+  - **Script 50** (`2026-10-09b`, production data): re-dates the 18 reversal tickets of the 12 references to their source ticket's date (all lines and accounts, so they stay balanced), plus the supplier / client ledger reversal rows' TransactionDate. The recon items get ClearedPeriodEnd = source month, and ReconID 38 moves to the August period.
+    - Effect on August: BDO PESO 1 Difference 2,290,814.93 → 2,204,535.35; PNB PESO −606,950.30 → −1,673,899.70 (transfer 27019 + AR 14107 now reversed in Aug).
+    - Other accounts: AP 20103 Aug −70.30M → −77.49M; 404 Other Income: 870.40 moves Sep → Aug.
+    - 37271 (Sep 8 → reversed Oct 6) moves to September.
+  - **Script 51** (`2026-10-09c`, all DBs): reversal tickets are dated like their source from now on. Covers `sp_ReverseTicketsAP` (cheque / cash / telegraphic) and `sp_ReverseCashAdvanceEntry`. The ledger reversal rows in `sp_CancelledChequesCS` and `sp_ReversePaymentClient` take the reversed row's TransactionDate.
+    - `sp_ReversePaymentClient`'s GL already used the payment date (since 09-11).
+    - Audit dates (PostingDate, CancelledDate, ReversedDate) stay "today".
+    - A source month closed in GLPeriodLock refuses the reversal (59900).
+  - 50 + 51 on all three DBs 2026-10-09 (production by the user). Every cheque-cancel screen goes through `sp_CancelledChequesCS`, so all bank reversals are covered.
+  - `sp_ReverseApprovedExpense` (`ViewExpenseDevEx`, an expense reversal with no bank leg) dated its GL ticket and supplier-ledger row today; fixed by script 52. `sp_ExpenseReversal` already uses the expense date, and `sp_CancelApprovedServiceOrder` takes the cancel date from the screen. Inventory reversals (STS / SO / stock out / conversion) are physical events and stay dated today. User 10-09: extend it to `sp_ReverseApprovedExpense` (script 52).
+  - **Rule (user, 2026-10-09): a reversal whose source month is closed in the GL stays refused** (lock trigger 59900). To reverse, an admin reopens the month (GLPeriodClosingFrm), or the accountant books a correction in an open month. v2 must keep the same rule.
+- **2026-10-09, handoff to the web Exception Center:** `docs/handoff/2026-10-09_BankRecon_ExceptionCenter_Handoff.md` + `..._Checks.sql`. 13 `BRC-*` checks, a shared function `fn_rpt_BankRecon_GLvsRecon`, Summary / Detail blocks in the web procs' shape.
+  - Tested rolled back on STAGING + DEV: DEV still shows the duplicate transfer and the 11 wrong-period cheques fixed on production 10-08. Summary runs in ≈ 1.7 s.
 - **Open (user):** "Select All" ticks rows across every control-number group (could bulk-resolve unrelated batches); `@ItemType` allow-list has no ADB (bank-side grid has no bulk resolve today); `sp_AddPaymentClient` has no double-post guard (a second run would add a second DIT to the group); open DITs carry `ResolvedDate = 1900-01-01` (written as ' '); GetPeriod lists every period ≤ the selected one, so a group can span months while the header totals are one period.
+
+## Feature 22 — STS V2: FIFO only from unbarcoded lots; receive summed (2026-10-03, script 34)
+
+- **User rules (10-03):**
+  - FIFO (Auto / By Shipment) offers and takes only lots with a blank `Inventory.Barcode`, so it never takes part of a lot that will be scanned. Scanning is unchanged. The same applies to Sales V2 (same engine).
+  - FIFO placements keep their generated sticker barcode.
+  - Receive screen: FIFO lines of one product show as one summed row; a scanned line stays its own row.
+  - Receipt / branch stock / ledger rows: one per line and batch (ShipmentNo + ReferenceCode + cost), no longer per lot.
+  - A short comes off the last line / batch; an over receipt goes on the last one.
+- **Found on DEV PO 13764:**
+  - Line 2 (100 kg from 5 lots of one batch) was received as 5 rows of 20 (script 26).
+  - `sp_ConfirmBranchRecievedOrderJFC` then set `ActualQty` = 20 from one joined row, and Variance = 80.
+  - The engine let FIFO take barcoded lots: Auto 6,000 of 13035 took 658.34 from barcoded lots.
+- **Script 34:**
+  - The engine gets `@SkipBarcodedLots` (default 0; LOT mode always allowed). The STS and Sales V2 posting procs pass 1.
+  - The four V2 dropdown functions count / list unbarcoded lots only.
+  - New `funcview_STSReceiveLines` (LineKind SCAN / FIFO, GroupSeqNo). The receive function returns one row per group.
+  - `spu_PostSTSReceiveFromFIFO` is set-based: group → lines → batches. A stale per-line screen keeps each line's own qty.
+  - Confirm adds up a line's receipt rows; TotalItem = lines.
+- **Grouping is opt-in (after sp-reviewer):**
+  - `funcview_InventoryDeliveryFIFOForReceiving` is unchanged (one row per line), and the new grouped `...ForReceivingV2` sits beside it.
+  - `spu_PostSTSReceiveFromFIFO` gets `@GroupedRows BIT = 0`. Without it, each row is one line, as before.
+  - So an old exe keeps working on the new SQL (tested: V7, and V9 with partial untick + over).
+  - A line whose source lot is missing is not received; it ends up in STS-SHORT. The guard 58171 refuses any line whose qty doesn't land on its batches.
+- **C#:**
+  - `ReceivedSTS.cs` reads V2.
+  - `ReceivedSTSBatchModeFIFO.cs`:
+    - passes `@GroupedRows = 1`;
+    - returns each line of an unticked row and refuses a row whose line count changed;
+    - names the lines already returned when one line fails;
+    - Kind / Lines captions, N3 / N2 formats; the confirm dialog shows rows and lines.
+  - Built.
+- **Reviews:**
+  - sp-reviewer: blocker (orphaned lot → phantom receipt) fixed. The rollout risk was fixed by the opt-in.
+  - The rounding claim was not taken: rounding per batch is closer to the shipped TotalCost than rounding per lot.
+  - Left as is: the `#Pre` path (hidden Dispatch module), a perf note on V2's OUTER APPLY, and `sp_InvFIFO_Preview` having no callers.
+  - ui-form-reviewer: items 1, 2, 3, 5 and 6 fixed. Item 4 (an unticked row's edited ActualQty is ignored) is intended. Item 7 was wrong: the return proc does take the lock.
+- **Tests (rolled back, scratchpad `sts/test_sts_v3.ps1`):**
+  - V1–V8 all tie: In Transit 0, branch GL = branch stock = received cost, no unbalanced tickets.
+  - Short / over amounts: STS-SHORT 9,004.30, STS-OVER 1,851.30.
+  - Old-form S1–S11: only S10's row grouping differs (3 rows → 2, same amounts).
+  - Sales V2 harness: only the refusal text differs.
+- **On DEV, 3 products have only barcoded stock** and can now only be scanned.
+- **2026-10-05, Sales V2 form (C# only):** `AddBranchOrderV2.displayForDelivery()` hides `TotalCost` from `funcview_SOV2_DeliveryLines`, and keeps it out of the column chooser (user: sales staff don't see cost). STS V2 (`AddBranchOrderSTSV2`) hides it the same way (user, same day).
+- **2026-10-05: rule replaced by script 37 (`SQL/2026-10-05_InvFIFO_StickerRule.sql`, on DEV 18:19).**
+  - FIFO now skips only **stickered** lots (user): `A01…` (supplier receiving) or 19 digits (offline app). `B01` / `C01` / `D01` are tags (no sticker), so FIFO may take them; blank too.
+  - Why: branches receive STS stock with a `B01` tag barcode, so under the 10-03 rule that stock had vanished from every FIFO dropdown at the branch.
+  - The rule lives in one place, the new `dbo.fn_InvIsStickerBarcode`. It's used by `sp_InvFIFO_Allocate` (anchor patch) and the 4 V2 dropdown functions; the `spu_InvFIFO_Deduct` message was reworded. Backups `_OLD_10052026120000`.
+  - The user's own DEV edit of `funcview_STSV2_ProductLots` (17:10, `LEN(Barcode) <> 19`) is now its `_OLD_` backup. It let A01 supplier stickers through.
+  - Effect on DEV:
+    - FIFO now reaches B01 tags (HO 74,885 kg, branches 41,692 kg) plus C01 / D01.
+    - A01 stays scan-only (HO 60,420 kg, branches 155,442 kg).
+    - The HO B01 lots of 13035 (30735 / 30738) are FIFO-able now (user: tags, no sticker).
+  - Tests (rolled back, then live):
+    - The rule holds on every barcode shape.
+    - Preview: a B01 batch at a branch allocates in full; an A01-only product gets 0 via Auto but its full qty via scan.
+    - STS V2 / Sales V2 harnesses: identical except the intended flips (V5a / b / d) and the reworded message.
+    - Exception Center: nothing new from this change.
+
+- **2026-10-03, V2 forms (`AddBranchOrderSTSV2` / `AddBranchOrderV2`, C# only, built):**
+  - Both now open on FIFO instead of Scan Barcode (user request); JFC opens on Manual (By Shipment).
+  - Fixed: the Manual dropdown was empty until the user switched to Auto and back. `LoadData()` runs before the form is shown and relied on the RadioGroup's `SelectedIndexChanged`, which doesn't fire before the window exists. It now sets the type quietly and loads the list itself.
+
+## Feature 23 — PROFOOD GMBH loan payment (ON HOLD 2026-10-04, plan only, nothing built)
+
+- **Ask:** pay the PROFOOD GMBH loan and interest the way AP is paid. Old system: DR "advance from other company" / CR forex gain/loss.
+- **User answers:**
+  - The loan is USD, but there is no rate math on our side. They agree the amount (the "negotiated payment") outside the system, pay it, and the balance goes down. No debit note to reference.
+  - The loan is the 56.4M only.
+- **Data (DEV):**
+  - The loan exists only as the 07-31 opening ticket 1 on branch 888: `20203 ADVANCES FROM MOTHER COMPANY` CR 56,407,600.00. Nothing has posted to 20203 since.
+  - It has no payable rows and no supplier-ledger rows. PROFOOD GMBH (000125) supplier balance 372.6M is trade only.
+  - 60313 = interest expense, 60323 = realized FX.
+- **Proposed (no new posting code):** load the 56.4M as payable rows and pay them through `VoucheringManualFrm` (Telegraphic).
+  - Rows: `ExpenseSummary` + `ExpenseMaster`, `PayableAccountCode = '20203'`, tagged as loan, with a supplier-ledger balance-forward row. **No GL ticket**: ticket 1 already has it.
+  - `sp_PostVoucherManual` already does what's needed:
+    - DR the row's own account / CR bank, and lowers the row balance under UPDLOCK.
+    - Variance goes to 60323 (paying less = gain), which is the old "DR advance / CR forex" entry.
+    - Partial payment works with Variance 0.
+  - The reversal goes through `SupplierVoucherReversalFrm`. Not yet verified that it puts the 20203 rows back.
+  - Steps:
+    1. Create a separate supplier "PROFOOD GMBH - LOAN".
+    2. Load script on DEV.
+    3. Rolled-back tests: full + gain, full + loss, partial, reversal. Also check that AP aging / AP-vs-20103 reports exclude the loan rows.
+    4. Exception Center check: open loan rows = GL 20203.
+    5. Only if new interest gets added later: a small "Loan Charge" entry (DR 60313 or bank / CR 20203 + payable row). `spu_PostExpenseV2` can't do it: its payable amount counts 20101/20102/20103 only, and it's shared by 4 forms.
+- **Waiting on the accountant (user, 10-04):**
+  1. The 56.4M split: principal vs interest, and how many rows.
+  2. A separate loan supplier, or keep it under 000125?
+  3. Will new interest or loan amounts be added to 20203 later? If not, step 5 is skipped.
+  4. Withholding tax on interest paid to PROFOOD?
 
 ## Open decisions (ask the user)
 
@@ -570,6 +860,10 @@ Tested full / partial / two-step on multi-branch and SINGLE invoices. **Status:*
 
 ## Gotchas learned (candidates for CLAUDE.md Known Bug Patterns)
 
+- **A SearchLookUpEdit / LookUpEdit `ValueMember` must be a unique key, and the picked row must be read from `EditValue` (or `GetSelectedDataRow()`), never from `Properties.View.FocusedRowHandle`.** Found 2026-10-10 in `AccountingDevEx/ClientPaymentsDevExAcctg` (customer dropdown).
+  - It had ValueMember = CustomerName, which 938 customers share (e.g. DAQUIZ, ARNOLD at branches 009 and 001), so picking the second one changed nothing.
+  - `SearchLookUpClass.getSingleValue` reads the popup's focused row, which isn't the picked row on the first pick after load.
+  - Fixed: ValueMember = CustomerKey, and the key comes from EditValue (C# only, built 14:21). `getSingleValue` is used elsewhere too, so other dropdowns may have the same first-pick bug.
 - Multi-branch expenses are `PostingMode='MULTI-MANUAL'`. V2 sends everything that isn't SINGLE through its "BATCH" branch.
 - V2's CATCH uses `ROLLBACK TRANSACTION PaySupplierV2`, a named rollback. Inside an outer test transaction this masks the real error with error 6401.
   To see the real error, test through a temporary copy with that line replaced, then drop the copy.
@@ -582,7 +876,11 @@ Tested full / partial / two-step on multi-branch and SINGLE invoices. **Status:*
 Read-only queries and DEV deploys ran through small PowerShell helpers kept in the session scratchpad, not in the repo.
 They read the registry connection string: value `dbconn` under `HKCU\AAITCRE\ConnSettingsMain`.
 They unprotect it with DPAPI (entropy `CORECS-ConnSettings-v1`, same as `Classes/RegistryProtection.cs`) and switch databases by replacing `Initial Catalog`.
-**Default to `COREX001`.** The registry already points there. Don't hard-code `CORECSERP_002_DEV` in the helpers.
+**Default to `COREX001`, and check the instance as well as the catalog.**
+- `ConnSettingsMain` on the dev laptop normally points to DEV, but the user switches it on purpose at times (e.g. to PRODUCTION, `PRODJFC_COREX` on 7701, on 2026-10-04). A catalog swap on a 7701 connection can never reach DEV.
+- Print `Data Source` and `Initial Catalog` before any check or deploy.
+- Reach DEV and the current STAGING through a default-instance connection (e.g. `ConnSettingsServer`). Reach the new STAGING through a connection to `,6601`.
+- Don't hard-code `CORECSERP_002_DEV` in the helpers.
 In PowerShell, pass the catalog as a `[string]`; a pipeline `PSObject` makes the assignment throw.
 Every write test ran inside `BEGIN TRAN … ROLLBACK`, followed by a check that no test rows remained.
-No credentials are stored anywhere.
+No credentials are stored in any file; they stay in the registry (DPAPI).

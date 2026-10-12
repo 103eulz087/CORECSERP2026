@@ -147,14 +147,14 @@
             // singleModeToolStripMenuItem
             // 
             this.singleModeToolStripMenuItem.Name = "singleModeToolStripMenuItem";
-            this.singleModeToolStripMenuItem.Size = new System.Drawing.Size(168, 26);
+            this.singleModeToolStripMenuItem.Size = new System.Drawing.Size(176, 26);
             this.singleModeToolStripMenuItem.Text = "Single Mode";
             this.singleModeToolStripMenuItem.Click += new System.EventHandler(this.singleModeToolStripMenuItem_Click);
             // 
             // batchModeToolStripMenuItem
             // 
             this.batchModeToolStripMenuItem.Name = "batchModeToolStripMenuItem";
-            this.batchModeToolStripMenuItem.Size = new System.Drawing.Size(168, 26);
+            this.batchModeToolStripMenuItem.Size = new System.Drawing.Size(176, 26);
             this.batchModeToolStripMenuItem.Text = "Batch Mode";
             this.batchModeToolStripMenuItem.Click += new System.EventHandler(this.batchModeToolStripMenuItem_Click);
             // 
@@ -235,7 +235,7 @@
             this.tabForApprovalSub.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.tabForApprovalSub.Name = "tabForApprovalSub";
             this.tabForApprovalSub.SelectedTabPage = this.PendingSTS;
-            this.tabForApprovalSub.Size = new System.Drawing.Size(1130, 648);
+            this.tabForApprovalSub.Size = new System.Drawing.Size(1413, 810);
             this.tabForApprovalSub.TabIndex = 8;
             this.tabForApprovalSub.TabPages.AddRange(new DevExpress.XtraTab.XtraTabPage[] {
             this.PendingSTS,
@@ -248,18 +248,18 @@
             this.PendingSTS.ImageOptions.Image = global::SalesInventorySystem.Properties.Resources.Transit_16x16;
             this.PendingSTS.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.PendingSTS.Name = "PendingSTS";
-            this.PendingSTS.Size = new System.Drawing.Size(1128, 616);
+            this.PendingSTS.Size = new System.Drawing.Size(1411, 778);
             this.PendingSTS.Text = "STS";
             // 
             // gridControl1
             // 
             this.gridControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gridControl1.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.gridControl1.Location = new System.Drawing.Point(0, 61);
+            this.gridControl1.Location = new System.Drawing.Point(0, 76);
             this.gridControl1.MainView = this.gridView1;
             this.gridControl1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.gridControl1.Name = "gridControl1";
-            this.gridControl1.Size = new System.Drawing.Size(1128, 555);
+            this.gridControl1.Size = new System.Drawing.Size(1764, 896);
             this.gridControl1.TabIndex = 6;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1,
@@ -343,7 +343,7 @@
             this.groupBox3.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.groupBox3.Size = new System.Drawing.Size(1128, 61);
+            this.groupBox3.Size = new System.Drawing.Size(1764, 61);
             this.groupBox3.TabIndex = 5;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Filter Date";
@@ -413,11 +413,11 @@
             // 
             this.gridControlPendingHRI.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gridControlPendingHRI.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.gridControlPendingHRI.Location = new System.Drawing.Point(0, 61);
+            this.gridControlPendingHRI.Location = new System.Drawing.Point(0, 76);
             this.gridControlPendingHRI.MainView = this.gridViewPendingHRI;
             this.gridControlPendingHRI.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.gridControlPendingHRI.Name = "gridControlPendingHRI";
-            this.gridControlPendingHRI.Size = new System.Drawing.Size(1128, 555);
+            this.gridControlPendingHRI.Size = new System.Drawing.Size(1410, 694);
             this.gridControlPendingHRI.TabIndex = 8;
             this.gridControlPendingHRI.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewPendingHRI,
@@ -500,7 +500,7 @@
             this.groupBox4.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.groupBox4.Size = new System.Drawing.Size(1128, 61);
+            this.groupBox4.Size = new System.Drawing.Size(1410, 61);
             this.groupBox4.TabIndex = 7;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Filter Date";
@@ -571,11 +571,11 @@
             // 
             this.gridControl3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gridControl3.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.gridControl3.Location = new System.Drawing.Point(0, 61);
+            this.gridControl3.Location = new System.Drawing.Point(0, 76);
             this.gridControl3.MainView = this.gridView3;
             this.gridControl3.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.gridControl3.Name = "gridControl3";
-            this.gridControl3.Size = new System.Drawing.Size(1130, 587);
+            this.gridControl3.Size = new System.Drawing.Size(1413, 734);
             this.gridControl3.TabIndex = 8;
             this.gridControl3.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView3,
@@ -657,7 +657,7 @@
             this.groupBox2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.groupBox2.Size = new System.Drawing.Size(1130, 61);
+            this.groupBox2.Size = new System.Drawing.Size(1413, 61);
             this.groupBox2.TabIndex = 7;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Filter Date";
@@ -728,11 +728,11 @@
             // 
             this.gridControl2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gridControl2.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.gridControl2.Location = new System.Drawing.Point(0, 61);
+            this.gridControl2.Location = new System.Drawing.Point(0, 76);
             this.gridControl2.MainView = this.gridView2;
             this.gridControl2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.gridControl2.Name = "gridControl2";
-            this.gridControl2.Size = new System.Drawing.Size(1130, 587);
+            this.gridControl2.Size = new System.Drawing.Size(1413, 734);
             this.gridControl2.TabIndex = 7;
             this.gridControl2.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView2,
@@ -815,7 +815,7 @@
             this.groupBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.groupBox1.Size = new System.Drawing.Size(1130, 61);
+            this.groupBox1.Size = new System.Drawing.Size(1413, 61);
             this.groupBox1.TabIndex = 6;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Filter Date";

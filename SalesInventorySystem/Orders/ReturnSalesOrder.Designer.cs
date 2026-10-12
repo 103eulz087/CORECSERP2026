@@ -30,6 +30,7 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ReturnSalesOrder));
             this.groupControl1 = new DevExpress.XtraEditors.GroupControl();
+            this.txtreason = new DevExpress.XtraEditors.MemoEdit();
             this.labelControl4 = new DevExpress.XtraEditors.LabelControl();
             this.txtstatus = new DevExpress.XtraEditors.TextEdit();
             this.simpleButton1 = new DevExpress.XtraEditors.SimpleButton();
@@ -42,9 +43,9 @@
             this.panelControl1 = new DevExpress.XtraEditors.PanelControl();
             this.gridControl1 = new DevExpress.XtraGrid.GridControl();
             this.gridView1 = new DevExpress.XtraGrid.Views.Grid.GridView();
-            this.txtreason = new DevExpress.XtraEditors.MemoEdit();
             ((System.ComponentModel.ISupportInitialize)(this.groupControl1)).BeginInit();
             this.groupControl1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.txtreason.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtstatus.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtdevno.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtpono.Properties)).BeginInit();
@@ -53,7 +54,6 @@
             this.panelControl1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.txtreason.Properties)).BeginInit();
             this.SuspendLayout();
             // 
             // groupControl1
@@ -75,6 +75,13 @@
             this.groupControl1.Size = new System.Drawing.Size(1045, 122);
             this.groupControl1.TabIndex = 0;
             this.groupControl1.Text = "Return All / Specific Items";
+            // 
+            // txtreason
+            // 
+            this.txtreason.Location = new System.Drawing.Point(504, 43);
+            this.txtreason.Name = "txtreason";
+            this.txtreason.Size = new System.Drawing.Size(261, 61);
+            this.txtreason.TabIndex = 9;
             // 
             // labelControl4
             // 
@@ -214,13 +221,6 @@
             this.gridView1.RowStyle += new DevExpress.XtraGrid.Views.Grid.RowStyleEventHandler(this.gridView1_RowStyle);
             this.gridView1.SelectionChanged += new DevExpress.Data.SelectionChangedEventHandler(this.gridView1_SelectionChanged);
             // 
-            // txtreason
-            // 
-            this.txtreason.Location = new System.Drawing.Point(504, 43);
-            this.txtreason.Name = "txtreason";
-            this.txtreason.Size = new System.Drawing.Size(261, 61);
-            this.txtreason.TabIndex = 9;
-            // 
             // ReturnSalesOrder
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
@@ -238,6 +238,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.groupControl1)).EndInit();
             this.groupControl1.ResumeLayout(false);
             this.groupControl1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.txtreason.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtstatus.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtdevno.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtpono.Properties)).EndInit();
@@ -246,7 +247,6 @@
             this.panelControl1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.txtreason.Properties)).EndInit();
             this.ResumeLayout(false);
 
         }

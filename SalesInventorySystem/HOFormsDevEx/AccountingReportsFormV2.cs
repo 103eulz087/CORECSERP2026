@@ -60,171 +60,94 @@ namespace SalesInventorySystem.HOFormsDevEx
             public bool AllowAllBranches;          // branch selector can be left blank -> passes NULL
         }
 
+        // 2026-10-07: only reports that tie to the ledger are listed (checked on STAGING against
+        // TicketDetails, every account): the ledger-based procs (2026-09-30 "Real-Time" set, now
+        // shown under the plain names) plus the fixed General Ledger (2026-10-07b). The older
+        // GLSummary-based entries are kept below, commented out: GLSummary is stale since the daily
+        // GL posting was retired (2026-09-30), so they showed wrong balances (e.g. a bank account
+        // stuck at its July opening). Their procs still exist.
         private readonly Dictionary<string, ReportConfig> _reportConfigs = new Dictionary<string, ReportConfig>
         {
-            ["GL Detail Ledger"] = new ReportConfig
+            ["Trial Balance"] = new ReportConfig
             {
-                SpName = "sp_rpt_GLDetailLedgerWithDate",
-                Mode = ParamMode.BranchAccountDateRange,
-                Shape = ResultShape.GLDetailLedgerLegacy,
-                Description = "Day-by-day account activity from GLSummary (pre-aggregated). Opening balance, daily rows, period totals. Requires a specific account. Check 'All Branches' for a combined ledger across every branch.",
+                SpName = "sp_rpt_TrialBalanceRealTime",
+                Mode = ParamMode.BranchAsOfDate,
+                Shape = ResultShape.Standard2Set,
+                Description = "Every account's balance as of a date, straight from the posted tickets. Debit must equal Credit for all branches (a single branch may not balance: cross-branch entries post each side under a different branch). Check 'All Branches' for the company-wide snapshot.",
                 AllowAllBranches = true
             },
-            ["GL Detail Transaction"] = new ReportConfig
+            ["Balance Sheet"] = new ReportConfig
             {
-                SpName = "sp_rpt_GLDetailTransactionReport",
-                Mode = ParamMode.BranchAccountDateRange,
+                SpName = "sp_rpt_BalanceSheetRealTimeSingleGrid",
+                Mode = ParamMode.BranchAsOfDate,
                 Shape = ResultShape.SingleSet,
-                Description = "Transaction-level detail straight from TicketDetails/TicketMaster - one row per posting leg, not pre-aggregated. Check 'All Accounts' and/or 'All Branches' to widen the scope.",
+                Description = "Assets, Liabilities and Equity as of a date, straight from the posted tickets, in one grid with section subtotals and grand totals. Current Period Earnings = the net of all income and expense accounts. Check 'All Branches' for the company-wide balance sheet.",
+                AllowAllBranches = true
+            },
+            ["Income Statement"] = new ReportConfig
+            {
+                SpName = "sp_rpt_IncomeStatementRealTimeSingleGrid",
+                Mode = ParamMode.BranchDateRange,
+                Shape = ResultShape.SingleSet,
+                Description = "Revenue, Cost of Goods Sold and Operating Expenses for a date range, straight from the posted tickets, in one grid. Check 'All Branches' for the side-by-side branch pivot with Grand Total.",
                 AllowAllBranches = true,
-                SupportsAllAccounts = true
+                SupportsAllBranchPivot = true,
+                PivotSpName = "sp_rpt_IncomeStatementRealTimeAllBranchesPivot"
             },
             ["General Ledger (All Accounts)"] = new ReportConfig
             {
                 SpName = "sp_rpt_GeneralLedger_WithRunningBal",
                 Mode = ParamMode.BranchDateRange,
                 Shape = ResultShape.SingleSet,
-                Description = "All accounts, running balance, one flat report - Beginning/Transaction/Period/Ending rows per account. Check 'All Branches' for every branch combined.",
+                Description = "All accounts, running balance, one flat report - Beginning/Transaction/Period/Ending rows per account. Every ticket line counted once (2026-10-07b). Check 'All Branches' for every branch combined.",
                 AllowAllBranches = true
             },
-            ["Trial Balance"] = new ReportConfig
-            {
-                SpName = "sp_rpt_TrialBalanceWithDate",
-                Mode = ParamMode.BranchAsOfDate,
-                Shape = ResultShape.Standard2Set,
-                Description = "Snapshot of all account balances at a specific date. Works for any date - not just month-end. Debit must equal Credit. Check 'All Branches' for a company-wide consolidated snapshot.",
-                AllowAllBranches = true
-            },
-            //["Income Statement"] = new ReportConfig
-            //{
-            //    // V2-only: single-grid Income Statement -- see class header comment (Balance
-            //    // Sheet did this first; Income Statement follows the same RowType-discriminator
-            //    // pattern, with an extra ExpenseSubSection nesting level Balance Sheet doesn't
-            //    // have -- see SQL/2026-09-13_sp_rpt_IncomeStatementWithDateSingleGrid_NewReport.sql).
-            //    // Not the same SP as V1's "Income Statement" entry (that one still returns 2
-            //    // result sets for the sidebar-era 2-grid layout).
-            //    SpName = "sp_rpt_IncomeStatementWithDateSingleGrid",
-            //    Mode = ParamMode.BranchDateRange,
-            //    Shape = ResultShape.SingleSet,
-            //    Description = "Revenue, Cost of Goods Sold, and Operating Expenses (with sub-breakdowns) for a date range, single branch -- line items, subsection/section subtotals, and Gross Profit/Operating Income/Other Income/Net Income all in ONE grid. Check 'All Branches' for a side-by-side pivot with Grand Total (also merged into one grid -- see SQL/2026-09-13_sp_rpt_IncomeStatementAllBranchesPivot_MergeSingleGrid.sql).",
-            //    SupportsAllBranchPivot = true,
-            //    // Already exists live -- built directly in SSMS, not previously tracked in this
-            //    // repo (see SQL/2026-09-13_sp_rpt_IncomeStatementAllBranchesPivot_MergeSingleGrid.sql,
-            //    // which fixes it to merge its two result sets into the one this form actually
-            //    // binds to for SingleSet shape).
-            //    PivotSpName = "sp_rpt_IncomeStatementAllBranchesPivot_TEST"
-            //},
-            ["Income Statement (v2)"] = new ReportConfig
-            {
-                SpName = "sp_rpt_IncomeStatementLiveWithDateSingleGrid",
-                Mode = ParamMode.BranchDateRange,
-                Shape = ResultShape.SingleSet,
-                Description = "Same as Income Statement, but folds in ticket activity not yet run through the nightly GL posting job -- reflects today's entries immediately, and (like this form's 'Income Statement' entry) renders as ONE grid instead of a detail grid + summary grid pair. Check 'All Branches' for a side-by-side pivot with Grand Total (same as the non-real-time entry), or 'Include Zero Activity' to list every IS account regardless of activity (single-branch mode only -- the pivot SP doesn't take that parameter, matching the non-real-time pivot).",
-                AllowAllBranches = true,
-                SupportsAllBranchPivot = true,
-                PivotSpName = "sp_rpt_IncomeStatementLiveAllBranchesPivot"   // SQL/2026-09-13_sp_rpt_IncomeStatementLiveAllBranchesPivot_NewReport.sql
-            },
-            //["Balance Sheet"] = new ReportConfig
-            //{
-            //    // V2-only: single-grid Balance Sheet -- see class header comment.
-            //    // Not the same SP as V1's "Balance Sheet" entry (that one still
-            //    // returns 2 result sets for the sidebar-era 2-grid layout).
-            //    SpName = "sp_rpt_BalanceSheetPerBranchInventorySingleGrid",
-            //    Mode = ParamMode.BranchAsOfDate,
-            //    Shape = ResultShape.SingleSet,
-            //    Description = "Assets, Liabilities, and Equity as of a specific date -- posting GL accounts, per-section subtotals, and grand totals in ONE grid (Petty Cash Fund/Inventory VAT/VAT-Exempt still broken out one row per branch). Check 'All Branches' to see every branch's rows at once.",
-            //    AllowAllBranches = true
-            //},
-            ["Balance Sheet V2)"] = new ReportConfig
-            {
-                // V2-only: single-grid, matching this form's "Balance Sheet" entry -- see
-                // SQL/2026-09-13_sp_rpt_BalanceSheetLiveWithDateSingleGrid_NewReport.sql.
-                SpName = "sp_rpt_BalanceSheetLiveWithDateSingleGrid",
-                Mode = ParamMode.BranchAsOfDate,
-                Shape = ResultShape.SingleSet,
-                Description = "Same as Balance Sheet, but folds in ticket activity not yet run through the nightly GL posting job -- reflects today's entries immediately, and (like this form's 'Balance Sheet' entry) renders as ONE grid instead of a detail grid + summary grid pair. Still does not include the per-branch Petty Cash/Inventory breakout. Check 'All Branches' for a company-wide consolidated snapshot, or 'Include Zero Activity' to list every BS account regardless of balance.",
-                AllowAllBranches = true
-            },
-            ["Bank Reconciliation"] = new ReportConfig
-            {
-                SpName = "sp_rpt_BankReconciliationWithDate",
-                Mode = ParamMode.BranchAccountAsOfDate,
-                Shape = ResultShape.BankReconShape,
-                Description = "GL side vs Bank side for a specific bank account, as of a specific date. Check 'All Branches' if this account's activity is recorded across multiple branches.",
-                AllowAllBranches = true
-            },
-            ["Consolidated GL"] = new ReportConfig
-            {
-                SpName = "sp_rpt_ConsolidatedGLWithDate",
-                Mode = ParamMode.ConsolidatedGL,
-                Shape = ResultShape.Standard2Set,
-                Description = "All branches combined. Trial Balance mode uses an as-of date; Income Statement mode uses a date range. (TB mode also returns a 3rd 'intercompany check' set, not yet shown here.)"
-            },
-
-            // ── Real-Time versions (2026-09-30, SQL/2026-09-30_GL_RealTime_Reports.sql) ──
-            // Same parameters, result sets and layout as the entries above, but computed
-            // straight from TicketDetails -- no GLSummary, so they don't depend on the daily
-            // GL posting and always include back-dated entries. The entries above are kept
-            // unchanged for comparison.
-            ["Trial Balance (Real-Time)"] = new ReportConfig
-            {
-                SpName = "sp_rpt_TrialBalanceRealTime",
-                Mode = ParamMode.BranchAsOfDate,
-                Shape = ResultShape.Standard2Set,
-                Description = "Every account's balance as of a date, straight from the posted tickets (no GL posting needed). Debit must equal Credit.",
-                AllowAllBranches = true
-            },
-            ["Balance Sheet (Real-Time)"] = new ReportConfig
-            {
-                SpName = "sp_rpt_BalanceSheetRealTimeSingleGrid",
-                Mode = ParamMode.BranchAsOfDate,
-                Shape = ResultShape.SingleSet,
-                Description = "Assets, Liabilities and Equity as of a date, straight from the posted tickets -- same layout as Balance Sheet V2, no GL posting needed.",
-                AllowAllBranches = true
-            },
-            ["Income Statement (Real-Time)"] = new ReportConfig
-            {
-                SpName = "sp_rpt_IncomeStatementRealTimeSingleGrid",
-                Mode = ParamMode.BranchDateRange,
-                Shape = ResultShape.SingleSet,
-                Description = "Revenue, COGS and expenses for a date range, straight from the posted tickets -- same layout as Income Statement (v2). Check 'All Branches' for the side-by-side pivot.",
-                AllowAllBranches = true,
-                SupportsAllBranchPivot = true,
-                PivotSpName = "sp_rpt_IncomeStatementRealTimeAllBranchesPivot"
-            },
-            ["GL Detail Ledger (Real-Time)"] = new ReportConfig
+            ["GL Detail Ledger"] = new ReportConfig
             {
                 SpName = "sp_rpt_GLDetailLedgerRealTime",
                 Mode = ParamMode.BranchAccountDateRange,
                 Shape = ResultShape.GLDetailLedgerLegacy,
-                Description = "Day-by-day activity of one account with opening and running balance, straight from the posted tickets. Requires a specific account.",
+                Description = "Day-by-day activity of one account with opening and running balance, straight from the posted tickets. Requires a specific account. Check 'All Branches' for a combined ledger across every branch.",
                 AllowAllBranches = true
             },
-            ["GL Detail Transaction (Real-Time)"] = new ReportConfig
+            ["GL Detail Transaction"] = new ReportConfig
             {
                 SpName = "sp_rpt_GLDetailTransactionRealTime",
                 Mode = ParamMode.BranchAccountDateRange,
                 Shape = ResultShape.SingleSet,
-                Description = "One row per posting leg with opening and ending balance, straight from the posted tickets (the opening now ties to the Trial Balance).",
+                Description = "One row per posting leg with opening and ending balance, straight from the posted tickets (the opening ties to the Trial Balance). Check 'All Accounts' and/or 'All Branches' to widen the scope.",
                 AllowAllBranches = true,
                 SupportsAllAccounts = true
             },
-            ["Bank Reconciliation (Real-Time)"] = new ReportConfig
+            ["Bank Reconciliation"] = new ReportConfig
             {
                 SpName = "sp_rpt_BankReconciliationRealTime",
                 // Date range: the reconciliation proc takes @DateFrom/@DateTo.
                 Mode = ParamMode.BranchAccountDateRange,
                 Shape = ResultShape.BankReconShape,
-                Description = "GL side vs Bank side for one bank account over a date range. The GL side equals the account's ledger (Trial Balance / GL Detail Ledger).",
+                Description = "The Bank Recon screen's reconciliation for one bank account as of the period end (Date To = month end): GL ending balance across all branches, bank statement balance, open deposits in transit / outstanding checks / bank items, adjusted bank vs adjusted book (2026-10-07c). Pick branch 888.",
                 AllowAllBranches = true
             },
-            ["Consolidated GL (Real-Time)"] = new ReportConfig
+            ["Consolidated GL"] = new ReportConfig
             {
                 SpName = "sp_rpt_ConsolidatedGLRealTime",
                 Mode = ParamMode.ConsolidatedGL,
                 Shape = ResultShape.Standard2Set,
                 Description = "All branches combined, straight from the posted tickets. Trial Balance mode uses an as-of date; Income Statement mode uses a date range."
             }
+
+            // ── Retired 2026-10-07 (GLSummary-based, stale; procs kept) ──────────────────────
+            //["Trial Balance (old, GLSummary)"]         = sp_rpt_TrialBalanceWithDate,                  Standard2Set, BranchAsOfDate
+            //["Balance Sheet V2) (old, GLSummary)"]     = sp_rpt_BalanceSheetLiveWithDateSingleGrid,    SingleSet, BranchAsOfDate
+            //["Income Statement (v2) (old, GLSummary)"] = sp_rpt_IncomeStatementLiveWithDateSingleGrid, SingleSet, BranchDateRange,
+            //                                             pivot sp_rpt_IncomeStatementLiveAllBranchesPivot
+            //["GL Detail Ledger (old, GLSummary)"]      = sp_rpt_GLDetailLedgerWithDate,                GLDetailLedgerLegacy, BranchAccountDateRange
+            //["GL Detail Transaction (old)"]            = sp_rpt_GLDetailTransactionReport,             SingleSet, BranchAccountDateRange, all accounts
+            //["Bank Reconciliation (old, GLSummary)"]   = sp_rpt_BankReconciliationWithDate,            BankReconShape, BranchAccountAsOfDate
+            //["Consolidated GL (old, GLSummary)"]       = sp_rpt_ConsolidatedGLWithDate,                Standard2Set, ConsolidatedGL
+            // Older still (already retired before 2026-10-07): "Income Statement" =
+            // sp_rpt_IncomeStatementWithDateSingleGrid (+ pivot sp_rpt_IncomeStatementAllBranchesPivot_TEST),
+            // "Balance Sheet" = sp_rpt_BalanceSheetPerBranchInventorySingleGrid.
         };
 
         // Report procs that take @IncludeZeroActivity (drives the checkbox and the parameter).
@@ -783,7 +706,21 @@ namespace SalesInventorySystem.HOFormsDevEx
 
             gridViewReport.BestFitColumns();
             gridViewSummary.BestFitColumns();
+
+            // 2026-10-09 (user): the transaction description (General Ledger, GL Detail Ledger, GL Detail
+            // Transaction) best-fits to its longest line and pushed the amounts off the page. It opens at
+            // most TransDescriptionWidth wide; the user can still drag it wider, and a cut-off cell shows
+            // its full text as a hint.
+            foreach (string descCol in new[] { "TransDescription", "Trans Description", "Particulars" })
+            {
+                var col = gridViewReport.Columns[descCol];
+                if (col == null) continue;
+                col.OptionsColumn.AllowSize = true;
+                if (col.Width > TransDescriptionWidth) col.Width = TransDescriptionWidth;
+            }
         }
+
+        private const int TransDescriptionWidth = 260;
 
         // ═══════════════════════════════════════════════════════════════
         // COSMETIC FORMATTING — applied to every report uniformly, since

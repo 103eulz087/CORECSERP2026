@@ -113,7 +113,7 @@ namespace SalesInventorySystem
             barHeaderItem1.Caption = Login.isglobalUserID;
             barHeaderItem3.Caption = Database.getConnectionServerName();
             barHeaderItem4.Caption = GlobalConfig.VersionCheckerUrl;//DateTime.Now.ToShortDateString();
-            barStaticCashierTransNo.Caption = Database.getConnectionServerName("dbname");
+            dbname.Caption = Database.getConnectionServerName("dbname");
 
             if (Convert.ToBoolean(Login.isCashier) == true)
             {
@@ -134,7 +134,7 @@ namespace SalesInventorySystem
             else
             {
                 barStaticItem8.Visibility = BarItemVisibility.Never;
-                barStaticCashierTransNo.Visibility = BarItemVisibility.Never;
+                dbname.Visibility = BarItemVisibility.Never;
             }
 
 
@@ -3911,7 +3911,7 @@ namespace SalesInventorySystem
         {
             Main m = new Main();
             string transdate = Database.getSingleResultSet("SELECT  dbo.func_ConvertDateTimeToChar('DATE','" + DateTime.Now.ToString() + "')");
-            bool isopen = Database.checkifExist("Select isOpen from SalesTransactionSummary WHERE BranchCode='"+Login.assignedBranch+"' and CashierTransNo='"+barStaticCashierTransNo.Caption+"' and TransactionDate='"+transdate+"' and isOpen=1");
+            bool isopen = Database.checkifExist("Select isOpen from SalesTransactionSummary WHERE BranchCode='"+Login.assignedBranch+"' and CashierTransNo='"+dbname.Caption+"' and TransactionDate='"+transdate+"' and isOpen=1");
            
             if (isopen == true)
             {

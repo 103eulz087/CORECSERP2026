@@ -1,0 +1,75 @@
+{
+  "id": "vouchering-telegraphic",
+  "order": 4,
+  "title": "Vouchering: Telegraphic",
+  "subtitle": "Purchase payable → telegraphic transfer voucher → one compound GL ticket, ledger, balances and bank recon",
+  "form": "AccountingDevEx/VoucheringManualFrm.cs → sp_PostVoucherManual (reversal: AccountingDevEx/SupplierVoucherReversalFrm.cs)",
+  "idLabel": "Voucher",
+  "maskLabel": "Supplier",
+  "sql": "VoucheringTelegraphic.sql",
+  "summary": "Telegraphic transfers (foreign suppliers paid in USD from a peso-booked payable) go through Vouchering Manual; cash and cheque vouchers go through Supplier Payment (previous module). The form loads the supplier's open invoices (splist_Accounts), the user enters per invoice the Amount to Apply (the pesos that actually left the bank) and the system computes the Variance against the invoice balance (the FX difference). Post takes a payment reference (sp_GetReferenceNumber) and a voucher number (sp_GetVoucherNumber) and sends the invoices (dbo.VoucherManualInvoiceTVP_v3) plus any manual GL lines (dbo.VoucherManualGLLineTVP) to sp_PostVoucherManual. In one transaction it writes the telegraphic voucher, re-reads each invoice balance under a lock, settles it (full or partial), writes the payment lines and a supplier-ledger debit per invoice, and posts ONE compound ticket (mnemonic VOUCHER-MANUAL) whose legs are netted per account: DR AP-Trade for the settled amount, CR the bank for the cash, DR (loss) or CR (gain) 60323 for the variance. One bank-recon item per bank account carries the cash.",
+  "keys": [
+    { "id": "sup",     "label": "Supplier",            "color": "#f59e0b", "note": "Supplier.SupplierID. APAccounts, APPaymentDetails, TelegraphicVoucher and SupplierLedger store it in SupplierID, TransactionPaymentAP in SupplierKey. SupplierKey = SupplierID for every supplier today." },
+    { "id": "seq",     "label": "AP invoice (sequence)", "color": "#22c55e", "note": "APAccounts.SequenceNo: with SupplierID + InvoiceNo, the key the voucher uses to find and lock the purchase invoice. APPaymentDetails stores it in SequenceReferenceNumber, the supplier ledger's opening row in ReferenceKey." },
+    { "id": "inv",     "label": "Invoice",             "color": "#eab308", "note": "The supplier's invoice number (APAccounts / APPaymentDetails / SupplierLedger.InvoiceNo)." },
+    { "id": "ref",     "label": "Payment reference",   "color": "#06b6d4", "note": "ReferenceNumber from sp_GetReferenceNumber at Post. Ties the voucher, payment lines, ticket, ledger debits, bank recon (SourceRef) and reversal audit. A second post with the same reference is refused (58020)." },
+    { "id": "voucher", "label": "Voucher no.",         "color": "#3b82f6", "note": "VoucherID from sp_GetVoucherNumber. The ticket stores it in ReferenceKey, the bank recon item in ReferenceNo." },
+    { "id": "ctl",     "label": "Transfer no.",        "color": "#a855f7", "note": "The telegraphic transfer's control number typed on the form (e.g. TT2026-0804A): TelegraphicVoucher.ControlNo and NotedBy, and SupplierLedger.ReferenceKey on the payment rows. Bank Recon shows it as the outstanding item's CV #." },
+    { "id": "ticket",  "label": "GL ticket",           "color": "#ef6f5e", "note": "TicketNumber of the compound VOUCHER-MANUAL ticket. APPaymentDetails.TicketNumber and SupplierLedger.TicketReference point to it." },
+    { "id": "mnem",    "label": "Mnemonic",            "color": "#84cc16", "note": "VOUCHER-MANUAL on the ticket; VOUCHER-MANUAL-APTRADE (payable account per pay method) and VOUCHER-MANUAL-FXVAR (gain / loss account) in JournalEntryMapping." },
+    { "id": "acct",    "label": "GL account",          "color": "#14b8a6", "note": "AccountCode. The bank picked on the form (stored in TelegraphicVoucher.OfficialReceiptNo, the payment line's CreditGLCode, the ticket's credit leg and the bank recon AccountCode); 20101 AP-Trade for purchases; 60323 for the FX variance." }
+  ],
+  "tables": {
+    "ap":      { "table": "APAccounts", "role": "Purchase payable (one per invoice)", "keys": { "SupplierID": "sup", "SequenceNo": "seq", "InvoiceNo": "inv" }, "money": ["VatExemptAmount", "VatableAmount", "ActualCost"], "mask": ["AddedBy"], "total": true },
+    "apSl":    { "table": "SupplierLedger", "role": "Supplier ledger: payable credit", "keys": { "SupplierID": "sup", "ReferenceKey": "seq", "InvoiceNo": "inv" }, "money": ["BeginningBalance", "Debit", "Credit", "EndingBalance"], "total": true, "empty": "No credit row for these invoices in the supplier ledger." },
+
+    "tv":      { "table": "TelegraphicVoucher", "role": "Voucher: telegraphic transfer", "keys": { "VoucherID": "voucher", "SupplierID": "sup", "ReferenceNumber": "ref", "ControlNo": "ctl", "NotedBy": "ctl", "OfficialReceiptNo": "acct" }, "money": ["Amount"], "mask": ["PaidTo", "PreparedBy"] },
+    "tpap":    { "table": "TransactionPaymentAP", "role": "Payment header (invoice cash only)", "keys": { "SupplierKey": "sup", "ReferenceNumber": "ref" }, "money": ["Amount"], "mask": ["ExecuteBy"], "empty": "No payment header." },
+    "apd":     { "table": "APPaymentDetails", "role": "Payment lines (one per invoice)", "keys": { "VoucherID": "voucher", "SupplierID": "sup", "ReferenceNumber": "ref", "InvoiceNo": "inv", "SequenceReferenceNumber": "seq", "DebitGLCode": "acct", "CreditGLCode": "acct", "TicketNumber": "ticket" }, "money": ["Amount", "Variance", "Settled"], "total": true, "empty": "No invoices: a voucher of manual GL lines only." },
+    "jem":     { "table": "JournalEntryMapping", "role": "Config: payable and FX accounts", "keys": { "Mnemonic": "mnem", "AccountCode": "acct" }, "empty": "No mapping row read." },
+
+    "payTm":   { "table": "TicketMaster", "role": "Compound GL ticket (header)", "keys": { "TicketNumber": "ticket", "ReferenceNumber": "ref", "ReferenceKey": "voucher", "Mnemonic": "mnem" }, "mask": ["Owner", "EnteredBy"] },
+    "payTd":   { "table": "TicketDetails", "role": "Compound GL ticket (one line per account, netted)", "keys": { "TicketNumber": "ticket", "ReferenceNumber": "ref", "ReferenceKey": "voucher", "AccountCode": "acct" }, "money": ["Debit", "Credit"], "lookup": ["AccountName"], "total": true },
+    "paySl":   { "table": "SupplierLedger", "role": "Supplier ledger: payment debit (settled amount)", "keys": { "SupplierID": "sup", "ReferenceNumber": "ref", "ReferenceKey": "ctl", "InvoiceNo": "inv", "TicketReference": "ticket" }, "money": ["BeginningBalance", "Debit", "Credit", "EndingBalance"], "total": true },
+    "apAfter": { "table": "APAccounts", "role": "Payable balances now", "keys": { "SupplierID": "sup", "SequenceNo": "seq", "InvoiceNo": "inv" }, "money": ["ActualCost", "AmountPaid", "Discount", "EWTAmount", "OffsetAmount", "Balance"], "mask": ["UpdateBy"], "total": true },
+    "bsr":     { "table": "BankStatementRecon", "role": "Bank recon: outstanding item for the cash", "keys": { "AccountCode": "acct", "ReferenceNo": "voucher", "SourceRef": "ref" }, "money": ["Amount"], "mask": ["Payee"], "empty": "No bank recon item." },
+    "sa":      { "table": "SupplierAccounts", "role": "Supplier account balance now", "keys": { "SupplierKey": "sup", "SupplierID": "sup" }, "money": ["AccountBalance"], "mask": ["SupplierName"] },
+
+    "pra":     { "table": "PaymentReversalAudit", "role": "Reversal audit", "keys": { "VoucherID": "voucher", "SupplierID": "sup", "ReferenceNumber": "ref" }, "mask": ["CancelledBy"], "empty": "Not reversed." },
+    "revTm":   { "table": "TicketMaster", "role": "Reversal GL ticket (header)", "keys": { "TicketNumber": "ticket", "ReferenceNumber": "ref", "ReferenceKey": "voucher", "Mnemonic": "mnem" }, "mask": ["EnteredBy"], "empty": "Not reversed." },
+    "revTd":   { "table": "TicketDetails", "role": "Reversal GL ticket (lines, DR/CR swapped)", "keys": { "TicketNumber": "ticket", "ReferenceNumber": "ref", "ReferenceKey": "voucher", "AccountCode": "acct" }, "money": ["Debit", "Credit"], "lookup": ["AccountName"], "total": true, "empty": "Not reversed." },
+    "revSl":   { "table": "SupplierLedger", "role": "Supplier ledger: reversal credit", "keys": { "SupplierID": "sup", "ReferenceNumber": "ref", "InvoiceNo": "inv", "TicketReference": "ticket" }, "money": ["Debit", "Credit", "EndingBalance"], "empty": "Not reversed." }
+  },
+  "steps": [
+    { "n": 1, "title": "The purchase payable", "who": "Go-live balance forward · SP_CONFIRMPO / SP_POSTINVENTORY (PO receiving)", "where": "Purchasing / Receiving",
+      "what": "A purchase invoice is one APAccounts row (ActualCost = the peso amount owed, Balance = what is still open) with a credit row in the supplier ledger. The invoices in these samples are balance-forward invoices loaded at go-live, so their ledger rows have no TransCode; new purchases get theirs from PO receiving.",
+      "tables": ["ap", "apSl"] },
+    { "n": 2, "title": "The telegraphic voucher is posted", "who": "sp_PostVoucherManual", "where": "Accounting › Vouchering Manual › Post",
+      "what": "Refuses a reference already posted (58020), a missing payable or FX mapping (58017 / 58018), and per invoice a balance that changed since the grid was loaded (58024), a settlement above the balance (58030) or a variance on a partial payment (58033). Writes the telegraphic voucher (Amount = the cash through the bank account, transfer no. in ControlNo / NotedBy, bank account in OfficialReceiptNo), the payment header (invoice cash only) and one INVOICE PAYMENT line per invoice: Amount = cash applied, Variance = FX difference, Settled = Amount − Variance. The payable account comes from VOUCHER-MANUAL-APTRADE, the FX account from VOUCHER-MANUAL-FXVAR.",
+      "tables": ["tv", "tpap", "apd", "jem"] },
+    { "n": 3, "title": "GL, ledger, balances and bank recon", "who": "sp_PostVoucherManual (same transaction) → sp_Payment_PostBankReconEntry", "where": "Same Post",
+      "what": "Every leg (per invoice: DR AP-Trade / CR bank for the cash, DR 60323 / CR AP-Trade for a loss or DR AP-Trade / CR 60323 for a gain, plus manual GL lines) is staged and netted per account into ONE VOUCHER-MANUAL ticket, checked DR = CR (58019). Per invoice: APAccounts.Balance drops by the settled amount (FULLYPAID / PARTIAL) while AmountPaid adds the cash, and the supplier ledger gets a PV-MANUAL debit for the settled amount with the transfer no. in ReferenceKey. One outstanding-item (OC) bank-recon line per bank account, combined before the call (Known Bug Pattern #9).",
+      "tables": ["payTm", "payTd", "paySl", "apAfter", "bsr", "sa"] },
+    { "n": 4, "title": "The voucher is reversed", "who": "sp_ReverseCombinedSupplierVoucher → sp_CancelledChequesCS (PURCHASE branch) → sp_ReverseTicketsAP, sp_BankRecon_VoidOC", "where": "Accounting › Supplier Voucher Reversal",
+      "what": "Same reversal as cash / cheque vouchers: audit row, invoices restored, mirrored ledger rows, a copy of the ticket with DR/CR swapped (Product = REVERSAL), the bank-recon item voided; the wrapper flags the telegraphic voucher. No telegraphic voucher has been reversed in these samples.",
+      "tables": ["pra", "revTm", "revTd", "revSl"] }
+  ],
+  "scenarios": [
+    { "id": "fx-gain", "title": "Two invoices settled in full at an FX gain", "ids": "897",
+      "story": "One transfer pays two meat invoices in full. The pesos that left the bank (4,731,546.12) are less than the payable booked at invoice time (2 × 2,422,359.37), so each line carries a negative variance (−56,586.31) and the ticket credits 60323 Realized Gain/Loss on Forex for 113,172.62. Follow the sequence key from APAccounts to the payment lines, then the reference and transfer no. into the ledger and bank recon." },
+    { "id": "partial-then-final", "title": "One invoice paid across two transfers (partial, then final with FX loss)", "ids": "896,906",
+      "story": "Transfer 896 pays three invoices, including 3,491,318.31 on SI-202511344 COLLAR with no variance (a partial payment: the invoice stays PARTIAL). A week later transfer 906 finishes it (1,884,038.94 cash, 105,407.25 FX loss, so 1,778,631.69 settled) and pays six more; SI-202511437 CHMDM is again a partial (405,579.14 still open). Both tickets debit 60323 for the losses. Note APAccounts.AmountPaid: it adds the cash, so a fully paid invoice with an FX loss shows AmountPaid above its ActualCost." },
+    { "id": "many-invoices", "title": "One transfer paying thirteen invoices", "ids": "799",
+      "story": "A single transfer to a European supplier settles thirteen invoices in full, twelve with an FX loss and one exactly at book value. The ticket still has only three lines: the netting pass compounds thirteen AP-Trade debits, twelve variance legs and thirteen bank credits into one line per account." }
+  ],
+  "findings": [
+    { "level": "info", "title": "The bank account is stored in OfficialReceiptNo, not CreditGLCode",
+      "text": "sp_PostVoucherManual writes @parmcreditglcode into TelegraphicVoucher.OfficialReceiptNo and leaves CreditGLCode blank (all telegraphic vouchers). A report or query that reads CreditGLCode for a telegraphic voucher sees nothing; the payment lines (APPaymentDetails.CreditGLCode) and the ticket carry the right account. The cash and cheque vouchers of Supplier Payment fill CreditGLCode." },
+    { "level": "info", "title": "APAccounts.AmountPaid is cash, Balance is settled",
+      "text": "Per invoice the balance drops by the settled amount (cash − variance) but AmountPaid adds the cash. With an FX loss a fully paid invoice shows AmountPaid above ActualCost (SI-202511383 RIBS: 2,057,217.69 paid on a 1,902,440.76 invoice), with a gain below it. The supplier ledger debits the settled amount, so the ledger and Balance agree; only AmountPaid includes the FX difference." },
+    { "level": "info", "title": "TransactionPaymentAP.DatePaid is the posting date",
+      "text": "The header's DatePaid is GETDATE() at Post, not the voucher date: the transfers dated 2026-08-04 / 08-11 show DatePaid 2026-10-06. The ticket, ledger and bank recon use the voucher date." },
+    { "level": "info", "title": "Not traced yet: a reversed telegraphic voucher",
+      "text": "No telegraphic voucher has been reversed on this database. The work log lists open points in the PURCHASE branch of sp_CancelledChequesCS (it matches invoices on SequenceNo only and subtracts APAccounts columns the posting never adds to); trace one once a reversal exists. On DEV, the one reversed telegraphic voucher (738) belongs to an invoice whose ledger and APAccounts amounts already disagree, so it isn't a usable sample." }
+  ]
+}

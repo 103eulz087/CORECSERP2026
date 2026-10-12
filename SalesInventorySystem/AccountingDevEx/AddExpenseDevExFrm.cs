@@ -749,6 +749,11 @@ namespace SalesInventorySystem.AccountingDevEx
             _shipmentNo = cboPO.EditValue;
         }
 
+        private void tabMain_Click(object sender, EventArgs e)
+        {
+            //test
+        }
+
         private void BtnEdit_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(_selectedPostedRefNo)) return;

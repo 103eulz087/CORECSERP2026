@@ -29,6 +29,10 @@ namespace SalesInventorySystem.AccountingDevEx
         private decimal _bookBal = 0m;
         private decimal _bankBal = 0m;
         private int _headerID = 0;
+        // 2026-10-09: Export to Excel (the figures shown in the summary box, and the account name of the loaded period)
+        private DevExpress.XtraEditors.SimpleButton btnExportXlsx;
+        private string _accountName = "";
+        private decimal _figDIT, _figOC, _figBCM, _figBDM;
         private int _selDitID = 0;
         private int _selOcID = 0;
         private int _selBankSideID = 0;
@@ -42,6 +46,7 @@ namespace SalesInventorySystem.AccountingDevEx
         public BankReconFormV2()
         {
             InitializeComponent();
+            HandleDestroyed += (s, e) => WaitForTickSaves();   // 2026-10-10: closing the screen lets queued ticks finish
             WireEvents();
             PopulateLookups();
             SetDefaultPeriod();
@@ -59,6 +64,9 @@ namespace SalesInventorySystem.AccountingDevEx
         {
             var v = (GridView)sender;
             if (e.RowHandle < 0) return;
+            // 2026-10-06: leave the focused row to the skin. Painting it light kept the skin's white
+            // selected-row text on a light background, which was unreadable.
+            if (e.RowHandle == v.FocusedRowHandle) return;
             var isAuto = v.GetRowCellValue(e.RowHandle, "IsAutoInserted");
             if (isAuto != null && isAuto != DBNull.Value && Convert.ToBoolean(isAuto))
             {
@@ -86,6 +94,7 @@ namespace SalesInventorySystem.AccountingDevEx
             btnResolveOC.Click += (s, e) => BtnResolve_Click(_selOcID);
             btnDeleteOC.Click += (s, e) => BtnDelete_Click(_selOcID);
             btnAutoMatch.Click += BtnAutoMatch_Click;
+            btnAutoMatch.Visible = false;   // 2026-10-08 (user): hidden, see btnAllAutoMatch
             chkSelectAllOC.CheckedChanged += ChkSelectAllOC_CheckedChanged;
             btnBulkResolveOC.Click += BtnBulkResolveOC_Click;
 
@@ -96,6 +105,18 @@ namespace SalesInventorySystem.AccountingDevEx
 
             btnLock.Click += BtnLock_Click;
             btnPrint.Click += BtnPrint_Click;
+
+            // 2026-10-09 (user): Export to Excel, next to Print in the footer
+            btnExportXlsx = new DevExpress.XtraEditors.SimpleButton
+            {
+                Name = "btnExportXlsx",
+                Text = "Export to Excel",
+                Size = new System.Drawing.Size(124, btnPrint.Height),
+                Location = new System.Drawing.Point(btnPrint.Right + 10, btnPrint.Top),
+                Margin = btnPrint.Margin
+            };
+            btnExportXlsx.Click += BtnExportXlsx_Click;
+            btnPrint.Parent?.Controls.Add(btnExportXlsx);
 
             dtPeriod.EditValueChanged += (s, e) =>
             {
@@ -139,10 +160,13 @@ namespace SalesInventorySystem.AccountingDevEx
                 _selBankSideID = has ? SafeInt(viewBankSide.GetRowCellValue(viewBankSide.FocusedRowHandle, "ReconID")) : 0;
                 _selBankSideType = has ? Convert.ToString(viewBankSide.GetRowCellValue(viewBankSide.FocusedRowHandle, "ItemType")) : "";
 
+                // 2026-10-08c: an item cleared in a later month shows as open here; it must not be posted or deleted again
+                bool clearedLater = has && viewBankSide.GetRowCellValue(viewBankSide.FocusedRowHandle, "ClearedPeriodEnd") is DateTime;
+
                 btnResolveBankSide.Enabled = has && !isResolved && !_isLocked;
-                btnDeleteBankSide.Enabled = has && !isResolved && !_isLocked;
+                btnDeleteBankSide.Enabled = has && !isResolved && !clearedLater && !_isLocked;
                 // Post Payment only makes sense for an unresolved Auto-Debit Broker row
-                btnPostAutoDebit.Enabled = has && !isResolved && !_isLocked && _selBankSideType == "ADB";
+                btnPostAutoDebit.Enabled = has && !isResolved && !clearedLater && !_isLocked && _selBankSideType == "ADB";
             };
         }
 
@@ -181,7 +205,11 @@ namespace SalesInventorySystem.AccountingDevEx
         {
             _branch = cmbBranch.EditValue?.ToString() ?? Login.assignedBranch;
             _account = cmbAccount.EditValue?.ToString() ?? "";
-            _period = dtPeriod.EditValue is DateTime dt ? dt : DateTime.TryParse(dtPeriod.Text, out var pd) ? pd : DateTime.Today;
+            var picked = dtPeriod.EditValue is DateTime dt ? dt : DateTime.TryParse(dtPeriod.Text, out var pd) ? pd : DateTime.Today;
+            // 2026-10-07: a recon period is a calendar month; client payments / vouchers file their items
+            // under the month-end header, so any date picked means that month's end.
+            picked = new DateTime(picked.Year, picked.Month, DateTime.DaysInMonth(picked.Year, picked.Month));
+            if (!(dtPeriod.EditValue is DateTime cur) || cur.Date != picked) dtPeriod.EditValue = picked;
 
             if (string.IsNullOrWhiteSpace(_account))
             {
@@ -189,6 +217,10 @@ namespace SalesInventorySystem.AccountingDevEx
                 return;
             }
 
+            // 2026-10-08c: _period is the month the clear / unclear calls send as @PeriodEnd, so it only moves
+            // to the picked month once that month is on screen; a failed load keeps the month still shown.
+            var previous = _period;
+            _period = picked;
             try
             {
                 LoadPeriod();
@@ -197,12 +229,14 @@ namespace SalesInventorySystem.AccountingDevEx
             }
             catch (SqlException ex)
             {
+                _period = previous;
                 SetStatus($"Load failed: {ex.Message}", err: true);
             }
         }
 
         private void LoadPeriod()
         {
+            WaitForTickSaves();   // 2026-10-10: queued ticks are saved before anything is read back
             using (var con = Database.getConnection())
             using (var cmd = new SqlCommand("sp_BankRecon_GetPeriod", con))
             {
@@ -222,6 +256,7 @@ namespace SalesInventorySystem.AccountingDevEx
                     _bookBal = SafeDec(hdr["GLBookBalance"]);
                     _bankBal = SafeDec(hdr["BankStatementBal"]);
                     _isLocked = hdr["Status"]?.ToString() == "LOCKED";
+                    _accountName = hdr.Table.Columns.Contains("AccountName") ? Convert.ToString(hdr["AccountName"]) : "";
 
                     lblBookBal.Text = _bookBal.ToString("N2");
                     txtBankBal.Text = _bankBal.ToString("N2");
@@ -251,6 +286,7 @@ namespace SalesInventorySystem.AccountingDevEx
                 BindBankSideGrid(_dtBankSide);
 
                 BindCombined();   // the combined DIT + OC grid, from _dtDIT / _dtOC
+                LoadSummary();    // 2026-10-06: the one-row-per-batch view (sp_BankRecon_GetPeriodSummary)
             }
 
             SetLockedState(_isLocked);
@@ -302,6 +338,8 @@ namespace SalesInventorySystem.AccountingDevEx
             FormatCol(view, "Payee", 160, false);
             FormatCol(view, "Amount", 110, true);
             FormatCol(view, "IsResolved", 60, false);
+            FormatCol(view, "ClearedPeriodEnd", 90, false, isDate: true);   // 2026-10-08c
+            if (view.Columns["ClearedPeriodEnd"] != null) view.Columns["ClearedPeriodEnd"].Caption = "Cleared In";
             FormatCol(view, "ResolvedReason", 110, false);
             FormatCol(view, "SourceModule", 80, false);
             FormatCol(view, "IsAutoInserted", 0, false);
@@ -322,6 +360,8 @@ namespace SalesInventorySystem.AccountingDevEx
             FormatCol(viewBankSide, "Payee", 160, false);
             FormatCol(viewBankSide, "Amount", 110, true);
             FormatCol(viewBankSide, "IsResolved", 60, false);
+            FormatCol(viewBankSide, "ClearedPeriodEnd", 90, false, isDate: true);   // 2026-10-08c
+            if (viewBankSide.Columns["ClearedPeriodEnd"] != null) viewBankSide.Columns["ClearedPeriodEnd"].Caption = "Cleared In";
             FormatCol(viewBankSide, "PostedPaymentRef", 100, false);
             FormatCol(viewBankSide, "ResolvedReason", 130, false);
             FormatCol(viewBankSide, "IsAutoInserted", 0, false);
@@ -508,6 +548,18 @@ namespace SalesInventorySystem.AccountingDevEx
         // all three just differ in how they gather the ReconID list beforehand.
         private void ResolveReconIDs(List<int> ids, string itemType)
         {
+            int? resolved = ResolveReconIDsNoReload(ids, itemType);
+            if (resolved == null) return;   // the error is already on the status bar
+            LoadPeriod();
+            RefreshSummary();
+            SetStatus($"{resolved} item(s) marked cleared.");
+        }
+
+        // Clears the items without reloading; null when the proc failed (message shown).
+        // 2026-10-06: split out so the summary view can clear DIT + OC with one reload and one message.
+        private int? ResolveReconIDsNoReload(List<int> ids, string itemType)
+        {
+            _lastError = null;
             try
             {
                 var dtIds = new DataTable();
@@ -524,18 +576,18 @@ namespace SalesInventorySystem.AccountingDevEx
                     p.Value = dtIds;
                     cmd.Parameters.Add("@ResolvedBy", SqlDbType.VarChar, 50).Value = Login.Fullname;
                     cmd.Parameters.Add("@ItemType", SqlDbType.VarChar, 5).Value = itemType;
+                    cmd.Parameters.Add("@PeriodEnd", SqlDbType.Date).Value = _period;   // 2026-10-08c: cleared in this month
 
                     con.Open();
                     using (var rdr = cmd.ExecuteReader())
                         if (rdr.Read()) resolved = SafeInt(rdr["ResolvedCount"]);
                 }
-
-                LoadPeriod();
-                RefreshSummary();
-                SetStatus($"{resolved} item(s) marked cleared.");
+                return resolved;
             }
-            catch (SqlException ex) { SetStatus(ex.Message, err: true); }
+            catch (SqlException ex) { _lastError = ex.Message; SetStatus(ex.Message, err: true); return null; }
         }
+
+        private string _lastError;   // 2026-10-10: the last bulk-clear refusal, for the tick handlers' message
 
         // Same Selected-checkbox / Check-All / Bulk Resolve pattern as the DIT grid --
         // OC has no ControlNo column, so no extra column formatting is needed here.
@@ -626,6 +678,7 @@ namespace SalesInventorySystem.AccountingDevEx
             decimal adjBook = _bookBal + bcm - bdm;
             decimal diff = adjBank - adjBook;
             bool balanced = Math.Abs(diff) < 0.01m;
+            _figDIT = dit; _figOC = oc; _figBCM = bcm; _figBDM = bdm;   // for Export to Excel
 
             SetLbl(lblBankStmt, _bankBal.ToString("N2"), C_TEXT);
             SetLbl(lblDIT, $"+{dit:N2}", C_DR);
@@ -737,6 +790,7 @@ namespace SalesInventorySystem.AccountingDevEx
                     cmd.Parameters.Add("@ReconID", SqlDbType.Int).Value = reconID;
                     cmd.Parameters.Add("@IsResolved", SqlDbType.Bit).Value = true;
                     cmd.Parameters.Add("@ResolvedBy", SqlDbType.VarChar, 50).Value = Login.Fullname;
+                    cmd.Parameters.Add("@PeriodEnd", SqlDbType.Date).Value = _period;   // 2026-10-08c: cleared in this month
                     con.Open();
                     cmd.ExecuteNonQuery();
                 }
@@ -759,6 +813,7 @@ namespace SalesInventorySystem.AccountingDevEx
                     cmd.Parameters.Add("@ReconID", SqlDbType.Int).Value = reconID;
                     cmd.Parameters.Add("@IsResolved", SqlDbType.Bit).Value = false;
                     cmd.Parameters.Add("@ResolvedBy", SqlDbType.VarChar, 50).Value = Login.Fullname;
+                    cmd.Parameters.Add("@PeriodEnd", SqlDbType.Date).Value = _period;   // 2026-10-08c: only the month it was cleared in can unclear it
                     con.Open();
                     cmd.ExecuteNonQuery();
                 }
@@ -812,6 +867,27 @@ namespace SalesInventorySystem.AccountingDevEx
                         "Confirm Payment", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                     return;
 
+                // 2026-10-08c: re-read the row just before paying. The payment posts before the row is marked,
+                // so a stale screen (another user cleared it, or it was cleared in a later month) would pay twice.
+                try
+                {
+                    using (var con = Database.getConnection())
+                    using (var cmd = new SqlCommand("SELECT ISNULL(IsResolved, 0) FROM dbo.BankStatementRecon WHERE ReconID = @ReconID", con))
+                    {
+                        cmd.Parameters.Add("@ReconID", SqlDbType.Int).Value = _selBankSideID;
+                        con.Open();
+                        object done = cmd.ExecuteScalar();
+                        if (done == null || Convert.ToBoolean(done))
+                        {
+                            XtraMessageBox.Show("This auto-debit has already been cleared or no longer exists. Load the period again.",
+                                "Post Payment", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            LoadPeriod(); RefreshSummary();
+                            return;
+                        }
+                    }
+                }
+                catch (SqlException ex) { SetStatus(ex.Message, err: true); return; }
+
                 try
                 {
                     string referenceNo = IDGenerator.getIDNumberSP("sp_GetReferenceNumber", "ReferenceNumber");
@@ -861,6 +937,7 @@ namespace SalesInventorySystem.AccountingDevEx
                         cmd.Parameters.Add("@ReferenceNo", SqlDbType.VarChar, 10).Value = referenceNo;
                         cmd.Parameters.Add("@VoucherID", SqlDbType.VarChar, 10).Value = voucherId;
                         cmd.Parameters.Add("@User", SqlDbType.VarChar, 50).Value = Login.Fullname;
+                        cmd.Parameters.Add("@PeriodEnd", SqlDbType.Date).Value = _period;   // 2026-10-08c: cleared in this month
                         con.Open();
                         cmd.ExecuteNonQuery();
                     }
@@ -964,6 +1041,105 @@ namespace SalesInventorySystem.AccountingDevEx
             XtraMessageBox.Show("Wire to your XtraReport template here.", "Print", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
+        // ================================================================
+        // EXPORT TO EXCEL (2026-10-09)
+        // Exports what is on screen: the Summary or Detailed list of the Deposits in Transit &
+        // Outstanding Checks tab, or the Bank-Side Items tab. Data-aware .xlsx (real numbers,
+        // groups expanded, footer sums kept), with the period and the summary-box figures on top.
+        // ================================================================
+        private void BtnExportXlsx_Click(object sender, EventArgs e)
+        {
+            if (_headerID == 0)
+            {
+                XtraMessageBox.Show("Load a period first.", "Export to Excel", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            DevExpress.XtraGrid.GridControl grid;
+            GridView view;
+            string what;
+            if (tabItems.SelectedTabPage == tabBankSide) { grid = gridBankSide; view = viewBankSide; what = "Bank-Side Items"; }
+            else if (_summaryMode && gridSum != null) { grid = gridSum; view = viewSum; what = "Summary"; }
+            else { grid = gridAll; view = viewAll; what = "Detailed"; }
+            if (grid == null || view == null) return;
+
+            using (var sfd = new SaveFileDialog
+            {
+                Filter = "Excel workbook (*.xlsx)|*.xlsx",
+                FileName = $"BankRecon_{_account}_{_period:yyyy-MM}_{what.Replace(" ", "").Replace("-", "")}.xlsx"
+            })
+            {
+                if (sfd.ShowDialog(this) != DialogResult.OK) return;
+
+                // the tick-box column is for the screen only
+                var sel = view.Columns["Selected"];
+                int selIndex = sel != null && sel.Visible ? sel.VisibleIndex : -1;
+                try
+                {
+                    if (selIndex >= 0) sel.Visible = false;
+
+                    var options = new DevExpress.XtraPrinting.XlsxExportOptionsEx
+                    {
+                        ExportType = DevExpress.Export.ExportType.DataAware,
+                        SheetName = what,
+                        GroupState = DevExpress.Export.GroupState.ExpandAll
+                    };
+                    options.CustomizeSheetHeader += ev => AddExportHeader(ev.ExportContext, what);
+                    grid.ExportToXlsx(sfd.FileName, options);
+                }
+                catch (Exception ex)
+                {
+                    XtraMessageBox.Show($"Export failed: {ex.Message}", "Export to Excel", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                finally
+                {
+                    if (selIndex >= 0) sel.VisibleIndex = selIndex;
+                }
+
+                SetStatus($"Exported to {sfd.FileName}");
+                if (XtraMessageBox.Show("Exported. Open the file now?", "Export to Excel", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                {
+                    try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(sfd.FileName) { UseShellExecute = true }); }
+                    catch (Exception ex) { SetStatus(ex.Message, err: true); }
+                }
+            }
+        }
+
+        // Rows above the exported table: the period and the same figures as the summary box.
+        private void AddExportHeader(DevExpress.Printing.ExportHelpers.IExportContext ctx, string what)
+        {
+            var title = new DevExpress.Export.XlFormattingObject { Font = new DevExpress.Export.XlCellFont { Bold = true, Size = 14 } };
+            var bold = new DevExpress.Export.XlFormattingObject { Font = new DevExpress.Export.XlCellFont { Bold = true } };
+            var money = new DevExpress.Export.XlFormattingObject { FormatType = DevExpress.Utils.FormatType.Numeric, FormatString = "#,##0.00;-#,##0.00" };
+            var moneyBold = new DevExpress.Export.XlFormattingObject { FormatType = DevExpress.Utils.FormatType.Numeric, FormatString = "#,##0.00;-#,##0.00", Font = new DevExpress.Export.XlCellFont { Bold = true } };
+            DevExpress.Printing.ExportHelpers.CellObject C(object v, DevExpress.Export.XlFormattingObject f = null) =>
+                new DevExpress.Printing.ExportHelpers.CellObject { Value = v, Formatting = f };
+
+            decimal adjBank = _bankBal + _figDIT - _figOC;
+            decimal adjBook = _bookBal + _figBCM - _figBDM;
+            decimal diff = adjBank - adjBook;
+
+            ctx.AddRow(new[] { C("Bank Reconciliation - " + what, title) });
+            ctx.AddRow(new[] { C("Bank Account", bold), C(string.IsNullOrWhiteSpace(_accountName) ? _account : $"{_account} - {_accountName}") });
+            ctx.AddRow(new[] { C("Branch", bold), C(_branch) });
+            ctx.AddRow(new[] { C("Period End", bold), C(_period.ToString("yyyy-MM-dd")) });
+            ctx.AddRow(new[] { C("Status", bold), C(_isLocked ? "LOCKED" : "OPEN") });
+            ctx.AddRow(new[] { C("Exported", bold), C($"{DateTime.Now:yyyy-MM-dd HH:mm} by {Login.Fullname}") });
+            ctx.AddRow();
+            ctx.AddRow(new[] { C("Bank Statement Balance"), C(_bankBal, money) });
+            ctx.AddRow(new[] { C("Add: Deposits in Transit"), C(_figDIT, money) });
+            ctx.AddRow(new[] { C("Less: Outstanding Checks"), C(_figOC, money) });
+            ctx.AddRow(new[] { C("Adjusted Bank Balance", bold), C(adjBank, moneyBold) });
+            ctx.AddRow(new[] { C("GL Book Balance"), C(_bookBal, money) });
+            ctx.AddRow(new[] { C("Add: Bank Credit Memos"), C(_figBCM, money) });
+            ctx.AddRow(new[] { C("Less: Bank Debit Memos / Auto-Debits"), C(_figBDM, money) });
+            ctx.AddRow(new[] { C("Adjusted Book Balance", bold), C(adjBook, moneyBold) });
+            ctx.AddRow(new[] { C("Difference (Adjusted Bank - Adjusted Book)", bold), C(diff, moneyBold),
+                               C(Math.Abs(diff) < 0.01m ? "RECONCILED" : "OUT OF BALANCE", bold) });
+            ctx.AddRow();
+        }
+
         private void SetStatus(string msg, bool err = false)
         {
             if (lblStatus == null) return;
@@ -1000,7 +1176,7 @@ namespace SalesInventorySystem.AccountingDevEx
         private int _selAllID = 0;
         private SimpleButton btnAllAddDIT, btnAllAddOC, btnAllResolve, btnAllUnresolve, btnAllDelete,
                              btnAllBulkResolve, btnAllResolveBatch, btnAllAutoMatch, btnAllCheckCtl;
-        private ToolStripMenuItem miAllCheckCtl, miAllUncheckCtl, miAllResolve, miAllUnresolve;
+        private ToolStripMenuItem miAllCheckCtl, miAllUncheckCtl, miAllResolve, miAllUnresolve, miAllResolveBatch;
         private CheckEdit chkAllSelect;
         private ContextMenuStrip cmsAll;
 
@@ -1017,6 +1193,29 @@ namespace SalesInventorySystem.AccountingDevEx
 
             viewAll.OptionsBehavior.Editable = true;   // only "Selected" is editable (set per column in BindCombined)
             viewAll.OptionsView.ShowGroupPanel = false;
+            // 2026-10-06: a check box on each Control No group row ticks / unticks that whole batch
+            _groupCheck.AllowGrayed = true;   // grey = part of the batch ticked
+            _groupCheck.Appearance.BackColor = System.Drawing.Color.Transparent;
+            _groupCheck.Appearance.Options.UseBackColor = true;
+            viewAll.CustomDrawGroupRow += ViewAll_CustomDrawGroupRow;
+            viewAll.MouseDown += ViewAll_MouseDown;
+            viewAll.GroupRowCollapsing += (s, e) => { if (DateTime.Now < _boxClickedUntil) e.Allow = false; };   // a double-click on the box
+            viewAll.GroupRowExpanding += (s, e) => { if (DateTime.Now < _boxClickedUntil) e.Allow = false; };    // doesn't fold the group
+            viewAll.CellValueChanged += (s, e) =>
+            {
+                if (e.Column != null && e.Column.FieldName == "Selected") { _groupState = null; gridAll.Invalidate(); }
+            };
+            // 2026-10-10 (user): nothing is edited in place; the Cleared box is clicked (ViewAll_MouseDown) or Space on the row
+            viewAll.ShowingEditor += (s, e) => e.Cancel = true;
+            viewAll.KeyDown += (s, e) =>
+            {
+                if (e.KeyCode != Keys.Space || _isLocked) return;
+                int h = viewAll.FocusedRowHandle;
+                if (viewAll.IsDataRow(h)) ToggleItemCleared(SafeInt(viewAll.GetRowCellValue(h, "ReconID")));
+                else if (viewAll.IsGroupRow(h) && GroupControlNo(h, out string t) is string c) ToggleBatchCleared(t, c);
+                else return;
+                e.Handled = true;
+            };
             viewAll.OptionsView.ShowFooter = false;
             viewAll.OptionsSelection.EnableAppearanceFocusedCell = false;
             viewAll.RowCellStyle += View_RowCellStyle;
@@ -1032,7 +1231,13 @@ namespace SalesInventorySystem.AccountingDevEx
             miAllUncheckCtl = new ToolStripMenuItem("Uncheck all in this Control No", null, (s, e) => CheckControlNoGroup(false));
             miAllResolve = new ToolStripMenuItem("Mark as Cleared", null, (s, e) => BtnResolve_Click(_selAllID));
             miAllUnresolve = new ToolStripMenuItem("Mark as Uncleared", null, (s, e) => MarkAsUncleared(_selAllID));
-            cmsAll.Items.AddRange(new ToolStripItem[] { miAllCheckCtl, miAllUncheckCtl, new ToolStripSeparator(), miAllResolve, miAllUnresolve });
+            // 2026-10-06 (user): same as the "Resolve Entire Batch (Control No)" button
+            miAllResolveBatch = new ToolStripMenuItem("Clear Entire Batch (Control No)", null, (s, e) => BtnAllResolveBatch_Click(s, e));
+            // 2026-10-09 (user): undo an accidental batch clear in one step
+            miAllUnresolveBatch = new ToolStripMenuItem("Unclear Entire Batch (Control No)", null, (s, e) => BtnAllUnresolveBatch_Click(s, e));
+            // 2026-10-10 (user): ticking the Cleared box (row) or the group box (batch) clears at once, so the
+            // check / mark items are no longer on the menu; the whole-batch clear / unclear stays
+            cmsAll.Items.AddRange(new ToolStripItem[] { miAllResolveBatch, miAllUnresolveBatch });
             gridAll.MouseUp += (s, e) =>
             {
                 if (e.Button != MouseButtons.Right || _isLocked) return;
@@ -1043,12 +1248,22 @@ namespace SalesInventorySystem.AccountingDevEx
                 bool hasCtl = !string.IsNullOrWhiteSpace(FocusedControlNo(out _));
                 miAllCheckCtl.Enabled = hasCtl;
                 miAllUncheckCtl.Enabled = hasCtl;
+                miAllResolveBatch.Enabled = hasCtl;
+                miAllUnresolveBatch.Enabled = hasCtl;
                 miAllResolve.Enabled = _selAllID > 0;
                 miAllUnresolve.Enabled = _selAllID > 0;
-                if (hasCtl || _selAllID > 0) cmsAll.Show(gridAll, e.Location);
+                if (hasCtl) cmsAll.Show(gridAll, e.Location);
             };
 
             var bar = new FlowLayoutPanel { Dock = DockStyle.Bottom, Height = 40, Padding = new Padding(4), WrapContents = false, AutoScroll = true };
+            // 2026-10-06: two displays; Summary (one row per Control No / CV #) is the default
+            rgView = new RadioGroup { Width = 190, Height = 28, Margin = new Padding(3, 4, 12, 3) };
+            rgView.Properties.Columns = 2;
+            rgView.Properties.Items.Add(new DevExpress.XtraEditors.Controls.RadioGroupItem(true, "Summary"));
+            rgView.Properties.Items.Add(new DevExpress.XtraEditors.Controls.RadioGroupItem(false, "Detailed"));
+            rgView.EditValue = true;
+            rgView.EditValueChanged += (s, e) => SetViewMode(Equals(rgView.EditValue, true));
+            bar.Controls.Add(rgView);
             btnAllAddDIT = NewBarButton(bar, "Add Deposit in Transit", (s, e) => BtnAdd_Click("DIT"));
             btnAllAddOC = NewBarButton(bar, "Add Outstanding Check", (s, e) => BtnAdd_Click("OC"));
             btnAllResolve = NewBarButton(bar, "Mark Cleared", (s, e) => BtnResolve_Click(_selAllID));
@@ -1060,13 +1275,325 @@ namespace SalesInventorySystem.AccountingDevEx
             btnAllCheckCtl = NewBarButton(bar, "Check Control No", (s, e) => CheckControlNoGroup(true));
             btnAllBulkResolve = NewBarButton(bar, "Bulk Resolve", BtnAllBulkResolve_Click);
             btnAllResolveBatch = NewBarButton(bar, "Resolve Entire Batch (Control No)", BtnAllResolveBatch_Click);
+            btnAllUnresolveBatch = NewBarButton(bar, "Unclear Entire Batch (Control No)", BtnAllUnresolveBatch_Click);   // 2026-10-09
+            btnAllBulkUnresolve = NewBarButton(bar, "Bulk Unclear", BtnAllBulkUnresolve_Click);                           // 2026-10-09
             btnAllAutoMatch = NewBarButton(bar, "Auto-Match Cleared Checks", BtnAutoMatch_Click);
+            // 2026-10-08 (user): hidden. sp_BankRecon_AutoMatch clears an outstanding check when its own payment
+            // is in the GL, not when the bank shows it, so it ticked cheques that never reached the bank.
+            btnAllAutoMatch.Visible = false;
 
+            BuildSummaryGrid();
             panelControl5.Controls.Add(gridAll);
+            panelControl5.Controls.Add(gridSum);
             panelControl5.Controls.Add(bar);
             gridAll.BringToFront();   // Fill docks after the bottom bar
+            gridSum.BringToFront();
+            SetViewMode(true);
 
             UpdateCombinedButtons();
+        }
+
+        // ================================================================
+        // 2026-10-06: SUMMARY VIEW -- one row per batch, no grouping
+        //   Deposits in transit by Control No (Debit), outstanding checks by CV # (Credit);
+        //   an item with no Control No / CV # is its own row. Data: sp_BankRecon_GetPeriodSummary
+        //   (same items as sp_BankRecon_GetPeriod). Staff clear by row: a row's OpenReconIDs go to
+        //   the existing sp_BankRecon_BulkResolveItems (ResolveReconIDs). "Detailed" switches back
+        //   to the grouped grid above.
+        // ================================================================
+        private RadioGroup rgView;
+        private bool _summaryMode;
+        private DevExpress.XtraGrid.GridControl gridSum;
+        private GridView viewSum;
+        private DataTable _dtSum;
+        private ContextMenuStrip cmsSum;
+        private ToolStripMenuItem miSumClearBatch;
+        // 2026-10-09: unclear (undo a clear) in one step
+        private ToolStripMenuItem miSumUnclearBatch, miAllUnresolveBatch;
+        private SimpleButton btnAllUnresolveBatch, btnAllBulkUnresolve;
+
+        private void BuildSummaryGrid()
+        {
+            gridSum = new DevExpress.XtraGrid.GridControl { Dock = DockStyle.Fill };
+            viewSum = new GridView(gridSum);
+            gridSum.MainView = viewSum;
+            gridSum.ViewCollection.Add(viewSum);
+
+            viewSum.OptionsBehavior.Editable = true;   // only "Selected"
+            viewSum.OptionsView.ShowGroupPanel = false;
+            viewSum.OptionsCustomization.AllowGroup = false;
+            viewSum.OptionsView.ShowFooter = true;
+            viewSum.OptionsSelection.EnableAppearanceFocusedCell = false;
+            Classes.DevXGridViewSettings.ApplyTotalsBandAppearance(viewSum);
+            viewSum.FocusedRowChanged += (s, e) => UpdateCombinedButtons();
+            // 2026-10-10 (user): the Cleared box is the action (tick = clear the batch, untick = unclear it), on the
+            // click itself; nothing is edited in place
+            viewSum.ShowingEditor += (s, e) => e.Cancel = true;
+            viewSum.MouseDown += (s, e) =>
+            {
+                if (e.Button != MouseButtons.Left || _isLocked) return;
+                var hit = viewSum.CalcHitInfo(e.Location);
+                if (hit.InRowCell && hit.RowHandle >= 0 && hit.Column != null && hit.Column.FieldName == "IsCleared")
+                    ToggleSummaryRow(viewSum.GetDataRow(hit.RowHandle));
+            };
+            viewSum.KeyDown += (s, e) =>
+            {
+                if (e.KeyCode != Keys.Space || _isLocked || viewSum.FocusedRowHandle < 0) return;
+                ToggleSummaryRow(viewSum.GetDataRow(viewSum.FocusedRowHandle));
+                e.Handled = true;
+            };
+            viewSum.RowStyle += (s, e) =>   // fully cleared batch: same soft green as the detailed view (focused row left to the skin)
+            {
+                if (e.RowHandle < 0 || e.RowHandle == viewSum.FocusedRowHandle) return;
+                if (Convert.ToString(viewSum.GetRowCellValue(e.RowHandle, "Status")) != "CLEARED") return;
+                e.Appearance.BackColor = ClearedBack;
+                e.Appearance.BackColor2 = ClearedBack;
+                e.Appearance.ForeColor = ClearedFore;
+                e.HighPriority = true;
+            };
+            viewSum.CustomColumnDisplayText += (s, e) =>
+            {
+                if (e.ListSourceRowIndex < 0 || e.Column == null || e.Column.FieldName != "BatchNo" || !(e.Value == null || e.Value == DBNull.Value)) return;
+                string type = Convert.ToString(viewSum.GetListSourceRowCellValue(e.ListSourceRowIndex, "ItemType"));
+                e.DisplayText = type == "OC" ? "(no CV #)" : "(no control no.)";
+            };
+
+            cmsSum = new ContextMenuStrip();
+            miSumClearBatch = new ToolStripMenuItem("Clear Entire Batch", null, (s, e) => BtnAllResolveBatch_Click(s, e));
+            miSumUnclearBatch = new ToolStripMenuItem("Unclear Entire Batch", null, (s, e) => BtnAllUnresolveBatch_Click(s, e));   // 2026-10-09
+            cmsSum.Items.Add(miSumClearBatch);
+            cmsSum.Items.Add(miSumUnclearBatch);
+            gridSum.MouseUp += (s, e) =>
+            {
+                if (e.Button != MouseButtons.Right || _isLocked) return;
+                var hit = viewSum.CalcHitInfo(e.Location);
+                if (!hit.InRow || hit.RowHandle < 0) return;
+                viewSum.FocusedRowHandle = hit.RowHandle;
+                miSumClearBatch.Enabled = !string.IsNullOrWhiteSpace(Convert.ToString(viewSum.GetRowCellValue(hit.RowHandle, "OpenReconIDs")));
+                miSumUnclearBatch.Enabled = SafeInt(viewSum.GetRowCellValue(hit.RowHandle, "ClearedItems")) > 0;
+                cmsSum.Show(gridSum, e.Location);
+            };
+        }
+
+        private void SetViewMode(bool summary)
+        {
+            _summaryMode = summary && gridSum != null;
+            if (_summaryMode && _sumStale && _headerID != 0) LoadSummary();   // 2026-10-10: items were ticked in the detailed view
+            if (gridSum != null) gridSum.Visible = _summaryMode;
+            gridAll.Visible = !_summaryMode;
+            if (rgView != null && !Equals(rgView.EditValue, _summaryMode)) rgView.EditValue = _summaryMode;
+            chkAllSelect.CheckedChanged -= ChkAllSelect_CheckedChanged;
+            chkAllSelect.Checked = false;
+            chkAllSelect.CheckedChanged += ChkAllSelect_CheckedChanged;
+            UpdateCombinedButtons();
+        }
+
+        private bool _summaryUnavailable;   // set once the summary proc fails; Summary stays off until the form reopens
+        private bool _sumStale;             // 2026-10-10: a tick in the detailed view changed items; reload the summary when shown
+
+        private void LoadSummary()
+        {
+            if (viewSum == null || _summaryUnavailable) return;
+            try
+            {
+                var dt = new DataTable();
+                using (var con = Database.getConnection())
+                using (var cmd = new SqlCommand("sp_BankRecon_GetPeriodSummary", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add("@BranchCode", SqlDbType.Char, 3).Value = _branch;
+                    cmd.Parameters.Add("@AccountCode", SqlDbType.VarChar, 20).Value = _account;
+                    cmd.Parameters.Add("@PeriodEnd", SqlDbType.Date).Value = _period;
+                    con.Open();
+                    new SqlDataAdapter(cmd).Fill(dt);
+                }
+                var sel = new DataColumn("Selected", typeof(bool)) { DefaultValue = false };
+                dt.Columns.Add(sel);
+                sel.SetOrdinal(0);
+                foreach (DataRow r in dt.Rows) r["Selected"] = false;
+                // 2026-10-10: the batch's Cleared box = every item of the row cleared
+                var clr = new DataColumn("IsCleared", typeof(bool)) { DefaultValue = false };
+                dt.Columns.Add(clr);
+                clr.SetOrdinal(1);
+                foreach (DataRow r in dt.Rows) r["IsCleared"] = Convert.ToString(r["Status"]) == "CLEARED";
+                _dtSum = dt;
+                _sumStale = false;
+                BindSummary();
+            }
+            catch (Exception ex)
+            {
+                // e.g. the proc isn't on this database yet: fall back to the detailed view, for good
+                // (catching everything so a bad result shape can't stop LoadPeriod before the lock state is set)
+                _summaryUnavailable = true;
+                _dtSum = null;
+                gridSum.DataSource = null;
+                SetViewMode(false);
+                rgView.Properties.Items[0].Enabled = false;
+                rgView.ToolTip = "Summary view unavailable: " + ex.Message;
+                XtraMessageBox.Show("The summary view is not available on this database, so the detailed view is shown.\n\n" + ex.Message,
+                                    "Bank Recon", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
+        private void BindSummary()
+        {
+            viewSum.BeginUpdate();
+            try
+            {
+                viewSum.Columns.Clear();
+                gridSum.DataSource = _dtSum;
+                viewSum.PopulateColumns();
+
+                foreach (DevExpress.XtraGrid.Columns.GridColumn col in viewSum.Columns)
+                    col.OptionsColumn.AllowEdit = false;   // 2026-10-10: the Cleared box is clicked, not edited
+
+                var captions = new Dictionary<string, string>
+                {
+                    { "IsCleared", "Cleared" }, { "BatchNo", "Control No / CV #" }, { "LastDate", "Date" }, { "CRNo", "CR No" },
+                    { "Items", "Items" }, { "ClearedItems", "Items Cleared" }
+                };
+                foreach (var kv in captions)
+                    if (viewSum.Columns[kv.Key] != null) viewSum.Columns[kv.Key].Caption = kv.Value;
+                // 2026-10-10: "Selected" (tick, then Bulk Resolve) is replaced by the Cleared box
+                foreach (string hide in new[] { "Selected", "ItemType", "BatchKey", "FirstDate", "CheckNo", "ReferenceNo", "OpenAmount", "OpenReconIDs" })
+                    if (viewSum.Columns[hide] != null) viewSum.Columns[hide].Visible = false;
+
+                var colSel = viewSum.Columns["IsCleared"];
+                var repo = new DevExpress.XtraEditors.Repository.RepositoryItemCheckEdit();
+                // 2026-10-10: display only; a click on the cell toggles it (BuildSummaryGrid's MouseDown), no editor = no delay
+                gridSum.RepositoryItems.Clear();
+                gridSum.RepositoryItems.Add(repo);
+                colSel.ColumnEdit = repo;
+                colSel.OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.False;
+                colSel.VisibleIndex = 0;
+
+                foreach (string money in new[] { "Debit", "Credit" })
+                {
+                    var c = viewSum.Columns[money];
+                    if (c == null) continue;
+                    c.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+                    c.DisplayFormat.FormatString = "N2";
+                    c.AppearanceCell.Font = F_MONO;
+                    c.AppearanceCell.Options.UseFont = true;
+                    c.AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+                    c.Summary.Clear();
+                    c.Summary.Add(DevExpress.Data.SummaryItemType.Sum, money, "{0:N2}");
+                }
+                var colDate = viewSum.Columns["LastDate"];
+                if (colDate != null)
+                {
+                    colDate.DisplayFormat.FormatType = DevExpress.Utils.FormatType.DateTime;
+                    colDate.DisplayFormat.FormatString = "yyyy-MM-dd";
+                }
+
+                viewSum.BestFitColumns();
+                colSel.Width = 55;
+            }
+            finally { viewSum.EndUpdate(); }
+
+            chkAllSelect.CheckedChanged -= ChkAllSelect_CheckedChanged;
+            chkAllSelect.Checked = false;
+            chkAllSelect.CheckedChanged += ChkAllSelect_CheckedChanged;
+            UpdateCombinedButtons();
+        }
+
+        private void UpdateSummaryButtons()
+        {
+            int h = viewSum.FocusedRowHandle;
+            bool hasOpen = h >= 0 && !string.IsNullOrWhiteSpace(Convert.ToString(viewSum.GetRowCellValue(h, "OpenReconIDs")));
+            bool open = !_isLocked && _headerID != 0;
+
+            // single-item actions belong to the detailed view
+            btnAllResolve.Visible = btnAllUnresolve.Visible = btnAllDelete.Visible = btnAllCheckCtl.Visible = false;
+            btnAllAddDIT.Enabled = open;
+            btnAllAddOC.Enabled = open;
+            // 2026-10-10 (user): the Cleared box clears / unclears at once; no select-then-resolve step
+            chkAllSelect.Visible = btnAllBulkResolve.Visible = false;
+            btnAllResolveBatch.Text = "Clear Entire Batch";
+            btnAllResolveBatch.Enabled = open && hasOpen;
+            btnAllAutoMatch.Enabled = open;
+            // 2026-10-09: undo the focused batch's clears; Bulk Unclear (ticked rows) is a detailed-view action
+            btnAllUnresolveBatch.Text = "Unclear Entire Batch";
+            btnAllUnresolveBatch.Enabled = open && h >= 0 && SafeInt(viewSum.GetRowCellValue(h, "ClearedItems")) > 0;
+            btnAllBulkUnresolve.Visible = false;
+        }
+
+        // Ticked rows (Bulk Resolve), or the focused row (Clear Entire Batch).
+        private List<DataRow> SummaryRows(bool selectedOnly)
+        {
+            viewSum.CloseEditor();
+            viewSum.UpdateCurrentRow();
+            var rows = new List<DataRow>();
+            if (_dtSum == null) return rows;
+            if (selectedOnly)
+            {
+                // visible rows only: a ticked row hidden by a column filter is not cleared
+                for (int i = 0; i < viewSum.RowCount; i++)
+                {
+                    var r = viewSum.GetDataRow(viewSum.GetVisibleRowHandle(i));
+                    if (r != null && r["Selected"] is bool sel && sel) rows.Add(r);
+                }
+            }
+            else
+            {
+                var r = viewSum.GetDataRow(viewSum.FocusedRowHandle);
+                if (r != null) rows.Add(r);
+            }
+            return rows;
+        }
+
+        // Clears every uncleared item behind the given summary rows, after a confirmation that spells out
+        // what goes (same procs as the detailed view).
+        private void SummaryResolve(List<DataRow> rows, string title)
+        {
+            var dit = new List<int>();
+            var oc = new List<int>();
+            int batches = 0;
+            foreach (DataRow r in rows)
+            {
+                string ids = Convert.ToString(r["OpenReconIDs"]);
+                if (string.IsNullOrWhiteSpace(ids)) continue;
+                batches++;
+                var target = Convert.ToString(r["ItemType"]) == "OC" ? oc : dit;
+                foreach (string part in ids.Split(','))
+                    if (int.TryParse(part.Trim(), out int id)) target.Add(id);
+            }
+
+            if (dit.Count + oc.Count == 0)
+            {
+                XtraMessageBox.Show(rows.Count == 0 ? "Tick the rows to clear first (or select a row for Clear Entire Batch)."
+                                                    : "Everything in the selected row(s) is already cleared.");
+                return;
+            }
+
+            string msg = $"Mark {dit.Count + oc.Count} uncleared item(s) in {batches} row(s) as cleared by the bank?\n\n" +
+                         $"  Deposits in transit: {dit.Count}\n  Outstanding checks: {oc.Count}";
+            if (XtraMessageBox.Show(msg, "Confirm " + title, MessageBoxButtons.YesNo,
+                                    batches > 1 ? MessageBoxIcon.Warning : MessageBoxIcon.Question) != DialogResult.Yes)
+                return;
+
+            // one reload and one message for both kinds; stop at the first failure (its message stays)
+            int done = 0;
+            if (dit.Count > 0)
+            {
+                int? n = ResolveReconIDsNoReload(dit, "DIT");
+                if (n == null) { LoadPeriod(); RefreshSummary(); return; }
+                done += n.Value;
+            }
+            if (oc.Count > 0)
+            {
+                int? n = ResolveReconIDsNoReload(oc, "OC");
+                if (n == null)
+                {
+                    LoadPeriod(); RefreshSummary();
+                    SetStatus($"{done} deposit(s) in transit cleared, but the outstanding checks failed: see the message. Try again.", err: true);
+                    return;
+                }
+                done += n.Value;
+            }
+            LoadPeriod();
+            RefreshSummary();
+            SetStatus($"{done} item(s) marked cleared.");
         }
 
         private static SimpleButton NewBarButton(FlowLayoutPanel bar, string text, EventHandler onClick)
@@ -1080,6 +1607,14 @@ namespace SalesInventorySystem.AccountingDevEx
         private static object Cell(DataRow r, string col) => r.Table.Columns.Contains(col) ? r[col] : DBNull.Value;
 
         private static object Blank2Null(object v) => v == null || v == DBNull.Value || string.IsNullOrWhiteSpace(v.ToString()) ? (object)DBNull.Value : v.ToString().Trim();
+
+        // 2026-10-08c: the month an item was cleared in ("Aug 2026"); "(later)" when that month is after the
+        // period on screen, where the item still counts as open.
+        private object ClearedInText(object clearedPeriodEnd)
+        {
+            if (!(clearedPeriodEnd is DateTime d)) return DBNull.Value;
+            return d.ToString("MMM yyyy") + (d.Date > _period.Date ? " (later)" : "");
+        }
 
         private void BindCombined()
         {
@@ -1099,6 +1634,7 @@ namespace SalesInventorySystem.AccountingDevEx
             dt.Columns.Add("SourceModule", typeof(string));
             dt.Columns.Add("Amount", typeof(decimal));
             dt.Columns.Add("IsResolved", typeof(bool));
+            dt.Columns.Add("ClearedIn", typeof(string));   // 2026-10-08c
             dt.Columns.Add("ResolvedReason", typeof(string));
             dt.Columns.Add("IsAutoInserted", typeof(bool));
 
@@ -1125,6 +1661,7 @@ namespace SalesInventorySystem.AccountingDevEx
                     n["Amount"] = SafeDec(Cell(r, "Amount"));
                     var res = Cell(r, "IsResolved");
                     n["IsResolved"] = res != DBNull.Value && Convert.ToBoolean(res);
+                    n["ClearedIn"] = ClearedInText(Cell(r, "ClearedPeriodEnd"));
                     n["ResolvedReason"] = Blank2Null(Cell(r, "ResolvedReason"));
                     var auto = Cell(r, "IsAutoInserted");
                     n["IsAutoInserted"] = auto != DBNull.Value ? Convert.ToBoolean(auto) : n["SourceModule"] != DBNull.Value;
@@ -1133,6 +1670,7 @@ namespace SalesInventorySystem.AccountingDevEx
             }
 
             _dtAll = dt;
+            _groupState = null;
             viewAll.BeginUpdate();
             try
             {
@@ -1141,22 +1679,25 @@ namespace SalesInventorySystem.AccountingDevEx
                 viewAll.PopulateColumns();
 
                 foreach (DevExpress.XtraGrid.Columns.GridColumn col in viewAll.Columns)
-                    col.OptionsColumn.AllowEdit = col.FieldName == "Selected" && !_isLocked;
+                    col.OptionsColumn.AllowEdit = false;   // 2026-10-10: the Cleared box is clicked, not edited
 
                 var captions = new Dictionary<string, string>
                 {
-                    { "Selected", "" }, { "ControlNo", "Control No" }, { "CRNo", "CR No" }, { "CheckNo", "Check No" }, { "CVNo", "CV #" },
+                    { "ControlNo", "Control No" }, { "CRNo", "CR No" }, { "CheckNo", "Check No" }, { "CVNo", "CV #" },
                     { "ReferenceNo", "Payment Ref / Voucher No" }, { "PaymentType", "Pay Type" }, { "SourceModule", "Source" },
-                    { "ItemDate", "Date" }, { "IsResolved", "Cleared" }, { "ResolvedReason", "Reason" }
+                    { "ItemDate", "Date" }, { "IsResolved", "Cleared" }, { "ClearedIn", "Cleared In" }, { "ResolvedReason", "Reason" }
                 };
                 foreach (var kv in captions)
                     if (viewAll.Columns[kv.Key] != null) viewAll.Columns[kv.Key].Caption = kv.Value;
 
-                foreach (string hide in new[] { "ItemType", "IsAutoInserted", "ReconID" })
+                // 2026-10-06 (user): Check No, Pay Type and Source hidden too (still in the data / bulk-resolve logic)
+                // 2026-10-10: "Selected" (tick, then Bulk Resolve) is replaced by the Cleared box itself
+                foreach (string hide in new[] { "Selected", "ItemType", "IsAutoInserted", "ReconID", "CheckNo", "PaymentType", "SourceModule", "ReferenceNo" })
                     if (viewAll.Columns[hide] != null) viewAll.Columns[hide].Visible = false;
 
-                var colSel = viewAll.Columns["Selected"];
+                var colSel = viewAll.Columns["IsResolved"];
                 var repoCheck = new DevExpress.XtraEditors.Repository.RepositoryItemCheckEdit();
+                // 2026-10-10: display only; a click on the cell toggles it (ViewAll_MouseDown), no editor = no delay
                 gridAll.RepositoryItems.Clear();   // one editor, not one more per reload
                 gridAll.RepositoryItems.Add(repoCheck);
                 colSel.ColumnEdit = repoCheck;
@@ -1182,10 +1723,16 @@ namespace SalesInventorySystem.AccountingDevEx
                 // group rows use DevExpress's default GroupFormat, whose {2} shows both summaries
 
                 viewAll.BestFitColumns();
-                colSel.Width = 30;
-                viewAll.ExpandAllGroups();
+                colSel.Width = 55;
             }
             finally { viewAll.EndUpdate(); }
+            // On load: Kind groups open, Control No groups closed (user, 2026-10-06), so the batches show
+            // as one line each with their count / total; users open the ones they need.
+            // After EndUpdate: inside BeginUpdate the groups aren't built yet.
+            viewAll.CollapseAllGroups();
+            for (int gh = -1; viewAll.IsValidRowHandle(gh); gh--)   // group row handles are -1, -2, ...
+                if (viewAll.GetRowLevel(gh) == 0)
+                    viewAll.SetRowExpanded(gh, true, false);         // not recursive: the Control No groups stay closed
 
             chkAllSelect.CheckedChanged -= ChkAllSelect_CheckedChanged;
             chkAllSelect.Checked = false;
@@ -1204,6 +1751,13 @@ namespace SalesInventorySystem.AccountingDevEx
         private void UpdateCombinedButtons()
         {
             if (viewAll == null) return;
+            if (_summaryMode) { UpdateSummaryButtons(); return; }
+            btnAllResolveBatch.Text = "Clear Entire Batch (Control No)";
+            // 2026-10-10 (user): the Cleared box (row) and the group box (batch) clear / unclear at once, so
+            // Mark Cleared / Uncleared, Select All, Check Control No, Bulk Resolve and Bulk Unclear are hidden
+            btnAllResolve.Visible = btnAllUnresolve.Visible = btnAllCheckCtl.Visible = false;
+            chkAllSelect.Visible = btnAllBulkResolve.Visible = btnAllBulkUnresolve.Visible = false;
+            btnAllDelete.Visible = true;
             int h = viewAll.FocusedRowHandle;
             bool isData = h >= 0 && viewAll.IsDataRow(h);
             _selAllID = isData ? SafeInt(viewAll.GetRowCellValue(h, "ReconID")) : 0;
@@ -1222,6 +1776,8 @@ namespace SalesInventorySystem.AccountingDevEx
             btnAllResolveBatch.Enabled = open && !string.IsNullOrWhiteSpace(ctl);
             btnAllCheckCtl.Enabled = open && !string.IsNullOrWhiteSpace(ctl);
             btnAllAutoMatch.Enabled = open;
+            btnAllUnresolveBatch.Text = "Unclear Entire Batch (Control No)";
+            btnAllUnresolveBatch.Enabled = open && !string.IsNullOrWhiteSpace(ctl);
         }
 
         // The control number (and kind) of the focused data row or Control No group row; null on a
@@ -1248,7 +1804,11 @@ namespace SalesInventorySystem.AccountingDevEx
             string type;
             string ctl = FocusedControlNo(out type);
             if (string.IsNullOrWhiteSpace(ctl)) { XtraMessageBox.Show("Select a row or a Control No group first."); return; }
+            SetControlNoChecked(type, ctl, check);
+        }
 
+        private void SetControlNoChecked(string type, string ctl, bool check)
+        {
             viewAll.CloseEditor();
             int n = 0;
             foreach (DataRow row in _dtAll.Rows)
@@ -1258,21 +1818,576 @@ namespace SalesInventorySystem.AccountingDevEx
                 row["Selected"] = check;
                 n++;
             }
-            viewAll.RefreshData();
+            // no RefreshData(): the edits reach the view through the binding, and a refresh would
+            // reopen every group the user had collapsed
+            _groupState = null;
+            gridAll.Invalidate();
             SetStatus($"{(check ? "Checked" : "Unchecked")} {n} item(s) under Control No '{ctl}'.");
+        }
+
+        // ---- 2026-10-06: check box on the Control No group rows (level 1) ----
+        // Not on Kind rows (level 0) or on the "(no control no.)" group: those aren't one batch,
+        // same rule as Check Control No / Resolve Entire Batch.
+        private readonly DevExpress.XtraEditors.Repository.RepositoryItemCheckEdit _groupCheck =
+            new DevExpress.XtraEditors.Repository.RepositoryItemCheckEdit();
+
+        // The kind and control number behind a Control No group row (level 1); "" = the "(no control no.)" group.
+        private bool GroupKey(int groupRowHandle, out string itemType, out string ctl)
+        {
+            itemType = null; ctl = null;
+            if (!viewAll.IsGroupRow(groupRowHandle) || viewAll.GetRowLevel(groupRowHandle) != 1) return false;
+            int dh = viewAll.GetDataRowHandleByGroupRowHandle(groupRowHandle);
+            if (dh < 0) return false;
+            itemType = Convert.ToString(viewAll.GetRowCellValue(dh, "ItemType"));
+            ctl = Convert.ToString(viewAll.GetRowCellValue(dh, "ControlNo")).Trim();
+            return true;
+        }
+
+        // The batch behind a group row: its kind and control number, or null when it has no check box.
+        private string GroupControlNo(int groupRowHandle, out string itemType)
+        {
+            string ctl;
+            if (!GroupKey(groupRowHandle, out itemType, out ctl)) return null;
+            return ctl.Length == 0 ? null : ctl;
+        }
+
+        // Per batch (ItemType|ControlNo): [0] uncleared items, [1] of them ticked, [2] all items.
+        // Built once per change (reload, a tick, a box click), not on every paint.
+        private Dictionary<string, int[]> _groupState;
+        private DateTime _boxClickedUntil = DateTime.MinValue;
+
+        private int[] GroupState(string type, string ctl)
+        {
+            if (_groupState == null)
+            {
+                var map = new Dictionary<string, int[]>(StringComparer.Ordinal);
+                foreach (DataRow row in _dtAll.Rows)
+                {
+                    string key = Convert.ToString(row["ItemType"]) + "|" + Convert.ToString(row["ControlNo"]).Trim();
+                    if (!map.TryGetValue(key, out var c)) map[key] = c = new int[3];
+                    c[2]++;
+                    if (row["IsResolved"] is bool done && done) continue;
+                    c[0]++;
+                    if (row["Selected"] is bool sel && sel) c[1]++;
+                }
+                _groupState = map;
+            }
+            return _groupState.TryGetValue(type + "|" + ctl, out var s) ? s : new int[3];
+        }
+
+        // Highlights (2026-10-06): Kind rows bold; a Control No row whose items are all CLEARED soft green.
+        private System.Drawing.Font _kindFont, _kindFontBase;
+        private static readonly System.Drawing.Color ClearedBack = System.Drawing.Color.FromArgb(226, 239, 218);
+        private static readonly System.Drawing.Color ClearedFore = System.Drawing.Color.FromArgb(56, 87, 35);
+        private static readonly System.Drawing.Color KindBack = System.Drawing.Color.FromArgb(214, 228, 245);
+        private static readonly System.Drawing.Color KindFore = System.Drawing.Color.FromArgb(31, 56, 100);
+
+        // Checked = every uncleared item of the batch is ticked (and there is at least one).
+        private bool IsControlNoChecked(string type, string ctl)
+        {
+            var s = GroupState(type, ctl);
+            return s[0] > 0 && s[1] == s[0];
+        }
+
+        // Where the check box sits: just right of the group row's expand button.
+        private static System.Drawing.Rectangle GroupCheckBounds(DevExpress.XtraGrid.Views.Grid.ViewInfo.GridGroupRowInfo info)
+        {
+            var b = info.ButtonBounds;
+            int size = Math.Max(14, Math.Min(18, info.Bounds.Height - 4));
+            return new System.Drawing.Rectangle(b.Right + 4, info.Bounds.Top + (info.Bounds.Height - size) / 2, size, size);
+        }
+
+        private void ViewAll_CustomDrawGroupRow(object sender, DevExpress.XtraGrid.Views.Base.RowObjectCustomDrawEventArgs e)
+        {
+            var info = e.Info as DevExpress.XtraGrid.Views.Grid.ViewInfo.GridGroupRowInfo;
+            if (info == null || _dtAll == null) return;
+
+            if (viewAll.GetRowLevel(e.RowHandle) == 0)   // Kind row: bold, default drawing
+            {
+                var baseFont = e.Appearance.Font;
+                if (_kindFont == null || !ReferenceEquals(_kindFontBase, baseFont))
+                {
+                    _kindFont?.Dispose();
+                    _kindFontBase = baseFont;
+                    _kindFont = new System.Drawing.Font(baseFont, System.Drawing.FontStyle.Bold);
+                }
+                e.Appearance.Font = _kindFont;
+                e.Appearance.BackColor = KindBack;    // highlighted band (user, 2026-10-06); fore + back both set,
+                e.Appearance.BackColor2 = KindBack;   // so it stays readable in any skin (Black included)
+                e.Appearance.ForeColor = KindFore;
+                return;
+            }
+
+            string type, ctl;
+            if (!GroupKey(e.RowHandle, out type, out ctl)) return;
+            var s = GroupState(type, ctl);
+            if (s[2] > 0 && s[0] == 0)   // every item of this Control No is cleared
+            {
+                e.Appearance.BackColor = ClearedBack;
+                e.Appearance.BackColor2 = ClearedBack;
+                e.Appearance.ForeColor = ClearedFore;
+            }
+
+            // check box: not while locked, not on "(no control no.)"
+            // 2026-10-10: it shows the batch's cleared state (ticked = all cleared, grey = part) and clicking it
+            // clears / unclears the batch at once
+            if (_isLocked || ctl.Length == 0 || s[2] == 0) return;
+
+            var r = GroupCheckBounds(info);
+            // room for the box: as many spaces as its width needs in this font (follows DPI / skin font)
+            var font = e.Appearance.Font ?? info.Appearance.Font;
+            float space = e.Cache.Graphics.MeasureString("x x", font).Width - e.Cache.Graphics.MeasureString("xx", font).Width;
+            int pad = space > 0 ? (int)Math.Ceiling((r.Width + 6) / space) : 6;
+            info.GroupText = new string(' ', pad) + info.GroupText.TrimStart();
+            e.DefaultDraw();
+
+            if (_groupCheckInfo == null)
+            {
+                _groupCheckInfo = (DevExpress.XtraEditors.ViewInfo.CheckEditViewInfo)_groupCheck.CreateViewInfo();
+                _groupCheckPainter = (DevExpress.XtraEditors.Drawing.CheckEditPainter)_groupCheck.CreatePainter();
+            }
+            _groupCheckInfo.EditValue = s[0] == 0 ? (object)true : s[0] < s[2] ? null : (object)false;   // null = grey (part cleared)
+            _groupCheckInfo.Bounds = r;
+            _groupCheckInfo.CalcViewInfo(e.Cache.Graphics);
+            _groupCheckPainter.Draw(new DevExpress.XtraEditors.Drawing.ControlGraphicsInfoArgs(_groupCheckInfo, e.Cache, r));
+            e.Handled = true;
+        }
+
+        private DevExpress.XtraEditors.ViewInfo.CheckEditViewInfo _groupCheckInfo;
+        private DevExpress.XtraEditors.Drawing.CheckEditPainter _groupCheckPainter;
+
+        private void ViewAll_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Left || _isLocked || _dtAll == null) return;
+            var hit = viewAll.CalcHitInfo(e.Location);
+            // 2026-10-10: a click on an item's Cleared box toggles it at once (the row still gets the focus)
+            if (hit.InRowCell && hit.Column != null && hit.Column.FieldName == "IsResolved" && viewAll.IsDataRow(hit.RowHandle))
+            {
+                ToggleItemCleared(SafeInt(viewAll.GetRowCellValue(hit.RowHandle, "ReconID")));
+                return;
+            }
+            if (!hit.InGroupRow) return;
+            var gvi = viewAll.GetViewInfo() as DevExpress.XtraGrid.Views.Grid.ViewInfo.GridViewInfo;
+            var info = gvi?.GetGridRowInfo(hit.RowHandle) as DevExpress.XtraGrid.Views.Grid.ViewInfo.GridGroupRowInfo;
+            if (info == null) return;
+            string type;
+            string ctl = GroupControlNo(hit.RowHandle, out type);
+            if (ctl == null || !GroupCheckBounds(info).Contains(e.Location)) return;
+            if (GroupState(type, ctl)[2] == 0) return;
+
+            _boxClickedUntil = DateTime.Now.AddMilliseconds(SystemInformation.DoubleClickTime);
+            viewAll.FocusedRowHandle = hit.RowHandle;
+            UpdateCombinedButtons();
+            DevExpress.Utils.DXMouseEventArgs.GetMouseArgs(e).Handled = true;   // don't also expand / collapse the group
+            // 2026-10-10: empty or grey -> clear the rest of the batch; ticked -> unclear it (on screen at once, saved in the background)
+            ToggleBatchCleared(type, ctl);
+        }
+
+        // ================================================================
+        // 2026-10-10 (user): TICK = CLEARED, at once and without waiting
+        //   A click on an item's Cleared box (detailed view; Space on the focused row too), on a Control No
+        //   group's box, or on a batch row's Cleared box (summary view) clears it in the month on screen;
+        //   another click unclears it. No confirmation: an untick undoes a tick.
+        //   Seamless (user, same day: "the user will tick fast"): the box and the figures change on the
+        //   click itself, and the database write goes into a queue that a background worker sends in
+        //   click order (sp_BankRecon_ResolveItem for one item, the bulk resolve / unresolve procs for a
+        //   batch: the same rules as before). If the database refuses or skips anything, the period is
+        //   reloaded once the queue is empty, so the screen shows what was saved, and the reason is shown.
+        //   The worker touches no control (Known Bug #8): it only runs SQL and posts its results back.
+        //   LoadPeriod waits for the queue first, so a reload never shows a half-saved state.
+        // ================================================================
+        private sealed class TickOp
+        {
+            public List<int> Ids;      // Bulk = false: one id, sp_BankRecon_ResolveItem
+            public bool Clear;
+            public bool Bulk;
+            public string ItemType;    // bulk resolve: DIT / OC
+            public DateTime Period;
+            public string User;
+            public string What;        // for messages
+        }
+
+        private readonly Queue<TickOp> _tickQueue = new Queue<TickOp>();
+        private readonly object _tickLock = new object();
+        private readonly List<string> _tickProblems = new List<string>();
+        private System.Threading.Tasks.Task _tickWorker = System.Threading.Tasks.Task.FromResult(0);
+        private bool _tickRunning;
+        private int _tickPending;
+
+        // An item's box: flip it on screen, queue the save.
+        private void ToggleItemCleared(int reconID)
+        {
+            if (_isLocked || _headerID == 0 || reconID <= 0 || _dtAll == null) return;
+            DataRow row = null;
+            foreach (DataRow r in _dtAll.Rows)
+                if (SafeInt(r["ReconID"]) == reconID) { row = r; break; }
+            if (row == null) return;
+
+            // cleared in a later month: shown open here, and only that month can change it (same rule as the proc, 93013)
+            string clearedIn = Convert.ToString(row["ClearedIn"]);
+            if (clearedIn.EndsWith("(later)"))
+            {
+                XtraMessageBox.Show($"This item was cleared in {clearedIn.Replace(" (later)", "")}. Open that month and untick it there first.",
+                                    "Bank Recon", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            bool clear = !(row["IsResolved"] is bool b && b);
+            string what = $"{Convert.ToString(row["Kind"])} {SafeDec(row["Amount"]):N2}";
+            ApplyClearedLocally(new List<int> { reconID }, clear);
+            EnqueueTick(new TickOp { Ids = new List<int> { reconID }, Clear = clear, Bulk = false, What = what });
+        }
+
+        // Group box: clears what is still open in the batch, or (all cleared) unclears the whole batch.
+        private void ToggleBatchCleared(string type, string ctl)
+        {
+            if (_isLocked || _headerID == 0 || _dtAll == null) return;
+            bool clear = GroupState(type, ctl)[0] > 0;
+            var ids = new List<int>();
+            foreach (DataRow row in _dtAll.Rows)
+            {
+                if (Convert.ToString(row["ItemType"]) != type || Convert.ToString(row["ControlNo"]).Trim() != ctl) continue;
+                bool done = row["IsResolved"] is bool d && d;
+                if (done != clear) ids.Add(SafeInt(row["ReconID"]));
+            }
+            if (ids.Count == 0) return;
+            ApplyClearedLocally(ids, clear);
+            EnqueueTick(new TickOp { Ids = ids, Clear = clear, Bulk = true, ItemType = type, What = $"Control No '{ctl}'" });
+        }
+
+        // Summary view: a batch row's box.
+        private void ToggleSummaryRow(DataRow sumRow)
+        {
+            if (_isLocked || _headerID == 0 || sumRow == null) return;
+            bool clear = !(sumRow["IsCleared"] is bool b && b);
+            var ids = SummaryRowItems(sumRow, cleared: !clear);   // clear: its open items; unclear: its cleared ones
+            if (ids.Count == 0) return;
+            string batch = Convert.ToString(sumRow["BatchNo"]);
+            ApplyClearedLocally(ids, clear);
+            EnqueueTick(new TickOp { Ids = ids, Clear = clear, Bulk = true, ItemType = Convert.ToString(sumRow["ItemType"]) == "OC" ? "OC" : "DIT",
+                                     What = string.IsNullOrWhiteSpace(batch) ? "the selected row" : $"batch '{batch}'" });
+        }
+
+        // The batch a source item belongs to in the summary view: Control No (DIT) / CV # (OC), else the item
+        // itself. Same keys as sp_BankRecon_GetPeriodSummary's BatchKey (see CollectSummaryCleared).
+        private static string SummaryKey(DataRow src, bool isOC)
+        {
+            string field = isOC ? "CVNo" : "ControlNo";
+            string no = src.Table.Columns.Contains(field) ? Convert.ToString(src[field]).Trim() : "";
+            return no.Length > 0 ? "NO:" + no : "ID:" + SafeInt(src["ReconID"]);
+        }
+
+        // The items behind a summary row that are cleared (cleared = true) or still open (false).
+        private List<int> SummaryRowItems(DataRow sumRow, bool cleared)
+        {
+            var ids = new List<int>();
+            bool isOC = Convert.ToString(sumRow["ItemType"]) == "OC";
+            DataTable src = isOC ? _dtOC : _dtDIT;
+            if (src == null) return ids;
+            string key = Convert.ToString(sumRow["BatchKey"]).Trim();
+            foreach (DataRow r in src.Rows)
+            {
+                bool done = r["IsResolved"] is bool d && d;
+                if (done == cleared && SummaryKey(r, isOC) == key) ids.Add(SafeInt(r["ReconID"]));
+            }
+            return ids;
+        }
+
+        // Shows the change at once: the item rows (sources and the detailed grid), the summary rows involved,
+        // the group boxes and the figures. Mirrors what the procs write (IsResolved, ResolvedReason 'CLEARED' /
+        // NULL, ClearedPeriodEnd = this month / NULL).
+        private void ApplyClearedLocally(List<int> ids, bool clear)
+        {
+            var set = new HashSet<int>(ids);
+            object reason = clear ? (object)"CLEARED" : DBNull.Value;
+            object month = clear ? (object)new DateTime(_period.Year, _period.Month, DateTime.DaysInMonth(_period.Year, _period.Month)) : DBNull.Value;
+            var keys = new HashSet<string>(StringComparer.Ordinal);   // summary rows to recount ("DIT|NO:123")
+
+            foreach (var src in new[] { _dtDIT, _dtOC })
+            {
+                if (src == null || !src.Columns.Contains("ReconID")) continue;
+                bool isOC = ReferenceEquals(src, _dtOC);
+                foreach (DataRow r in src.Rows)
+                {
+                    if (!set.Contains(SafeInt(r["ReconID"]))) continue;
+                    r["IsResolved"] = clear;
+                    if (src.Columns.Contains("ResolvedReason")) r["ResolvedReason"] = reason;
+                    if (src.Columns.Contains("ClearedPeriodEnd")) r["ClearedPeriodEnd"] = month;
+                    keys.Add((isOC ? "OC|" : "DIT|") + SummaryKey(r, isOC));
+                }
+            }
+            foreach (DataRow r in _dtAll.Rows)
+            {
+                if (!set.Contains(SafeInt(r["ReconID"]))) continue;
+                r["IsResolved"] = clear;
+                r["ResolvedReason"] = reason;
+                r["ClearedIn"] = ClearedInText(month);
+            }
+            if (_dtSum != null && keys.Count > 0) RecountSummaryRows(keys);
+
+            _groupState = null;
+            RefreshSummary();
+            gridAll.Invalidate();
+        }
+
+        // Status / Cleared count / open items of the summary rows whose batch changed (same rules as the proc).
+        private void RecountSummaryRows(HashSet<string> keys)
+        {
+            var count = new Dictionary<string, int[]>(StringComparer.Ordinal);          // [0] items, [1] cleared
+            var open = new Dictionary<string, List<int>>(StringComparer.Ordinal);
+            var openAmt = new Dictionary<string, decimal>(StringComparer.Ordinal);
+            foreach (var src in new[] { _dtDIT, _dtOC })
+            {
+                if (src == null || !src.Columns.Contains("ReconID")) continue;
+                bool isOC = ReferenceEquals(src, _dtOC);
+                foreach (DataRow r in src.Rows)
+                {
+                    string k = (isOC ? "OC|" : "DIT|") + SummaryKey(r, isOC);
+                    if (!keys.Contains(k)) continue;
+                    if (!count.TryGetValue(k, out var c)) { count[k] = c = new int[2]; open[k] = new List<int>(); openAmt[k] = 0m; }
+                    c[0]++;
+                    if (r["IsResolved"] is bool d && d) c[1]++;
+                    else { open[k].Add(SafeInt(r["ReconID"])); openAmt[k] += SafeDec(r["Amount"]); }
+                }
+            }
+            foreach (DataRow s in _dtSum.Rows)
+            {
+                string k = (Convert.ToString(s["ItemType"]) == "OC" ? "OC|" : "DIT|") + Convert.ToString(s["BatchKey"]).Trim();
+                if (!count.TryGetValue(k, out var c)) continue;
+                s["ClearedItems"] = c[1];
+                s["Status"] = c[1] == c[0] ? "CLEARED" : c[1] > 0 ? "PARTLY CLEARED" : "OPEN";
+                s["IsCleared"] = c[1] == c[0];
+                if (_dtSum.Columns.Contains("OpenReconIDs")) s["OpenReconIDs"] = open[k].Count == 0 ? (object)DBNull.Value : string.Join(",", open[k]);
+                if (_dtSum.Columns.Contains("OpenAmount")) s["OpenAmount"] = openAmt[k];
+            }
+        }
+
+        private void EnqueueTick(TickOp op)
+        {
+            op.Period = _period;
+            op.User = Login.Fullname;
+            lock (_tickLock)
+            {
+                _tickQueue.Enqueue(op);
+                _tickPending++;
+                if (!_tickRunning)
+                {
+                    _tickRunning = true;
+                    _tickWorker = System.Threading.Tasks.Task.Run(() => DrainTicks());
+                }
+            }
+            ShowTickStatus();
+        }
+
+        // Background worker: SQL only, in click order; results go back to the UI thread by BeginInvoke.
+        private void DrainTicks()
+        {
+            while (true)
+            {
+                TickOp op;
+                lock (_tickLock)
+                {
+                    if (_tickQueue.Count == 0) { _tickRunning = false; break; }
+                    op = _tickQueue.Dequeue();
+                }
+                string problem;
+                try { problem = SaveTick(op); }
+                catch (Exception ex) { problem = $"{op.What}: {ex.Message}"; }   // a refusal (SqlException) or a lost connection
+                lock (_tickLock)
+                {
+                    _tickPending--;
+                    if (problem != null) _tickProblems.Add(problem);
+                }
+                PostToUi(ShowTickStatus);
+            }
+            PostToUi(OnTicksSaved);
+        }
+
+        // One queued change; null = saved exactly as clicked, else what differed.
+        private static string SaveTick(TickOp op)
+        {
+            var dtIds = new DataTable();
+            dtIds.Columns.Add("ReconID", typeof(int));
+            foreach (int id in op.Ids) dtIds.Rows.Add(id);
+
+            using (var con = Database.getConnection())
+            {
+                con.Open();
+                if (!op.Bulk)
+                {
+                    using (var cmd = new SqlCommand("sp_BankRecon_ResolveItem", con))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.Add("@ReconID", SqlDbType.Int).Value = op.Ids[0];
+                        cmd.Parameters.Add("@IsResolved", SqlDbType.Bit).Value = op.Clear;
+                        cmd.Parameters.Add("@ResolvedBy", SqlDbType.VarChar, 50).Value = op.User;
+                        cmd.Parameters.Add("@PeriodEnd", SqlDbType.Date).Value = op.Period;
+                        cmd.ExecuteNonQuery();
+                    }
+                    return null;
+                }
+                if (op.Clear)
+                {
+                    using (var cmd = new SqlCommand("sp_BankRecon_BulkResolveItems", con))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        var p = cmd.Parameters.Add("@ReconIDs", SqlDbType.Structured);
+                        p.TypeName = "dbo.tt_BankReconIDList";
+                        p.Value = dtIds;
+                        cmd.Parameters.Add("@ResolvedBy", SqlDbType.VarChar, 50).Value = op.User;
+                        cmd.Parameters.Add("@ItemType", SqlDbType.VarChar, 5).Value = op.ItemType;
+                        cmd.Parameters.Add("@PeriodEnd", SqlDbType.Date).Value = op.Period;
+                        int n = 0;
+                        using (var rdr = cmd.ExecuteReader())
+                            if (rdr.Read()) n = SafeInt(rdr["ResolvedCount"]);
+                        return n == op.Ids.Count ? null
+                             : $"{op.What}: {op.Ids.Count - n} of {op.Ids.Count} item(s) were left as they are (already cleared in another month).";
+                    }
+                }
+                using (var cmd = new SqlCommand("sp_BankRecon_BulkUnresolveItems", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    var p = cmd.Parameters.Add("@ReconIDs", SqlDbType.Structured);
+                    p.TypeName = "dbo.tt_BankReconIDList";
+                    p.Value = dtIds;
+                    cmd.Parameters.Add("@ResolvedBy", SqlDbType.VarChar, 50).Value = op.User;
+                    cmd.Parameters.Add("@PeriodEnd", SqlDbType.Date).Value = op.Period;
+                    int done = 0, otherMonth = 0, system = 0;
+                    using (var rdr = cmd.ExecuteReader())
+                        if (rdr.Read())
+                        {
+                            done = SafeInt(rdr["UnclearedCount"]);
+                            otherMonth = SafeInt(rdr["SkippedOtherMonth"]);
+                            system = SafeInt(rdr["SkippedSystem"]);
+                        }
+                    if (done == op.Ids.Count) return null;
+                    string why = otherMonth > 0 ? $"{otherMonth} cleared in another month (untick them in that month)" : "";
+                    if (system > 0) why += (why.Length > 0 ? ", " : "") + $"{system} closed by a reversal or a posted auto-debit";
+                    return $"{op.What}: {op.Ids.Count - done} of {op.Ids.Count} item(s) were left cleared" + (why.Length > 0 ? $" ({why})." : ".");
+                }
+            }
+        }
+
+        private void PostToUi(Action a)
+        {
+            try { if (!IsDisposed && IsHandleCreated) BeginInvoke(a); }
+            catch (InvalidOperationException) { }   // the screen is closing
+        }
+
+        private void ShowTickStatus()
+        {
+            int n;
+            lock (_tickLock) n = _tickPending;
+            if (n > 0) SetStatus($"Saving {n} change(s)…");
+        }
+
+        // The queue is empty: done, or (something was refused / skipped) reload and say why.
+        private void OnTicksSaved()
+        {
+            List<string> problems;
+            lock (_tickLock)
+            {
+                if (_tickRunning || _tickPending > 0) return;   // more clicks came in; their worker reports
+                problems = new List<string>(_tickProblems);
+                _tickProblems.Clear();
+            }
+            if (problems.Count == 0) { SetStatus("All changes saved."); return; }
+
+            ReloadKeepingView();
+            var shown = problems.Count > 12 ? problems.GetRange(0, 12) : problems;
+            string msg = "Not every tick could be saved as clicked, so the screen now shows what the database has:\n\n" +
+                         string.Join("\n", shown) + (problems.Count > 12 ? $"\n… and {problems.Count - 12} more." : "");
+            SetStatus(problems[0], err: true);
+            XtraMessageBox.Show(msg, "Bank Recon", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        }
+
+        // Called before any reload (LoadPeriod) and when the screen closes: lets the queued saves finish.
+        // Safe to block on: the worker never waits for the UI thread (it only posts).
+        private void WaitForTickSaves()
+        {
+            System.Threading.Tasks.Task t;
+            lock (_tickLock) t = _tickWorker;
+            if (t.IsCompleted) return;
+            SetStatus("Saving your ticks first…");
+            var old = Cursor.Current;
+            Cursor.Current = Cursors.WaitCursor;
+            try { t.Wait(); } catch (AggregateException) { }
+            finally { Cursor.Current = old; }
+        }
+
+        // Reloads the period but keeps what the user was looking at: the open Control No groups, the
+        // scroll position and the focused row (detailed view), the focused row and scroll (summary view).
+        private void ReloadKeepingView()
+        {
+            var open = new HashSet<string>(StringComparer.Ordinal);
+            int top = 0, focusID = 0, sumTop = 0, sumFocus = 0;
+            string focusGroup = null;
+            if (viewAll != null && _dtAll != null)
+            {
+                for (int gh = -1; viewAll.IsValidRowHandle(gh); gh--)
+                    if (viewAll.GetRowLevel(gh) == 1 && viewAll.GetRowExpanded(gh) && GroupKey(gh, out var t, out var c)) open.Add(t + "|" + c);
+                top = viewAll.TopRowIndex;
+                int fh = viewAll.FocusedRowHandle;
+                if (viewAll.IsDataRow(fh)) focusID = SafeInt(viewAll.GetRowCellValue(fh, "ReconID"));
+                else if (GroupKey(fh, out var ft, out var fc)) focusGroup = ft + "|" + fc;
+            }
+            if (viewSum != null) { sumTop = viewSum.TopRowIndex; sumFocus = viewSum.FocusedRowHandle; }
+
+            try { LoadPeriod(); RefreshSummary(); }
+            catch (SqlException ex) { SetStatus(ex.Message, err: true); return; }
+
+            if (viewAll != null)
+            {
+                // no BeginUpdate here: the groups were built by BindCombined, and expanding them must take effect now
+                for (int gh = -1; viewAll.IsValidRowHandle(gh); gh--)
+                {
+                    if (viewAll.GetRowLevel(gh) != 1 || !GroupKey(gh, out var t, out var c)) continue;
+                    string key = t + "|" + c;
+                    if (open.Contains(key)) viewAll.SetRowExpanded(gh, true, false);
+                    if (key == focusGroup) viewAll.FocusedRowHandle = gh;
+                }
+                if (focusID > 0)
+                {
+                    int h = viewAll.LocateByValue("ReconID", focusID);
+                    if (h != DevExpress.XtraGrid.GridControl.InvalidRowHandle) viewAll.FocusedRowHandle = h;
+                }
+                viewAll.TopRowIndex = top;
+            }
+            if (viewSum != null && _dtSum != null && viewSum.RowCount > 0)
+            {
+                viewSum.FocusedRowHandle = Math.Max(0, Math.Min(sumFocus, viewSum.RowCount - 1));
+                viewSum.TopRowIndex = sumTop;
+            }
+            UpdateCombinedButtons();
         }
 
         private void SetCombinedLocked(bool locked)
         {
             if (viewAll == null) return;
+            // 2026-10-10: the Cleared boxes are the editable columns (tick = clear at once)
             foreach (DevExpress.XtraGrid.Columns.GridColumn col in viewAll.Columns)
-                col.OptionsColumn.AllowEdit = col.FieldName == "Selected" && !locked;
+                col.OptionsColumn.AllowEdit = false;
+            if (viewSum != null)
+                foreach (DevExpress.XtraGrid.Columns.GridColumn col in viewSum.Columns)
+                    col.OptionsColumn.AllowEdit = false;
             UpdateCombinedButtons();
+            gridAll.Invalidate();   // the group check boxes are drawn only while unlocked
         }
 
         // Ticks only the data rows currently visible (filtered, in expanded groups).
         private void ChkAllSelect_CheckedChanged(object sender, EventArgs e)
         {
+            if (_summaryMode)
+            {
+                for (int i = 0; i < viewSum.RowCount; i++)
+                {
+                    int sh = viewSum.GetVisibleRowHandle(i);
+                    if (sh < 0) continue;
+                    bool cleared = Convert.ToString(viewSum.GetRowCellValue(sh, "Status")) == "CLEARED";
+                    viewSum.SetRowCellValue(sh, "Selected", chkAllSelect.Checked && !cleared);
+                }
+                return;
+            }
             for (int i = 0; i < viewAll.RowCount; i++)
             {
                 int handle = viewAll.GetVisibleRowHandle(i);
@@ -1284,6 +2399,7 @@ namespace SalesInventorySystem.AccountingDevEx
         private void BtnAllBulkResolve_Click(object sender, EventArgs e)
         {
             if (_isLocked) return;
+            if (_summaryMode) { SummaryResolve(SummaryRows(selectedOnly: true), "Bulk Resolve"); return; }
             viewAll.CloseEditor();
             viewAll.UpdateCurrentRow();
 
@@ -1320,6 +2436,7 @@ namespace SalesInventorySystem.AccountingDevEx
         private void BtnAllResolveBatch_Click(object sender, EventArgs e)
         {
             if (_isLocked) return;
+            if (_summaryMode) { SummaryResolve(SummaryRows(selectedOnly: false), "Clear Entire Batch"); return; }
             int dh = FocusedDataRowHandle();
             if (dh < 0) { XtraMessageBox.Show("Select a row or a Control No group first."); return; }
 
@@ -1343,6 +2460,153 @@ namespace SalesInventorySystem.AccountingDevEx
                 return;
 
             ResolveReconIDs(ids, type);
+        }
+
+        // ================================================================
+        // UNCLEAR IN ONE STEP (2026-10-09): the opposite of Clear Entire Batch / Bulk Resolve,
+        // through sp_BankRecon_BulkUnresolveItems (all or nothing). Only items cleared in the month
+        // on screen are undone; the rest are skipped and counted.
+        // ================================================================
+
+        // Unclear Entire Batch: the focused Control No (detailed view) or the focused batch row (summary view).
+        private void BtnAllUnresolveBatch_Click(object sender, EventArgs e)
+        {
+            if (_isLocked) return;
+            var ids = new List<int>();
+            decimal amount = 0m;
+            string what;
+
+            if (_summaryMode)
+            {
+                var r = viewSum.GetDataRow(viewSum.FocusedRowHandle);
+                if (r == null) { XtraMessageBox.Show("Select a batch row first."); return; }
+                CollectSummaryCleared(r, ids, ref amount);
+                string batch = Convert.ToString(r["BatchNo"]);
+                what = string.IsNullOrWhiteSpace(batch) ? "in the selected row" : $"in batch '{batch}'";
+            }
+            else
+            {
+                int dh = FocusedDataRowHandle();
+                if (dh < 0) { XtraMessageBox.Show("Select a row or a Control No group first."); return; }
+                string ctl = Convert.ToString(viewAll.GetRowCellValue(dh, "ControlNo"));
+                string type = Convert.ToString(viewAll.GetRowCellValue(dh, "ItemType"));
+                if (string.IsNullOrWhiteSpace(ctl)) { XtraMessageBox.Show("This item has no Control No."); return; }
+                foreach (DataRow row in _dtAll.Rows)
+                {
+                    if (Convert.ToString(row["ItemType"]) != type || Convert.ToString(row["ControlNo"]) != ctl) continue;
+                    if (!(row["IsResolved"] is bool done && done)) continue;
+                    ids.Add(SafeInt(row["ReconID"]));
+                    amount += SafeDec(row["Amount"]);
+                }
+                what = $"under Control No '{ctl}'";
+            }
+
+            if (ids.Count == 0) { XtraMessageBox.Show("Nothing in this batch is cleared."); return; }
+            UnresolveReconIDs(ids, amount, what, "Unclear Entire Batch");
+        }
+
+        // Bulk Unclear (detailed view): the ticked rows that are cleared.
+        private void BtnAllBulkUnresolve_Click(object sender, EventArgs e)
+        {
+            if (_isLocked || _summaryMode) return;
+            viewAll.CloseEditor();
+            viewAll.UpdateCurrentRow();
+
+            var ids = new List<int>();
+            decimal amount = 0m;
+            var controls = new HashSet<string>();
+            foreach (DataRow row in _dtAll.Rows)
+            {
+                if (!(row["Selected"] is bool sel && sel)) continue;
+                if (!(row["IsResolved"] is bool done && done)) continue;
+                ids.Add(SafeInt(row["ReconID"]));
+                amount += SafeDec(row["Amount"]);
+                string ctlNo = Convert.ToString(row["ControlNo"]);
+                if (!string.IsNullOrWhiteSpace(ctlNo)) controls.Add(ctlNo);
+            }
+
+            if (ids.Count == 0)
+            {
+                XtraMessageBox.Show("No cleared items are checked. Check the cleared rows you want to mark uncleared.");
+                return;
+            }
+            UnresolveReconIDs(ids, amount, $"in {controls.Count} control number(s)", "Bulk Unclear");
+        }
+
+        // The cleared items behind one summary row: its batch (Control No for deposits, CV # for checks)
+        // or, for a row without one, its single item. Same keys as sp_BankRecon_GetPeriodSummary.
+        private void CollectSummaryCleared(DataRow sumRow, List<int> ids, ref decimal amount)
+        {
+            bool isOC = Convert.ToString(sumRow["ItemType"]) == "OC";
+            DataTable src = isOC ? _dtOC : _dtDIT;
+            if (src == null) return;
+            string key = Convert.ToString(sumRow["BatchKey"]);
+            string field = isOC ? "CVNo" : "ControlNo";
+            foreach (DataRow row in src.Rows)
+            {
+                if (!(row["IsResolved"] is bool done && done)) continue;
+                bool match = key.StartsWith("ID:")
+                    ? SafeInt(row["ReconID"]) == SafeInt(key.Substring(3))
+                    : key.StartsWith("NO:") && src.Columns.Contains(field) && Convert.ToString(row[field]).Trim() == key.Substring(3).Trim();
+                if (!match) continue;
+                ids.Add(SafeInt(row["ReconID"]));
+                amount += SafeDec(row["Amount"]);
+            }
+        }
+
+        private void UnresolveReconIDs(List<int> ids, decimal amount, string what, string title)
+        {
+            string msg = $"Mark {ids.Count} cleared item(s) {what} as uncleared?\n\n" +
+                         $"  Amount: {amount:N2}\n\n" +
+                         $"Only items cleared in {_period:MMM yyyy} are undone; items cleared in another month are left as they are.";
+            if (XtraMessageBox.Show(msg, "Confirm " + title, MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes)
+                return;
+
+            if (!UnresolveCore(ids, title)) return;
+            LoadPeriod();
+            RefreshSummary();
+        }
+
+        // sp_BankRecon_BulkUnresolveItems without a confirmation and without a reload (2026-10-10: the batch
+        // boxes call it directly). False when the proc refused (message shown); the result goes to the status bar.
+        private bool UnresolveCore(List<int> ids, string title)
+        {
+            int done = 0, otherMonth = 0, notCleared = 0, system = 0;
+            try
+            {
+                var dtIds = new DataTable();
+                dtIds.Columns.Add("ReconID", typeof(int));
+                foreach (var id in ids) dtIds.Rows.Add(id);
+
+                using (var con = Database.getConnection())
+                using (var cmd = new SqlCommand("sp_BankRecon_BulkUnresolveItems", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    var p = cmd.Parameters.Add("@ReconIDs", SqlDbType.Structured);
+                    p.TypeName = "dbo.tt_BankReconIDList";
+                    p.Value = dtIds;
+                    cmd.Parameters.Add("@ResolvedBy", SqlDbType.VarChar, 50).Value = Login.Fullname;
+                    cmd.Parameters.Add("@PeriodEnd", SqlDbType.Date).Value = _period;
+                    con.Open();
+                    using (var rdr = cmd.ExecuteReader())
+                        if (rdr.Read())
+                        {
+                            done = SafeInt(rdr["UnclearedCount"]);
+                            otherMonth = SafeInt(rdr["SkippedOtherMonth"]);
+                            notCleared = SafeInt(rdr["SkippedNotCleared"]);
+                            system = SafeInt(rdr["SkippedSystem"]);
+                        }
+                }
+            }
+            catch (SqlException ex) { SetStatus(ex.Message, err: true); XtraMessageBox.Show(ex.Message, title, MessageBoxButtons.OK, MessageBoxIcon.Warning); return false; }
+
+            string result = $"{done} item(s) marked uncleared.";
+            if (otherMonth > 0) result += $"\n{otherMonth} item(s) were cleared in another month: open that month to undo them.";
+            if (system > 0) result += $"\n{system} item(s) were closed by a reversal or a posted auto-debit and were left as they are.";
+            if (notCleared > 0) result += $"\n{notCleared} item(s) were not cleared.";
+            SetStatus(result.Replace("\n", "  "));
+            if (otherMonth + system + notCleared > 0) XtraMessageBox.Show(result, title, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            return true;
         }
 
         private void btnLoad_Click(object sender, EventArgs e)

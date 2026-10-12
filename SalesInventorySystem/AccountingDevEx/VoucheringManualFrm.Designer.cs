@@ -260,7 +260,7 @@
             // 
             this.lblReferenceNo.Location = new System.Drawing.Point(14, 39);
             this.lblReferenceNo.Name = "lblReferenceNo";
-            this.lblReferenceNo.Size = new System.Drawing.Size(74, 13);
+            this.lblReferenceNo.Size = new System.Drawing.Size(86, 16);
             this.lblReferenceNo.TabIndex = 0;
             this.lblReferenceNo.Text = "Reference No.:";
             // 
@@ -269,14 +269,14 @@
             this.txtReferenceNo.Location = new System.Drawing.Point(148, 36);
             this.txtReferenceNo.Name = "txtReferenceNo";
             this.txtReferenceNo.Properties.ReadOnly = true;
-            this.txtReferenceNo.Size = new System.Drawing.Size(150, 20);
+            this.txtReferenceNo.Size = new System.Drawing.Size(150, 22);
             this.txtReferenceNo.TabIndex = 1;
             // 
             // lblVoucherDate
             // 
             this.lblVoucherDate.Location = new System.Drawing.Point(358, 39);
             this.lblVoucherDate.Name = "lblVoucherDate";
-            this.lblVoucherDate.Size = new System.Drawing.Size(69, 13);
+            this.lblVoucherDate.Size = new System.Drawing.Size(82, 16);
             this.lblVoucherDate.TabIndex = 2;
             this.lblVoucherDate.Text = "Voucher Date:";
             // 
@@ -289,14 +289,14 @@
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.txtVoucherDate.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton()});
-            this.txtVoucherDate.Size = new System.Drawing.Size(150, 20);
+            this.txtVoucherDate.Size = new System.Drawing.Size(150, 22);
             this.txtVoucherDate.TabIndex = 3;
             // 
             // lblBranch
             // 
             this.lblBranch.Location = new System.Drawing.Point(668, 39);
             this.lblBranch.Name = "lblBranch";
-            this.lblBranch.Size = new System.Drawing.Size(37, 13);
+            this.lblBranch.Size = new System.Drawing.Size(44, 16);
             this.lblBranch.TabIndex = 4;
             this.lblBranch.Text = "Branch:";
             // 
@@ -304,14 +304,14 @@
             // 
             this.cboBranch.Location = new System.Drawing.Point(764, 36);
             this.cboBranch.Name = "cboBranch";
-            this.cboBranch.Size = new System.Drawing.Size(198, 20);
+            this.cboBranch.Size = new System.Drawing.Size(198, 22);
             this.cboBranch.TabIndex = 5;
             // 
             // lblSupplier
             // 
             this.lblSupplier.Location = new System.Drawing.Point(14, 65);
             this.lblSupplier.Name = "lblSupplier";
-            this.lblSupplier.Size = new System.Drawing.Size(86, 13);
+            this.lblSupplier.Size = new System.Drawing.Size(106, 16);
             this.lblSupplier.TabIndex = 6;
             this.lblSupplier.Text = "Vendor / Supplier:";
             // 
@@ -320,7 +320,7 @@
             this.cboSupplier.Location = new System.Drawing.Point(148, 62);
             this.cboSupplier.Name = "cboSupplier";
             this.cboSupplier.Properties.PopupView = this.gridViewSupplierPopup;
-            this.cboSupplier.Size = new System.Drawing.Size(494, 20);
+            this.cboSupplier.Size = new System.Drawing.Size(494, 22);
             this.cboSupplier.TabIndex = 7;
             // 
             // gridViewSupplierPopup
@@ -365,7 +365,7 @@
             // 
             this.lblCheckNo.Location = new System.Drawing.Point(14, 91);
             this.lblCheckNo.Name = "lblCheckNo";
-            this.lblCheckNo.Size = new System.Drawing.Size(53, 13);
+            this.lblCheckNo.Size = new System.Drawing.Size(62, 16);
             this.lblCheckNo.TabIndex = 13;
             this.lblCheckNo.Text = "Check No.:";
             // 
@@ -373,14 +373,14 @@
             // 
             this.txtCheckNo.Location = new System.Drawing.Point(148, 88);
             this.txtCheckNo.Name = "txtCheckNo";
-            this.txtCheckNo.Size = new System.Drawing.Size(150, 20);
+            this.txtCheckNo.Size = new System.Drawing.Size(150, 22);
             this.txtCheckNo.TabIndex = 14;
             // 
             // lblControlNo
             // 
             this.lblControlNo.Location = new System.Drawing.Point(14, 90);
             this.lblControlNo.Name = "lblControlNo";
-            this.lblControlNo.Size = new System.Drawing.Size(59, 13);
+            this.lblControlNo.Size = new System.Drawing.Size(69, 16);
             this.lblControlNo.TabIndex = 15;
             this.lblControlNo.Text = "Control No.:";
             this.lblControlNo.Visible = false;
@@ -389,7 +389,7 @@
             // 
             this.txtControlNo.Location = new System.Drawing.Point(148, 87);
             this.txtControlNo.Name = "txtControlNo";
-            this.txtControlNo.Size = new System.Drawing.Size(150, 20);
+            this.txtControlNo.Size = new System.Drawing.Size(150, 22);
             this.txtControlNo.TabIndex = 16;
             this.txtControlNo.Visible = false;
             // 
@@ -397,7 +397,7 @@
             // 
             this.lblRemarks.Location = new System.Drawing.Point(339, 91);
             this.lblRemarks.Name = "lblRemarks";
-            this.lblRemarks.Size = new System.Drawing.Size(45, 13);
+            this.lblRemarks.Size = new System.Drawing.Size(55, 16);
             this.lblRemarks.TabIndex = 17;
             this.lblRemarks.Text = "Remarks:";
             // 
@@ -421,7 +421,7 @@
             // 
             this.lblCreditGLCode.Location = new System.Drawing.Point(668, 65);
             this.lblCreditGLCode.Name = "lblCreditGLCode";
-            this.lblCreditGLCode.Size = new System.Drawing.Size(73, 13);
+            this.lblCreditGLCode.Size = new System.Drawing.Size(86, 16);
             this.lblCreditGLCode.TabIndex = 20;
             this.lblCreditGLCode.Text = "Credit GLCode:";
             // 
@@ -430,7 +430,7 @@
             this.cboCreditGLCode.Location = new System.Drawing.Point(764, 62);
             this.cboCreditGLCode.Name = "cboCreditGLCode";
             this.cboCreditGLCode.Properties.PopupView = this.gridViewCreditGLPopup;
-            this.cboCreditGLCode.Size = new System.Drawing.Size(198, 20);
+            this.cboCreditGLCode.Size = new System.Drawing.Size(198, 22);
             this.cboCreditGLCode.TabIndex = 21;
             // 
             // gridViewCreditGLPopup
@@ -453,13 +453,13 @@
             // gridControlInvoices
             // 
             this.gridControlInvoices.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControlInvoices.Location = new System.Drawing.Point(2, 23);
+            this.gridControlInvoices.Location = new System.Drawing.Point(2, 28);
             this.gridControlInvoices.MainView = this.gridViewInvoices;
             this.gridControlInvoices.Name = "gridControlInvoices";
             this.gridControlInvoices.RepositoryItems.AddRange(new DevExpress.XtraEditors.Repository.RepositoryItem[] {
             this.repPay,
             this.repInvAmount});
-            this.gridControlInvoices.Size = new System.Drawing.Size(992, 252);
+            this.gridControlInvoices.Size = new System.Drawing.Size(992, 247);
             this.gridControlInvoices.TabIndex = 0;
             this.gridControlInvoices.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewInvoices});
@@ -495,7 +495,7 @@
             this.grpGLEntry.Dock = System.Windows.Forms.DockStyle.Fill;
             this.grpGLEntry.Location = new System.Drawing.Point(0, 442);
             this.grpGLEntry.Name = "grpGLEntry";
-            this.grpGLEntry.Size = new System.Drawing.Size(996, 384);
+            this.grpGLEntry.Size = new System.Drawing.Size(996, 379);
             this.grpGLEntry.TabIndex = 0;
             this.grpGLEntry.Text = "Additional GL Entry (manual, free-form — e.g. cash advances; AP-Trade/Cash/FX for" +
     " checked invoices now auto-post separately)";
@@ -503,7 +503,7 @@
             // gridControlGL
             // 
             this.gridControlGL.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControlGL.Location = new System.Drawing.Point(2, 23);
+            this.gridControlGL.Location = new System.Drawing.Point(2, 28);
             this.gridControlGL.MainView = this.gridViewGL;
             this.gridControlGL.Name = "gridControlGL";
             this.gridControlGL.RepositoryItems.AddRange(new DevExpress.XtraEditors.Repository.RepositoryItem[] {
@@ -511,7 +511,7 @@
             this.repGLDebit,
             this.repGLCredit,
             this.repGLParticulars});
-            this.gridControlGL.Size = new System.Drawing.Size(992, 359);
+            this.gridControlGL.Size = new System.Drawing.Size(992, 349);
             this.gridControlGL.TabIndex = 0;
             this.gridControlGL.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewGL});
@@ -676,7 +676,7 @@
             this.panelControl1.Controls.Add(this.lblBalanceStatus);
             this.panelControl1.Controls.Add(this.lblTieStatus);
             this.panelControl1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panelControl1.Location = new System.Drawing.Point(0, 726);
+            this.panelControl1.Location = new System.Drawing.Point(0, 721);
             this.panelControl1.Name = "panelControl1";
             this.panelControl1.Size = new System.Drawing.Size(996, 100);
             this.panelControl1.TabIndex = 7;
@@ -693,7 +693,6 @@
             this.tabNewVoucher,
             this.tabPosted});
             this.tabMain.SelectedPageChanged += new DevExpress.XtraTab.TabPageChangedEventHandler(this.TabMain_SelectedPageChanged);
-            //this.tabMain.Click += new System.EventHandler(this.tabMain_Click);
             // 
             // tabNewVoucher
             // 
@@ -702,13 +701,13 @@
             this.tabNewVoucher.Controls.Add(this.grpInvoices);
             this.tabNewVoucher.Controls.Add(this.grpHeader);
             this.tabNewVoucher.Name = "tabNewVoucher";
-            this.tabNewVoucher.Size = new System.Drawing.Size(996, 826);
+            this.tabNewVoucher.Size = new System.Drawing.Size(996, 821);
             this.tabNewVoucher.Text = "New Telegraphic Voucher";
             // 
             // tabPosted
             // 
             this.tabPosted.Name = "tabPosted";
-            this.tabPosted.Size = new System.Drawing.Size(996, 826);
+            this.tabPosted.Size = new System.Drawing.Size(996, 821);
             this.tabPosted.Text = "Posted Telegraphic Voucher";
             // 
             // pnlPostedFilter

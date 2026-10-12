@@ -148,14 +148,14 @@
             ((System.ComponentModel.ISupportInitialize)(this.gridView10)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtcashier.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView9)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.txtsalesdateto.Properties.CalendarTimeProperties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtsalesdateto.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtsalesdateto.Properties.CalendarTimeProperties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtmachine.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView5)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtbranch.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.searchLookUpEdit1View)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.txtsalesdatefrom.Properties.CalendarTimeProperties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtsalesdatefrom.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtsalesdatefrom.Properties.CalendarTimeProperties)).BeginInit();
             this.xtraTabPage2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.groupControl4)).BeginInit();
             this.groupControl4.SuspendLayout();
@@ -175,8 +175,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.txttotalsales.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtbrcodemgmtdata.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.txtsalesdatemgmtdata.Properties.CalendarTimeProperties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtsalesdatemgmtdata.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtsalesdatemgmtdata.Properties.CalendarTimeProperties)).BeginInit();
             this.xtraTabPage3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.groupControl5)).BeginInit();
             this.groupControl5.SuspendLayout();
@@ -195,8 +195,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.txttotalsalesVAT.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtbranchVAT.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView8)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.txtdateVAT.Properties.CalendarTimeProperties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtdateVAT.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtdateVAT.Properties.CalendarTimeProperties)).BeginInit();
             this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -230,10 +230,10 @@
             // 
             this.groupControl7.Controls.Add(this.gridControl4);
             this.groupControl7.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupControl7.Location = new System.Drawing.Point(0, 432);
+            this.groupControl7.Location = new System.Drawing.Point(0, 630);
             this.groupControl7.Margin = new System.Windows.Forms.Padding(2, 5, 2, 5);
             this.groupControl7.Name = "groupControl7";
-            this.groupControl7.Size = new System.Drawing.Size(1688, 217);
+            this.groupControl7.Size = new System.Drawing.Size(2110, 181);
             this.groupControl7.TabIndex = 3;
             this.groupControl7.Text = "B";
             // 
@@ -245,7 +245,7 @@
             this.gridControl4.MainView = this.gridView11;
             this.gridControl4.Margin = new System.Windows.Forms.Padding(2, 5, 2, 5);
             this.gridControl4.Name = "gridControl4";
-            this.gridControl4.Size = new System.Drawing.Size(1684, 187);
+            this.gridControl4.Size = new System.Drawing.Size(2106, 151);
             this.gridControl4.TabIndex = 1;
             this.gridControl4.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView11});
@@ -273,10 +273,10 @@
             // 
             this.groupControl2.Controls.Add(this.gridControl1);
             this.groupControl2.Dock = System.Windows.Forms.DockStyle.Top;
-            this.groupControl2.Location = new System.Drawing.Point(0, 147);
+            this.groupControl2.Location = new System.Drawing.Point(0, 185);
             this.groupControl2.Margin = new System.Windows.Forms.Padding(2, 5, 2, 5);
             this.groupControl2.Name = "groupControl2";
-            this.groupControl2.Size = new System.Drawing.Size(1688, 285);
+            this.groupControl2.Size = new System.Drawing.Size(2110, 356);
             this.groupControl2.TabIndex = 1;
             this.groupControl2.Text = "A";
             // 
@@ -288,7 +288,7 @@
             this.gridControl1.MainView = this.gridView1;
             this.gridControl1.Margin = new System.Windows.Forms.Padding(2, 5, 2, 5);
             this.gridControl1.Name = "gridControl1";
-            this.gridControl1.Size = new System.Drawing.Size(1684, 255);
+            this.gridControl1.Size = new System.Drawing.Size(2106, 326);
             this.gridControl1.TabIndex = 1;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1});
@@ -341,7 +341,7 @@
             this.groupControl1.Location = new System.Drawing.Point(0, 0);
             this.groupControl1.Margin = new System.Windows.Forms.Padding(2, 5, 2, 5);
             this.groupControl1.Name = "groupControl1";
-            this.groupControl1.Size = new System.Drawing.Size(1688, 147);
+            this.groupControl1.Size = new System.Drawing.Size(2110, 148);
             this.groupControl1.TabIndex = 0;
             this.groupControl1.Paint += new System.Windows.Forms.PaintEventHandler(this.groupControl1_Paint);
             // 
@@ -665,10 +665,10 @@
             // 
             this.groupControl4.Controls.Add(this.gridControl2);
             this.groupControl4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupControl4.Location = new System.Drawing.Point(0, 203);
+            this.groupControl4.Location = new System.Drawing.Point(0, 254);
             this.groupControl4.Margin = new System.Windows.Forms.Padding(2, 5, 2, 5);
             this.groupControl4.Name = "groupControl4";
-            this.groupControl4.Size = new System.Drawing.Size(1688, 446);
+            this.groupControl4.Size = new System.Drawing.Size(2110, 558);
             this.groupControl4.TabIndex = 2;
             // 
             // gridControl2
@@ -679,7 +679,7 @@
             this.gridControl2.MainView = this.gridView3;
             this.gridControl2.Margin = new System.Windows.Forms.Padding(2, 5, 2, 5);
             this.gridControl2.Name = "gridControl2";
-            this.gridControl2.Size = new System.Drawing.Size(1684, 416);
+            this.gridControl2.Size = new System.Drawing.Size(2106, 528);
             this.gridControl2.TabIndex = 1;
             this.gridControl2.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView3});
@@ -737,7 +737,7 @@
             this.groupControl3.Location = new System.Drawing.Point(0, 0);
             this.groupControl3.Margin = new System.Windows.Forms.Padding(2, 5, 2, 5);
             this.groupControl3.Name = "groupControl3";
-            this.groupControl3.Size = new System.Drawing.Size(1688, 203);
+            this.groupControl3.Size = new System.Drawing.Size(2110, 203);
             this.groupControl3.TabIndex = 1;
             // 
             // groupBox1
@@ -1116,10 +1116,10 @@
             // 
             this.groupControl5.Controls.Add(this.gridControl3);
             this.groupControl5.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupControl5.Location = new System.Drawing.Point(0, 161);
+            this.groupControl5.Location = new System.Drawing.Point(0, 201);
             this.groupControl5.Margin = new System.Windows.Forms.Padding(2, 5, 2, 5);
             this.groupControl5.Name = "groupControl5";
-            this.groupControl5.Size = new System.Drawing.Size(1688, 488);
+            this.groupControl5.Size = new System.Drawing.Size(2110, 610);
             this.groupControl5.TabIndex = 4;
             // 
             // gridControl3
@@ -1130,7 +1130,7 @@
             this.gridControl3.MainView = this.gridView4;
             this.gridControl3.Margin = new System.Windows.Forms.Padding(2, 5, 2, 5);
             this.gridControl3.Name = "gridControl3";
-            this.gridControl3.Size = new System.Drawing.Size(1684, 458);
+            this.gridControl3.Size = new System.Drawing.Size(2106, 580);
             this.gridControl3.TabIndex = 1;
             this.gridControl3.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView4});
@@ -1187,7 +1187,7 @@
             this.groupControl6.Location = new System.Drawing.Point(0, 0);
             this.groupControl6.Margin = new System.Windows.Forms.Padding(2, 5, 2, 5);
             this.groupControl6.Name = "groupControl6";
-            this.groupControl6.Size = new System.Drawing.Size(1688, 161);
+            this.groupControl6.Size = new System.Drawing.Size(2110, 161);
             this.groupControl6.TabIndex = 3;
             // 
             // txtmachineVAT

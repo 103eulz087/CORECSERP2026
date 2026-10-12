@@ -187,7 +187,7 @@
             // 
             this.chckboxAllBranch.AutoSize = true;
             this.chckboxAllBranch.Location = new System.Drawing.Point(340, 18);
-            this.chckboxAllBranch.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.chckboxAllBranch.Margin = new System.Windows.Forms.Padding(4);
             this.chckboxAllBranch.Name = "chckboxAllBranch";
             this.chckboxAllBranch.Size = new System.Drawing.Size(86, 20);
             this.chckboxAllBranch.TabIndex = 451;
@@ -468,11 +468,11 @@
             this.txtavg.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
             this.tablePanel1.SetColumn(this.txtavg, 3);
             this.txtavg.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txtavg.Location = new System.Drawing.Point(1063, 106);
+            this.txtavg.Location = new System.Drawing.Point(1063, 88);
             this.txtavg.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.txtavg.Name = "txtavg";
             this.tablePanel1.SetRow(this.txtavg, 1);
-            this.txtavg.Size = new System.Drawing.Size(340, 78);
+            this.txtavg.Size = new System.Drawing.Size(340, 96);
             this.txtavg.TabIndex = 17;
             this.txtavg.Text = "labelControl4";
             // 
@@ -493,7 +493,7 @@
             this.labelControl2.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.labelControl2.Name = "labelControl2";
             this.tablePanel1.SetRow(this.labelControl2, 0);
-            this.labelControl2.Size = new System.Drawing.Size(340, 98);
+            this.labelControl2.Size = new System.Drawing.Size(340, 79);
             this.labelControl2.TabIndex = 17;
             this.labelControl2.Text = "TOTAL GROSS";
             // 
@@ -510,11 +510,11 @@
             this.txttotasalesb4tax.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
             this.tablePanel1.SetColumn(this.txttotasalesb4tax, 2);
             this.txttotasalesb4tax.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txttotasalesb4tax.Location = new System.Drawing.Point(721, 106);
+            this.txttotasalesb4tax.Location = new System.Drawing.Point(721, 88);
             this.txttotasalesb4tax.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.txttotasalesb4tax.Name = "txttotasalesb4tax";
             this.tablePanel1.SetRow(this.txttotasalesb4tax, 1);
-            this.txttotasalesb4tax.Size = new System.Drawing.Size(340, 78);
+            this.txttotasalesb4tax.Size = new System.Drawing.Size(340, 96);
             this.txttotasalesb4tax.TabIndex = 17;
             this.txttotasalesb4tax.Text = "labelControl3";
             // 
@@ -535,7 +535,7 @@
             this.labelControl3.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.labelControl3.Name = "labelControl3";
             this.tablePanel1.SetRow(this.labelControl3, 0);
-            this.labelControl3.Size = new System.Drawing.Size(340, 98);
+            this.labelControl3.Size = new System.Drawing.Size(340, 79);
             this.labelControl3.TabIndex = 18;
             this.labelControl3.Text = "TOTAL NET";
             // 
@@ -552,11 +552,11 @@
             this.txttotsalesnet.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
             this.tablePanel1.SetColumn(this.txttotsalesnet, 1);
             this.txttotsalesnet.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txttotsalesnet.Location = new System.Drawing.Point(379, 106);
+            this.txttotsalesnet.Location = new System.Drawing.Point(379, 88);
             this.txttotsalesnet.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.txttotsalesnet.Name = "txttotsalesnet";
             this.tablePanel1.SetRow(this.txttotsalesnet, 1);
-            this.txttotsalesnet.Size = new System.Drawing.Size(340, 78);
+            this.txttotsalesnet.Size = new System.Drawing.Size(340, 96);
             this.txttotsalesnet.TabIndex = 16;
             this.txttotsalesnet.Text = "labelControl2";
             // 
@@ -577,7 +577,7 @@
             this.labelControl4.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.labelControl4.Name = "labelControl4";
             this.tablePanel1.SetRow(this.labelControl4, 0);
-            this.labelControl4.Size = new System.Drawing.Size(340, 98);
+            this.labelControl4.Size = new System.Drawing.Size(340, 79);
             this.labelControl4.TabIndex = 19;
             this.labelControl4.Text = "AVERAGE";
             // 
@@ -594,11 +594,11 @@
             this.txttotinvoice.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
             this.tablePanel1.SetColumn(this.txttotinvoice, 0);
             this.txttotinvoice.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txttotinvoice.Location = new System.Drawing.Point(3, 106);
+            this.txttotinvoice.Location = new System.Drawing.Point(3, 88);
             this.txttotinvoice.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.txttotinvoice.Name = "txttotinvoice";
             this.tablePanel1.SetRow(this.txttotinvoice, 1);
-            this.txttotinvoice.Size = new System.Drawing.Size(374, 78);
+            this.txttotinvoice.Size = new System.Drawing.Size(374, 96);
             this.txttotinvoice.TabIndex = 15;
             this.txttotinvoice.Text = "labelControl1";
             // 
@@ -619,7 +619,7 @@
             this.labelControl1.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.labelControl1.Name = "labelControl1";
             this.tablePanel1.SetRow(this.labelControl1, 0);
-            this.labelControl1.Size = new System.Drawing.Size(374, 98);
+            this.labelControl1.Size = new System.Drawing.Size(374, 79);
             this.labelControl1.TabIndex = 16;
             this.labelControl1.Text = "TOTAL INVOICE";
             // 
@@ -786,7 +786,7 @@
             this.gridControl1.MainView = this.gridView1;
             this.gridControl1.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
             this.gridControl1.Name = "gridControl1";
-            this.gridControl1.Size = new System.Drawing.Size(1122, 543);
+            this.gridControl1.Size = new System.Drawing.Size(1122, 518);
             this.gridControl1.TabIndex = 5;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1,
@@ -1001,17 +1001,17 @@
             this.panelControl3.Location = new System.Drawing.Point(0, 0);
             this.panelControl3.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.panelControl3.Name = "panelControl3";
-            this.panelControl3.Size = new System.Drawing.Size(1130, 649);
+            this.panelControl3.Size = new System.Drawing.Size(1413, 811);
             this.panelControl3.TabIndex = 0;
             // 
             // panelControl5
             // 
             this.panelControl5.Controls.Add(this.gridControl2);
             this.panelControl5.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelControl5.Location = new System.Drawing.Point(2, 121);
+            this.panelControl5.Location = new System.Drawing.Point(2, 151);
             this.panelControl5.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.panelControl5.Name = "panelControl5";
-            this.panelControl5.Size = new System.Drawing.Size(1126, 526);
+            this.panelControl5.Size = new System.Drawing.Size(1409, 658);
             this.panelControl5.TabIndex = 1;
             // 
             // panelControl4
@@ -1034,7 +1034,7 @@
             this.panelControl4.Location = new System.Drawing.Point(2, 2);
             this.panelControl4.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.panelControl4.Name = "panelControl4";
-            this.panelControl4.Size = new System.Drawing.Size(1126, 119);
+            this.panelControl4.Size = new System.Drawing.Size(1409, 149);
             this.panelControl4.TabIndex = 0;
             // 
             // xtraTabPage2
@@ -1060,10 +1060,10 @@
             // 
             this.panelControl7.Controls.Add(this.gridControl1);
             this.panelControl7.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelControl7.Location = new System.Drawing.Point(2, 125);
+            this.panelControl7.Location = new System.Drawing.Point(2, 156);
             this.panelControl7.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.panelControl7.Name = "panelControl7";
-            this.panelControl7.Size = new System.Drawing.Size(1409, 684);
+            this.panelControl7.Size = new System.Drawing.Size(1409, 653);
             this.panelControl7.TabIndex = 1;
             // 
             // panelControl6
@@ -1084,7 +1084,7 @@
             this.panelControl6.Location = new System.Drawing.Point(2, 2);
             this.panelControl6.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.panelControl6.Name = "panelControl6";
-            this.panelControl6.Size = new System.Drawing.Size(1409, 123);
+            this.panelControl6.Size = new System.Drawing.Size(1409, 154);
             this.panelControl6.TabIndex = 0;
             // 
             // POSSalesReportDevEx

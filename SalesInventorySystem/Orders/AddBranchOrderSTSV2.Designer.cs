@@ -159,7 +159,7 @@
             this.groupControl2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupControl2.Location = new System.Drawing.Point(2, 2);
             this.groupControl2.Name = "groupControl2";
-            this.groupControl2.Size = new System.Drawing.Size(1707, 186);
+            this.groupControl2.Size = new System.Drawing.Size(1707, 187);
             this.groupControl2.TabIndex = 5;
             this.groupControl2.Text = "Add Order";
             // 
@@ -238,7 +238,7 @@
             this.rdoFifoType.Properties.Items.AddRange(new DevExpress.XtraEditors.Controls.RadioGroupItem[] {
             new DevExpress.XtraEditors.Controls.RadioGroupItem("AUTO", "Auto (By Sequence)"),
             new DevExpress.XtraEditors.Controls.RadioGroupItem("MANUAL", "Manual (By Shipment)")});
-            this.rdoFifoType.Size = new System.Drawing.Size(309, 31);
+            this.rdoFifoType.Size = new System.Drawing.Size(313, 31);
             this.rdoFifoType.TabIndex = 90;
             this.rdoFifoType.SelectedIndexChanged += new System.EventHandler(this.rdoFifoType_SelectedIndexChanged);
             // 
@@ -810,7 +810,7 @@
             this.groupControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupControl1.Location = new System.Drawing.Point(2, 2);
             this.groupControl1.Name = "groupControl1";
-            this.groupControl1.Size = new System.Drawing.Size(770, 735);
+            this.groupControl1.Size = new System.Drawing.Size(964, 919);
             this.groupControl1.TabIndex = 4;
             this.groupControl1.Text = "Items Requested by Branch";
             // 
@@ -820,7 +820,7 @@
             this.gridControl1.Location = new System.Drawing.Point(2, 28);
             this.gridControl1.MainView = this.gridView1;
             this.gridControl1.Name = "gridControl1";
-            this.gridControl1.Size = new System.Drawing.Size(766, 705);
+            this.gridControl1.Size = new System.Drawing.Size(960, 889);
             this.gridControl1.TabIndex = 2;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1,
@@ -896,7 +896,7 @@
             this.gridControl2.Location = new System.Drawing.Point(2, 2);
             this.gridControl2.MainView = this.gridView2;
             this.gridControl2.Name = "gridControl2";
-            this.gridControl2.Size = new System.Drawing.Size(925, 735);
+            this.gridControl2.Size = new System.Drawing.Size(1157, 919);
             this.gridControl2.TabIndex = 3;
             this.gridControl2.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView2,
@@ -994,7 +994,7 @@
             this.panelControl1.Location = new System.Drawing.Point(0, 0);
             this.panelControl1.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.panelControl1.Name = "panelControl1";
-            this.panelControl1.Size = new System.Drawing.Size(1711, 190);
+            this.panelControl1.Size = new System.Drawing.Size(1711, 191);
             this.panelControl1.TabIndex = 8;
             // 
             // tablePanel1
@@ -1005,12 +1005,12 @@
             this.tablePanel1.Controls.Add(this.panelControl3);
             this.tablePanel1.Controls.Add(this.panelControl2);
             this.tablePanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tablePanel1.Location = new System.Drawing.Point(0, 190);
+            this.tablePanel1.Location = new System.Drawing.Point(0, 191);
             this.tablePanel1.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.tablePanel1.Name = "tablePanel1";
             this.tablePanel1.Rows.AddRange(new DevExpress.Utils.Layout.TablePanelRow[] {
             new DevExpress.Utils.Layout.TablePanelRow(DevExpress.Utils.Layout.TablePanelEntityStyle.Absolute, 26F)});
-            this.tablePanel1.Size = new System.Drawing.Size(1711, 745);
+            this.tablePanel1.Size = new System.Drawing.Size(1711, 744);
             this.tablePanel1.TabIndex = 0;
             // 
             // panelControl3
@@ -1022,7 +1022,7 @@
             this.panelControl3.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.panelControl3.Name = "panelControl3";
             this.tablePanel1.SetRow(this.panelControl3, 0);
-            this.panelControl3.Size = new System.Drawing.Size(968, 924);
+            this.panelControl3.Size = new System.Drawing.Size(968, 923);
             this.panelControl3.TabIndex = 11;
             // 
             // panelControl2
@@ -1030,11 +1030,11 @@
             this.tablePanel1.SetColumn(this.panelControl2, 0);
             this.panelControl2.Controls.Add(this.gridControl2);
             this.panelControl2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelControl2.Location = new System.Drawing.Point(3, 4);
+            this.panelControl2.Location = new System.Drawing.Point(2, 3);
             this.panelControl2.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.panelControl2.Name = "panelControl2";
             this.tablePanel1.SetRow(this.panelControl2, 0);
-            this.panelControl2.Size = new System.Drawing.Size(1161, 924);
+            this.panelControl2.Size = new System.Drawing.Size(1161, 923);
             this.panelControl2.TabIndex = 10;
             // 
             // AddBranchOrderSTSV2

@@ -213,7 +213,7 @@
             this.btnCloseSalesTransaction = new DevExpress.XtraBars.BarButtonItem();
             this.btnENDofDayTrans = new DevExpress.XtraBars.BarButtonItem();
             this.barStaticItem8 = new DevExpress.XtraBars.BarStaticItem();
-            this.barStaticCashierTransNo = new DevExpress.XtraBars.BarStaticItem();
+            this.dbname = new DevExpress.XtraBars.BarStaticItem();
             this.btnReceivedSTS = new DevExpress.XtraBars.BarButtonItem();
             this.btnViewSTSOrder = new DevExpress.XtraBars.BarButtonItem();
             this.btnBIRReports = new DevExpress.XtraBars.BarButtonItem();
@@ -520,7 +520,7 @@
             this.btnCloseSalesTransaction,
             this.btnENDofDayTrans,
             this.barStaticItem8,
-            this.barStaticCashierTransNo,
+            this.dbname,
             this.btnReceivedSTS,
             this.btnViewSTSOrder,
             this.btnBIRReports,
@@ -2289,11 +2289,11 @@
             this.barStaticItem8.Id = 182;
             this.barStaticItem8.Name = "barStaticItem8";
             // 
-            // barStaticCashierTransNo
+            // dbname
             // 
-            this.barStaticCashierTransNo.Caption = "NON";
-            this.barStaticCashierTransNo.Id = 183;
-            this.barStaticCashierTransNo.Name = "barStaticCashierTransNo";
+            this.dbname.Caption = "NON";
+            this.dbname.Id = 183;
+            this.dbname.Name = "dbname";
             // 
             // btnReceivedSTS
             // 
@@ -3277,7 +3277,7 @@
             this.ribbonStatusBar.ItemLinks.Add(this.barStaticItem7);
             this.ribbonStatusBar.ItemLinks.Add(this.barHeaderItem4);
             this.ribbonStatusBar.ItemLinks.Add(this.barStaticItem8);
-            this.ribbonStatusBar.ItemLinks.Add(this.barStaticCashierTransNo);
+            this.ribbonStatusBar.ItemLinks.Add(this.dbname);
             this.ribbonStatusBar.Location = new System.Drawing.Point(0, 760);
             this.ribbonStatusBar.Margin = new System.Windows.Forms.Padding(0, 4, 0, 4);
             this.ribbonStatusBar.Name = "ribbonStatusBar";
@@ -3614,7 +3614,7 @@
         private DevExpress.XtraBars.BarButtonItem btnCloseSalesTransaction;
         private DevExpress.XtraBars.BarButtonItem btnENDofDayTrans;
         private DevExpress.XtraBars.BarStaticItem barStaticItem8;
-        public DevExpress.XtraBars.BarStaticItem barStaticCashierTransNo;
+        public DevExpress.XtraBars.BarStaticItem dbname;
         private DevExpress.XtraBars.BarButtonItem btnReceivedSTS;
         private DevExpress.XtraBars.Ribbon.RibbonPageGroup ribbonPageGroup23;
         private DevExpress.XtraBars.BarButtonItem btnViewSTSOrder;

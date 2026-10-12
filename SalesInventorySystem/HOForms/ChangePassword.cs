@@ -36,13 +36,18 @@ namespace SalesInventorySystem.HOForms
                 return;
             }
 
-            string validationMessage;
-            if (!PasswordPolicy.Validate(txtnewpass.Text.Trim(), Login.isglobalUserID, out validationMessage))
+            if (GlobalCache.CompanyName != "VROSS")
             {
-                BigAlert.Show("WEAK PASSWORD", validationMessage, MessageBoxIcon.Warning);
-                //XtraMessageBox.Show(validationMessage, "Weak Password", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
+                string validationMessage;
+                if (!PasswordPolicy.Validate(txtnewpass.Text.Trim(), Login.isglobalUserID, out validationMessage))
+                {
+                    BigAlert.Show("WEAK PASSWORD", validationMessage, MessageBoxIcon.Warning);
+                    //XtraMessageBox.Show(validationMessage, "Weak Password", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
             }
+
 
             update();
             this.Dispose();

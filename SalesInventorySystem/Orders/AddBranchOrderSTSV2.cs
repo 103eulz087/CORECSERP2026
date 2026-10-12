@@ -80,9 +80,10 @@ namespace SalesInventorySystem.Orders
             //    panel1.Visible = true;
 
             //}
-            barcodescanning.Checked = true;
-            panel1.Visible = true;
-            txtbarcodescanning.Focus();
+            // 2026-10-03 (user): open on FIFO, not Scan Barcode; LoadData() set the FIFO type
+            // (JFC = Manual (By Shipment)). Tick the scan box to scan by barcode instead.
+            barcodescanning.Checked = false;
+            barcodescanning_CheckedChanged(barcodescanning, EventArgs.Empty);   // set the panels even if it was already unchecked
             Database.displayComboBoxItems("SELECT Description FROM ProductCategory", "Description", txtprodcat);
 
             // The opener (ViewBranchOrderSTS.openBranchOrderV2) already resolved
@@ -133,17 +134,23 @@ namespace SalesInventorySystem.Orders
             _dataLoaded = true;
             this.Text = (string.IsNullOrWhiteSpace(this.Text) ? "STS" : this.Text) + "  [FIFO V2 - TEST]";
             // JFC picks a specific batch; other companies take any warehouse lot.
-            // Setting EditValue fires rdoFifoType_SelectedIndexChanged -> LoadProductLookup().
+            // LoadData() runs before the form is shown, and the RadioGroup raises no
+            // SelectedIndexChanged until its window exists (2026-10-03: Manual looked selected
+            // but its dropdown was empty). So set the type quietly and load the list here.
             string defaultType = GlobalCache.CompanyName == "JFC" ? FifoManual : FifoAuto;
-            if (Equals(rdoFifoType.EditValue, defaultType)) LoadProductLookup();
-            else rdoFifoType.EditValue = defaultType;
+            _settingFifoType = true;
+            try { rdoFifoType.EditValue = defaultType; }
+            finally { _settingFifoType = false; }
+            LoadProductLookup();
             displayForDelivery();
         }
 
+        bool _settingFifoType = false;   // LoadData() sets the default type and loads the list itself
         bool IsManualFifo => Equals(rdoFifoType.EditValue, FifoManual);
 
         private void rdoFifoType_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (_settingFifoType) return;
             LoadProductLookup();
         }
 
@@ -308,7 +315,14 @@ namespace SalesInventorySystem.Orders
                 Database.display(cmd, gridControl2, gridView2);
             }
             FormatNumeric(gridView2, "QtyDelivered", "N3");
-            FormatNumeric(gridView2, "TotalCost", "N2");
+            // 2026-10-05 (user): cost is not shown on the processing screen. display() rebuilds the
+            // columns on every load, so hide it each time, and keep it out of the column chooser.
+            var costCol = gridView2.Columns["TotalCost"];
+            if (costCol != null)
+            {
+                costCol.Visible = false;
+                costCol.OptionsColumn.ShowInCustomizationForm = false;
+            }
 
 
             //Database.display("SELECT SeqNo,ProductNo,ProductName,BarcodeNo,QtyDelivered " +
