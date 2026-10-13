@@ -37,19 +37,27 @@ namespace SalesInventorySystem.POSV2
             foreach (var r in rows)
                 dt.Rows.Add(props.Select(p => p.GetValue(r, null) ?? (object)DBNull.Value).ToArray());
             _grid.DataSource = dt;
-            _view.PopulateColumns();
-            foreach (DevExpress.XtraGrid.Columns.GridColumn c in _view.Columns)
-                if (c.ColumnType == typeof(decimal))
-                {
-                    c.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
-                    c.DisplayFormat.FormatString = "N2";
-                }
-                else if (c.ColumnType == typeof(DateTime))
-                {
-                    c.DisplayFormat.FormatType = DevExpress.Utils.FormatType.DateTime;
-                    c.DisplayFormat.FormatString = "yyyy-MM-dd HH:mm";
-                }
-            _view.BestFitColumns();
+            // columns exist only once the form is shown (PopulateColumns in the constructor creates none)
+            Shown += (s, e) =>
+            {
+                _view.PopulateColumns();
+                foreach (DevExpress.XtraGrid.Columns.GridColumn c in _view.Columns)
+                    if (c.ColumnType == typeof(decimal))
+                    {
+                        c.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+                        c.DisplayFormat.FormatString = "N2";
+                        c.AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+                        c.AppearanceCell.Options.UseTextOptions = true;
+                        c.AppearanceHeader.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+                        c.AppearanceHeader.Options.UseTextOptions = true;
+                    }
+                    else if (c.ColumnType == typeof(DateTime))
+                    {
+                        c.DisplayFormat.FormatType = DevExpress.Utils.FormatType.DateTime;
+                        c.DisplayFormat.FormatString = "yyyy-MM-dd HH:mm";
+                    }
+                _view.BestFitColumns();
+            };
             _view.DoubleClick += (s, e) => { if (_view.CalcHitInfo(_grid.PointToClient(MousePosition)).InRow) Pick(); };
             Controls.Add(_grid);
             KeyDown += (s, e) =>

@@ -1204,11 +1204,12 @@ namespace SalesInventorySystem
             var btn = new BarButtonItem { Caption = "Loan Revaluation" };
             btn.ItemClick += (s, args) =>
             {
-                using (var frm = new AccountingDevEx.LoanRevaluationFrm())
-                {
-                    frm.LoadData();
-                    frm.Show();
-                }
+                // non-modal so other screens stay usable; no using block (it disposed the form as soon as Show() returned)
+                foreach (Form f in Application.OpenForms)
+                    if (f is AccountingDevEx.LoanRevaluationFrm) { f.Activate(); return; }
+                var frm = new AccountingDevEx.LoanRevaluationFrm();
+                frm.LoadData();
+                frm.Show();
             };
             ribbonControl.Items.Add(btn);
             popupMenuAcctgSettings.ItemLinks.Add(btn);
@@ -3081,83 +3082,85 @@ namespace SalesInventorySystem
         }
         private void btnPointOFSale_ItemClick(object sender, ItemClickEventArgs e)
         {
-            string charDate = Database.getSingleResultSet("SELECT dbo.func_ConvertDateTimeToChar('DATE','" + DateTime.Now.ToShortDateString() + "')");
+            openPOS();
 
-            bool isPOSDetailsExists = Database.checkifExist("SELECT TOP(1) BranchCode FROM dbo.POSInfoDetails WHERE MachineUsed='" + Environment.MachineName + "'");
+           // string charDate = Database.getSingleResultSet("SELECT dbo.func_ConvertDateTimeToChar('DATE','" + DateTime.Now.ToShortDateString() + "')");
 
-            //check if END OF DAY Transaction is already Executed, IF True, cashiers cannot login anymore.
-            bool isExists = Database.checkifExist("SELECT 1 " +
-                                                    "FROM POSZReadingTransactions " +
-                                                    "WHERE MachineUsed='" + Environment.MachineName + "' " +
-                                                    "AND BranchCode='"+Login.assignedBranch+"' " +
-                                                    "and DateExecute='" + DateTime.Now.ToShortDateString() + "' ");
-            //bool notyetEOF = Database.checkifExist("Select isEndOfDay FROM POSEODMonitoring WHERE isEndOfDay=0 and TransactionDate='" + DateTime.Now.ToShortDateString() + "'");
+           // bool isPOSDetailsExists = Database.checkifExist("SELECT TOP(1) BranchCode FROM dbo.POSInfoDetails WHERE MachineUsed='" + Environment.MachineName + "'");
+
+           // //check if END OF DAY Transaction is already Executed, IF True, cashiers cannot login anymore.
+           // bool isExists = Database.checkifExist("SELECT 1 " +
+           //                                         "FROM POSZReadingTransactions " +
+           //                                         "WHERE MachineUsed='" + Environment.MachineName + "' " +
+           //                                         "AND BranchCode='"+Login.assignedBranch+"' " +
+           //                                         "and DateExecute='" + DateTime.Now.ToShortDateString() + "' ");
+           // //bool notyetEOF = Database.checkifExist("Select isEndOfDay FROM POSEODMonitoring WHERE isEndOfDay=0 and TransactionDate='" + DateTime.Now.ToShortDateString() + "'");
             
-            //check if END OF DAY Monitoring is not yet EXECUTED on this date.
-            //used this condition always, because what if the CASHIER are forgot to EXECUTE END OF DAY
-            bool notyetEOF = Database.checkifExist("Select 1 " +
-                                                    "FROM POSEODMonitoring " +
-                                                    "WHERE isEndOfDay=0 AND BranchCode='"+Login.assignedBranch+"' " +
-                                                    "AND TransactionDate<>'"+ charDate + "'"); 
+           // //check if END OF DAY Monitoring is not yet EXECUTED on this date.
+           // //used this condition always, because what if the CASHIER are forgot to EXECUTE END OF DAY
+           // bool notyetEOF = Database.checkifExist("Select 1 " +
+           //                                         "FROM POSEODMonitoring " +
+           //                                         "WHERE isEndOfDay=0 AND BranchCode='"+Login.assignedBranch+"' " +
+           //                                         "AND TransactionDate<>'"+ charDate + "'"); 
 
-            //check if there are still OPEN CASHIER TRANSACTION on previous date.
-            bool stillOpenTransaction = Database.checkifExist("Select 1 " +
-                                                          "FROM SalesTransactionSummary " +
-                                                          "WHERE BranchCode='" + Login.assignedBranch + "' " +
-                                                          "and isOpen=1 " +
-                                                          //"and UserID='" + Login.isglobalUserID + "' " +
-                                                          "and CAST(TransactionDate as date) < '" + DateTime.Now.ToShortDateString() + "'" +
-                                                          "AND MachineUsed='" + Environment.MachineName.ToString() + "' ");
+           // //check if there are still OPEN CASHIER TRANSACTION on previous date.
+           // bool stillOpenTransaction = Database.checkifExist("Select 1 " +
+           //                                               "FROM SalesTransactionSummary " +
+           //                                               "WHERE BranchCode='" + Login.assignedBranch + "' " +
+           //                                               "and isOpen=1 " +
+           //                                               //"and UserID='" + Login.isglobalUserID + "' " +
+           //                                               "and CAST(TransactionDate as date) < '" + DateTime.Now.ToShortDateString() + "'" +
+           //                                               "AND MachineUsed='" + Environment.MachineName.ToString() + "' ");
 
-           bool cashierAlreadyLogin = Database.checkifExist("Select 1 " +
-                                                          "FROM SalesTransactionSummary " +
-                                                          "WHERE BranchCode='" + Login.assignedBranch + "' " +
-                                                          "and UserID='" + Login.isglobalUserID + "' " +
-                                                          "and isOpen=0 " +
-                                                          "and CAST(TransactionDate as date) = '" + DateTime.Now.ToShortDateString() + "'" +
-                                                          "AND MachineUsed='" + Environment.MachineName.ToString() + "' ");
+           //bool cashierAlreadyLogin = Database.checkifExist("Select 1 " +
+           //                                               "FROM SalesTransactionSummary " +
+           //                                               "WHERE BranchCode='" + Login.assignedBranch + "' " +
+           //                                               "and UserID='" + Login.isglobalUserID + "' " +
+           //                                               "and isOpen=0 " +
+           //                                               "and CAST(TransactionDate as date) = '" + DateTime.Now.ToShortDateString() + "'" +
+           //                                               "AND MachineUsed='" + Environment.MachineName.ToString() + "' ");
 
-            if (!isPOSDetailsExists)
-            {
-                POS.POSDetails posdet = new POS.POSDetails();
-                posdet.ShowDialog(this);
-            }
-            bool checkIfSameBranch = Database.checkifExist("SELECT TOP 1 BranchCode FROM POSInfoDetails WHERE MachineUsed='" + Environment.MachineName + "' AND BranchCode='" + Login.assignedBranch + "'");
-            if (!checkIfSameBranch)
-            {
-                XtraMessageBox.Show("The System found out that your Profile Branch Code is not registered in this machine....");
-                return;
-            }
-            if(cashierAlreadyLogin)
-            {
-                XtraMessageBox.Show("The System found out that this Cashier is Already Transacted in this Machine....");
-                return;
-            }
-            //either one of these condition are true.. 
-            if (notyetEOF == true || stillOpenTransaction==true) //naay transaction nga wla ka end of day..bsan ang mga cashier kay nag close transaction pro ang admin or supervisor wla ka execute og end of day.
-            {
-                XtraMessageBox.Show("The System found out that some transactions are still not yet END OF DAY Process..Please contact Admin..");
-                POS.POSTransactionChecker asjkdh = new POS.POSTransactionChecker();
-                display(asjkdh);
-                asjkdh.ShowDialog(this);
-                if(POS.POSTransactionChecker.isdone==true)
-                {
-                    display(asjkdh);
-                    if(asjkdh.gridView1.RowCount==0 && asjkdh.gridView2.RowCount == 0)
-                    {
-                        asjkdh.Dispose();
-                    }
-                }
-            }
-            else if (isExists == true)//dli na mka login kay na execute na ang end of day transaction sa karon nga adlaw...so by next day na pwedi ka cash begin or login.
-            {
-                XtraMessageBox.Show("The System found out that END OF DAY Transaction is Already Process for today's date...You can login on the next business day/s..");
-                return;
-            }
-            else
-            {
-                OpenPOSTransaction();
-            }
+           // if (!isPOSDetailsExists)
+           // {
+           //     POS.POSDetails posdet = new POS.POSDetails();
+           //     posdet.ShowDialog(this);
+           // }
+           // bool checkIfSameBranch = Database.checkifExist("SELECT TOP 1 BranchCode FROM POSInfoDetails WHERE MachineUsed='" + Environment.MachineName + "' AND BranchCode='" + Login.assignedBranch + "'");
+           // if (!checkIfSameBranch)
+           // {
+           //     XtraMessageBox.Show("The System found out that your Profile Branch Code is not registered in this machine....");
+           //     return;
+           // }
+           // if(cashierAlreadyLogin)
+           // {
+           //     XtraMessageBox.Show("The System found out that this Cashier is Already Transacted in this Machine....");
+           //     return;
+           // }
+           // //either one of these condition are true.. 
+           // if (notyetEOF == true || stillOpenTransaction==true) //naay transaction nga wla ka end of day..bsan ang mga cashier kay nag close transaction pro ang admin or supervisor wla ka execute og end of day.
+           // {
+           //     XtraMessageBox.Show("The System found out that some transactions are still not yet END OF DAY Process..Please contact Admin..");
+           //     POS.POSTransactionChecker asjkdh = new POS.POSTransactionChecker();
+           //     display(asjkdh);
+           //     asjkdh.ShowDialog(this);
+           //     if(POS.POSTransactionChecker.isdone==true)
+           //     {
+           //         display(asjkdh);
+           //         if(asjkdh.gridView1.RowCount==0 && asjkdh.gridView2.RowCount == 0)
+           //         {
+           //             asjkdh.Dispose();
+           //         }
+           //     }
+           // }
+           // else if (isExists == true)//dli na mka login kay na execute na ang end of day transaction sa karon nga adlaw...so by next day na pwedi ka cash begin or login.
+           // {
+           //     XtraMessageBox.Show("The System found out that END OF DAY Transaction is Already Process for today's date...You can login on the next business day/s..");
+           //     return;
+           // }
+           // else
+           // {
+           //     OpenPOSTransaction();
+           // }
         }
 
         private void btnPOSSettings_ItemClick(object sender, ItemClickEventArgs e)

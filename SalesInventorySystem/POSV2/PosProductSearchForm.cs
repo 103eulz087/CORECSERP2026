@@ -38,13 +38,6 @@ namespace SalesInventorySystem.POSV2
             _view.OptionsSelection.EnableAppearanceFocusedCell = false;
             _view.Appearance.Row.Font = new Font("Tahoma", 11f);
             _grid.DataSource = _items.Select(p => new { p.ProductCode, p.Description, p.Barcode, Price = p.SellingPrice, VAT = p.IsVat }).ToList();
-            _view.PopulateColumns();
-            if (_view.Columns["Price"] != null)
-            {
-                _view.Columns["Price"].DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
-                _view.Columns["Price"].DisplayFormat.FormatString = "N2";
-            }
-            _view.BestFitColumns();
             _view.DoubleClick += (s, e) => { if (_view.CalcHitInfo(_grid.PointToClient(MousePosition)).InRow) Pick(); };
             Controls.Add(_grid);
             KeyDown += (s, e) =>
@@ -52,7 +45,23 @@ namespace SalesInventorySystem.POSV2
                 if (e.KeyCode == Keys.Enter) { Pick(); e.Handled = true; }
                 else if (e.KeyCode == Keys.Escape) { DialogResult = DialogResult.Cancel; }
             };
-            Shown += (s, e) => _view.ShowFindPanel();
+            // columns exist only once the form is shown (PopulateColumns in the constructor creates none)
+            Shown += (s, e) =>
+            {
+                _view.PopulateColumns();
+                var price = _view.Columns["Price"];
+                if (price != null)
+                {
+                    price.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+                    price.DisplayFormat.FormatString = "N2";
+                    price.AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+                    price.AppearanceCell.Options.UseTextOptions = true;
+                    price.AppearanceHeader.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+                    price.AppearanceHeader.Options.UseTextOptions = true;
+                }
+                _view.BestFitColumns();
+                _view.ShowFindPanel();
+            };
         }
 
         private void Pick()

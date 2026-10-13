@@ -36,6 +36,8 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.btnResetEntry = new DevExpress.XtraEditors.SimpleButton();
             this.txtCharge = new DevExpress.XtraEditors.SpinEdit();
             this.labelControl6 = new DevExpress.XtraEditors.LabelControl();
+            this.labelControlConversionDate = new DevExpress.XtraEditors.LabelControl();
+            this.dtConversionDate = new DevExpress.XtraEditors.DateEdit();
             this.radioGroupType = new DevExpress.XtraEditors.RadioGroup();
             this.labelControl5 = new DevExpress.XtraEditors.LabelControl();
             this.txtBranch = new DevExpress.XtraEditors.TextEdit();
@@ -107,6 +109,8 @@ namespace SalesInventorySystem.HOFormsDevEx
             ((System.ComponentModel.ISupportInitialize)(this.panelHeader)).BeginInit();
             this.panelHeader.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtCharge.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dtConversionDate.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dtConversionDate.Properties.CalendarTimeProperties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.radioGroupType.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtBranch.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtRefNo.Properties)).BeginInit();
@@ -202,6 +206,8 @@ namespace SalesInventorySystem.HOFormsDevEx
             // 
             // panelHeader
             // 
+            this.panelHeader.Controls.Add(this.dtConversionDate);
+            this.panelHeader.Controls.Add(this.labelControlConversionDate);
             this.panelHeader.Controls.Add(this.btnResetEntry);
             this.panelHeader.Controls.Add(this.txtCharge);
             this.panelHeader.Controls.Add(this.labelControl6);
@@ -219,9 +225,37 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.panelHeader.Name = "panelHeader";
             this.panelHeader.Size = new System.Drawing.Size(1346, 83);
             this.panelHeader.TabIndex = 0;
-            // 
+            //
+            // labelControlConversionDate
+            //
+            this.labelControlConversionDate.Location = new System.Drawing.Point(745, 17);
+            this.labelControlConversionDate.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.labelControlConversionDate.Name = "labelControlConversionDate";
+            this.labelControlConversionDate.Size = new System.Drawing.Size(86, 13);
+            this.labelControlConversionDate.TabIndex = 10;
+            this.labelControlConversionDate.Text = "Conversion Date:";
+            //
+            // dtConversionDate
+            //
+            this.dtConversionDate.EditValue = null;
+            this.dtConversionDate.Location = new System.Drawing.Point(843, 13);
+            this.dtConversionDate.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.dtConversionDate.Name = "dtConversionDate";
+            this.dtConversionDate.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9.8F);
+            this.dtConversionDate.Properties.Appearance.Options.UseFont = true;
+            this.dtConversionDate.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.dtConversionDate.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.dtConversionDate.Properties.DisplayFormat.FormatString = "MM/dd/yyyy";
+            this.dtConversionDate.Properties.DisplayFormat.FormatType = DevExpress.Utils.FormatType.DateTime;
+            this.dtConversionDate.Properties.EditFormat.FormatString = "MM/dd/yyyy";
+            this.dtConversionDate.Properties.EditFormat.FormatType = DevExpress.Utils.FormatType.DateTime;
+            this.dtConversionDate.Size = new System.Drawing.Size(120, 22);
+            this.dtConversionDate.TabIndex = 11;
+            //
             // btnResetEntry
-            // 
+            //
             this.btnResetEntry.Location = new System.Drawing.Point(623, 9);
             this.btnResetEntry.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btnResetEntry.Name = "btnResetEntry";
@@ -991,6 +1025,8 @@ namespace SalesInventorySystem.HOFormsDevEx
             this.panelHeader.ResumeLayout(false);
             this.panelHeader.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtCharge.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dtConversionDate.Properties.CalendarTimeProperties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dtConversionDate.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.radioGroupType.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtBranch.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtRefNo.Properties)).EndInit();
@@ -1048,6 +1084,8 @@ namespace SalesInventorySystem.HOFormsDevEx
         private DevExpress.XtraEditors.SimpleButton btnResetEntry;
         private DevExpress.XtraEditors.SpinEdit txtCharge;
         private DevExpress.XtraEditors.LabelControl labelControl6;
+        private DevExpress.XtraEditors.LabelControl labelControlConversionDate;
+        private DevExpress.XtraEditors.DateEdit dtConversionDate;
         private DevExpress.XtraEditors.RadioGroup radioGroupType;
         private DevExpress.XtraEditors.LabelControl labelControl5;
         private DevExpress.XtraEditors.TextEdit txtBranch;

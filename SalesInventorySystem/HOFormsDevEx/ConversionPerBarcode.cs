@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
@@ -41,6 +42,11 @@ namespace SalesInventorySystem.HOFormsDevEx
                 return;
 
             txtBranch.Text = Login.assignedBranch;
+            // Conversion Date (2026-10-13b): dates the conversion, its output lots and the Finalize GL ticket,
+            // like a Sales Order's effectivity date. Defaults to today; staff pick an earlier date to catch up a
+            // past month. It stays as picked between entries (New Entry doesn't reset it) for batch catch-up.
+            dtConversionDate.DateTime = DateTime.Today;
+            dtConversionDate.Properties.MaxValue = DateTime.Today;
             BuildSourceGridShape();
             BuildOutputGridShape();
             FetchNewReferenceNumber();
@@ -217,6 +223,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             tableSource.Rows.Clear();
             tableOutput.Rows.Clear();
             txtCharge.Value = 0;
+            dtConversionDate.Properties.MaxValue = DateTime.Today;   // the picked date itself stays (batch catch-up)
             txtOutputProductCode.Text = "";
             txtOutputProductDesc.EditValue = null;
             txtOutputQty.Value = 0;
@@ -254,6 +261,9 @@ namespace SalesInventorySystem.HOFormsDevEx
             tableSource.Columns.Add("SeqNo", typeof(int));
             tableSource.Columns.Add("InventorySeqNo", typeof(int));
             tableSource.Columns.Add("Barcode", typeof(string));
+            // Display only: the source lot's own Inventory.ReferenceCode, on every row (scan, Auto, Manual).
+            // Not the "ReferenceCode" column below, which is sent to spu_PostConversionBarcode.
+            tableSource.Columns.Add("LotReferenceCode", typeof(string));
             tableSource.Columns.Add("ProductCode", typeof(string));
             tableSource.Columns.Add("Description", typeof(string));
             tableSource.Columns.Add("Qty", typeof(decimal));
@@ -270,6 +280,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             gridViewSource.Columns["SeqNo"].Visible = false;
             gridViewSource.Columns["InventorySeqNo"].Visible = false;
             gridViewSource.Columns["ReferenceCode"].Visible = false;
+            gridViewSource.Columns["LotReferenceCode"].Caption = "Reference Code";
             gridViewSource.Columns["ProductCode"].Caption = "Product Code";
             gridViewSource.Columns["Cost"].Caption = "Unit Cost";
             gridViewSource.BestFitColumns();
@@ -368,10 +379,12 @@ namespace SalesInventorySystem.HOFormsDevEx
             decimal qty = Convert.ToDecimal(found["Available"]);
             decimal cost = Convert.ToDecimal(found["Cost"]);
 
+            int scannedSeqNo = Convert.ToInt32(found["SequenceNumber"]);
             DataRow row = tableSource.NewRow();
             row["SeqNo"] = tableSource.Rows.Count + 1;
-            row["InventorySeqNo"] = Convert.ToInt32(found["SequenceNumber"]);
+            row["InventorySeqNo"] = scannedSeqNo;
             row["Barcode"] = found["Barcode"].ToString();
+            row["LotReferenceCode"] = LotReferenceCode(GetLotReferenceCodes(new[] { scannedSeqNo }), scannedSeqNo);
             row["ProductCode"] = scannedProduct;
             row["Description"] = found["Description"].ToString();
             row["Qty"] = qty;
@@ -400,6 +413,34 @@ namespace SalesInventorySystem.HOFormsDevEx
 
                 return dt.Rows.Count > 0 ? dt.Rows[0] : null;
             }
+        }
+
+        // The source lots' own Inventory.ReferenceCode, for the grid's Reference Code column (display only).
+        // The scan / FIFO lookup procs don't return it, so it is read by SequenceNumber in one round trip.
+        Dictionary<int, string> GetLotReferenceCodes(IEnumerable<int> seqNos)
+        {
+            var result = new Dictionary<int, string>();
+            string list = string.Join(",", seqNos.Distinct());
+            if (list.Length == 0) return result;
+
+            using (var con = Database.getConnection())
+            using (var cmd = new SqlCommand(
+                "SELECT i.SequenceNumber, i.ReferenceCode " +
+                "FROM dbo.Inventory AS i " +
+                "WHERE i.SequenceNumber IN (SELECT TRY_CAST(s.value AS INT) FROM STRING_SPLIT(@SeqNos, ',') AS s)", con))
+            {
+                cmd.Parameters.Add("@SeqNos", SqlDbType.VarChar, -1).Value = list;
+                con.Open();
+                using (var rdr = cmd.ExecuteReader())
+                    while (rdr.Read())
+                        result[Convert.ToInt32(rdr.GetValue(0))] = rdr.IsDBNull(1) ? "" : rdr.GetValue(1).ToString();
+            }
+            return result;
+        }
+
+        static object LotReferenceCode(Dictionary<int, string> codes, int seqNo)
+        {
+            return codes.TryGetValue(seqNo, out string code) && !string.IsNullOrEmpty(code) ? (object)code : DBNull.Value;
         }
 
         private void mnuRemoveSourceLine_Click(object sender, EventArgs e)
@@ -507,15 +548,18 @@ namespace SalesInventorySystem.HOFormsDevEx
                 }
             }
 
+            var lotRefCodes = GetLotReferenceCodes(breakdown.AsEnumerable().Select(r => Convert.ToInt32(r["SequenceNumber"])));
             foreach (DataRow r in breakdown.Rows)
             {
                 decimal lineQty = Convert.ToDecimal(r["Qty"]);
                 decimal lineCost = Convert.ToDecimal(r["Cost"]);
+                int lotSeqNo = Convert.ToInt32(r["SequenceNumber"]);
 
                 DataRow row = tableSource.NewRow();
                 row["SeqNo"] = tableSource.Rows.Count + 1;
-                row["InventorySeqNo"] = Convert.ToInt32(r["SequenceNumber"]);
+                row["InventorySeqNo"] = lotSeqNo;
                 row["Barcode"] = r["Barcode"].ToString();
+                row["LotReferenceCode"] = LotReferenceCode(lotRefCodes, lotSeqNo);
                 row["ProductCode"] = r["ProductCode"].ToString();
                 row["Description"] = r["Description"].ToString();
                 row["Qty"] = lineQty;
@@ -714,6 +758,7 @@ namespace SalesInventorySystem.HOFormsDevEx
                 cmd.Parameters["@CuttingCharge"].Precision = 18;
                 cmd.Parameters["@CuttingCharge"].Scale = 2;
                 cmd.Parameters.Add("@ConvertedBy", SqlDbType.VarChar, 50).Value = Login.Fullname;
+                cmd.Parameters.Add("@DateConversion", SqlDbType.Date).Value = dtConversionDate.DateTime.Date;
 
                 var pSource = cmd.Parameters.AddWithValue("@SourceLines", sourceTvp);
                 pSource.SqlDbType = SqlDbType.Structured;
@@ -791,6 +836,27 @@ namespace SalesInventorySystem.HOFormsDevEx
                     MessageBoxIcon.Warning);
                 return false;
             }
+
+            // Conversion Date: required, not in the future (the server also refuses a GL-closed month, 59218)
+            if (dtConversionDate.EditValue == null || dtConversionDate.EditValue == DBNull.Value)
+            {
+                BigAlert.Show("NO CONVERSION DATE", "Please pick the Conversion Date.", MessageBoxIcon.Warning);
+                dtConversionDate.Focus();
+                return false;
+            }
+            DateTime convDate = dtConversionDate.DateTime.Date;
+            if (convDate > DateTime.Today)
+            {
+                BigAlert.Show("INVALID CONVERSION DATE", "The Conversion Date cannot be in the future.", MessageBoxIcon.Warning);
+                dtConversionDate.Focus();
+                return false;
+            }
+            if (convDate != DateTime.Today &&
+                XtraMessageBox.Show(
+                    $"This conversion will be dated {convDate:MM/dd/yyyy}, not today.\n\n" +
+                    "Its output stock and the GL ticket posted at Finalize will carry that date. Continue?",
+                    "Back-dated Conversion", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                return false;
 
             return true;
         }
@@ -872,13 +938,33 @@ namespace SalesInventorySystem.HOFormsDevEx
             Database.display(
                 "SELECT ConversionRefNo, ConversionType, TotalSourceQty, TotalSourceCost, CuttingCharge, " +
                 "TotalDriplossQty, MaterialRatePerUnit, ChargeRatePerLine, Status, DateConverted, ConvertedBy, " +
-                "ReversedBy, DateReversed, FinalizedBy, DateFinalized " +
+                "ReversedBy, DateReversed, FinalizedBy, DateFinalized, DateEntered " +
                 "FROM dbo.vw_ConversionBarcodeSummary WITH (NOLOCK) " +
                 "WHERE BranchCode = '" + Login.assignedBranch.Replace("'", "''") + "' " +
                 "AND Status IN ('POSTED', 'REVERSED') " +
                 "ORDER BY DateConverted DESC",
                 gridControlPosted, gridViewPosted);
+            FormatConversionDateColumns(gridViewPosted);
             gridViewPosted.BestFitColumns();
+        }
+
+        // DateConverted = the Conversion Date picked at entry (dates the GL ticket); DateEntered = when it was keyed
+        static void FormatConversionDateColumns(DevExpress.XtraGrid.Views.Grid.GridView view)
+        {
+            var conv = view.Columns["DateConverted"];
+            if (conv != null)
+            {
+                conv.Caption = "Conversion Date";
+                conv.DisplayFormat.FormatType = DevExpress.Utils.FormatType.DateTime;
+                conv.DisplayFormat.FormatString = "MM/dd/yyyy";
+            }
+            var entered = view.Columns["DateEntered"];
+            if (entered != null)
+            {
+                entered.Caption = "Entered";
+                entered.DisplayFormat.FormatType = DevExpress.Utils.FormatType.DateTime;
+                entered.DisplayFormat.FormatString = "MM/dd/yyyy HH:mm";
+            }
         }
 
         private void btnRefreshPosted_Click(object sender, EventArgs e)
@@ -895,12 +981,13 @@ namespace SalesInventorySystem.HOFormsDevEx
         {
             Database.display(
                 "SELECT ConversionRefNo, ConversionType, TotalSourceQty, TotalSourceCost, CuttingCharge, " +
-                "TotalDriplossQty, MaterialRatePerUnit, ChargeRatePerLine, Status, DateConverted, ConvertedBy " +
+                "TotalDriplossQty, MaterialRatePerUnit, ChargeRatePerLine, Status, DateConverted, ConvertedBy, DateEntered " +
                 "FROM dbo.vw_ConversionBarcodeSummary WITH (NOLOCK) " +
                 "WHERE BranchCode = '" + Login.assignedBranch.Replace("'", "''") + "' " +
                 "AND Status = 'FOR POSTING' " +
                 "ORDER BY DateConverted DESC",
                 gridControlForPosting, gridViewForPosting);
+            FormatConversionDateColumns(gridViewForPosting);
             gridViewForPosting.BestFitColumns();
         }
 

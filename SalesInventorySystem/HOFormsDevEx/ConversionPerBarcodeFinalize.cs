@@ -10,6 +10,7 @@ namespace SalesInventorySystem.HOFormsDevEx
     public partial class ConversionPerBarcodeFinalize : DevExpress.XtraEditors.XtraForm
     {
         readonly string conversionRefNo;
+        DateTime? conversionDate;
 
         public ConversionPerBarcodeFinalize(string conversionRefNo)
         {
@@ -19,16 +20,31 @@ namespace SalesInventorySystem.HOFormsDevEx
 
         private void ConversionPerBarcodeFinalize_Load(object sender, EventArgs e)
         {
-            Text = "Finalize Conversion - " + conversionRefNo;
+            // the Conversion Date: the GL ticket posted here is dated with it (2026-10-13b)
+            using (var con = Database.getConnection())
+            using (var cmd = new SqlCommand("SELECT DateConverted FROM dbo.vw_ConversionBarcodeSummary WHERE ConversionRefNo = @RefNo", con))
+            {
+                cmd.Parameters.Add("@RefNo", SqlDbType.VarChar, 20).Value = conversionRefNo;
+                con.Open();
+                object d = cmd.ExecuteScalar();
+                conversionDate = d == null || d == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(d).Date;
+            }
+            Text = "Finalize Conversion - " + conversionRefNo +
+                   (conversionDate.HasValue ? "  (Conversion Date " + conversionDate.Value.ToString("MM/dd/yyyy") + ")" : "");
 
+            // ReferenceCode = the source lot's own Inventory.ReferenceCode (the function doesn't return it)
             using (var con = Database.getConnection())
             using (var cmd = new SqlCommand(
-                "SELECT SeqNo, Barcode, ProductCode, Description, Qty, Cost, Amount " +
-                "FROM dbo.funcview_ConversionBarcodeSourceDetails(@RefNo) ORDER BY SeqNo", con))
+                "SELECT d.SeqNo, d.Barcode, i.ReferenceCode, d.ProductCode, d.Description, d.Qty, d.Cost, d.Amount " +
+                "FROM dbo.funcview_ConversionBarcodeSourceDetails(@RefNo) AS d " +
+                "LEFT JOIN dbo.Inventory AS i ON i.SequenceNumber = d.InventorySeqNo " +
+                "ORDER BY d.SeqNo", con))
             {
                 cmd.Parameters.Add("@RefNo", SqlDbType.VarChar, 20).Value = conversionRefNo;
                 Database.display(cmd, gridControlSourceDetails, gridViewSourceDetails);
             }
+            if (gridViewSourceDetails.Columns["ReferenceCode"] != null)
+                gridViewSourceDetails.Columns["ReferenceCode"].Caption = "Reference Code";
             gridViewSourceDetails.BestFitColumns();
 
             using (var con = Database.getConnection())
@@ -117,8 +133,9 @@ namespace SalesInventorySystem.HOFormsDevEx
                 tvp.Rows.Add(Convert.ToInt32(row["SeqNo"]), finalCost);
             }
 
+            string ticketDateText = conversionDate.HasValue ? " dated " + conversionDate.Value.ToString("MM/dd/yyyy") + " (the Conversion Date)" : "";
             if (XtraMessageBox.Show(
-                    "Finalize this Conversion? This applies the Final Cost to inventory and posts the GL ticket entries. This cannot be undone afterward.",
+                    "Finalize this Conversion? This applies the Final Cost to inventory and posts the GL ticket entries" + ticketDateText + ". This cannot be undone afterward.",
                     "Finalize Conversion", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                 return;
 

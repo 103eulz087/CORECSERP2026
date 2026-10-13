@@ -89,6 +89,13 @@ namespace SalesInventorySystem.POSV2
                 _tabs.TabPages.Add(page);
                 _views[r[1]] = view;
             }
+            // a grid on a tab not opened yet can't be formatted at load (no columns yet): format it when its tab opens
+            _tabs.SelectedPageChanged += (s, e) =>
+            {
+                var view = _views[Reports[_tabs.SelectedTabPageIndex][1]];
+                var data = view.GridControl.DataSource as DataTable;
+                if (data != null && !Equals(view.Tag, "formatted")) Bind(view, data);
+            };
             Controls.Add(_tabs);
             Controls.Add(top);
             Shown += async (s, e) => { await LoadBranchesAsync(); await LoadAsync(); };
@@ -172,10 +179,13 @@ namespace SalesInventorySystem.POSV2
         private static void Bind(GridView view, DataTable data)
         {
             // the columns are built once; a reload keeps the user's order, widths and filters (UI review S4)
-            bool first = view.Columns.Count == 0;
+            // formatted once, flagged in Tag (not by Columns.Count: a grid on a tab not shown yet gets no columns from
+            // PopulateColumns, then makes its own when shown, which skipped the formatting for good; CLAUDE.md numeric rule 4)
             view.GridControl.DataSource = data;
-            if (!first) return;
+            if (Equals(view.Tag, "formatted")) return;
             view.PopulateColumns();
+            if (view.Columns.Count == 0) return;   // not bound yet: the next load formats it
+            view.Tag = "formatted";
             bool attention = data.Columns.Contains("Kind");   // Needs attention: Amount mixes pesos and qty, so no sums
             if (data.Columns.Contains("ORNo") && data.Columns.Contains("Status") && !data.Columns.Contains("ReturnNo"))
                 view.ActiveFilterString = "[Status] <> 'VOIDED'";   // sales journal: footers = sales that count (clear the filter to see voids)

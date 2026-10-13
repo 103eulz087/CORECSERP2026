@@ -70,16 +70,15 @@ namespace SalesInventorySystem.POSV2
             _view.OptionsCustomization.AllowSort = false;
             _view.OptionsCustomization.AllowFilter = false;
             _view.OptionsView.ShowFooter = true;
-            _grid.DataSource = _lines;
-            _view.PopulateColumns();
-            foreach (DevExpress.XtraGrid.Columns.GridColumn c in _view.Columns)
+            // columns added explicitly: PopulateColumns() creates none while the form isn't shown yet (constructor)
+            var caps = new[] { new[] { "LineNo", "#" }, new[] { "Description", "Description" }, new[] { "Qty", "Sold" }, new[] { "ReturnedQty", "Returned" },
+                               new[] { "Returnable", "Returnable" }, new[] { "ReturnQty", "Return now" }, new[] { "UnitPrice", "Price" }, new[] { "LineTotal", "Paid (line)" } };
+            foreach (var cap in caps)
             {
-                c.OptionsColumn.AllowEdit = c.FieldName == "ReturnQty";   // only the qty to return is typed
-                c.Visible = new[] { "LineNo", "Description", "Qty", "ReturnedQty", "Returnable", "ReturnQty", "UnitPrice", "LineTotal" }.Contains(c.FieldName);
+                var c = _view.Columns.AddVisible(cap[0], cap[1]);
+                c.OptionsColumn.AllowEdit = cap[0] == "ReturnQty";   // only the qty to return is typed
             }
-            var caps = new[] { new[] { "LineNo", "#" }, new[] { "Qty", "Sold" }, new[] { "ReturnedQty", "Returned" }, new[] { "ReturnQty", "Return now" },
-                               new[] { "UnitPrice", "Price" }, new[] { "LineTotal", "Paid (line)" } };
-            foreach (var c in caps) if (_view.Columns[c[0]] != null) _view.Columns[c[0]].Caption = c[1];
+            _grid.DataSource = _lines;
             foreach (var f in new[] { "Qty", "ReturnedQty", "Returnable", "ReturnQty" }) Num(f, "N3");
             foreach (var f in new[] { "UnitPrice", "LineTotal" }) Num(f, "N2");
             _view.Columns["ReturnQty"].AppearanceCell.BackColor = Color.LightYellow;
@@ -127,6 +126,10 @@ namespace SalesInventorySystem.POSV2
             if (c == null) return;
             c.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
             c.DisplayFormat.FormatString = fmt;
+            c.AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+            c.AppearanceCell.Options.UseTextOptions = true;
+            c.AppearanceHeader.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+            c.AppearanceHeader.Options.UseTextOptions = true;
         }
 
         // The server is asked off the UI thread; the grid is bound back on it (Known Bug #8). A newer lookup wins, the screen

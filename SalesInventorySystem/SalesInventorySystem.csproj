@@ -341,6 +341,9 @@
     <Compile Include="AccountingDevEx\ViewLinkedPODetailsFrm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="AccountingDevEx\ViewLinkedPODetailsFrm.Designer.cs">
+      <DependentUpon>ViewLinkedPODetailsFrm.cs</DependentUpon>
+    </Compile>
     <Compile Include="AccountingDevEx\BalanceSheetAccountDetails.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -3650,6 +3653,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="AccountingDevEx\BalanceSheetAccountDetails.resx">
       <DependentUpon>BalanceSheetAccountDetails.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AccountingDevEx\ViewLinkedPODetailsFrm.resx">
+      <DependentUpon>ViewLinkedPODetailsFrm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="AccountingDevEx\BalanceSheetDevEx.resx">
       <DependentUpon>BalanceSheetDevEx.cs</DependentUpon>

@@ -43,7 +43,7 @@ namespace SalesInventorySystem.POSV2
             Controls.Add(_grid);
             Controls.Add(bar);
             CancelButton = btnClose;
-            Load += (s, e) => Reload();
+            Shown += (s, e) => Reload();   // after the form is shown, so PopulateColumns finds the grid bound
         }
 
         private void Reload()

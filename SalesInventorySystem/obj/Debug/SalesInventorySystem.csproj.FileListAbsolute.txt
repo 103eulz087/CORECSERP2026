@@ -2538,3 +2538,4 @@ D:\CORECSXWINDOWSAPP\SalesInventorySystem\obj\Debug\SalesInventorySystem.csproj.
 D:\CORECSXWINDOWSAPP\SalesInventorySystem\obj\Debug\SalesInv.A74E2F72.Up2Date
 D:\CORECSXWINDOWSAPP\SalesInventorySystem\obj\Debug\SalesInventorySystem.exe
 D:\CORECSXWINDOWSAPP\SalesInventorySystem\obj\Debug\SalesInventorySystem.pdb
+D:\CORECSXWINDOWSAPP\SalesInventorySystem\obj\Debug\SalesInventorySystem.AccountingDevEx.ViewLinkedPODetailsFrm.resources

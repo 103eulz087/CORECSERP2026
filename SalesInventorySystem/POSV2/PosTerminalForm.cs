@@ -159,15 +159,19 @@ namespace SalesInventorySystem.POSV2
             view.Appearance.Row.Font = new Font("Tahoma", 13f);
             view.Appearance.HeaderPanel.Font = new Font("Tahoma", 10f, FontStyle.Bold);
             view.RowHeight = 30;
+            // columns added explicitly: PopulateColumns() creates none while the grid isn't on a shown form yet (constructor),
+            // which made Columns["LineNo"] null here. ProductCode, Barcode, VAT / discount details stay on the bound line only.
+            Col(view, "LineNo", "#", 40);
+            Col(view, "Description", "Description", 420);
+            Col(view, "Qty", "Qty", 90);
+            Col(view, "PriceLevel", "Level", 70);
+            Col(view, "UnitPrice", "Price", 110);
+            Col(view, "LineDiscount", "Discount", 100);
+            Col(view, "LineTotal", "Amount", 120);
+            Col(view, "IsVat", "VAT", 50);
+            Col(view, "DiscountCode", "Disc.", 70);
             grid.DataSource = _cart;
-            view.PopulateColumns();
-            foreach (string hide in new[] { "ProductCode", "Barcode", "VatAmount", "IsVatItem", "DiscNo", "DiscountAmount", "VatExemptAmount" })
-                if (view.Columns[hide] != null) view.Columns[hide].Visible = false;
-            var captions = new Dictionary<string, string> { { "LineNo", "#" }, { "PriceLevel", "Level" }, { "UnitPrice", "Price" }, { "LineTotal", "Amount" }, { "IsVat", "VAT" }, { "LineDiscount", "Discount" }, { "DiscountCode", "Disc." } };
-            foreach (var kv in captions) if (view.Columns[kv.Key] != null) view.Columns[kv.Key].Caption = kv.Value;
             Num(view, "Qty", "N3"); Num(view, "UnitPrice", "N2"); Num(view, "LineTotal", "N2"); Num(view, "LineDiscount", "N2");
-            view.Columns["LineNo"].Width = 40;
-            view.Columns["Description"].Width = 420;
 
             Controls.Add(grid);
             Controls.Add(right);
@@ -185,6 +189,12 @@ namespace SalesInventorySystem.POSV2
             parent.Controls.Add(l);
         }
 
+        private static void Col(GridView v, string field, string caption, int width)
+        {
+            var c = v.Columns.AddVisible(field, caption);
+            c.Width = width;
+        }
+
         private static void Num(GridView v, string field, string fmt)
         {
             var c = v.Columns[field];
@@ -192,6 +202,9 @@ namespace SalesInventorySystem.POSV2
             c.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
             c.DisplayFormat.FormatString = fmt;
             c.AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+            c.AppearanceCell.Options.UseTextOptions = true;
+            c.AppearanceHeader.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+            c.AppearanceHeader.Options.UseTextOptions = true;
         }
 
         // ── start / stop ───────────────────────────────────────────────
