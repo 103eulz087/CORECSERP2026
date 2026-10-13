@@ -109,30 +109,56 @@ namespace SalesInventorySystem.AccountingDevEx
         {
             if (searchLookUpEdit1.EditValue == null)
                 return "100000000";
+            return GetNextCheckNo(searchLookUpEdit1.EditValue.ToString());
+        }
 
+        // The next cheque number of a bank account: the last voucher's cheque + 1, as before.
+        // 2026-10-12: a cancelled cheque recorded with "Cancelled Cheque…" (PaidTo 'CANCELLED', amount 0,
+        // voided) never counts as the last voucher, since one recorded out of sequence (an older number)
+        // must not pull the suggestion back; and any number already used on that bank is skipped (on the
+        // production copy BDO PESO 2 and PNB PESO 2 were suggesting cheque numbers already issued).
+        private string GetNextCheckNo(string bankGLCode)
+        {
             string sql = @"
         SELECT TOP(1) CheckNo
         FROM dbo.CheckVoucher
        WHERE OfficialReceiptNo=@bankglcode
-        ORDER BY VoucherID DESC, SequenceNumber DESC";
+         AND NOT (PaidTo = 'CANCELLED' AND ISNULL(Amount, 0) = 0 AND ISNULL(isErrorCorrect, 0) = 1)
+        ORDER BY VoucherID DESC, SequenceNumber DESC;
+
+        SELECT DISTINCT LTRIM(RTRIM(CheckNo)) AS CheckNo
+        FROM dbo.CheckVoucher
+       WHERE (OfficialReceiptNo=@bankglcode OR CreditGLCode=@bankglcode)
+         AND ISNULL(CheckNo, '') <> '';";
 
             string lastCheckNo = null;
+            var used = new HashSet<string>(StringComparer.OrdinalIgnoreCase);   // every number already used on the bank
 
             using (SqlConnection conn = Database.getConnection())
             using (SqlCommand cmd = new SqlCommand(sql, conn))
             {
-                cmd.Parameters.AddWithValue(
-                    "@bankglcode",
-                    searchLookUpEdit1.EditValue.ToString());
+                cmd.Parameters.Add("@bankglcode", SqlDbType.VarChar, 100).Value = bankGLCode;
 
                 conn.Open();
 
-                object result = cmd.ExecuteScalar();
-
-                if (result != null && result != DBNull.Value)
-                    lastCheckNo = result.ToString();
+                using (var rdr = cmd.ExecuteReader())
+                {
+                    if (rdr.Read() && rdr[0] != DBNull.Value)
+                        lastCheckNo = rdr[0].ToString();
+                    if (rdr.NextResult())
+                        while (rdr.Read())
+                            if (rdr[0] != DBNull.Value) used.Add(rdr[0].ToString());
+                }
             }
 
+            string next = IncrementCheckNo(lastCheckNo);
+            for (int guard = 0; guard < 10000 && used.Contains(next); guard++)
+                next = IncrementCheckNo(next);
+            return next;
+        }
+
+        private static string IncrementCheckNo(string lastCheckNo)
+        {
             // If there is no previous check number, start from a sensible default
             if (string.IsNullOrEmpty(lastCheckNo))
                 return "100000000";
@@ -321,6 +347,330 @@ namespace SalesInventorySystem.AccountingDevEx
             InitializeComponent();
             WireEvents();
             repositoryItemCheckEditStat.EditValueChanged += RepositoryItemCheckEditStat_EditValueChanged;
+            BuildCancelledChequeButton();
+        }
+
+        // ── 2026-10-12: RECORD A CANCELLED (SPOILED) CHEQUE ─────────────────────
+        // Spoiled / misprinted / lost cheques used to be "paid" to a fake supplier CANCELLED. Now:
+        // one button in the Check Voucher panel -> dbo.sp_RecordCancelledCheque, which uses up the
+        // cheque no., a CV no., a voucher no. and a reference no., and makes no GL entry, no bank
+        // recon item and no AP / ledger row. A cheque already posted to pay a supplier is not this:
+        // it is reversed (Supplier Voucher Reversal).
+        private SimpleButton btnRecordCancelledCheque;
+
+        private void BuildCancelledChequeButton()
+        {
+            txtlastchecknum.Width = 130;   // room for the button in the Check Voucher panel (409 px wide)
+            btnRecordCancelledCheque = new SimpleButton
+            {
+                Text = "Cancelled Cheque…",
+                Location = new Point(294, 2),
+                Size = new Size(108, 24),
+                ToolTip = "Record a spoiled / misprinted / lost cheque: uses up its cheque no. and a CV no. No payment, no GL entry."
+            };
+            btnRecordCancelledCheque.Click += BtnRecordCancelledCheque_Click;
+            panelCheckVoucher.Controls.Add(btnRecordCancelledCheque);
+            btnRecordCancelledCheque.BringToFront();
+        }
+
+        // 2026-10-12 (user: fix typos after recording): the button opens the list of cancelled cheques recorded
+        // so far (sp_GetCancelledCheques), with New… / Edit…; Edit corrects one through sp_EditCancelledCheque
+        // (SQL/2026-10-12c), which also logs the old and new values in CancelledChequeEditLog.
+        private void BtnRecordCancelledCheque_Click(object sender, EventArgs e)
+        {
+            DataTable banks;
+            try
+            {
+                banks = GetDataTable(@"SELECT c.AccountCode, c.AccountCode + ' - ' + c.Description AS DisplayText
+                                       FROM dbo.ChartOfAccounts c
+                                       WHERE EXISTS (SELECT 1 FROM dbo.BankCoa b WHERE b.AccountCode = c.AccountCode)
+                                       ORDER BY c.AccountCode");
+            }
+            catch (SqlException ex) { XtraMessageBox.Show(ex.Message, "Cancelled Cheque", MessageBoxButtons.OK, MessageBoxIcon.Error); return; }
+
+            bool changed = false;
+            using (var dlg = new XtraForm
+            {
+                Text = "Cancelled Cheques",
+                StartPosition = FormStartPosition.CenterParent,
+                MinimizeBox = false,
+                ShowInTaskbar = false,
+                ClientSize = new Size(980, 480),
+                MinimumSize = new Size(700, 360)
+            })
+            {
+                var top = new PanelControl { Dock = DockStyle.Top, Height = 44 };
+                var lblFrom = new LabelControl { Text = "Cheque date from", Location = new Point(10, 14) };
+                var dtFrom = new DateEdit { Location = new Point(115, 10), Width = 110 };
+                var lblTo = new LabelControl { Text = "to", Location = new Point(234, 14) };
+                var dtTo = new DateEdit { Location = new Point(252, 10), Width = 110 };
+                var today = DateTime.Today;
+                dtFrom.EditValue = new DateTime(today.Year, today.Month, 1).AddMonths(-2);
+                dtTo.EditValue = today;
+                var btnShow = new SimpleButton { Text = "Show", Location = new Point(372, 8), Size = new Size(70, 26) };
+                top.Controls.AddRange(new Control[] { lblFrom, dtFrom, lblTo, dtTo, btnShow });
+
+                var bottom = new PanelControl { Dock = DockStyle.Bottom, Height = 44 };
+                var btnNew = new SimpleButton { Text = "New…", Location = new Point(10, 8), Size = new Size(90, 28) };
+                var btnEdit = new SimpleButton { Text = "Edit…", Location = new Point(106, 8), Size = new Size(90, 28) };
+                var btnClose = new SimpleButton { Text = "Close", Size = new Size(90, 28), DialogResult = DialogResult.Cancel,
+                                                  Anchor = AnchorStyles.Top | AnchorStyles.Right };
+                btnClose.Location = new Point(bottom.Width - 100, 8);
+                bottom.Controls.AddRange(new Control[] { btnNew, btnEdit, btnClose });
+
+                var grid = new DevExpress.XtraGrid.GridControl { Dock = DockStyle.Fill };
+                var view = new GridView(grid);
+                grid.MainView = view;
+                view.OptionsBehavior.Editable = false;
+                view.OptionsView.ShowGroupPanel = false;
+                view.OptionsSelection.EnableAppearanceFocusedCell = false;
+
+                Action load = () =>
+                {
+                    try
+                    {
+                        var dt = new DataTable();
+                        using (var con = Database.getConnection())
+                        using (var cmd = new SqlCommand("dbo.sp_GetCancelledCheques", con) { CommandType = CommandType.StoredProcedure })
+                        {
+                            cmd.Parameters.Add("@DateFrom", SqlDbType.Date).Value = dtFrom.EditValue is DateTime f ? (object)f.Date : DBNull.Value;
+                            cmd.Parameters.Add("@DateTo", SqlDbType.Date).Value = dtTo.EditValue is DateTime t ? (object)t.Date : DBNull.Value;
+                            con.Open();
+                            new SqlDataAdapter(cmd).Fill(dt);
+                        }
+                        grid.DataSource = dt;
+                        view.PopulateColumns();
+                        foreach (string hide in new[] { "VoucherID", "ReferenceNumber", "BankGLCode" })
+                            if (view.Columns[hide] != null) view.Columns[hide].Visible = false;
+                        var captions = new Dictionary<string, string>
+                        {
+                            { "CheckDate", "Cheque Date" }, { "BankName", "Bank" }, { "CheckNo", "Cheque No." }, { "CVNo", "CV No." },
+                            { "RecordedBy", "Recorded By" }, { "RecordedAt", "Recorded" }, { "Edits", "Edits" }
+                        };
+                        foreach (var kv in captions)
+                            if (view.Columns[kv.Key] != null) view.Columns[kv.Key].Caption = kv.Value;
+                        if (view.Columns["CheckDate"] != null)
+                        {
+                            view.Columns["CheckDate"].DisplayFormat.FormatType = DevExpress.Utils.FormatType.DateTime;
+                            view.Columns["CheckDate"].DisplayFormat.FormatString = "yyyy-MM-dd";
+                        }
+                        if (view.Columns["RecordedAt"] != null)
+                        {
+                            view.Columns["RecordedAt"].DisplayFormat.FormatType = DevExpress.Utils.FormatType.DateTime;
+                            view.Columns["RecordedAt"].DisplayFormat.FormatString = "yyyy-MM-dd HH:mm";
+                        }
+                        view.BestFitColumns();
+                        btnEdit.Enabled = dt.Rows.Count > 0;
+                    }
+                    catch (SqlException ex) { XtraMessageBox.Show(ex.Message, "Cancelled Cheques", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
+                };
+                Action edit = () =>
+                {
+                    var row = view.GetFocusedDataRow();
+                    if (row == null) { XtraMessageBox.Show("Select a cancelled cheque first."); return; }
+                    if (ShowCancelledChequeEntry(banks, row)) { changed = true; load(); }
+                };
+
+                btnShow.Click += (s, a) => load();
+                btnNew.Click += (s, a) => { if (ShowCancelledChequeEntry(banks, null)) { changed = true; load(); } };
+                btnEdit.Click += (s, a) => edit();
+                view.DoubleClick += (s, a) =>
+                {
+                    var hit = view.CalcHitInfo(grid.PointToClient(Control.MousePosition));
+                    if (hit.InRow) edit();
+                };
+
+                dlg.Controls.Add(grid);
+                dlg.Controls.Add(top);
+                dlg.Controls.Add(bottom);
+                grid.BringToFront();
+                dlg.CancelButton = btnClose;
+                load();
+                dlg.ShowDialog(this);
+            }
+
+            if (changed && CanGenerateVoucher())
+                RefreshVoucher();   // the next cheque / CV no. on the main screen move past the ones used
+        }
+
+        // The entry window: new (existing == null) or a correction of a recorded cancelled cheque. True when saved.
+        private bool ShowCancelledChequeEntry(DataTable banks, DataRow existing)
+        {
+            bool isEdit = existing != null;
+            using (var dlg = new XtraForm
+            {
+                Text = isEdit ? "Edit Cancelled Cheque" : "Record Cancelled Cheque",
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                StartPosition = FormStartPosition.CenterParent,
+                MaximizeBox = false,
+                MinimizeBox = false,
+                ShowInTaskbar = false,
+                ClientSize = new Size(470, 362)
+            })
+            {
+                var info = new LabelControl
+                {
+                    Text = isEdit
+                        ? "Correct the details of this cancelled cheque (typos). It stays a cancelled cheque:\n" +
+                          "no payment, no GL entry. The old and new values are kept in the edit log."
+                        : "For a cheque that was spoiled, misprinted or lost and never paid anyone.\n" +
+                          "It uses up the cheque no. and a CV no. No payment, no GL entry.\n" +
+                          "A cheque already posted to pay a supplier is reversed instead (Supplier Voucher Reversal).",
+                    Location = new Point(14, 10),
+                    AutoSizeMode = LabelAutoSizeMode.Vertical,
+                    Width = 442
+                };
+                var lblBank = new LabelControl { Text = "Bank account", Location = new Point(14, 76) };
+                var cboBank = new LookUpEdit { Location = new Point(120, 72), Width = 336 };
+                cboBank.Properties.DataSource = banks;
+                cboBank.Properties.ValueMember = "AccountCode";
+                cboBank.Properties.DisplayMember = "DisplayText";
+                cboBank.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;   // Known Bug #2
+                cboBank.Properties.ShowHeader = false;
+                cboBank.Properties.Columns.Add(new DevExpress.XtraEditors.Controls.LookUpColumnInfo("DisplayText", "Bank account"));
+                cboBank.Properties.NullText = "";
+
+                var lblNo = new LabelControl { Text = "Cheque no.", Location = new Point(14, 108) };
+                var txtNo = new TextEdit { Location = new Point(120, 104), Width = 160 };
+                var lblDate = new LabelControl { Text = "Cheque date", Location = new Point(14, 140) };
+                var dtDate = new DateEdit { Location = new Point(120, 136), Width = 160 };
+                dtDate.EditValue = txtcheckdate.EditValue is DateTime cd ? cd : DateTime.Today;
+
+                // 2026-10-12 (user): the CV no. the cheque uses up; filled with the next one of the series
+                // (same rule as GenerateVoucherNumber), may be overwritten (SQL/2026-10-12b refuses one already used)
+                var lblCV = new LabelControl { Text = "CV no.", Location = new Point(14, 172) };
+                var txtCV = new TextEdit { Location = new Point(120, 168), Width = 220 };
+                txtCV.Properties.MaxLength = 50;
+
+                var lblReason = new LabelControl { Text = "Reason", Location = new Point(14, 204) };
+                var cboReason = new ComboBoxEdit { Location = new Point(120, 200), Width = 160 };
+                cboReason.Properties.Items.AddRange(new object[] { "SPOILED", "MISPRINTED", "DAMAGED", "LOST", "WRONG PAYEE", "OTHER" });
+                cboReason.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;
+                cboReason.SelectedIndex = 0;
+
+                var lblRemarks = new LabelControl { Text = "Remarks", Location = new Point(14, 236) };
+                var memo = new MemoEdit { Location = new Point(120, 232), Size = new Size(336, 70) };
+                memo.Properties.MaxLength = 1000;
+
+                var btnSave = new SimpleButton { Text = isEdit ? "Save" : "Record", Location = new Point(270, 320), Size = new Size(90, 28) };
+                var btnClose = new SimpleButton { Text = "Close", Location = new Point(366, 320), Size = new Size(90, 28), DialogResult = DialogResult.Cancel };
+
+                // new: the next cheque no. of the chosen bank, and the CV no., follow the inputs until the user types
+                // their own; edit: they start as recorded and only change when the user changes them
+                bool typed = isEdit, settingNo = false;
+                txtNo.EditValueChanging += (s, a) => { if (!settingNo) typed = true; };
+                cboBank.EditValueChanged += (s, a) =>
+                {
+                    if (typed || cboBank.EditValue == null) return;
+                    try { settingNo = true; txtNo.Text = GetNextCheckNo(cboBank.EditValue.ToString()); }
+                    catch (SqlException ex) { XtraMessageBox.Show(ex.Message, "Cancelled Cheque"); }
+                    finally { settingNo = false; }
+                };
+                bool cvTyped = isEdit, settingCV = false;
+                txtCV.EditValueChanging += (s, a) => { if (!settingCV) cvTyped = true; };
+                Action fillCV = () =>
+                {
+                    if (cvTyped || cboBank.EditValue == null || !(dtDate.EditValue is DateTime d)) return;
+                    try
+                    {
+                        settingCV = true;
+                        int seq = GetNextSequenceForMonth(d.Year, d.Month);
+                        txtCV.Text = $"CV{d:yy}{d:MM}-{seq:D3}{GetBank(cboBank.EditValue.ToString())}{txtNo.Text.Trim()}";
+                    }
+                    finally { settingCV = false; }
+                };
+                cboBank.EditValueChanged += (s, a) => fillCV();
+                dtDate.EditValueChanged += (s, a) => fillCV();
+                txtNo.EditValueChanged += (s, a) => fillCV();
+
+                string oldNo = "";
+                if (isEdit)
+                {
+                    cboBank.EditValue = Convert.ToString(existing["BankGLCode"]);
+                    oldNo = Convert.ToString(existing["CheckNo"]).Trim();
+                    txtNo.Text = oldNo;
+                    dtDate.EditValue = existing["CheckDate"] is DateTime ed ? ed : (object)DateTime.Today;
+                    txtCV.Text = Convert.ToString(existing["CVNo"]).Trim();
+                    string r0 = Convert.ToString(existing["Reason"]).Trim();
+                    if (r0.Length > 0 && !cboReason.Properties.Items.Contains(r0)) cboReason.Properties.Items.Add(r0);
+                    cboReason.EditValue = r0.Length > 0 ? r0 : "SPOILED";
+                    memo.Text = Convert.ToString(existing["Remarks"]);
+                    // a corrected cheque no. carries into the CV no. when the CV no. ends with the old one (as the series does)
+                    txtNo.EditValueChanged += (s, a) =>
+                    {
+                        string cv = txtCV.Text.Trim(), nw = txtNo.Text.Trim();
+                        if (oldNo.Length > 0 && cv.EndsWith(oldNo, StringComparison.OrdinalIgnoreCase) && nw.Length > 0)
+                        {
+                            settingCV = true;
+                            txtCV.Text = cv.Substring(0, cv.Length - oldNo.Length) + nw;
+                            settingCV = false;
+                            oldNo = nw;
+                        }
+                    };
+                }
+                else
+                {
+                    // start on the bank already picked on the voucher, if it is a bank account
+                    string picked = searchLookUpEdit1.EditValue?.ToString();
+                    if (!string.IsNullOrEmpty(picked))
+                        foreach (DataRow r in banks.Rows)
+                            if (Convert.ToString(r["AccountCode"]) == picked) { cboBank.EditValue = picked; break; }
+                }
+
+                btnSave.Click += (s, a) =>
+                {
+                    string bank = cboBank.EditValue?.ToString();
+                    string no = txtNo.Text.Trim();
+                    if (string.IsNullOrWhiteSpace(bank)) { XtraMessageBox.Show("Select the bank account."); return; }
+                    if (no.Length == 0) { XtraMessageBox.Show("Enter the cheque number."); return; }
+                    if (!(dtDate.EditValue is DateTime date)) { XtraMessageBox.Show("Enter the cheque date."); return; }
+                    string reason = cboReason.Text.Trim();
+                    if (reason.Length == 0) { XtraMessageBox.Show("Select the reason."); return; }
+                    string cvNo = txtCV.Text.Trim();
+                    if (cvNo.Length == 0) { XtraMessageBox.Show("Enter the CV number."); return; }
+
+                    string ask = isEdit
+                        ? $"Save the corrected details of this cancelled cheque?\n\nCheque {no}, {cboBank.Text}, CV no. {cvNo} ({reason})."
+                        : $"Record cheque {no} of {cboBank.Text} as CANCELLED ({reason}), CV no. {cvNo}?\n\n" +
+                          "It uses up this cheque no. and CV no.";
+                    if (XtraMessageBox.Show(ask, dlg.Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                        return;
+
+                    try
+                    {
+                        string message = isEdit ? "Cancelled cheque updated." : "Cancelled cheque recorded.";
+                        using (var con = Database.getConnection())
+                        using (var cmd = new SqlCommand(isEdit ? "dbo.sp_EditCancelledCheque" : "dbo.sp_RecordCancelledCheque", con) { CommandType = CommandType.StoredProcedure })
+                        {
+                            if (isEdit)
+                            {
+                                cmd.Parameters.Add("@VoucherID", SqlDbType.VarChar, 10).Value = Convert.ToString(existing["VoucherID"]);
+                                cmd.Parameters.Add("@ReferenceNumber", SqlDbType.VarChar, 10).Value = Convert.ToString(existing["ReferenceNumber"]);
+                            }
+                            cmd.Parameters.Add("@BankGLCode", SqlDbType.VarChar, 30).Value = bank;
+                            cmd.Parameters.Add("@CheckNo", SqlDbType.VarChar, 50).Value = no;
+                            cmd.Parameters.Add("@CheckDate", SqlDbType.Date).Value = date.Date;
+                            cmd.Parameters.Add("@Reason", SqlDbType.VarChar, 100).Value = reason;
+                            cmd.Parameters.Add("@Remarks", SqlDbType.VarChar, 1000).Value = memo.Text.Trim();
+                            cmd.Parameters.Add("@User", SqlDbType.VarChar, 50).Value = Login.Fullname;
+                            cmd.Parameters.Add("@CVNo", SqlDbType.VarChar, 50).Value = cvNo;   // SQL/2026-10-12b / 12c
+                            con.Open();
+                            using (var rdr = cmd.ExecuteReader())
+                                if (rdr.Read()) message = rdr["Message"]?.ToString() ?? message;
+                        }
+                        BigAlert.Show("SUCCESS", message, MessageBoxIcon.Information);
+                        dlg.DialogResult = DialogResult.OK;
+                    }
+                    catch (SqlException ex)
+                    {
+                        XtraMessageBox.Show(ex.Message, dlg.Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+                };
+
+                dlg.Controls.AddRange(new Control[] { info, lblBank, cboBank, lblNo, txtNo, lblDate, dtDate, lblCV, txtCV, lblReason, cboReason, lblRemarks, memo, btnSave, btnClose });
+                dlg.CancelButton = btnClose;
+                return dlg.ShowDialog(this) == DialogResult.OK;
+            }
         }
         private void RepositoryItemCheckEditStat_EditValueChanged(object sender, EventArgs e)
         {
@@ -354,16 +704,40 @@ namespace SalesInventorySystem.AccountingDevEx
             if (_dataLoaded)
                 return;
 
-            Database.displaySearchlookupEdit(
-                "SELECT SupplierID,SupplierName FROM Supplier",
-                searchLookUpSupplier,
-                "SupplierName",
-                "SupplierName");
+            // 2026-10-12 (user: the screen took a second to open): its 5 distinct lookup queries go in one
+            // batch, one round trip (Database.FetchTables), then bind exactly as before. They used to run one after
+            // another, 8 round trips (the 3 grid account lookups repeated the credit-account query).
+            Dictionary<string, DataTable> t;
+            try
+            {
+                t = Database.FetchTables(new Dictionary<string, string>
+                {
+                    // 2026-10-12 (user): the "CANCELLED" supplier was only a workaround for recording spoiled cheques;
+                    // that is now "Cancelled Cheque…" (sp_RecordCancelledCheque), so it is hidden here
+                    ["suppliers"] = "SELECT SupplierID,SupplierName FROM Supplier WHERE LTRIM(RTRIM(SupplierName)) <> 'CANCELLED'",
+                    ["coaD"] = "SELECT AccountCode, Description FROM ChartOfAccounts WHERE AccountType='D' ORDER BY AccountCode",
+                    ["coa508"] = "SELECT AccountCode, Description FROM ChartOfAccounts ORDER BY CASE WHEN AccountCode = '508' THEN 0 ELSE 1 END, AccountCode",
+                    ["coaAll"] = "SELECT coa.AccountCode, coa.Description, coa.AccountCode + '-' + coa.Description AS DisplayText FROM ChartOfAccounts coa ORDER BY coa.AccountCode",
+                    ["branches"] = "SELECT BranchCode, BranchName, BranchCode + '-' + BranchName AS DisplayText FROM Branches ORDER BY BranchCode",
+                });
+            }
+            catch (SqlException ex)
+            {
+                XtraMessageBox.Show("Failed to load dropdown data: " + ex.Message, "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;   // not marked loaded: the next LoadData tries again
+            }
 
-            populateCOA();
+            // same binding as Database.displaySearchlookupEdit
+            searchLookUpSupplier.Properties.View.Columns.Clear();
+            searchLookUpSupplier.Properties.DataSource = null;
+            searchLookUpSupplier.Properties.DataSource = t["suppliers"];
+            searchLookUpSupplier.Properties.DisplayMember = "SupplierName";
+            searchLookUpSupplier.Properties.ValueMember = "SupplierName";
+
+            populateCOA(t["coaD"], t["coa508"]);
             radChanged();
-            BindDebitAccountLookup();
-            BindBranchLineLookup();
+            BindDebitAccountLookup(t["coaAll"]);
+            BindBranchLineLookup(t["branches"]);
 
             _dataLoaded = true;
         }
@@ -408,9 +782,9 @@ namespace SalesInventorySystem.AccountingDevEx
             UpdateTotal();
         }
          
-        private void BindBranchLineLookup()
+        private void BindBranchLineLookup(DataTable dt = null)   // 2026-10-12: dt = already fetched by LoadData
         {
-            DataTable dt = GetDataTable(
+            if (dt == null) dt = GetDataTable(
         "SELECT BranchCode, BranchName, BranchCode + '-' + BranchName AS DisplayText FROM Branches ORDER BY BranchCode");
 
             repBranchLine.DataSource = dt;
@@ -419,9 +793,9 @@ namespace SalesInventorySystem.AccountingDevEx
             repBranchLineView.PopulateColumns();      // CHANGED — populate the popup grid's own View
             repBranchLineView.OptionsView.ShowGroupPanel = false;
         }
-        private void BindDebitAccountLookup()
+        private void BindDebitAccountLookup(DataTable dt = null)   // 2026-10-12: dt = already fetched by LoadData
         {
-            DataTable dt = GetDataTable(@"
+            if (dt == null) dt = GetDataTable(@"
                         SELECT coa.AccountCode, coa.Description,
                                coa.AccountCode + '-' + coa.Description AS DisplayText
                         FROM ChartOfAccounts coa
@@ -469,26 +843,41 @@ namespace SalesInventorySystem.AccountingDevEx
             lblTotal.Text = total.ToString("N2");
         }
         
-        private void BindCreditGLCodeLookup()
+        private void BindCreditGLCodeLookup(DataTable dt = null)   // 2026-10-12: dt = already fetched by LoadData
         {
-            var dt = GetDataTable("SELECT AccountCode, Description FROM ChartOfAccounts WHERE AccountType='D' ORDER BY AccountCode");
+            if (dt == null) dt = GetDataTable("SELECT AccountCode, Description FROM ChartOfAccounts WHERE AccountType='D' ORDER BY AccountCode");
             searchLookUpEdit1.Properties.DataSource = dt;
             searchLookUpEdit1.Properties.DisplayMember = "Description";
             searchLookUpEdit1.Properties.ValueMember = "AccountCode";
             searchLookUpEdit1.Properties.PopulateViewColumns();
 
         }
-        void populateCOA()
+        void populateCOA(DataTable coaD = null, DataTable coa508 = null)   // 2026-10-12: tables already fetched by LoadData
         {
-            BindCreditGLCodeLookup();
+            if (coaD == null || coa508 == null)
+            {
+                var t = Database.FetchTables(new Dictionary<string, string>
+                {
+                    ["coaD"] = "SELECT AccountCode, Description FROM ChartOfAccounts WHERE AccountType='D' ORDER BY AccountCode",
+                    ["coa508"] = "SELECT AccountCode, Description FROM ChartOfAccounts ORDER BY CASE WHEN AccountCode = '508' THEN 0 ELSE 1 END, AccountCode",
+                });
+                coaD = t["coaD"];
+                coa508 = t["coa508"];
+            }
+            BindCreditGLCodeLookup(coaD);
             //Database.displaySearchlookupEdit("SELECT AccountCode,Description FROM ChartOfAccounts WHERE AccountType='D'", searchLookUpEdit1, "AccountCode", "AccountCode");
-            Database.displayRepositorySearchlookupEdit("SELECT AccountCode,Description FROM ChartOfAccounts WHERE AccountType='D'", repositoryItemSearchLookUpEditoffsetdebitglcode, "AccountCode", "AccountCode");
-            Database.displayRepositorySearchlookupEdit("SELECT AccountCode,Description FROM ChartOfAccounts WHERE AccountType='D'", repositoryItemSearchLookUpEditoffsetCreditGLCode, "AccountCode", "AccountCode");
-            Database.displayRepositorySearchlookupEdit("SELECT AccountCode,Description FROM ChartOfAccounts WHERE AccountType='D'", repositoryItemSearchLookUpEditdiscountglcode, "AccountCode", "AccountCode");
+            // the 3 grid account lookups used the same AccountType='D' list: one fetch, a copy each
+            // (same binding as Database.displayRepositorySearchlookupEdit)
+            foreach (var rep in new[] { repositoryItemSearchLookUpEditoffsetdebitglcode, repositoryItemSearchLookUpEditoffsetCreditGLCode, repositoryItemSearchLookUpEditdiscountglcode })
+            {
+                rep.DataSource = coaD.Copy();
+                rep.DisplayMember = "AccountCode";
+                rep.ValueMember = "AccountCode";
+            }
             // NEW — same helper, same pattern, defaults the popup to show 508 near the top
-            Database.displayRepositorySearchlookupEdit(
-                "SELECT AccountCode, Description FROM ChartOfAccounts ORDER BY CASE WHEN AccountCode = '508' THEN 0 ELSE 1 END, AccountCode",
-                repDiscountAccount, "AccountCode", "AccountCode");
+            repDiscountAccount.DataSource = coa508;
+            repDiscountAccount.DisplayMember = "AccountCode";
+            repDiscountAccount.ValueMember = "AccountCode";
         }
         
         private bool HasValidDebitLines()

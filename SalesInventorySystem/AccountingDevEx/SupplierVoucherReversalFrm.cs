@@ -271,17 +271,179 @@ namespace SalesInventorySystem.AccountingDevEx
                 return;
             }
 
-            ShowVoucherDetailsPopup(referenceNo, voucherId, paidTo, amount, physicalRef, voucherDate,
-                voucherType, paymentMethod, hasInvoiceLeg, hasManualLeg, invoiceLegs, glLegs);
+            DataSet invoiceView = hasInvoiceLeg ? LoadInvoiceView(supplierId, referenceNo) : null;
+
+            try
+            {
+                ShowVoucherDetailsPopup(referenceNo, voucherId, paidTo, amount, physicalRef, voucherDate,
+                    voucherType, paymentMethod, hasInvoiceLeg, hasManualLeg, invoiceLegs, glLegs, invoiceView);
+            }
+            finally
+            {
+                invoiceView?.Dispose();
+            }
+        }
+
+        // NEW 2026-10-12 -- the voucher's invoices the way the payment screen
+        // (splist_Accounts) showed them: one row per invoice (balance before,
+        // amount paid, EWT, discount, ... balance after), each expanding into
+        // its branch legs. sp_GetSupplierVoucherInvoiceView returns the two
+        // result sets linked by InvKey. Returns null when the proc isn't there
+        // (an older database) so the popup still opens with its other tabs.
+        private DataSet LoadInvoiceView(string supplierId, string referenceNo)
+        {
+            try
+            {
+                using (var con = Database.getConnection())
+                using (var cmd = new SqlCommand("sp_GetSupplierVoucherInvoiceView", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add("@SupplierID", SqlDbType.VarChar, 50).Value = supplierId;
+                    cmd.Parameters.Add("@ReferenceNumber", SqlDbType.VarChar, 10).Value = referenceNo;
+                    con.Open();
+                    using (var da = new SqlDataAdapter(cmd))
+                    {
+                        var ds = new DataSet();
+                        da.TableMappings.Add("Table", "Invoices");
+                        da.TableMappings.Add("Table1", "Legs");
+                        da.Fill(ds);
+                        if (!ds.Tables.Contains("Invoices") || !ds.Tables.Contains("Legs") || ds.Tables["Invoices"].Rows.Count == 0
+                            || !ds.Tables["Invoices"].Columns.Contains("InvKey") || !ds.Tables["Legs"].Columns.Contains("InvKey"))
+                            return null;
+                        // Code - Name, the system-wide convention for a branch
+                        var legs = ds.Tables["Legs"];
+                        if (legs.Columns.Contains("BranchCode") && legs.Columns.Contains("BranchName"))
+                            legs.Columns.Add("Branch", typeof(string), "BranchCode + ' - ' + ISNULL(BranchName, '')");
+                        ds.Relations.Add("Branch Legs", ds.Tables["Invoices"].Columns["InvKey"], legs.Columns["InvKey"], false);
+                        return ds;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // the tab is optional: the popup still opens with the other tabs
+                System.Diagnostics.Debug.WriteLine("sp_GetSupplierVoucherInvoiceView: " + ex.Message);
+                return null;
+            }
+        }
+
+        private static void FormatMoneyColumns(GridView view, string[] fields, bool footerSum)
+        {
+            foreach (var f in fields)
+            {
+                var col = view.Columns[f];
+                if (col == null) continue;
+                col.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+                col.DisplayFormat.FormatString = "N2";
+                col.AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+                col.AppearanceCell.Options.UseTextOptions = true;
+                if (footerSum) col.Summary.Add(DevExpress.Data.SummaryItemType.Sum, f, "{0:n2}");
+            }
+        }
+
+        private static void AddColumn(GridView view, string field, string caption)
+        {
+            var col = view.Columns.AddVisible(field, caption);
+            col.OptionsColumn.AllowEdit = false;
+        }
+
+        // The "Invoices (as paid)" tab: master = invoices, detail = branch legs.
+        private static DevExpress.XtraTab.XtraTabPage BuildInvoiceViewTab(DataSet invoiceView)
+        {
+            var tab = new DevExpress.XtraTab.XtraTabPage { Text = "Invoices (as paid)" };
+            var grid = new DevExpress.XtraGrid.GridControl { Dock = DockStyle.Fill };
+            var master = new GridView(grid);
+            var detail = new GridView(grid);
+            grid.MainView = master;
+            grid.LevelTree.Nodes.Add("Branch Legs", detail);
+
+            foreach (var v in new[] { master, detail })
+            {
+                v.OptionsBehavior.Editable = false;
+                v.OptionsView.ShowGroupPanel = false;
+                v.OptionsView.ShowFooter = true;
+                v.OptionsView.ColumnAutoWidth = false;
+                Classes.DevXGridViewSettings.ApplyTotalsBandAppearance(v);
+            }
+
+            AddColumn(master, "Type", "Type");
+            AddColumn(master, "InvoiceNo", "Invoice No.");
+            AddColumn(master, "ReferenceNo", "Ref No.");
+            AddColumn(master, "InvoiceDate", "Invoice Date");
+            AddColumn(master, "Description", "Description");
+            AddColumn(master, "Branches", "Branches");
+            AddColumn(master, "InvoiceAmount", "Invoice Amount");
+            AddColumn(master, "BalanceBefore", "Balance Before");
+            AddColumn(master, "AmountPaid", "Amount Paid");
+            AddColumn(master, "Variance", "Variance");
+            AddColumn(master, "EWTAmount", "EWT");
+            AddColumn(master, "DiscountAmount", "Discount");
+            AddColumn(master, "ReturnAllowances", "Return Allowances");
+            AddColumn(master, "OverPay", "OverPay (Credit)");
+            AddColumn(master, "OverPayExpense", "OverPay (Expense)");
+            AddColumn(master, "AdvanceApplied", "Advance Applied");
+            AddColumn(master, "AmountSettled", "Amount Settled");
+            AddColumn(master, "BalanceAfter", "Balance After");
+            AddColumn(master, "BalanceNow", "Balance Now");
+            AddColumn(master, "Status", "Status");
+            master.Columns["InvoiceDate"].DisplayFormat.FormatType = DevExpress.Utils.FormatType.DateTime;
+            master.Columns["InvoiceDate"].DisplayFormat.FormatString = "MM/dd/yyyy";
+            master.Columns["InvoiceNo"].Summary.Add(DevExpress.Data.SummaryItemType.Count, "InvoiceNo", "Count: {0}");
+            FormatMoneyColumns(master, new[] { "InvoiceAmount", "BalanceBefore", "AmountPaid", "Variance", "EWTAmount", "DiscountAmount",
+                "ReturnAllowances", "OverPay", "OverPayExpense", "AdvanceApplied", "AmountSettled", "BalanceAfter", "BalanceNow" }, true);
+            // a negative balance after this voucher = paid more than was owed (e.g. the 2026-10-12 split-rounding bug); shown in red
+            var boldFont = new Font(master.Appearance.Row.Font, FontStyle.Bold);
+            grid.Disposed += (s, e) => boldFont.Dispose();
+            master.RowCellStyle += (s, e) =>
+            {
+                if (e.Column.FieldName != "BalanceAfter") return;
+                var v = master.GetRowCellValue(e.RowHandle, "BalanceAfter");
+                if (v != null && v != DBNull.Value && Convert.ToDecimal(v) < 0)
+                {
+                    e.Appearance.ForeColor = Color.Firebrick;
+                    e.Appearance.Font = boldFont;
+                }
+            };
+
+            AddColumn(detail, "Branch", "Branch");
+            AddColumn(detail, "BranchShare", "Branch Share");
+            AddColumn(detail, "AmountPaid", "Amount Paid");
+            AddColumn(detail, "Variance", "Variance");
+            AddColumn(detail, "EWTAmount", "EWT");
+            AddColumn(detail, "DiscountAmount", "Discount");
+            AddColumn(detail, "ReturnAllowances", "Return Allowances");
+            AddColumn(detail, "OverPay", "OverPay (Credit)");
+            AddColumn(detail, "OverPayExpense", "OverPay (Expense)");
+            AddColumn(detail, "AdvanceApplied", "Advance Applied");
+            AddColumn(detail, "AmountSettled", "Amount Settled");
+            AddColumn(detail, "TicketNumber", "Ticket No.");
+            FormatMoneyColumns(detail, new[] { "BranchShare", "AmountPaid", "Variance", "EWTAmount", "DiscountAmount", "ReturnAllowances",
+                "OverPay", "OverPayExpense", "AdvanceApplied", "AmountSettled" }, true);
+            detail.ViewCaption = "Branch legs";
+
+            grid.DataSource = invoiceView;
+            grid.DataMember = "Invoices";
+            // best-fit once the grid exists (the popup isn't shown yet here), and each detail when it opens
+            grid.HandleCreated += (s, e) =>
+            {
+                master.BestFitColumns();
+                if (master.Columns["Description"].Width > 260) master.Columns["Description"].Width = 260;
+            };
+            master.MasterRowExpanded += (s, e) =>
+            {
+                if (master.GetDetailView(e.RowHandle, e.RelationIndex) is GridView dv) dv.BestFitColumns();
+            };
+            tab.Controls.Add(grid);
+            return tab;
         }
         private void ShowVoucherDetailsPopup(string referenceNo, string voucherId, string paidTo, decimal amount,
             string physicalRef, string voucherDate, string voucherType, string paymentMethod,
-            bool hasInvoiceLeg, bool hasManualLeg, DataTable invoiceLegs, DataTable glLegs)
+            bool hasInvoiceLeg, bool hasManualLeg, DataTable invoiceLegs, DataTable glLegs, DataSet invoiceView)
         {
             using (var popup = new XtraForm())
             {
                 popup.Text = $"Voucher Detail — {referenceNo}";
-                popup.Size = new Size(820, 600);
+                popup.Size = invoiceView != null ? new Size(1180, 640) : new Size(820, 600);
                 popup.StartPosition = FormStartPosition.CenterParent;
                 popup.MinimizeBox = false;
                 popup.MaximizeBox = true;
@@ -327,6 +489,10 @@ namespace SalesInventorySystem.AccountingDevEx
                 });
 
                 var tabs = new DevExpress.XtraTab.XtraTabControl { Dock = DockStyle.Fill };
+
+                // NEW 2026-10-12 -- first tab: the invoices as they were paid (payment-screen shape)
+                if (invoiceView != null)
+                    tabs.TabPages.Add(BuildInvoiceViewTab(invoiceView));
 
                 if (invoiceLegs.Rows.Count > 0)
                 {

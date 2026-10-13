@@ -22,6 +22,18 @@ namespace SalesInventorySystem.AccountingDevEx
         public TicketInquiryFrm()
         {
             InitializeComponent();
+            // 2026-10-12 (user): Matching Tickets and Ticket Detail share the height below the search box 50/50.
+            // grpResults is docked Top with a fixed height and grpDetails fills the rest, so it is re-split on resize.
+            Resize += (s, e) => KeepResultsDetailsRatio();
+            KeepResultsDetailsRatio();
+        }
+
+        private void KeepResultsDetailsRatio()
+        {
+            int free = ClientSize.Height - (grpSearch.Visible ? grpSearch.Height : 0);
+            if (free <= 0) return;
+            int h = free / 2;
+            if (grpResults.Height != h) grpResults.Height = h;
         }
 
         public void LoadData()

@@ -7,6 +7,7 @@ shows `Found = 0` on every line.
 | Script | Covers |
 |---|---|
 | `SO_STS_ExceptionCheck.sql` | Sales Order (place → process → cancel → confirm → credit memo → return) and STS (save → return → receive) |
+| `POSV2_ExceptionCheck.sql` | POS V2 (shift GL ticket balanced / booked once / AR leg; shift cost vs lots; void restock; POS charge invoice vs sale and client ledger; customer credit 20115; BIR: VAT split vs net, grand-total chain; work lists: review flags, open shortages, long shifts, OR gaps). Checks P01-P15; a healthy database shows 0 on CRITICAL / HIGH. The work lists without a "done" marker look back `@SinceDays` (45). Run after any POS V2 proc change and daily once terminals sell. |
 
 ## How to run
 

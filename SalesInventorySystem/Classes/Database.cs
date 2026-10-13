@@ -2816,6 +2816,36 @@ namespace SalesInventorySystem
                 XtraMessageBox.Show("Failed to load dropdown data: " + ex.Message, "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+        // 2026-10-12: runs several read-only lookup queries in ONE batch on one connection (one round trip)
+        // and returns the tables by key, so a screen's start-up pays one network round trip instead of one
+        // per dropdown. (Running them in parallel was measured slower: each needs its own connection, and
+        // opening one to the server costs ~400 ms.) DB only: never touches a control, so it is also safe off
+        // the UI thread (Known Bug Pattern #8). Each query must be a single constant SELECT (no user input).
+        public static Dictionary<string, DataTable> FetchTables(IDictionary<string, string> queries)
+        {
+            var keys = new List<string>(queries.Keys);
+            var batch = new StringBuilder("SET NOCOUNT ON;\n");
+            foreach (var k in keys) batch.Append(queries[k].Trim().TrimEnd(';')).Append(";\n");
+
+            var ds = new DataSet();
+            using (var con = getConnection())
+            using (var cmd = new SqlCommand(batch.ToString(), con) { CommandTimeout = 120 })
+            {
+                con.Open();
+                new SqlDataAdapter(cmd).Fill(ds);
+            }
+            if (ds.Tables.Count != keys.Count)
+                throw new InvalidOperationException($"FetchTables: expected {keys.Count} result sets, got {ds.Tables.Count}.");
+
+            var tables = new DataTable[ds.Tables.Count];
+            ds.Tables.CopyTo(tables, 0);
+            ds.Tables.Clear();   // detach them, so each table is bound on its own
+
+            var result = new Dictionary<string, DataTable>();
+            for (int i = 0; i < keys.Count; i++) result[keys[i]] = tables[i];
+            return result;
+        }
+
         public static async Task displaySearchlookupEditAsync(string query, SearchLookUpEdit searchEdit, string displaymember, string valuemember)
         {
             try

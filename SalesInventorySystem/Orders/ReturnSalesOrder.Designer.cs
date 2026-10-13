@@ -72,7 +72,7 @@
             this.groupControl1.Location = new System.Drawing.Point(0, 0);
             this.groupControl1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.groupControl1.Name = "groupControl1";
-            this.groupControl1.Size = new System.Drawing.Size(1045, 122);
+            this.groupControl1.Size = new System.Drawing.Size(1045, 118);
             this.groupControl1.TabIndex = 0;
             this.groupControl1.Text = "Return All / Specific Items";
             // 
@@ -183,10 +183,10 @@
             // 
             this.panelControl1.Controls.Add(this.gridControl1);
             this.panelControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelControl1.Location = new System.Drawing.Point(0, 122);
+            this.panelControl1.Location = new System.Drawing.Point(0, 118);
             this.panelControl1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.panelControl1.Name = "panelControl1";
-            this.panelControl1.Size = new System.Drawing.Size(1045, 464);
+            this.panelControl1.Size = new System.Drawing.Size(1045, 468);
             this.panelControl1.TabIndex = 1;
             // 
             // gridControl1
@@ -197,7 +197,7 @@
             this.gridControl1.MainView = this.gridView1;
             this.gridControl1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.gridControl1.Name = "gridControl1";
-            this.gridControl1.Size = new System.Drawing.Size(1041, 460);
+            this.gridControl1.Size = new System.Drawing.Size(1041, 464);
             this.gridControl1.TabIndex = 5;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1});

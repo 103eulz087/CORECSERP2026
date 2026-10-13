@@ -160,6 +160,8 @@ namespace SalesInventorySystem.AccountingDevEx
         private void BuildFluentLayout()
         {
             navFrameMain = new NavigationFrame { Name = "navFrameMain", Dock = DockStyle.Fill };
+            // 2026-10-12 (user): no slide / fade when switching menu items; the page just appears
+            navFrameMain.AllowTransitionAnimation = DevExpress.Utils.DefaultBoolean.False;
             fluentDesignFormContainer1.Controls.Add(navFrameMain);
 
             _contentFactories = BuildContentFactories();
@@ -261,12 +263,27 @@ namespace SalesInventorySystem.AccountingDevEx
             if (!_contentFactories.TryGetValue(key, out var factory))
                 return;
 
-            var content = factory();
-            if (content == null)
-                return;
+            // 2026-10-12 (user: a second before the screen shows): the first open of a menu item builds the
+            // screen and runs its lookups. The page now switches and paints at once, with DevExpress's loading
+            // overlay over it while that happens, instead of the board looking frozen on the old page.
+            navFrameMain.Refresh();
+            DevExpress.XtraSplashScreen.IOverlaySplashScreenHandle overlay = null;
+            try { overlay = DevExpress.XtraSplashScreen.SplashScreenManager.ShowOverlayForm(page); }
+            catch (Exception) { overlay = null; }   // cosmetic only: never block the screen over it
+            try
+            {
+                var content = factory();
+                if (content == null)
+                    return;
 
-            content.Dock = DockStyle.Fill;
-            page.Controls.Add(content);
+                content.Dock = DockStyle.Fill;
+                page.Controls.Add(content);
+            }
+            finally
+            {
+                if (overlay != null)
+                    DevExpress.XtraSplashScreen.SplashScreenManager.CloseOverlayForm(overlay);
+            }
         }
 
         // ---------------------------------------------------------------

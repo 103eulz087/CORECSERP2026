@@ -49,10 +49,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.pnlFilter)).BeginInit();
             this.pnlFilter.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.cboSupplier.Properties)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.txtDateFrom.Properties.CalendarTimeProperties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtDateFrom.Properties)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.txtDateTo.Properties.CalendarTimeProperties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtDateFrom.Properties.CalendarTimeProperties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtDateTo.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtDateTo.Properties.CalendarTimeProperties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridControlVouchers)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridViewVouchers)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pnlButtons)).BeginInit();

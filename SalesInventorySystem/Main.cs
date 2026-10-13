@@ -73,6 +73,8 @@ namespace SalesInventorySystem
             // enzowarehouse.Visible = false;
             validate_userAccess();
             SetupGLPeriodClosingMenu();
+            SetupPosV2ReportsMenu();
+            SetupLoanRevaluationMenu();
             //checkAccess();
             //  ribbonPage1.Visible = false;
             //if (Convert.ToBoolean(Login.isglobalAdmin) != true) //ADMIN TOOLS TAB
@@ -679,6 +681,16 @@ namespace SalesInventorySystem
 
         void openPOS()
         {
+            // 2026-10-12: POS V2 (hybrid online / offline, POSV2/), opt-in per machine: HKCU\AAITCRE\POSV2 Enabled = 1.
+            // Every other machine keeps the old POS below.
+            if (POSV2.PosV2Config.IsEnabledOnThisMachine)
+            {
+                foreach (Form form in Application.OpenForms)
+                    if (form is POSV2.PosTerminalForm) { form.Activate(); return; }
+                new POSV2.PosTerminalForm().Show();
+                return;
+            }
+
             bool isRetail = Database.checkifExist("SELECT POSType FROM dbo.POSType where POSType=1");
 
             if (isRetail == true)
@@ -1158,6 +1170,48 @@ namespace SalesInventorySystem
             };
             ribbonControl.Items.Add(btnGLPeriodClosing);
             popupMenuAcctgSettings.ItemLinks.Insert(0, btnGLPeriodClosing);
+        }
+
+        // POS V2 phase 5: its reports (Z-readings, sales journal, returns, needs attention), added in code like GL Period
+        // Closing so Main.Designer.cs stays untouched; admins and accounting users only.
+        private void SetupPosV2ReportsMenu()
+        {
+            bool isAdmin, isAcctg;
+            bool.TryParse(Login.isglobalAdmin, out isAdmin);
+            bool.TryParse(Login.isglobalAccounting, out isAcctg);
+            if (!isAdmin && !isAcctg) return;
+
+            var btn = new BarButtonItem { Caption = "POS V2 Reports" };
+            btn.ItemClick += (s, args) =>
+            {
+                foreach (Form f in Application.OpenForms)
+                    if (f is POSV2.PosV2ReportsForm) { f.Activate(); return; }
+                new POSV2.PosV2ReportsForm().Show();
+            };
+            ribbonControl.Items.Add(btn);
+            popupMenuAcctgSettings.ItemLinks.Add(btn);
+        }
+
+        // Loan Revaluation (SQL/[65]-2026-10-12h_LoanRevaluation.sql): month-end revaluation of foreign-currency loans,
+        // added in code like GL Period Closing so Main.Designer.cs stays untouched; admins and accounting users only..
+        private void SetupLoanRevaluationMenu()
+        {
+            bool isAdmin, isAcctg;
+            bool.TryParse(Login.isglobalAdmin, out isAdmin);
+            bool.TryParse(Login.isglobalAccounting, out isAcctg);
+            if (!isAdmin && !isAcctg) return;
+
+            var btn = new BarButtonItem { Caption = "Loan Revaluation" };
+            btn.ItemClick += (s, args) =>
+            {
+                using (var frm = new AccountingDevEx.LoanRevaluationFrm())
+                {
+                    frm.LoadData();
+                    frm.Show();
+                }
+            };
+            ribbonControl.Items.Add(btn);
+            popupMenuAcctgSettings.ItemLinks.Add(btn);
         }
 
         private void barButtonItem42_ItemClick(object sender, ItemClickEventArgs e)

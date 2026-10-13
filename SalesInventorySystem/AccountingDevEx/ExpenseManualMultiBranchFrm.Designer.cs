@@ -202,7 +202,7 @@
             this.tabNew.Controls.Add(this.grpHeader);
             this.tabNew.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.tabNew.Name = "tabNew";
-            this.tabNew.Size = new System.Drawing.Size(1450, 675);
+            this.tabNew.Size = new System.Drawing.Size(1450, 680);
             this.tabNew.Text = "Post Expense";
             // 
             // grpLines
@@ -210,10 +210,10 @@
             this.grpLines.Controls.Add(this.panelControl1);
             this.grpLines.Controls.Add(this.gridControlLines);
             this.grpLines.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.grpLines.Location = new System.Drawing.Point(0, 293);
+            this.grpLines.Location = new System.Drawing.Point(0, 234);
             this.grpLines.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.grpLines.Name = "grpLines";
-            this.grpLines.Size = new System.Drawing.Size(1813, 551);
+            this.grpLines.Size = new System.Drawing.Size(1450, 446);
             this.grpLines.TabIndex = 1;
             this.grpLines.Text = "GL Lines (manual — no mapping)";
             // 
@@ -230,10 +230,10 @@
             this.panelControl1.Controls.Add(this.lblTotalCreditCaption);
             this.panelControl1.Controls.Add(this.lblTotalDebit);
             this.panelControl1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panelControl1.Location = new System.Drawing.Point(2, 449);
+            this.panelControl1.Location = new System.Drawing.Point(2, 344);
             this.panelControl1.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.panelControl1.Name = "panelControl1";
-            this.panelControl1.Size = new System.Drawing.Size(1809, 100);
+            this.panelControl1.Size = new System.Drawing.Size(1446, 100);
             this.panelControl1.TabIndex = 9;
             // 
             // btnAddLine
@@ -252,7 +252,7 @@
             this.chkAllowCrossBranch.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.chkAllowCrossBranch.Name = "chkAllowCrossBranch";
             this.chkAllowCrossBranch.Properties.Caption = "Allow Cross-Branch Entry (only overall total needs to balance)";
-            this.chkAllowCrossBranch.Size = new System.Drawing.Size(420, 24);
+            this.chkAllowCrossBranch.Size = new System.Drawing.Size(420, 20);
             this.chkAllowCrossBranch.TabIndex = 8;
             this.chkAllowCrossBranch.CheckedChanged += new System.EventHandler(this.ChkAllowCrossBranch_CheckedChanged);
             // 
@@ -308,7 +308,7 @@
             this.lblTotalCredit.Location = new System.Drawing.Point(828, 11);
             this.lblTotalCredit.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.lblTotalCredit.Name = "lblTotalCredit";
-            this.lblTotalCredit.Size = new System.Drawing.Size(35, 18);
+            this.lblTotalCredit.Size = new System.Drawing.Size(28, 14);
             this.lblTotalCredit.TabIndex = 6;
             this.lblTotalCredit.Text = "0.00";
             // 
@@ -317,7 +317,7 @@
             this.lblTotalDebitCaption.Location = new System.Drawing.Point(568, 11);
             this.lblTotalDebitCaption.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.lblTotalDebitCaption.Name = "lblTotalDebitCaption";
-            this.lblTotalDebitCaption.Size = new System.Drawing.Size(67, 16);
+            this.lblTotalDebitCaption.Size = new System.Drawing.Size(56, 13);
             this.lblTotalDebitCaption.TabIndex = 3;
             this.lblTotalDebitCaption.Text = "Total Debit:";
             // 
@@ -326,7 +326,7 @@
             this.lblTotalCreditCaption.Location = new System.Drawing.Point(748, 11);
             this.lblTotalCreditCaption.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.lblTotalCreditCaption.Name = "lblTotalCreditCaption";
-            this.lblTotalCreditCaption.Size = new System.Drawing.Size(72, 16);
+            this.lblTotalCreditCaption.Size = new System.Drawing.Size(60, 13);
             this.lblTotalCreditCaption.TabIndex = 5;
             this.lblTotalCreditCaption.Text = "Total Credit:";
             // 
@@ -337,7 +337,7 @@
             this.lblTotalDebit.Location = new System.Drawing.Point(648, 11);
             this.lblTotalDebit.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.lblTotalDebit.Name = "lblTotalDebit";
-            this.lblTotalDebit.Size = new System.Drawing.Size(35, 18);
+            this.lblTotalDebit.Size = new System.Drawing.Size(28, 14);
             this.lblTotalDebit.TabIndex = 4;
             this.lblTotalDebit.Text = "0.00";
             // 
@@ -345,7 +345,7 @@
             // 
             this.gridControlLines.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gridControlLines.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
-            this.gridControlLines.Location = new System.Drawing.Point(2, 28);
+            this.gridControlLines.Location = new System.Drawing.Point(2, 23);
             this.gridControlLines.MainView = this.gridViewLines;
             this.gridControlLines.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.gridControlLines.Name = "gridControlLines";
@@ -355,7 +355,7 @@
             this.repParticulars,
             this.repDebit,
             this.repCredit});
-            this.gridControlLines.Size = new System.Drawing.Size(1809, 521);
+            this.gridControlLines.Size = new System.Drawing.Size(1446, 421);
             this.gridControlLines.TabIndex = 0;
             this.gridControlLines.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewLines});
@@ -486,7 +486,7 @@
             this.grpHeader.Location = new System.Drawing.Point(0, 0);
             this.grpHeader.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.grpHeader.Name = "grpHeader";
-            this.grpHeader.Size = new System.Drawing.Size(1813, 234);
+            this.grpHeader.Size = new System.Drawing.Size(1450, 234);
             this.grpHeader.TabIndex = 0;
             this.grpHeader.Text = "Expense Header (Manual, No Mapping, Multi-Branch)";
             // 
@@ -495,7 +495,7 @@
             this.lblReferenceNo.Location = new System.Drawing.Point(16, 59);
             this.lblReferenceNo.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.lblReferenceNo.Name = "lblReferenceNo";
-            this.lblReferenceNo.Size = new System.Drawing.Size(86, 16);
+            this.lblReferenceNo.Size = new System.Drawing.Size(74, 13);
             this.lblReferenceNo.TabIndex = 0;
             this.lblReferenceNo.Text = "Reference No.:";
             // 
@@ -505,7 +505,7 @@
             this.txtReferenceNo.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.txtReferenceNo.Name = "txtReferenceNo";
             this.txtReferenceNo.Properties.ReadOnly = true;
-            this.txtReferenceNo.Size = new System.Drawing.Size(150, 22);
+            this.txtReferenceNo.Size = new System.Drawing.Size(150, 20);
             this.txtReferenceNo.TabIndex = 1;
             // 
             // lblExpenseDate
@@ -513,7 +513,7 @@
             this.lblExpenseDate.Location = new System.Drawing.Point(360, 59);
             this.lblExpenseDate.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.lblExpenseDate.Name = "lblExpenseDate";
-            this.lblExpenseDate.Size = new System.Drawing.Size(82, 16);
+            this.lblExpenseDate.Size = new System.Drawing.Size(71, 13);
             this.lblExpenseDate.TabIndex = 2;
             this.lblExpenseDate.Text = "Expense Date:";
             // 
@@ -527,7 +527,7 @@
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.txtExpenseDate.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton()});
-            this.txtExpenseDate.Size = new System.Drawing.Size(150, 22);
+            this.txtExpenseDate.Size = new System.Drawing.Size(150, 20);
             this.txtExpenseDate.TabIndex = 3;
             // 
             // lblDefaultBranch
@@ -535,7 +535,7 @@
             this.lblDefaultBranch.Location = new System.Drawing.Point(670, 59);
             this.lblDefaultBranch.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.lblDefaultBranch.Name = "lblDefaultBranch";
-            this.lblDefaultBranch.Size = new System.Drawing.Size(88, 16);
+            this.lblDefaultBranch.Size = new System.Drawing.Size(75, 13);
             this.lblDefaultBranch.TabIndex = 4;
             this.lblDefaultBranch.Text = "Default Branch:";
             this.lblDefaultBranch.Visible = false;
@@ -545,7 +545,7 @@
             this.cboDefaultBranch.Location = new System.Drawing.Point(804, 57);
             this.cboDefaultBranch.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.cboDefaultBranch.Name = "cboDefaultBranch";
-            this.cboDefaultBranch.Size = new System.Drawing.Size(160, 22);
+            this.cboDefaultBranch.Size = new System.Drawing.Size(160, 20);
             this.cboDefaultBranch.TabIndex = 5;
             this.cboDefaultBranch.Visible = false;
             // 
@@ -554,7 +554,7 @@
             this.lblSupplier.Location = new System.Drawing.Point(16, 105);
             this.lblSupplier.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.lblSupplier.Name = "lblSupplier";
-            this.lblSupplier.Size = new System.Drawing.Size(106, 16);
+            this.lblSupplier.Size = new System.Drawing.Size(86, 13);
             this.lblSupplier.TabIndex = 6;
             this.lblSupplier.Text = "Vendor / Supplier:";
             // 
@@ -564,7 +564,7 @@
             this.cboSupplier.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.cboSupplier.Name = "cboSupplier";
             this.cboSupplier.Properties.PopupView = this.gridViewSupplierPopup;
-            this.cboSupplier.Size = new System.Drawing.Size(493, 22);
+            this.cboSupplier.Size = new System.Drawing.Size(493, 20);
             this.cboSupplier.TabIndex = 7;
             // 
             // gridViewSupplierPopup
@@ -579,7 +579,7 @@
             this.lblInvoiceNo.Location = new System.Drawing.Point(670, 105);
             this.lblInvoiceNo.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.lblInvoiceNo.Name = "lblInvoiceNo";
-            this.lblInvoiceNo.Size = new System.Drawing.Size(68, 16);
+            this.lblInvoiceNo.Size = new System.Drawing.Size(59, 13);
             this.lblInvoiceNo.TabIndex = 8;
             this.lblInvoiceNo.Text = "Invoice No.:";
             // 
@@ -588,7 +588,7 @@
             this.txtInvoiceNo.Location = new System.Drawing.Point(804, 102);
             this.txtInvoiceNo.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.txtInvoiceNo.Name = "txtInvoiceNo";
-            this.txtInvoiceNo.Size = new System.Drawing.Size(160, 22);
+            this.txtInvoiceNo.Size = new System.Drawing.Size(160, 20);
             this.txtInvoiceNo.TabIndex = 9;
             // 
             // lblRemarks
@@ -596,7 +596,7 @@
             this.lblRemarks.Location = new System.Drawing.Point(16, 153);
             this.lblRemarks.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.lblRemarks.Name = "lblRemarks";
-            this.lblRemarks.Size = new System.Drawing.Size(55, 16);
+            this.lblRemarks.Size = new System.Drawing.Size(45, 13);
             this.lblRemarks.TabIndex = 10;
             this.lblRemarks.Text = "Remarks:";
             // 
@@ -628,7 +628,7 @@
             this.tabPosted.Controls.Add(this.pnlPostedFilter);
             this.tabPosted.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.tabPosted.Name = "tabPosted";
-            this.tabPosted.Size = new System.Drawing.Size(1450, 675);
+            this.tabPosted.Size = new System.Drawing.Size(1450, 680);
             this.tabPosted.Text = "Posted Expenses";
             // 
             // splitPosted
@@ -636,8 +636,8 @@
             this.splitPosted.Dock = System.Windows.Forms.DockStyle.Fill;
             this.splitPosted.FixedPanel = DevExpress.XtraEditors.SplitFixedPanel.None;
             this.splitPosted.Horizontal = false;
-            this.splitPosted.Location = new System.Drawing.Point(0, 73);
-            this.splitPosted.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.splitPosted.Location = new System.Drawing.Point(0, 58);
+            this.splitPosted.Margin = new System.Windows.Forms.Padding(4);
             this.splitPosted.Name = "splitPosted";
             // 
             // splitPosted.Panel1
@@ -650,8 +650,8 @@
             this.splitPosted.Panel2.Controls.Add(this.gridControlPostedDetails);
             this.splitPosted.Panel2.Controls.Add(this.pnlPostedButtons);
             this.splitPosted.Panel2.Text = "Panel2";
-            this.splitPosted.Size = new System.Drawing.Size(1813, 771);
-            this.splitPosted.SplitterPosition = 350;
+            this.splitPosted.Size = new System.Drawing.Size(1450, 622);
+            this.splitPosted.SplitterPosition = 283;
             this.splitPosted.TabIndex = 4;
             // 
             // gridControlPosted
@@ -662,7 +662,7 @@
             this.gridControlPosted.MainView = this.gridViewPosted;
             this.gridControlPosted.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.gridControlPosted.Name = "gridControlPosted";
-            this.gridControlPosted.Size = new System.Drawing.Size(1813, 350);
+            this.gridControlPosted.Size = new System.Drawing.Size(1450, 283);
             this.gridControlPosted.TabIndex = 2;
             this.gridControlPosted.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewPosted});
@@ -684,7 +684,7 @@
             this.gridControlPostedDetails.MainView = this.gridViewPostedDetails;
             this.gridControlPostedDetails.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.gridControlPostedDetails.Name = "gridControlPostedDetails";
-            this.gridControlPostedDetails.Size = new System.Drawing.Size(1813, 360);
+            this.gridControlPostedDetails.Size = new System.Drawing.Size(1450, 280);
             this.gridControlPostedDetails.TabIndex = 0;
             this.gridControlPostedDetails.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewPostedDetails});
@@ -706,7 +706,7 @@
             this.pnlPostedButtons.Location = new System.Drawing.Point(0, 0);
             this.pnlPostedButtons.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.pnlPostedButtons.Name = "pnlPostedButtons";
-            this.pnlPostedButtons.Size = new System.Drawing.Size(1813, 49);
+            this.pnlPostedButtons.Size = new System.Drawing.Size(1450, 49);
             this.pnlPostedButtons.TabIndex = 1;
             // 
             // btnViewDetails
@@ -757,7 +757,7 @@
             this.pnlPostedFilter.Location = new System.Drawing.Point(0, 0);
             this.pnlPostedFilter.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.pnlPostedFilter.Name = "pnlPostedFilter";
-            this.pnlPostedFilter.Size = new System.Drawing.Size(1813, 58);
+            this.pnlPostedFilter.Size = new System.Drawing.Size(1450, 58);
             this.pnlPostedFilter.TabIndex = 3;
             // 
             // lblDateFrom
@@ -765,7 +765,7 @@
             this.lblDateFrom.Location = new System.Drawing.Point(12, 21);
             this.lblDateFrom.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.lblDateFrom.Name = "lblDateFrom";
-            this.lblDateFrom.Size = new System.Drawing.Size(35, 16);
+            this.lblDateFrom.Size = new System.Drawing.Size(28, 13);
             this.lblDateFrom.TabIndex = 0;
             this.lblDateFrom.Text = "From:";
             // 
@@ -779,7 +779,7 @@
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.txtDateFrom.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton()});
-            this.txtDateFrom.Size = new System.Drawing.Size(120, 22);
+            this.txtDateFrom.Size = new System.Drawing.Size(120, 20);
             this.txtDateFrom.TabIndex = 1;
             // 
             // lblDateTo
@@ -787,7 +787,7 @@
             this.lblDateTo.Location = new System.Drawing.Point(190, 23);
             this.lblDateTo.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.lblDateTo.Name = "lblDateTo";
-            this.lblDateTo.Size = new System.Drawing.Size(20, 16);
+            this.lblDateTo.Size = new System.Drawing.Size(16, 13);
             this.lblDateTo.TabIndex = 2;
             this.lblDateTo.Text = "To:";
             // 
@@ -801,7 +801,7 @@
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.txtDateTo.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton()});
-            this.txtDateTo.Size = new System.Drawing.Size(120, 22);
+            this.txtDateTo.Size = new System.Drawing.Size(120, 20);
             this.txtDateTo.TabIndex = 3;
             // 
             // btnRefreshPosted

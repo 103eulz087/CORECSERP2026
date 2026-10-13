@@ -977,56 +977,66 @@ namespace SalesInventorySystem.HOFormsDevEx
 
                 try
                 {
-                    using (var ps = new DevExpress.XtraPrinting.PrintingSystem())
-                    using (var compositeLink = new CompositeLink(ps))
-                    using (var headerGrid = new DevExpress.XtraGrid.GridControl())
-                    using (var headerView = new GridView())
-                    {
-                        headerGrid.ViewCollection.Add(headerView);
-                        headerGrid.MainView = headerView;
-                        headerView.GridControl = headerGrid;
-                        var headerData = new DataTable();
-                        headerData.Columns.Add("Report", typeof(string));
-                        headerData.Columns.Add("Details", typeof(string));
-                        headerData.Rows.Add(lblReportTitle.Text, lblReportSubtitle.Text);
-                        headerGrid.DataSource = headerData;
-                        headerView.OptionsView.ShowColumnHeaders = false;
-                        headerView.OptionsView.ShowGroupPanel = false;
-                        headerView.PopulateColumns();
-                        headerView.Columns["Report"].AppearanceCell.Font = new Font("Tahoma", 12F, FontStyle.Bold);
-                        headerView.Columns["Report"].AppearanceCell.Options.UseFont = true;
-                        headerView.BestFitColumns();
-
-                        var headerLink = new DevExpress.XtraPrinting.PrintableComponentLink(ps) { Component = headerGrid };
-                        compositeLink.Links.Add(headerLink);
-
-                        var detailLink = new DevExpress.XtraPrinting.PrintableComponentLink(ps) { Component = gridControlReport };
-                        compositeLink.Links.Add(detailLink);
-
-                        if (gridControlSummary.DataSource != null && gridViewSummary.RowCount > 0)
-                        {
-                            var summaryLink = new DevExpress.XtraPrinting.PrintableComponentLink(ps) { Component = gridControlSummary };
-                            compositeLink.Links.Add(summaryLink);
-                        }
-
-                        compositeLink.CreateDocument();
-
-                        bool wantsPdf = sfd.FileName.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase);
-                        if (wantsPdf)
-                        {
-                            compositeLink.ExportToPdf(sfd.FileName);
-                        }
-                        else
-                        {
-                            compositeLink.ExportToXlsx(sfd.FileName, new DevExpress.XtraPrinting.XlsxExportOptions());
-                        }
-                    }
+                    ExportPrintLayout(sfd.FileName);
                     XtraMessageBox.Show("Exported successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 catch (Exception ex)
                 {
                     XtraMessageBox.Show($"Export failed: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
+            }
+        }
+
+        // PDF / non-pivot Excel: a title band (report name + details) above the report grid and the
+        // summary grid, as one print layout.
+        private void ExportPrintLayout(string fileName)
+        {
+            using (var ps = new DevExpress.XtraPrinting.PrintingSystem())
+            using (var compositeLink = new CompositeLink(ps))
+            using (var headerGrid = new DevExpress.XtraGrid.GridControl())
+            using (var headerView = new GridView())
+            {
+                // The title grid is never placed on a form, so it has no BindingContext of its own:
+                // without one, PopulateColumns() creates no columns (Columns["Report"] was null ->
+                // "Object reference not set", 2026-10-12) and the band prints empty. Give it one and
+                // define its two columns explicitly.
+                headerGrid.BindingContext = new BindingContext();
+                headerGrid.ViewCollection.Add(headerView);
+                headerGrid.MainView = headerView;
+                headerView.GridControl = headerGrid;
+                var headerData = new DataTable();
+                headerData.Columns.Add("Report", typeof(string));
+                headerData.Columns.Add("Details", typeof(string));
+                headerData.Rows.Add(lblReportTitle.Text, lblReportSubtitle.Text);
+                var colReport = headerView.Columns.AddVisible("Report");
+                headerView.Columns.AddVisible("Details");
+                headerGrid.DataSource = headerData;
+                headerGrid.ForceInitialize();
+                headerView.OptionsView.ShowColumnHeaders = false;
+                headerView.OptionsView.ShowGroupPanel = false;
+                headerView.OptionsView.ShowIndicator = false;
+                colReport.AppearanceCell.Font = new Font("Tahoma", 12F, FontStyle.Bold);
+                colReport.AppearanceCell.Options.UseFont = true;
+                headerView.BestFitColumns();
+
+                var headerLink = new DevExpress.XtraPrinting.PrintableComponentLink(ps) { Component = headerGrid };
+                compositeLink.Links.Add(headerLink);
+
+                var detailLink = new DevExpress.XtraPrinting.PrintableComponentLink(ps) { Component = gridControlReport };
+                compositeLink.Links.Add(detailLink);
+
+                if (gridControlSummary.DataSource != null && gridViewSummary.RowCount > 0)
+                {
+                    var summaryLink = new DevExpress.XtraPrinting.PrintableComponentLink(ps) { Component = gridControlSummary };
+                    compositeLink.Links.Add(summaryLink);
+                }
+
+                compositeLink.CreateDocument();
+
+                if (fileName.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
+                    compositeLink.ExportToPdf(fileName);
+                else
+                    compositeLink.ExportToXlsx(fileName, new DevExpress.XtraPrinting.XlsxExportOptions());
             }
         }
 

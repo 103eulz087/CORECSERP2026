@@ -45,9 +45,24 @@ namespace SalesInventorySystem.AccountingDevEx
         {
             custkey = txtcustid.Text;
             groupControl1.Text = custkey;
-            populateCustname();
-            populateRepositorySearchLookUp();
-            populateCOA();
+            // 2026-10-12 (user: the screen took a second+ to open): the customer list (10,731 rows, about 2.8 s
+            // over the network) now fills in the background while the screen is already usable, and the 7
+            // account lookups below share one query instead of running it 7 times.
+            populateCustnameInBackground();
+            DataTable coa = null;
+            try
+            {
+                coa = Database.FetchTables(new Dictionary<string, string> { ["coa"] = CoaDebitSql })["coa"];
+            }
+            catch (SqlException ex)
+            {
+                XtraMessageBox.Show("Failed to load dropdown data: " + ex.Message, "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            if (coa != null)
+            {
+                populateRepositorySearchLookUp(coa);
+                populateCOA(coa);
+            }
             display();
             RefreshAvailableCredit();
 
@@ -100,6 +115,34 @@ namespace SalesInventorySystem.AccountingDevEx
                 LoadPostedClientPayments();
         }
 
+
+        // 2026-10-12: the customer list is fetched on a background thread (DB only, Known Bug #8) and bound
+        // on the UI thread when it arrives; until then the dropdown is disabled and says so.
+        void populateCustnameInBackground()
+        {
+            txtcustname.Enabled = false;
+            txtcustname.Properties.NullText = "Loading customers…";
+            const string sql = "SELECT BranchName,CustomerKey,CustomerName FROM view_Customers";
+            System.Threading.Tasks.Task.Run(() => Database.FetchTables(new Dictionary<string, string> { ["c"] = sql })["c"])
+                .ContinueWith(t =>
+                {
+                    if (IsDisposed || txtcustname.IsDisposed) return;
+                    txtcustname.Properties.NullText = "";
+                    txtcustname.Enabled = true;
+                    if (t.IsFaulted)
+                    {
+                        var ex = t.Exception.GetBaseException();
+                        XtraMessageBox.Show("Failed to load the customer list: " + ex.Message, "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                    // same binding as Database.displaySearchlookupEdit (ValueMember CustomerKey, 2026-10-10)
+                    txtcustname.Properties.View.Columns.Clear();
+                    txtcustname.Properties.DataSource = null;
+                    txtcustname.Properties.DataSource = t.Result;
+                    txtcustname.Properties.DisplayMember = "CustomerName";
+                    txtcustname.Properties.ValueMember = "CustomerKey";
+                }, System.Threading.Tasks.TaskScheduler.FromCurrentSynchronizationContext());
+        }
 
         void populateCustname()
         {
@@ -221,21 +264,33 @@ namespace SalesInventorySystem.AccountingDevEx
         }
 
         // ── COA LOOKUPS ─────────────────────────────────────────────────
-        void populateCOA()
+        // 2026-10-12: one query for all 7 account lookups (it used to run once per lookup)
+        private const string CoaDebitSql = "SELECT AccountCode, Description FROM ChartOfAccounts WHERE AccountType='D'";
+
+        void populateCOA(DataTable coa)
         {
-            const string sql = "SELECT AccountCode, Description FROM ChartOfAccounts WHERE AccountType='D'";
-            Database.displaySearchlookupEdit(sql, txtdebitglcode, "AccountCode", "AccountCode");
-            Database.displaySearchlookupEdit(sql, txtcreditglcode, "AccountCode", "AccountCode");
+            // same binding as Database.displaySearchlookupEdit, one copy of the list each
+            foreach (var edit in new[] { txtdebitglcode, txtcreditglcode })
+            {
+                edit.Properties.View.Columns.Clear();
+                edit.Properties.DataSource = null;
+                edit.Properties.DataSource = coa.Copy();
+                edit.Properties.DisplayMember = "AccountCode";
+                edit.Properties.ValueMember = "AccountCode";
+            }
         }
 
-        void populateRepositorySearchLookUp()
+        void populateRepositorySearchLookUp(DataTable coa)
         {
-            const string sql = "Select AccountCode, Description FROM ChartOfAccounts WHERE AccountType='D'";
-            Database.displayRepositorySearchlookupEdit(sql, repositoryItemSearchLookUpEditglcode, "AccountCode", "AccountCode");
-            Database.displayRepositorySearchlookupEdit(sql, repositoryItemSearchLookUpEditOffsetGLCode, "AccountCode", "AccountCode");
-            Database.displayRepositorySearchlookupEdit(sql, repositoryItemSearchLookUpEditOffsetCreditGLCode, "AccountCode", "AccountCode");
-            Database.displayRepositorySearchlookupEdit(sql, repositoryItemSearchLookUpEditEWTDebitGLCode, "AccountCode", "AccountCode");
-            Database.displayRepositorySearchlookupEdit(sql, repositoryItemSearchLookUpEditEWTCreditGLCode, "AccountCode", "AccountCode");
+            // same binding as Database.displayRepositorySearchlookupEdit, one copy of the list each
+            foreach (var rep in new[] { repositoryItemSearchLookUpEditglcode, repositoryItemSearchLookUpEditOffsetGLCode,
+                                        repositoryItemSearchLookUpEditOffsetCreditGLCode, repositoryItemSearchLookUpEditEWTDebitGLCode,
+                                        repositoryItemSearchLookUpEditEWTCreditGLCode })
+            {
+                rep.DataSource = coa.Copy();
+                rep.DisplayMember = "AccountCode";
+                rep.ValueMember = "AccountCode";
+            }
         }
 
         // ── GRID EVENTS ─────────────────────────────────────────────────

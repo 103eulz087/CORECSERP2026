@@ -690,7 +690,7 @@
             this.tablePanel4.SetColumn(this.panelControl13, 0);
             this.panelControl13.Controls.Add(this.panelControl8);
             this.panelControl13.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelControl13.Location = new System.Drawing.Point(4, 4);
+            this.panelControl13.Location = new System.Drawing.Point(3, 3);
             this.panelControl13.Name = "panelControl13";
             this.tablePanel4.SetRow(this.panelControl13, 0);
             this.panelControl13.Size = new System.Drawing.Size(1726, 308);

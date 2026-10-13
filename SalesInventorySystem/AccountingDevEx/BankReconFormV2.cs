@@ -28,6 +28,7 @@ namespace SalesInventorySystem.AccountingDevEx
         private DateTime _period = DateTime.Today;
         private decimal _bookBal = 0m;
         private decimal _bankBal = 0m;
+        private decimal? _previewBankBal;   // 2026-10-12: the statement balance typed but not saved yet (null = none)
         private int _headerID = 0;
         // 2026-10-09: Export to Excel (the figures shown in the summary box, and the account name of the loaded period)
         private DevExpress.XtraEditors.SimpleButton btnExportXlsx;
@@ -82,6 +83,7 @@ namespace SalesInventorySystem.AccountingDevEx
         {
             btnLoad.Click += (s, e) => LoadRecon();
             btnSaveHeader.Click += BtnSaveHeader_Click;
+            txtBankBal.EditValueChanged += TxtBankBal_EditValueChanged;   // 2026-10-12: live preview of the summary
 
             btnAddDIT.Click += (s, e) => BtnAdd_Click("DIT");
             btnResolveDIT.Click += (s, e) => BtnResolve_Click(_selDitID);
@@ -259,6 +261,7 @@ namespace SalesInventorySystem.AccountingDevEx
                     _accountName = hdr.Table.Columns.Contains("AccountName") ? Convert.ToString(hdr["AccountName"]) : "";
 
                     lblBookBal.Text = _bookBal.ToString("N2");
+                    _previewBankBal = null;   // a (re)load shows the saved balance
                     txtBankBal.Text = _bankBal.ToString("N2");
                 }
                 else
@@ -674,13 +677,15 @@ namespace SalesInventorySystem.AccountingDevEx
                 else bdm += amt; // BDM, BC, NSF, ADB
             }
 
-            decimal adjBank = _bankBal + dit - oc;
+            // 2026-10-12 (user): while a new statement balance is being typed, the summary shows it (preview, not saved)
+            decimal bankBal = _previewBankBal ?? _bankBal;
+            decimal adjBank = bankBal + dit - oc;
             decimal adjBook = _bookBal + bcm - bdm;
             decimal diff = adjBank - adjBook;
             bool balanced = Math.Abs(diff) < 0.01m;
             _figDIT = dit; _figOC = oc; _figBCM = bcm; _figBDM = bdm;   // for Export to Excel
 
-            SetLbl(lblBankStmt, _bankBal.ToString("N2"), C_TEXT);
+            SetLbl(lblBankStmt, bankBal.ToString("N2"), _previewBankBal == null ? C_TEXT : C_GOLD);   // gold = typed, not saved yet
             SetLbl(lblDIT, $"+{dit:N2}", C_DR);
             SetLbl(lblOC, $"-{oc:N2}", C_CR);
             SetLbl(lblAdjBank, adjBank.ToString("N2"), C_OK);
@@ -697,6 +702,21 @@ namespace SalesInventorySystem.AccountingDevEx
             {
                 SetLbl(lblDiff, $"{Math.Abs(diff):N2}  OUT OF BALANCE", C_ERR);
             }
+        }
+
+        // 2026-10-12 (user): typing the bank statement balance recomputes the summary at once, so the
+        // Difference can be checked before Save. Nothing is saved: Save still writes it, and Lock / Export
+        // use the saved balance. The typed figure shows in gold until it is saved.
+        private void TxtBankBal_EditValueChanged(object sender, EventArgs e)
+        {
+            if (_headerID == 0 || _isLocked || _dtDIT == null || _dtOC == null || _dtBankSide == null) return;
+            string text = txtBankBal.Text.Replace(",", "").Trim();
+            if (!decimal.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out var typed)) return;   // half-typed ("-", "")
+            typed = Math.Round(typed, 2);
+            _previewBankBal = typed == _bankBal ? (decimal?)null : typed;
+            RefreshSummary();
+            if (_previewBankBal != null)
+                SetStatus($"Preview with statement balance {typed:N2} (saved: {_bankBal:N2}). Click Save to keep it.");
         }
 
         private void SetLbl(LabelControl lbl, string text, System.Drawing.Color color)
@@ -730,6 +750,7 @@ namespace SalesInventorySystem.AccountingDevEx
                     cmd.ExecuteNonQuery();
                 }
                 _bankBal = bal;
+                _previewBankBal = null;
                 LoadPeriod();
                 RefreshSummary();
                 SetStatus("Bank statement balance saved.");

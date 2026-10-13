@@ -74,6 +74,17 @@ Status checked 2026-09-25 by probing each script's actual feature in each databa
 | 52 | `2026-10-09d_ReverseApprovedExpense_SourceDate.sql` (same rule for `sp_ReverseApprovedExpense`, ViewExpenseDevEx: reversal ticket + lines dated like the expense, supplier-ledger reversal row = the reversed row's TransactionDate; backup `_OLD_10092026170000`; no exe change) | ✅ 2026-10-09. Rolled back first: expense 32475 reversed dated 09-29, ledger txdate 09-29; a closed September refuses (59900) | ✅ 2026-10-09 14:45 by Claude, user-approved (rehearsed rolled back first). ✅ PRODUCTION: run by the user 2026-10-09 |
 | 53 | `2026-10-10_ItemCostingReport_Detail_SoldReference.sql` (`sp_rpt_ItemCostingReport_Detail`, Item Costing Report movement ledger: Sold Reference = DeliverySummary.InvoiceNo + " | " + customer BranchCode-CustomerName (PurchaseOrderSummary.Customer -> Customers); Transfer = PO no.; anchor patch, backup `_OLD_10102026120000`. C#: `Reporting/ItemCostingReport.cs` hides BranchName) | ✅ 2026-10-10 (old vs new rolled back first: 13,824 rows, same totals and lot endings) | ✅ 2026-10-10 14:58 by Claude, user-approved (rehearsed rolled back first; live: 15,626 rows, same totals as before, 13,931 / 13,963 sales with a customer). ⏳ PRODUCTION: the user runs it; the new exe hides BranchName |
 | 54 | `2026-10-10b_Inventory_CostFix_Lots1109_1110.sql` (data only, production lots: 1109 / 1110 back to their cost at the 09-11 sale, 229.87 / 109.50. They had +54,922,375.00 = expense 17959's inventory leg 2,746,118.75 / 0.05 kg remaining, a second application of a cost already in lot 1112 / shipment 10955. Nothing moved since, so no GL; backup `Inventory_CostFix_Backup_20261010`) | — (DEV has different data) | ✅ 2026-10-10 by Claude, user-approved (rehearsed rolled back first): 1109 = 229.87, 1110 = 109.50, backup table created, no lot above 100,000. ⏳ PRODUCTION: the user runs it (before the 0.05 kg on lot 1109 moves) |
+| 55 | `2026-10-12_SupplierPayment_RecordCancelledCheque.sql` (new `sp_RecordCancelledCheque`: a spoiled / misprinted / lost cheque uses up its cheque no., a CV no. (same rule as the screen), a voucher no. and a reference no.; one CheckVoucher row (amount 0, PaidTo CANCELLED, voided) + a CheckVoucherCancelled log row; no GL, recon, AP or ledger rows; a number already used on the bank is refused 60607, older out-of-sequence numbers allowed. C#: `SupplierPaymentDevEx` "Cancelled Cheque…" button, CANCELLED supplier hidden, the next-cheque suggestion skips every number already used on the bank) | ✅ 2026-10-12 (C1–C6 rolled back first, all as intended) | ✅ 2026-10-12 by Claude, user-approved (C1–C6 rehearsed rolled back first, same results as DEV). ⏳ PRODUCTION: the user runs it; run it with 56; users need the new exe (11:21) |
+| 56 | `2026-10-12b_RecordCancelledCheque_CVNoField.sql` (needs 55: `sp_RecordCancelledCheque` gets an optional @CVNo, the CV no. typed in the new "CV no." field; blank = next of the series; a CV no. already used is refused 60610; backup `_OLD_10122026160000`) | ✅ 2026-10-12 (D1–D5 rolled back first) | ✅ 2026-10-12 by Claude, user-approved (D1–D5 rehearsed rolled back first). ⏳ PRODUCTION: the user runs 55 + 56 together; **the exe from 11:21 on sends @CVNo, so it needs 56** |
+| 57 | `2026-10-12c_CancelledCheque_ListEdit.sql` (needs 55 + 56: new `sp_GetCancelledCheques` (list), `sp_EditCancelledCheque` (typo fixes: bank, cheque no., date, CV no., reason, remarks; only records made by sp_RecordCancelledCheque, 60621; another voucher's cheque no. 60622 / CV no. 60623 refused), table `CancelledChequeEditLog` (old / new values, who, when). C#: "Cancelled Cheque…" opens the list with New / Edit) | ✅ 2026-10-12 (E1–E6 rolled back first) | ✅ 2026-10-12 by Claude, user-approved (E1–E6 rehearsed rolled back first; the list shows the test record 2384564 / CV2610-001BDO2384564 made in the app). ⏳ PRODUCTION: the user runs 55 → 56 → 57, then the exe from 12:38 |
+| 58 | `POSV2/2026-10-12_POSV2_01_Types.sql` (POS V2 phases 1–4: TVPs `tt_POSV2_SaleLine`, `tt_POSV2_Payment`, `tt_POSV2_SaleDiscount`, `tt_POSV2_ReturnLine`; run before 59) | ✅ 2026-10-12 | ⏳ with 59 |
+| 59 | `POSV2/2026-10-12_POSV2_02_Server.sql` (POS V2 phases 1–5: tables `POSV2_Terminal / Shift / Sale / SaleLine / SaleLot / Payment / Shortage / DiscountType / SaleDiscount / Supervisor(Log) / Return / ReturnLine / ReturnLot` + the `POSV2-SHIFT` JournalEntryMapping rows + COA 60340; charge sales write TransactionChargeSales + ClientLedger; `spu_POSV2_RegisterTerminal`, `sp_POSV2_GetProducts`, `sp_POSV2_GetStock`, `spu_POSV2_PostSale` (idempotent by SaleGUID, FIFO deduction via the engine, short stock → POSV2_Shortage); new objects only) | ✅ 2026-10-12, re-created with phase 3 (reset + 01 + 02) 2026-10-12; phase 3: S1–S19 rolled back, GL-failure path committed + cleaned, end-to-end with the real terminal code, then DEV restored | ⏳ waiting for the user's go; nothing uses it until a machine sets POSV2 Enabled = 1 |
+| 60 | `POSV2/2026-10-13_POSV2_03_BIRReports_PeriodClose.sql` (needs 58 + 59; anchor patches, backups `_OLD_10132026120000`: BIR reports `spr_ESalesDetails` / `spr_POSSalesReportSummary` / `spr_POSSalesReportSummary2` (2550M via `spr_SalesReportSummary2`) / `spr_SalesReportSummary` (older BIR2550M screen, still on the menu) add POS V2 Z-readings next to the old POS; `spu_GLPeriod_Close` refuses 59908 while a POS V2 shift of the month is open or its GL is not booked, 59909 while a terminal used in the month hasn't connected since it ended) | ✅ 2026-10-13, re-installed after the sp-review (reset + 58 + 59 + 60): F1–F9b + phase 3 / 4 suites + EC1–EC3 rolled back; end-to-end with the real classes, then DEV restored | ⏳ with 58 + 59 (the 5 patched procs had the same definitions on STAGING as DEV, checked 2026-10-13) |
+| 61 | `2026-10-12d_SupplierPayment_MultiBranchSplit_InvoiceView.sql` (multi-branch split fix in `sp_AddPaymentSupplierCompound_V2`: last branch = amount settled − the rounded shares; backup `_OLD_10122026200000`. New read-only `sp_GetSupplierVoucherInvoiceView` for SupplierVoucherReversalFrm › View Details › "Invoices (as paid)"; the new exe shows it, an old exe ignores it) | ✅ 2026-10-12 17:07 (first version 16:55 reverted and re-applied after the reviews). Rolled back first: the bug reproduced on CEB-PCF-081826 / 082726 (+0.48 / +0.18), fixed = legs = screen = cheque = bank, ledger 0; partial then final; EWT 1,000 split per branch; single-branch unchanged; purchase with EWT row + partial purchase; refusals 60523 (net liability 0) / 60524 (negative last share). Backup = the original (hash) | ✅ 2026-10-12 17:07 by Claude, user-approved. Rehearsed rolled back: 13-branch payment 20,183.04 = legs = cheque (was +0.06); real vouchers 688 / 913 show Balance After −0.06. Backup = original. ✅ PRODUCTION: run by the user 2026-10-12 (users need the new exe for the "Invoices (as paid)" tab) |
+| 62 | `2026-10-12e_SupplierVoucherReversal_TelegraphicVariance.sql` (`sp_CancelledChequesCS`, Supplier Voucher Reversal: purchase / expense balance back by the amount settled = cash − the Variance column of telegraphic rows; purchase AmountPaid back by the telegraphic cash only, EWTAmount / Discount / OffsetAmount untouched (a cash / check purchase reversal drove them negative); PayStatus PARTIAL while another payment stands; telegraphic / cash vouchers can't be reversed twice + applock `APREV:<supplier>:<voucher>`; backup `_OLD_10122026230000`. Data repair of purchases the old rule left short, only when the dropped variance explains the whole gap; backup table `APACCOUNTS_RevVariance_Backup_20261012`; no exe change) | ✅ 2026-10-12 17:22 (rolled back first R1–R5: telegraphic purchase with FX gain 386,428.57 → 396,428.57; partial-then-rest → 296,428.57 PARTIAL; telegraphic expense 285,000 → 285,365; cash / check purchase AmountPaid −396,128.57 → 0; double reversal refused). Repair: nothing to fix (RIBS 32339 already right) | ✅ 2026-10-12 17:22 by Claude, user-approved (rehearsed rolled back first). Repair: PRIBLET 000125/15 0.00 FULLYPAID → 70,000.00 PARTIAL (1 row, backup kept); the voucher view of 38581 now shows Balance After = Balance Now = 70,000. ✅ PRODUCTION: run by the user 2026-10-12 (its repaired / skipped list not seen yet) |
+| 63 | `2026-10-12f_SupplierPayment_SplitBug_VoucherCorrection.sql` (data only. User 2026-10-12: the cheques were written for the screen's total. Vouchers inflated by the split bug corrected on the leg, ticket DR/CR, supplier-ledger row, CheckVoucher and bank-recon OC; listed refs only: 28500 / 688 and 38626 / 913, 199,999.06 → 199,999.00; every value checked first, else nothing changes (tested: listing 35103 is refused); backups `SplitFix_Backup_20261012_*`) | ✅ 2026-10-12 (28500 only; 38626 isn't on DEV). Rehearsed rolled back first | ✅ 2026-10-12 by Claude, user-approved (rehearsed rolled back first): both vouchers cheque = legs = bank credit = recon = 199,999.00, ledger net 0, supplier 000047 +0.12. ✅ PRODUCTION: run by the user 2026-10-12. The other 6 affected vouchers (684, 803, 823, 837, 787, 867) wait for the accountant's confirmation of their cheque amounts |
+| 64 | `2026-10-12g_GLDetailLedger_ReferenceKey.sql` (`sp_rpt_GLDetailLedgerRealTime`, Accounting Reports › GL Detail Ledger: new 2nd column ReferenceKey = the day's distinct TicketMaster.ReferenceKey values, comma-separated, as TicketNumbers; backup `_OLD_10122026233000`; no exe change) | ✅ 2026-10-12 18:01 (old vs new rolled back first: same rows and amounts apart from the new column) | ✅ 2026-10-12 18:01 by Claude, user-approved (same rehearsal). ✅ PRODUCTION: run by the user 2026-10-12 |
+| 65 | `[65]-2026-10-12h_LoanRevaluation.sql` (Loan Revaluation, Feature 23 / plan `docs/plans/2026-10-12_PROFOOD_Loan_FX_Plan.md`: tables `LoanAccount` / `LoanTransaction`, mapping `LOAN-REVAL` FXLOSS / FXGAIN = 60323, procs `sp_Loan_GetAccounts` / `_GetTransactions` / `_GetTicketLines`, `spu_Loan_PostRevaluation` (month end, in order, stale guard, 62001–62009) / `spu_Loan_ReverseRevaluation` (latest only, dated like the original, 62011–62015); loan LOAN051618 PROFOOD GMBH EUR 800,000 opening 07-31 @70.5095 = 56,407,600 = GL 20203. C#: new `AccountingDevEx/LoanRevaluationFrm` (code-only), Accounting Settings › "Loan Revaluation" (admins + accounting)) | ✅ 2026-10-12 23:3x (same as STAGING) | ✅ 2026-10-12 23:3x by Claude, user-approved ("apply directly in staging"). Rehearsed rolled back first: 08-31 @71.9305 = +1,136,800 loss, 09-30 @70.2158 = −1,371,760 gain → 56,172,640 = Peachtree = GL 20203; reversal of 09-30 back to 57,544,400; refusals 62002 / 62004 / 62005 / 62012 / 62015. The 08-31 / 09-30 revaluations are NOT posted yet (to be posted from the screen). **2026-10-13 08:47 reinstalled (reviewed version) on DEV + STAGING** after sp-reviewer / ui-form-reviewer: install stops unless COA 60323 / 20203 exist and GL 20203/888 before 08-01 = 56,407,600; next date must be the following month end, not after this month (62016); GL liability on the branch up to the date must equal the loan balance (62020, catches a hand-booked JV); mapping accounts checked in the COA; reference no. from the counter inline. Form: loan pick kept on a transient null, Code - Name account column, preview rounding = server, grids sized on show. Tests rolled back again + UI harness 6 / 6 runs clean. Later 10-13 (C# only): the Posted grids' figures were never formatted (the `Columns.Count == 0` check is never true after DataSource), now N2 / rates `#,##0.0000##`, right-aligned cells + headers + rate box; CLAUDE.md numeric rule items 3 / 4. ⏳ PRODUCTION: the user runs it + the new exe |
 | 47 | `2026-10-08d_BankRecon_StampClearedMonth.sql` (data; after 46: moves old-exe ticks of earlier-period items to the month that was on screen; set branch / account / month / tick dates) | — | rehearsed on STAGING with 46 (old-exe ticks → July 0.00 again, Aug unchanged). For PRODUCTION if the accountant ticks BDO PESO 1 Aug with the old exe from 10-09 | ✅ 2026-10-07 14:46, run by the user; verified: 34 rows, July 31 differences = Peachtree's, no duplicates |
 
 - 2026-09-26: the live `sp_rpt_ItemCostingRecon_List` on both DBs was changed by the user (14:13 DEV / 14:18 STAGING): `BranchCode` → `BranchName` via `INNER JOIN dbo.Branches`. The repo copy in script 6 (`2026-09-24b`) still has `BranchCode`.
@@ -715,6 +726,13 @@ Tested full / partial / two-step on multi-branch and SINGLE invoices. **Status:*
     - The boxes are no longer grid editors: the click is caught in MouseDown, so there's no editor delay. Space toggles the focused row too.
     - An item cleared in a later month ("(later)") is refused on the click, before anything is queued.
   - Built 10:33 (bin). Not yet clicked in the app.
+- **2026-10-12, statement balance preview (C# only, built 11:25).** Typing in the bank statement balance box recomputes the summary at once (Adjusted Bank, Difference); the typed figure shows in gold until Save, and the status bar shows the saved one. Lock and Export to Excel still use the saved balance. A reload (period load, Save, a refused tick) puts the saved balance back.
+- **2026-10-12, Accounting Board opens screens faster (C# only, built 12:24).** The first open of a menu item builds the screen and runs its lookups; each lookup is a network round trip (~55 ms, a new connection ~400 ms).
+  - `AccountingBoard.SelectAndLoad`: page transition animation off; the page switches and paints at once with DevExpress's loading overlay (`SplashScreenManager.ShowOverlayForm`) while the screen loads.
+  - New `Database.FetchTables(dict)`: several constant SELECTs in **one batch, one round trip**. Parallel queries were tried and measured slower (each needs its own connection).
+  - `SupplierPaymentDevEx.LoadData`: 8 round trips → 1 (lookups 515–735 ms → 68–139 ms; screen 0.8–0.9 s → 0.36–0.47 s).
+  - `ClientPaymentsDevExAcctg` Load: the customer list (10,731 rows, ~2.8 s of network transfer, 15 ms on the server) loads in the background; the dropdown shows "Loading customers…" until then. The account list is fetched once for the 7 lookups (screen 1.1–1.4 s → 0.44–0.58 s).
+  - Other board screens are unchanged (0.2–0.6 s each); the same `FetchTables` pattern applies if needed. Timed in a harness loading the built exe; not yet clicked in the app.  - `AccountingBoard.SelectAndLoad`: page transition animation off; the page switches and paints at once with DevExpress's loading overlay (`SplashScreenManager.ShowOverlayForm`) while the screen loads.  - New `Database.FetchTables(dict)`: several constant SELECTs in **one batch, one round trip**. Parallel queries were tried and measured slower (each needs its own connection).  - `SupplierPaymentDevEx.LoadData`: 8 round trips → 1 (lookups 515–735 ms → 68–139 ms; screen 0.8–0.9 s → 0.36–0.47 s).  - `ClientPaymentsDevExAcctg` Load: the customer list (10,731 rows, ~2.8 s of network transfer, 15 ms on the server) loads in the background; the dropdown shows "Loading customers…" until then. The account list is fetched once for the 7 lookups (screen 1.1–1.4 s → 0.44–0.58 s).  - Other board screens are unchanged (0.2–0.6 s each); the same `FetchTables` pattern applies if needed. Not yet clicked in the app (timed in a harness loading the built exe).
 - **2026-10-09, reversals in a later month (found; fix built, scripts 50 + 51).**
   - Reversed / voided items are hidden in every month. For 16 items (14.87M, mostly Aug → Sep) that hid them from their original month, while the GL still had the original entry there. Example: BDO PESO 2 X2608-023, 5,914,761.28, voided Sep 26.
   - Sent to the accountants: `docs/reports/2026-10-09_BankRecon_ReversedInLaterMonth_STAGING.xlsx`.
@@ -795,8 +813,193 @@ Tested full / partial / two-step on multi-branch and SINGLE invoices. **Status:*
 - **2026-10-03, V2 forms (`AddBranchOrderSTSV2` / `AddBranchOrderV2`, C# only, built):**
   - Both now open on FIFO instead of Scan Barcode (user request); JFC opens on Manual (By Shipment).
   - Fixed: the Manual dropdown was empty until the user switched to Auto and back. `LoadData()` runs before the form is shown and relied on the RadioGroup's `SelectedIndexChanged`, which doesn't fire before the window exists. It now sets the type quietly and loads the list itself.
+## Feature 24 — POS V2, hybrid online / offline (phases 1–5 BUILT on DEV 2026-10-12 / 13)
+## Feature 24 — POS V2, hybrid online / offline (phases 1–4 BUILT on DEV 2026-10-12)
+
+- **User 2026-10-12: all 5 recommendations.** Q1: terminals keep a local SQL Server and the local schema runs on SQL Server 2014. Q2: GL once per shift (phase 3). Q3: short stock → post anyway + shortage list. Q4: new tables, old reports rebuilt in phase 5. Q5: no restaurant / hotel options.
+- **Phase 1 built:**
+  - SQL scripts 58 + 59 (`SQL/POSV2/`), on DEV.
+  - C# in `SalesInventorySystem/POSV2/`:
+    - `PosV2Config` (registry HKCU\AAITCRE\POSV2, no credentials);
+    - `Models/PosModels`;
+    - `Services/PosPricingService` (VAT 12/112, the server's rounding);
+    - `PosLocalSchema` + `PosLocalStore` (local DB `CORECS_POSV2`, created on first run; one transaction per sale with its OR no. and outbox row);
+    - `PosSyncService` (background worker: register, master data every 30 min, outbox in order; 61010–61021 = needs attention, else retry; no UI access);
+    - `Devices/PosReceiptPrinter`, `Devices/PosScale`;
+    - `PosProductSearchForm`, `PosPaymentForm`, `PosTerminalForm` (keys Enter / F2–F5 / Del / F8 / F10–F12, "2.5*code").
+  - `Main.openPOS()` opens V2 only when the machine has POSV2 `Enabled = 1`.
+- **Tests:**
+  - P1–P7 rolled back on DEV.
+  - End-to-end with the real classes (harness exe): register (`001T01`, 156 products); offline (unreachable server) 2 sales kept locally; back online, both posted in 1.45 s, one line short (15125 3.41 of 5); forced re-upload = DUPLICATE, no second deduction; online sale posted 231 ms after saving. Server stock / ledger / lots verified.
+  - DEV then restored exactly (14017 427,930.000 / 13035 116,814.250 / 15125 3.410), test DB, keys and exe removed.
+- **Not yet clicked in the app:** the screens (PosTerminalForm, search, payment) were built and compile, but only the services were exercised.
+- **Phase 1 limits (later phases):** no discounts / void / hold / shifts / X-Z read / GL / card / charge / returns. No LOT mode for stickered lots (POS takes any eligible lot by FIFO). The stock ledger is dated at upload, not at the sale time, for offline sales. The BIR receipt header is phase 5. The first run needs the server once (registration).
+- The ledger remark is `POS SALE OR#<terminal prefix>-<seq>`.
+- **Phase 2 BUILT on DEV 2026-10-12** (user: one STAGING update at the end, so phase 2 is folded into scripts 58 / 59; DEV re-created with `SQL/POSV2/DEVONLY_2026-10-12_POSV2_Reset.sql`, which refuses if any POS V2 sale exists):
+  - Discounts: `POSV2_DiscountType` (configurable; seeded SC20 / PWD20 = 20% VAT-exempt + name and ID required, SC5 / PWD5 = 5% basic necessities, OTHER = cashier %, ONETIME = amount spread by value) + `POSV2_SaleDiscount` + line DiscountAmount / VatExemptAmount. The server re-checks every line (61022–61028).
+    - Senior on a VAT item: ex-VAT = ROUND(gross / 1.12, 2), exemption = gross − ex-VAT, discount = ROUND(ex-VAT × 20%, 2), and the line is no longer taxed.
+  - Void after payment: `spu_POSV2_VoidSale` restores the sale's own lots (ledger `POS VOID OR#…`), sets shortages to VOIDED, idempotent. On the terminal: the cashier's own sales of today, with a reason, as a VOID outbox event behind the SALE.
+  - Hold / recall: on the terminal only (PosHold*), no OR number used.
+  - Lines removed before payment: counted on the sale (CancelledLineCount / Amount) for the phase-3 Z-reading. A whole sale cleared with F8 is not recorded yet.
+  - Reprint any of today's receipts (local ReprintCount).
+  - New keys: F6 discount, F7 hold / recall, F9 void, F11 reprint picker. New windows: PosDiscountForm, PosListPickerForm.
+- **Phase 2 tests:**
+  - Server: P1–P7 + D1–D5 + V1–V2, all rolled back.
+  - End-to-end with the real classes: offline senior sale 725.00 → 526.43 (exemption 66.96, discounts 111.61 + 20.00) and a one-time sale voided offline; back online, 3 events in order in 0.78 s; stock and ledger verified (void = out and back in); hold / recall round trip OK.
+  - DEV then restored exactly; test DB, keys and exe removed.
+- **Open for later phases:** supervisor approval for voids and large discounts (phase 3, with shifts); recording a whole sale cancelled with F8. (Both done in phase 3.)
+- **Phase 3 BUILT on DEV 2026-10-12** (user: "go ahead start it"; folded into scripts 58 / 59 like phase 2; DEV re-created with the reset script).
+  - **Shifts:** `POSV2_Shift`. The cashier opens a shift with the cash beginning (works offline), every sale belongs to one (`POSV2_Sale.ShiftGUID` required, 61030 / 61031), and the Z-reading closes it with a blind cash count. One open shift per terminal (filtered unique index; 61052). The Z counter is per terminal, never resets, and resumes after a reinstall (`RegisterTerminal` returns LastZNo + the open shift).
+  - **Close (`spu_POSV2_CloseShift`):** re-derives every figure from the server's own rows. It refuses (61057) when the terminal's sale count / void count / net differ, i.e. a sale of the shift is still "needs attention". F12 re-queues both in order.
+  - **GL once per shift (user Q2), `spu_POSV2_PostShiftGL`:** ONE ticket, mnemonic `POSV2-SHIFT`, dated the shift's opening day, on its branch, all VAT-exempt.
+    - Accounts from JournalEntryMapping:
+      - CASH (counted − beginning) → DR 10101 Cash on Hand;
+      - DISCOUNT + VATEXEMPT → DR 40103 Sales Discount;
+      - GROSS → CR 401;
+      - COST → DR 501 / CR 101040201;
+      - SHORT → DR 60340 CASH SHORTAGE - POS (an expense; user + accountant 2026-10-13; new account added by script 59 under 603, same placement as 60339);
+      - OVER → CR 404 Other Income.
+    - Legs are netted per account (#Legs), so a short bigger than the sales still balances.
+    - A GL failure (closed month 59900, mapping missing 61062, ...) never undoes the close: GLStatus FAILED with the reason, and `spu_POSV2_PostPendingShiftGL` retries it (the terminal's sync calls it every 30 minutes).
+    - Note: the old unused `CR-CASH` mapping uses 1010101 Petty Cash; POS V2 uses 10101 Cash on Hand.
+  - **Supervisors:** `POSV2_Supervisor` holds the PIN as a PBKDF2 hash (PasswordHasher, ≥ 6 digits), separate from the login password on purpose. Admins set them with Ctrl+P (`spu_POSV2_SetSupervisor` checks Users.isAdmin, 61083). Terminals download the hashes, so approvals work offline; 5 wrong PINs lock approvals for a minute.
+    - Approval needed for: a void (61045 / 61046), a discount type with `RequiresApproval` (seeded OTHER / ONETIME; 61032 / 61033), clearing a sale (F8), a no-sale drawer opening (Ctrl+D), and closing another cashier's shift (61058).
+    - The server records the approver and refuses an unknown one.
+  - **Void only while the sale's shift is open** (61044). After the Z-reading it needs a return (phase 4).
+  - **Terminal:** shift line in the header; Ctrl+X X-reading, Ctrl+Z close (Z), Ctrl+R reprint Z, Ctrl+D no-sale drawer, Ctrl+P supervisors. A cleared sale and drawer openings are counted on the Z (local `PosShiftEvent`, sent with the close).
+    - New windows: `PosApprovalForm`, `PosAmountForm`, `PosSupervisorAdminForm`.
+    - New devices: `PosCashDrawer` (ESC/POS pulse through the receipt printer, RAW; registry DrawerKick / DrawerPrinter / DrawerCode) and `PosDisplayPole` (serial 2×20; PolePort / PoleBaud; failures never stop a sale).
+  - **Tests:**
+    - Server: S1–S19 rolled back (over 30.00 → CR 404; short 25.00 → DR 101030201; short 750 > sales nets 10101 to a credit; void out of the GL; empty shift = no ticket; retry proc; every refusal).
+    - GL-failure path committed then cleaned (OVER mapping off → CLOSED + FAILED 61062 → on → retry → POSTED).
+    - End-to-end with the real classes: PIN set via the admin service and checked offline; shift opened online; offline sale + approved ONETIME sale + approved void + cleared sale + drawer + Z close (counted 1,185 vs 1,180); back online, 4 events in 1.4 s; server figures = terminal's; ticket 10101 185 / 40103 20 / 401 200 / 404 5 / 501 = 101040201 = 159.02 = lot cost, DR = CR; Z#2 opened.
+    - DEV restored exactly (14017 427,930.000 / 13035 116,814.250; no POS V2 rows, tickets or ledger rows); test DB, keys and exe removed. Built 2026-10-12.
+  - **Reviews (2026-10-12), fixed and retested** (S1–S19 + R1–R13 rolled back, end-to-end rerun, DEV restored again):
+    - sp-reviewer B1: money checks at post are now exact (61015 / 61016 / 61018 / 61022; the terminal rounds the same way), so a one-cent drift can't make every close fail. The close's own post-check now has its own code, 61065.
+    - B3: a configuration change after an offline sale (type deactivated, approval / ID newly required, PCT rate changed) posts the sale with `NeedsReview` + `ReviewNote` instead of refusing it for good. New admin `spu_POSV2_ForceCloseShift` (61066) closes a stuck shift with the server's figures (ForcedBy / ForceReason); the terminal's later close = DUPLICATE.
+    - B2 (trust model, system-wide: `@User` comes from the client over the shared SQL login): approvers are now checked per branch (61033 / 46 / 59). PIN hashes need ≥ 100,000 iterations. `POSV2_SupervisorLog` records every change with SUSER_SNAME / HOST_NAME.
+    - S1 lock order shift → sale → stock everywhere. S2 SetSupervisor: NULL keeps the branch, '' = every branch. S3 a terminal clock ahead > 1 day refused at open (61050); close before open 61056. S4 SET QUOTED_IDENTIFIER / ANSI_NULLS ON in the script. S6 a FAILED GL update never overwrites POSTED. S7 void DUPLICATE before the approver checks. S8 the COA check covers only the legs used.
+    - R11: a closed GL month (lock through 10-31) makes PostShiftGL throw the trigger's 59900, which the close records as FAILED.
+    - ui-form-reviewer:
+      - X-reading needs a supervisor (it shows the expected cash, which would defeat the blind count).
+      - SaveSale refuses a sale under another cashier's shift, and a discount needing approval (or missing from the local list) without an approver.
+      - Orphan discounts no longer prompt.
+      - The shift prompt waits until the terminal window is active (no stacked dialogs).
+      - Ctrl+X / Ctrl+Z still cut / undo while typing in the scan box.
+      - Scanning needs your own open shift.
+      - The drawer event is logged before the drawer opens.
+      - A cleared sale also counts its removed lines on the Z (`@ClearedLineCount / Amount`).
+      - Closing the window with a sale on screen = cleared sale (approval); a Windows shutdown holds it.
+      - The close warns about held sales.
+      - A FAILED sale can't be voided.
+      - F12's count / message is fixed.
+    - **Rule (user, 2026-10-13): a supervisor MAY approve their own action** (some branches have only one person on duty). Not blocked; the approver is recorded.
+    - Not changed, noted: PIN hashes on terminals are brute-forceable offline by someone with the local DB (inherent to offline approvals); CLEARED / DRAWER details (approver, reason) stay on the terminal, only counts reach the server.
+  - **Phase 3 limits / open:** no cash pull-out (mid-shift pick-up) yet, so the count must include everything taken in; a terminal reinstalled while the server still has its shift open gets 61052 until that shift is closed (no admin force-close screen yet); the BIR accumulated grand total and the MIN / serial on the Z are phase 5; the close's post-check assumes cash only (phase 4 must extend it for card / charge); screens not yet clicked in the app.
+  - **Accountant (2026-10-13):** cash short = an expense (60340); senior / PWD VAT exemption → 40103 with the discounts (as built).
+- **Phase 4 BUILT on DEV 2026-10-13** (user: go; folded into scripts 58 / 59; DEV re-created with the reset script).
+  - **User decisions (10-13):**
+    - Cash short → new account 60340 CASH SHORTAGE - POS.
+    - A charge over the credit limit needs a supervisor's PIN.
+    - Refunds "same as paid".
+  - **Payments CASH / CARD / CHARGE in any mix** (`PosPaymentForm`):
+    - Change comes only out of cash (61019).
+    - A card needs its reference (61036).
+    - A charge needs the customer (61034 / 61035). The customer list is downloaded per branch (`sp_POSV2_GetCustomers`, 1,570 on DEV 001).
+  - **A charge sale writes the AR invoice at once:** `TransactionChargeSales` (PaymentType CREDIT, InvoiceNo = ReferenceNo = the OR no., DueDate = date + Term) and a `ClientLedger` debit (TransCode POSV2-CHARGE). Client Payments collects it like any invoice.
+    - The GL AR leg posts with the shift (POSV2-SHIFT CHARGE → DR 101030101). **Within an open shift, AR subledger > GL AR by the shift's charges** (timing, closes at the Z-reading).
+    - Credit check on the terminal: downloaded balance + this terminal's unsent charges. Over the limit → supervisor (`CreditApprovedBy`). The server re-checks the live balance and flags NeedsReview when there's no approver.
+  - **Void of a charge sale:** the invoice → CANCELLED (0) + a ClientLedger credit dated like the sale. Refused (61047) once anything was paid on it; the cashier does a return instead.
+  - **Returns (Ctrl+T, `PosReturnForm`, `spu_POSV2_PostReturn`, event RETURN, slip series `<prefix>-R<seq>`):**
+    - Any posted sale of the branch, part or all of a line, with a supervisor. The sale comes from the server when online (every terminal's returns + the invoice's live open balance), else from this terminal's own copy.
+    - Amounts are the line's rounded share; returning all that's left takes the exact remainder.
+    - Stock goes back to the sale's own lots, newest first, capped by earlier returns (`POSV2_ReturnLot`, ledger `POS RETURN <no> OR#<or>`). A qty that was sold short closes its shortage instead.
+    - Refund split: account first (up to the invoice's open balance; any excess → CUSTCREDIT 20115 + NeedsReview), then card, then cash from the current drawer. The return slip prints, and the drawer opens only for cash.
+    - Over-returns (stale terminal) are posted flagged, and the restock is capped.
+  - **Shift GL legs added (mapping rows 9–15):** CARD DR 101030105; CHARGE DR 101030101; RETGROSS DR 401; RETDISC CR 40103; RETCOST DR 101040201 / CR 501; CUSTCREDIT CR 20115.
+    - Expected cash = beginning + cash sales − cash refunds.
+    - The close compares the terminal's returns too (@ReturnCount / @ReturnNet, 61057). The post-check covers both identities (61065).
+  - **Tests:**
+    - Server: C1–C7 + R1–R10 rolled back (split sale, invoice + ledger, credit flag / approval, charge void + refusal, returns with charge / card / cash refunds, over-return flag, short line unshorted, excess → 20115, duplicate, every refusal); all tickets DR = CR.
+    - End-to-end with the real classes: customers downloaded; offline split sale 600 (cash 150, change 50 / card 200 / charge 300) → Z1; offline return in Z2 of 1 + 1 (350 = account 300 + card 50) → Z2; back online, 5 events in 0.8 s.
+      - Invoice RETURNED; ledger +300 / −300.
+      - Z1: 10101 100 / 101030101 300 / 101030105 200 / 401 600 / COGS 185.37. Z2: 401 350 / 101030101 −300 / 101030105 −50 / restock 132.44 = lot cost.
+      - Another terminal's live view sees the right returnable qty.
+    - DEV restored exactly (stock, no POS V2 / AR / ledger / ticket rows; customer balance 0); test DB, keys and exe removed. Built.
+  - **Reviews (2026-10-13), fixed and retested** (C1–C7, R1–R10, V1, L1, K1, P1, P2 rolled back; end-to-end rerun; DEV restored again):
+    - sp-reviewer B2 (confirmed live, DEV + STAGING): Client Payments holds the invoice reference in 10 characters (`splist_ARAccounts` OrderNo varchar(10); `ARPaymentDetails.PONumber` varchar(10) and its C# parameter). An OR no. there would break the AR list and silently cut the payment's match.
+      - POS charge invoices now use `ReferenceNo` = 'P' + 9 digits (new SEQUENCE `seq_POSV2_ARRef`, kept on `POSV2_Sale.ARReferenceNo`); the OR no. stays in `InvoiceNo`. No shared proc / table changed.
+      - P1 proves it: the list shows the invoice and `sp_AddPaymentClient` pays it in full (ledger 300 / −300, balance 0). A later void is refused (P2).
+    - Both reviews' B1: a sale with a return can't be voided (server 61048, terminal too).
+    - UI B2: the return screen adds this terminal's not-yet-uploaded returns to the server's view, and `SaveReturn` re-checks qty / amount under lock. A server-unreachable fallback and an unconfirmed account refund need a Yes.
+    - UI B3 + sp S8: **rule (user, 2026-10-13): a credit limit of 0 = unlimited** (no approval, no flag). For a customer with a limit, a failed balance read or a customer list older than a day needs approval too. Charges posted after the last customer download count as owing. (L1 retested: a 0 limit posts clean; C5 over-limit still flagged.)
+    - sp S1: a return's cash beyond what was paid in cash, and a line amount off its pro-rata share (±0.02), are flagged.
+    - S3 / S4: restock order = highest Inventory SequenceNumber first, one row per lot. The piece that empties a lot takes exactly what's left of its sale cost (K1: three returns = sale cost 238.53).
+    - S7: the credit check reads ClientAccounts without a lock (the same order as Client Payments).
+    - S9: TransactionChargeSales updates must hit exactly one row (61047 / 61069).
+    - TransactionChargeSales.BranchCode is `LEFT(@Branch, 3)`.
+    - UI S1: cash follows what's left after card + charge until typed; a cash tender that is all change is dropped. Enter on a button doesn't pay; numeric masks; card ref max 100.
+    - UI S2: return qty is a spin box capped at what's returnable; Return is blocked while an edit is invalid.
+    - UI S3: lookups are sequenced and the screen is cleared first.
+    - UI S4: the return series resumes after a reinstall (RegisterTerminal LastReturnSeq). UI S7: online is re-checked at each lookup.
+    - Receipt lines are clipped to 40 columns.
+    - The reset script refuses on a named instance or with POSV2 tickets present, and drops the sequence.
+    - **Not changed, noted:**
+      - a void of a charge sale already paid stays refused (61047). Offline + paid in between is rare; it needs a force close.
+      - A ChargeExcess (customer credit to 20115) isn't in the AR credit pool (`sp_GetCustomerAvailableCredit`); NeedsReview is the trace. Exception Center check in phase 5.
+      - GL date = the shift's opening day, while AR dates = the sale / return day (a shift across midnight or a month end splits them).
+      - Block the month-end close while a POSV2 shift is OPEN / PENDING / FAILED (phase 5).
+      - The restock goes back at the sale-time lot cost, while `spu_InvFIFO_Restore` may value the ledger at the lot's current cost.
+  - **Not yet / open:** a void of a charge sale made offline and paid in between is refused (61047) → force close. Card settlement with the bank (101030105 → bank) is outside POS. A return can't be voided (a new sale re-sells). Reports / BIR / Exception Center / Process Trace = phase 5. Screens not yet clicked in the app.
+- **Phase 5 BUILT on DEV 2026-10-13** (user: go).
+  - **BIR registration on the terminal:** `POSV2_Terminal.BIRMachine` = its `POSInfoDetails.MachineUsed` on the branch (old-POS table: business name, address, TIN, MIN, serial no., accreditation, PTU no. and validity).
+    - Set per machine in the registry (POSV2 `BIRMachine`). Sent at registration, which now also re-runs at every master refresh (idempotent; counters only move up).
+    - Receipt / return slip / Z-reading print the BIR header (name, wrapped address, VAT REG TIN, MIN, SN) and footer (accreditation, date issued, PTU, validity).
+    - A linked terminal prints "SALES INVOICE" / "SI No."; an unlinked one says so in the footer.
+  - **Accumulated grand total** (`AccumulatedBefore / After` on the shift, terminal and server): + net sales of the shift; voids are out and returns don't lower it. It resumes after a reinstall (RegisterTerminal LastAccumulated, max rule). The Z prints the Z counter, reset counter 0, and accumulated before / after. **Accountant to confirm the basis (net sales).**
+  - **BIR reports (script 60):** E-Sales, POS Sales Summary, 2550M add POS V2 from `fn_POSV2_ZReadings` (closed shifts = sales less returns, split by the original line's VAT). A terminal not linked to POSInfoDetails is listed with TIN / MIN blank, never left out. Old-POS rows unchanged (both old Z tables are empty on DEV).
+  - **GL month close (script 60):** `spu_GLPeriod_Close` refuses (59908) while a POS V2 shift of the month (or earlier) is open or its GL isn't booked.
+  - **Reports in the main app:** "POS V2 Reports" (Accounting Settings menu, admins + accounting; added in code, Main.Designer untouched): Z-readings, Sales journal, Returns, Needs attention. N2 / N3, footer sums, data-aware Excel export. Procs `sp_rpt_POSV2_Shifts / _SalesJournal / _Returns / _NeedsAttention`.
+  - **Exception Center:** `tools/ExceptionCenter/POSV2_ExceptionCheck.sql`, P01–P15 (P14 / P15 added after the review):
+    - GL: ticket balanced / booked once / AR leg = charges − charge refunds / GL not booked.
+    - Cost: shift cost vs lots, return cost vs restocked lots.
+    - Stock: void restock.
+    - AR: POS invoice vs sale − returns; client-ledger rows vs balance; customer credit 20115.
+    - Work lists: NeedsReview, open shortages, shifts open > 1 day, OR-series gaps.
+    - Tested: clean data = 0; injected faults found (P01 −50.00, P05 +1.00).
+  - **Credit limit rule (user, 10-13): 0 = unlimited** (terminal + server; L1 retested clean).
+  - **Tests:** F1 (BIR register), F2 (two shifts + return: grand total 0 → 600 → 800; E-Sales / Summary / 2550M rows net of the return: VATable 223.22, VAT 26.78), F3 (59908) rolled back. End-to-end with the real classes: BIR header / footer on the receipt and Z; grand total terminal = server (500 → 600); E-Sales feed. DEV restored, test BIR row removed.
+  - **Process Trace module: deferred** until POS V2 has real sales (the builder needs sample transactions; none exist anywhere yet).
+  - **Phase 5 reviews (2026-10-13), fixed and re-tested:**
+    - sp-reviewer B1: the older `BIR2550M` screen (two menu buttons) reads `spr_SalesReportSummary`, which had no POS V2 → patched too (F4: branch 001 gains exactly the Z feed, no other branch moves).
+    - VAT split exact at the source: `spu_POSV2_PostSale` 61017 has no 0.01 tolerance any more and requires zero-rated = 0 (a line has no zero-rated flag; the terminal always sends 0). A return line can't carry VAT on a non-VAT line or more VAT than its amount (61072); a VAT share off by > 0.02 is a review flag, like the net. The close post-check 61065 now also checks VATable + VAT + exempt + zero-rated = net, for sales and returns.
+    - Grand total: `CloseShift` resumes from the last shift that has one (`AccumulatedAfter IS NOT NULL`, also in Register), stores what the terminal printed (`TerminalAccumulatedAfter`, sent by the terminal from now on), and Needs attention lists "GRAND TOTAL DIFFERS".
+    - The BIR machine is stored on the shift at close (`POSV2_Shift.BIRMachine`), so editing the mapping later doesn't move filed months. The POSInfoDetails row is picked by the latest PTU (two rows for one machine).
+    - Month close: the guard reads the shifts `UPDLOCK, HOLDLOCK`; 59908 names `spu_POSV2_ForceCloseShift`; new 59909 (a terminal used in the month, not seen since it ended, may hold offline sales). Limit: a terminal offline the WHOLE month isn't known; its shift's GL then fails 59900 and shows in Needs attention.
+    - Reports: date filters sargable, `OPTION (RECOMPILE)` for the optional branch, index `POSV2_Return(ReturnDateTime)` and `POSV2_Shift(BusinessDate)`. E-Sales OR range cut to its 20-char column.
+    - Exception Center: P01 also finds POSTED-without-ticket; P03 one finding when the mapping row is missing; P07 compares the restored qty; P08 counts invoice rows (a duplicate shows); P07 / P10 / P11 / P13 look back `@SinceDays` (45) because they have no "done" marker; P10 now MEDIUM; new P14 (VAT split vs net) and P15 (grand total chain / printed vs server). EC3 finds both injected faults.
+    - Recorded, not changed: a shift counts on its BusinessDate (cross-midnight sales count on the opening day in the Z / BIR / GL, while the sales journal lists each OR by its own date); voided ORs are in the OR range and the transaction count; a day with more returns than sales shows negative; P09 assumes every ledger row of a POS invoice carries the OR no. in InvoiceNo (check on the first real Client Payments of one); credit limit NULL is treated like 0 (unlimited), and the server's check doesn't see the terminal's unsent charges (only NeedsReview, never a refusal).
+    - ui-form-reviewer: blank branch for a non-admin → message, no load; register at refresh can't break the sync loop; counters reset to the server's when the terminal ID changes; report columns built once, count columns N0; receipt: "registered" = TIN on file, MIN only if present, nothing internal on a customer slip (the terminal header shows the BIR link status instead), SI/OR wording.
+  - Harness note: the phase 3 / 4 test scripts needed the phase-5 register result shape (scratchpad only).
+  - Built 2026-10-13 into bin\Debug. Not yet clicked in the app: the reports screen and the BIR printouts.
+  - Dependency Atlas rebuilt from DEV (`-RegistryKey AAITCRE\ConnSettingsServer -Catalog COREX001`) with every POS V2 object and republished (version 5).
+
+### Phase 1 plan notes (2026-10-12)
+
+- Plan: `docs/plans/2026-10-12_POS_V2_Hybrid_Plan.md`. Ask: rebuild `POS/PointOfSale.cs` as a new module (own folder, tables, procs, views). Online = real-time stock deduction and posting; offline = kept locally, uploaded and deducted automatically when back online.
+- Found:
+  - the old POS posts line by line (`sp_AddSalesInvoice` → BatchSalesDetails / Summary), local-first, uploaded at end of day by table copy;
+  - stock is deducted later by an HO batch (`spu_ComputeSalesCosting`), and `isRealTimeDeduction` is unused;
+  - numbering is MAX+1 and a text file;
+  - production JFC has no POS rows (the POS serves another deployment);
+  - this laptop's local POS DB is SQL Server 2014.
+- Proposed: always local first, plus an outbox and a background sync worker (online = posted within seconds). The server proc is idempotent by sale GUID and deducts via the FIFO engine. Numbering is per terminal. New `POSV2_*` tables. Five phases.
+- Waiting on the user: Q1 where it runs / local SQL version; Q2 GL per shift vs per sale; Q3 offline oversell; Q4 old reports; Q5 drop restaurant / hotel options.
 
 ## Feature 23 — PROFOOD GMBH loan payment (ON HOLD 2026-10-04, plan only, nothing built)
+
+- **2026-10-12: new plan `docs/plans/2026-10-12_PROFOOD_Loan_FX_Plan.md`** (revised after the Peachtree screenshots): the loan is **EUR 800,000**, revalued every month end (07-31 @70.5095 = our 20203 opening 56,407,600). Peachtree booked revaluations as a "payment" of invoice LOAN051618 with the forex account 6041 as cash account. **Our GL lacks the 08-31 (+1,136,800 loss) and 09-30 (−1,371,760 gain) revaluations** (STAGING); interim = 2 Manual JVs. Proposal: a Loan Revaluation screen (not VoucheringManualFrm), payments mode later. A 09-25 Manual JV (ticket 15949) allocated 833,362.65 of loan forex to 12 branches: basis to ask. Waiting on the accountant (plan section 4).
+  - **Answered 2026-10-13 (user):** only 60323 and 20203 (rate up = DR 60323 / CR 20203, down = DR 20203 / CR 60323); 888 only, no branch allocation; principal / interest / withholding set aside. Script 65 already posts exactly this, so no change was needed.
 
 - **Ask:** pay the PROFOOD GMBH loan and interest the way AP is paid. Old system: DR "advance from other company" / CR forex gain/loss.
 - **User answers:**
@@ -829,6 +1032,15 @@ Tested full / partial / two-step on multi-branch and SINGLE invoices. **Status:*
 
 1. **1-cent rounding in multi-branch payments.** In `sp_AddPaymentSupplierCompound_V2`'s BATCH branch, the last branch's gross = eGross − SUM(**unrounded**
    shares), so branch grosses can sum to eGross + 0.01. Fix: remainder from the running sum of rounded shares.
+   - **2026-10-12, confirmed on STAGING and worse than 1 cent** (user's case: expense 17710 / CEB-PCF-080626, 199,999.00 paid by voucher 688 / ref 28500 as 199,999.06).
+     Line 842's `SUM(BranchNetLiability/@eNetLiability * @eGross)` divides a SUM column, DECIMAL(38,2), so the ratio is cut to 6 decimals (6220/199999 → 0.031100).
+     The other branches are therefore under-counted (12,559.9372 instead of 12,560), and the last branch (888) gets the rest: 187,439.06 instead of 187,439.00.
+     Line 840 (variables) keeps 20 decimals, so the other branches are exact.
+     The extra reaches the APPaymentDetails leg, the GL (DR 20103 / CR bank), SupplierLedger (invoice nets −0.06), the voucher / cheque amount (= sum of the legs) and the bank-recon OC. TransactionPaymentAP keeps the screen's 199,999.00.
+     8 of the 9 multi-branch vouchers on STAGING are affected, +0.01 to +0.52, 1.38 in all: 684, 688, 803, 823, 837, 787, 867, and 913 (10-12).
+     Corrected: those 5 invoices (refs 32956 / 34730 / 35103 / 32949 / 36453) were not edited after payment; their Balance was booked below the Amount at posting (net payable), and the payments matched the Balance.
+   - **Fixed by script 61** (DEV + STAGING 2026-10-12; production by the user). The 1.38 already overpaid on the 8 STAGING vouchers is for the accountant (the cheques went out at those amounts).
+   - **Found 2026-10-12, fixed by script 62 the same day: a telegraphic reversal restored the cash, not the settled amount.** STAGING PRIBLET (SI-202511470, 3,279,561.30): voucher 38580 settled it with 3,209,561.30 cash + 70,000 FX gain; its reversal put back only 3,209,561.30, so 38581 paid that and the invoice shows FULLYPAID while the supplier ledger still owes 70,000. (Same family as "PURCHASE reversal ... subtracts APAccounts columns posting never adds to".) The new voucher view shows it: 38581 Balance After 70,000 vs Balance Now 0.
 2. **Reversal zeroes each line's accrual EWT/Discount/Offset** in `sp_CancelledChequesCS` (it subtracts the line's own value from itself). A reversed-and-repaid
    multi-branch invoice may withhold no EWT.
 3. **Show overpayments and advances on supplier statements (`SupplierLedger`)?** Would need to be done for all modes together.
@@ -852,8 +1064,8 @@ Tested full / partial / two-step on multi-branch and SINGLE invoices. **Status:*
   discount leg at the gross amount. No DR = CR check. No PV-AP tickets existed on DEV yet.
 - `PV-AP` bank leg uses GROSS, not NET. It's unbalanced when there's a variance or return allowance without a discount.
 - The FX loss mapping points at 60302, but COA 60302 is BAD DEBTS; 60323 is the FX account.
-- PURCHASE reversal matches invoices on `SequenceNo` only and subtracts `APAccounts` columns that posting never adds to.
-- The "already reversed" guard checks only `CheckVoucher`, not Cash or Telegraphic vouchers.
+- PURCHASE reversal matches invoices on `SequenceNo` only. (Its subtracting of `APAccounts` columns that posting never adds to was fixed by script 62, 2026-10-12.)
+- ~~The "already reversed" guard checks only `CheckVoucher`~~: fixed by script 62 (audit + Telegraphic / Cash + applock), 2026-10-12.
 - Multi-branch BATCH: if `@eNetLiability = 0`, branch amounts become NULL.
 - `sp_PostExpenseManualMultiBranch` calls `GetTicketNumber` once, before the branch loop, so every branch shares one ticket number.
   `sp_EditExpenseManualMultiBranch` gets a new number per branch. Not changed; confirm which one is intended.

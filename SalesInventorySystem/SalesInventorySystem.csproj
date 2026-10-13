@@ -323,6 +323,9 @@
     <Compile Include="AccountingDevEx\AccountingBoard.Designer.cs">
       <DependentUpon>AccountingBoard.cs</DependentUpon>
     </Compile>
+    <Compile Include="AccountingDevEx\LoanRevaluationFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="AccountingDevEx\GLPeriodClosingFrm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -2704,6 +2707,47 @@
     <Compile Include="POS\PointOfSaleManual.Designer.cs">
       <DependentUpon>PointOfSaleManual.cs</DependentUpon>
     </Compile>
+    <Compile Include="POSV2\PosV2Config.cs" />
+    <Compile Include="POSV2\Models\PosModels.cs" />
+    <Compile Include="POSV2\Services\PosPricingService.cs" />
+    <Compile Include="POSV2\Services\PosLocalSchema.cs" />
+    <Compile Include="POSV2\Services\PosLocalStore.cs" />
+    <Compile Include="POSV2\Services\PosSyncService.cs" />
+    <Compile Include="POSV2\Devices\PosReceiptPrinter.cs" />
+    <Compile Include="POSV2\Devices\PosScale.cs" />
+    <Compile Include="POSV2\PosProductSearchForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="POSV2\PosPaymentForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="POSV2\PosTerminalForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="POSV2\PosDiscountForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="POSV2\PosListPickerForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="POSV2\PosApprovalForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="POSV2\PosReturnForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="POSV2\PosV2ReportsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="POSV2\PosAmountForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="POSV2\PosSupervisorAdminForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="POSV2\Services\PosSupervisorAdmin.cs" />
+    <Compile Include="POSV2\Devices\PosCashDrawer.cs" />
+    <Compile Include="POSV2\Devices\PosDisplayPole.cs" />
     <Compile Include="POS\POSAddDiscount.cs">
       <SubType>Form</SubType>
     </Compile>

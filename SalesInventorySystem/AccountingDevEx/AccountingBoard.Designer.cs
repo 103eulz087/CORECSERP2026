@@ -157,6 +157,7 @@ namespace SalesInventorySystem.AccountingDevEx
             this.menuPostClientPayment.Style = DevExpress.XtraBars.Navigation.ElementStyle.Item;
             this.menuPostClientPayment.Tag = "navPostClientPayment";
             this.menuPostClientPayment.Text = "Post Client Payment";
+            //this.menuPostClientPayment.Click += new System.EventHandler(this.menuPostClientPayment_Click);
             // 
             // groupExpense
             // 
