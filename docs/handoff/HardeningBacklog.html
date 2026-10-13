@@ -1,0 +1,431 @@
+<title>CORECS Hardening Backlog</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Layout: one reading column; a scannable register (tier, status, item) on top, each item opening into its work order below. */
+:root {
+  --bg: #f5f7f8;
+  --surface: #ffffff;
+  --ink: #17232b;
+  --muted: #56656f;
+  --line: #d8e0e5;
+  --accent: #0e6a73;
+  --accent-soft: #e2f0f1;
+  --tier-a: #b3261e; --tier-a-bg: #fbe9e7;
+  --tier-b: #8a5a00; --tier-b-bg: #fbf0d9;
+  --tier-c: #4b5a66; --tier-c-bg: #e8edf1;
+  --st-open: #56656f; --st-open-bg: #eceff2;
+  --st-prog: #0e5aa8; --st-prog-bg: #e3eefb;
+  --st-done: #1d6b3a; --st-done-bg: #e2f2e7;
+  --font-display: "IBM Plex Sans Condensed", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --step--1: 0.8125rem; --step-0: 0.9375rem; --step-1: 1.0625rem; --step-2: 1.375rem; --step-3: 2rem;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f171c; --surface: #16222a; --ink: #e3eaee; --muted: #9aabb6; --line: #2a3a44;
+    --accent: #5cc3cc; --accent-soft: #163a3f;
+    --tier-a: #ff8a80; --tier-a-bg: #3a1a18; --tier-b: #f2c260; --tier-b-bg: #382a0e; --tier-c: #b4c2cc; --tier-c-bg: #26333c;
+    --st-open: #b4c2cc; --st-open-bg: #26333c; --st-prog: #8ec1ff; --st-prog-bg: #152b45; --st-done: #7fd69c; --st-done-bg: #15301f;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f171c; --surface: #16222a; --ink: #e3eaee; --muted: #9aabb6; --line: #2a3a44;
+  --accent: #5cc3cc; --accent-soft: #163a3f;
+  --tier-a: #ff8a80; --tier-a-bg: #3a1a18; --tier-b: #f2c260; --tier-b-bg: #382a0e; --tier-c: #b4c2cc; --tier-c-bg: #26333c;
+  --st-open: #b4c2cc; --st-open-bg: #26333c; --st-prog: #8ec1ff; --st-prog-bg: #152b45; --st-done: #7fd69c; --st-done-bg: #15301f;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: var(--step-0); line-height: 1.55; }
+.wrap { max-width: 960px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 64px; display: grid; gap: 36px; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; letter-spacing: 0.01em; }
+h1 { font-size: var(--step-3); font-weight: 700; line-height: 1.1; }
+h2 { font-size: var(--step-2); font-weight: 600; }
+h3 { font-size: var(--step-1); font-weight: 600; }
+p { margin: 0; max-width: 68ch; }
+code, .mono { font-family: var(--font-mono); font-size: 0.86em; }
+code { background: var(--accent-soft); color: var(--ink); padding: 0.05em 0.35em; border-radius: 3px; overflow-wrap: anywhere; }
+a { color: var(--accent); }
+.eyebrow { font-family: var(--font-mono); font-size: var(--step--1); text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+header { display: grid; gap: 12px; }
+.lede { color: var(--muted); font-size: var(--step-1); }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 20px; color: var(--muted); font-size: var(--step--1); }
+.meta span strong { color: var(--ink); font-weight: 600; }
+
+/* counts */
+.counts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.count { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; display: grid; gap: 2px; }
+.count b { font-family: var(--font-display); font-size: var(--step-3); line-height: 1; font-variant-numeric: tabular-nums; }
+.count span { color: var(--muted); font-size: var(--step--1); }
+.count.a b { color: var(--tier-a); } .count.b b { color: var(--tier-b); } .count.c b { color: var(--tier-c); }
+
+/* chips */
+.chip { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 0.75rem; font-weight: 500; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+.tier-A { color: var(--tier-a); background: var(--tier-a-bg); }
+.tier-B { color: var(--tier-b); background: var(--tier-b-bg); }
+.tier-C { color: var(--tier-c); background: var(--tier-c-bg); }
+.st-open { color: var(--st-open); background: var(--st-open-bg); }
+.st-prog { color: var(--st-prog); background: var(--st-prog-bg); }
+.st-done { color: var(--st-done); background: var(--st-done-bg); }
+.st-open::before, .st-prog::before, .st-done::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+/* filter */
+.filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.filters button { font: inherit; font-size: var(--step--1); color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; cursor: pointer; }
+.filters button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+.filters button:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* register */
+.register { display: grid; gap: 10px; }
+.item { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--line); border-radius: 6px; }
+.item[data-tier="A"] { border-left-color: var(--tier-a); }
+.item[data-tier="B"] { border-left-color: var(--tier-b); }
+.item[data-tier="C"] { border-left-color: var(--tier-c); }
+.item summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: 3.2rem minmax(0, 1fr) auto; gap: 4px 12px; align-items: center; padding: 12px 14px; }
+.item summary::-webkit-details-marker { display: none; }
+.item .id { font-family: var(--font-mono); font-weight: 500; color: var(--muted); }
+.item .name { font-weight: 600; min-width: 0; }
+.item .tags { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.item .body { padding: 0 14px 16px calc(14px + 3.2rem + 12px); display: grid; gap: 12px; }
+.item .body h4 { margin: 0; font-family: var(--font-mono); font-size: var(--step--1); text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 500; }
+.item .body ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 4px; max-width: 70ch; }
+.item .body section { display: grid; gap: 4px; }
+.evidence { font-size: var(--step--1); color: var(--muted); }
+.evidence strong { color: var(--ink); }
+.chev { transition: transform 150ms ease; color: var(--muted); }
+details[open] .chev { transform: rotate(90deg); }
+@media (max-width: 640px) {
+  .item summary { grid-template-columns: 2.6rem minmax(0, 1fr); }
+  .item .tags { grid-column: 2; justify-content: flex-start; }
+  .item .body { padding-left: 14px; }
+}
+@media (prefers-reduced-motion: reduce) { .chev { transition: none; } }
+
+/* tables */
+.tablebox { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: var(--step--1); }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-family: var(--font-mono); font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-size: 0.72rem; }
+tr:last-child td { border-bottom: 0; }
+td.num { font-family: var(--font-mono); white-space: nowrap; }
+
+/* protocol + order */
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 16px; display: grid; gap: 10px; align-content: start; }
+.panel ol, .panel ul { margin: 0; padding-left: 1.2rem; display: grid; gap: 6px; }
+.order { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-family: var(--font-mono); }
+.order .step { padding: 4px 10px; border-radius: 4px; background: var(--tier-a-bg); color: var(--tier-a); font-weight: 500; }
+.order .arrow { color: var(--muted); }
+.note { font-size: var(--step--1); color: var(--muted); }
+section.block { display: grid; gap: 14px; }
+footer { color: var(--muted); font-size: var(--step--1); border-top: 1px solid var(--line); padding-top: 14px; display: grid; gap: 4px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">CORECS ERP · guardrails</div>
+    <h1>Hardening backlog</h1>
+    <p class="lede">The bug classes still open after the September–October fixes, in the order to harden them. Fable takes one item at a time; the ERP session keeps operating and verifies each one.</p>
+    <div class="meta">
+      <span>As of <strong>2026-10-14</strong></span>
+      <span>Evidence read on <strong>PRODUCTION</strong> (read-only)</span>
+      <span>Next script number <strong class="mono">[78]</strong></span>
+      <span>Source <code>docs/handoff/2026-10-14_Hardening_Handoff_to_Fable.md</code></span>
+    </div>
+  </header>
+
+  <div class="counts" aria-label="Items by tier and status">
+    <div class="count a"><b>6</b><span>Tier A · money or a ledger can go wrong silently</span></div>
+    <div class="count b"><b>5</b><span>Tier B · needs a specific sequence or action</span></div>
+    <div class="count c"><b>2</b><span>Tier C · needs a decision first</span></div>
+    <div class="count"><b id="cOpen">13</b><span>Open · 0 in progress · 0 done</span></div>
+  </div>
+
+  <section class="block" aria-labelledby="regTitle">
+    <h2 id="regTitle">Register</h2>
+    <div class="filters" role="group" aria-label="Filter by tier">
+      <button type="button" id="fAll" data-f="all" aria-pressed="true">All 13</button>
+      <button type="button" id="fA" data-f="A" aria-pressed="false">Tier A</button>
+      <button type="button" id="fB" data-f="B" aria-pressed="false">Tier B</button>
+      <button type="button" id="fC" data-f="C" aria-pressed="false">Tier C</button>
+      <span class="note">Open an item for its work order.</span>
+    </div>
+
+    <div class="register" id="register">
+
+      <details class="item" data-tier="A">
+        <summary><span class="id">H1</span><span class="name">GL ticket writer can post an unbalanced ticket and hides its errors</span><span class="tags"><span class="chip tier-A">Tier A</span><span class="chip st-open">Open</span><span class="chev" aria-hidden="true">›</span></span></summary>
+        <div class="body">
+          <section><h4>Problem</h4><ul>
+            <li><code>sp_PostCompoundTicket</code> (PV-AP payment legs, inventory posting, upload finalize) has no debit = credit check.</li>
+            <li>An amount type the caller didn't supply falls back to GROSS: <code>PV-AP-DISC</code> / <code>PV-AP-EWT-DISC</code> post the discount leg at the gross amount; the <code>PV-AP</code> bank leg uses gross, not net.</li>
+            <li>Every error reaches the screen as <code>50050 'ERROR SP'</code>.</li>
+            <li>The FX loss mapping points at 60302 (Bad Debts); 60323 is the FX account (accountant to confirm).</li>
+          </ul></section>
+          <section><h4>Harden</h4><ul>
+            <li>Assert balanced per ticket and branch before the insert, with its own error number.</li>
+            <li>Refuse a missing amount type instead of defaulting; re-throw the original error; check every mapped account against the chart of accounts. Keep the signature (incl. <code>@LedgerSide</code> from [71]).</li>
+          </ul></section>
+          <section><h4>Done when</h4><ul>
+            <li>Balanced postings identical old vs new (rolled back, per mnemonic); unbalanced and missing-type cases refused.</li>
+            <li>New Exception Center check "any ticket with DR ≠ CR, all modules" is 0 on DEV, STAGING and PRODUCTION.</li>
+          </ul></section>
+          <p class="evidence"><strong>PRODUCTION 10-14:</strong> no balance check in the definition; still re-throws as 50050.</p>
+        </div>
+      </details>
+
+      <details class="item" data-tier="A">
+        <summary><span class="id">H2</span><span class="name">Reversing an AR payment can reverse another customer's sales ticket</span><span class="tags"><span class="chip tier-A">Tier A</span><span class="chip st-open">Open</span><span class="chev" aria-hidden="true">›</span></span></summary>
+        <div class="body">
+          <section><h4>Problem</h4><ul>
+            <li><code>sp_ReversePaymentClient</code> mirrors every ticket and client-ledger row <code>WHERE ReferenceNumber = @refno</code>.</li>
+            <li>Sales tickets keep the PO number in the same column, from a different counter. When the numbers meet, the reversal also mirrors that sale.</li>
+          </ul></section>
+          <section><h4>Harden</h4><ul>
+            <li>Scope tickets to the payment's own <code>OR-%</code> mnemonics and the ledger to the customer + <code>OR-%</code> trans codes; refuse when the scope is empty or touches a second customer.</li>
+            <li>Review every other reversal that selects by <code>ReferenceNumber</code> alone (Dependency Atlas).</li>
+          </ul></section>
+          <section><h4>Done when</h4><ul>
+            <li>A forced collision on DEV (rolled back) mirrors only the payment; normal reversals produce identical rows to today's.</li>
+          </ul></section>
+          <p class="evidence"><strong>PRODUCTION 10-14:</strong> not scoped. No collision yet (DEV had 34), so it is waiting to happen.</p>
+        </div>
+      </details>
+
+      <details class="item" data-tier="A">
+        <summary><span class="id">H3</span><span class="name">Rollbacks and re-throws hide the real error, including the month lock</span><span class="tags"><span class="chip tier-A">Tier A</span><span class="chip st-open">Open</span><span class="chev" aria-hidden="true">›</span></span></summary>
+        <div class="body">
+          <section><h4>Problem</h4><ul>
+            <li>Named rollbacks (<code>ROLLBACK TRANSACTION PaySupplierV2</code>) raise 6401 when nested and hide the cause.</li>
+            <li><code>sp_AddPaymentSupplierCompound*</code>, <code>sp_AddPaymentClient</code>, <code>SP_CONFIRMPO</code>, <code>sp_ReversePaymentClient</code>, <code>SP_UPLOADINVENTORY</code> turn the month-lock refusal (59900) into "no BEGIN TRANSACTION"; <code>RAISERROR(@msg)</code> becomes 50000.</li>
+          </ul></section>
+          <section><h4>Harden</h4><ul>
+            <li>One standard for every posting proc: <code>XACT_ABORT ON</code>, TRY / TRAN / COMMIT, <code>CATCH: IF XACT_STATE() &lt;&gt; 0 ROLLBACK; THROW;</code>. Safe with or without an outer transaction. Written into <code>docs/standards/</code>.</li>
+          </ul></section>
+          <section><h4>Done when</h4><ul>
+            <li>Success path identical; a forced 59900 surfaces as 59900; no 6401 inside an outer transaction. Prerequisite for H4.</li>
+          </ul></section>
+        </div>
+      </details>
+
+      <details class="item" data-tier="A">
+        <summary><span class="id">H4</span><span class="name">Multi-step postings can stop halfway</span><span class="tags"><span class="chip tier-A">Tier A</span><span class="chip st-open">Open</span><span class="chev" aria-hidden="true">›</span></span></summary>
+        <div class="body">
+          <section><h4>Problem</h4><ul>
+            <li><code>sp_PostSupplierPaymentWithManualLines</code>: the invoice payment commits, then the manual lines run on their own; a failure leaves cheque ≠ GL ("already posted, do not re-run", 60299).</li>
+            <li><code>sp_ReverseCombinedSupplierVoucher</code> has no transaction.</li>
+            <li>STS receive screens make 3 separate calls from C# (receive, confirm, GL).</li>
+          </ul></section>
+          <section><h4>Harden</h4><ul>
+            <li>One transaction per business action (after H3), or the orchestration moved into one proc; C# makes one call per action.</li>
+          </ul></section>
+          <section><h4>Done when</h4><ul>
+            <li>Forcing a failure in the last step leaves nothing of the earlier steps (rolled back tests).</li>
+          </ul></section>
+          <p class="evidence"><strong>PRODUCTION 10-14:</strong> both procs still without their own transaction.</p>
+        </div>
+      </details>
+
+      <details class="item" data-tier="A">
+        <summary><span class="id">H5</span><span class="name">Payments settle against the amount on screen, not the current balance</span><span class="tags"><span class="chip tier-A">Tier A</span><span class="chip st-open">Open</span><span class="chev" aria-hidden="true">›</span></span></summary>
+        <div class="body">
+          <section><h4>Problem</h4><ul>
+            <li>Known Bug #10 is fixed only in the telegraphic voucher. Supplier payments (expense and purchase) settle with the screen's amount.</li>
+            <li><code>sp_AddPaymentClient</code> recomputes <code>Balance = TotalAmount − (AmountPaid + EWT + Discount + Offset)</code>; any invoice whose balance was set directly is silently reset by its next payment (fixed once for balance-forward rows by [43]).</li>
+            <li>Credit memo, return and cash advance: not audited yet for this pattern.</li>
+          </ul></section>
+          <section><h4>Harden</h4><ul>
+            <li>Re-read each balance under <code>UPDLOCK</code>; refuse a stale screen with its own code; make balance updates incremental, or assert the formula before applying it.</li>
+          </ul></section>
+          <section><h4>Done when</h4><ul>
+            <li>A two-session test (grid loaded, invoice paid elsewhere, then submit) is refused; the normal path is identical; invoice = ledger checks stay 0 for AP and AR.</li>
+          </ul></section>
+          <p class="evidence"><strong>PRODUCTION 10-14:</strong> the AR balance formula is still a recompute.</p>
+        </div>
+      </details>
+
+      <details class="item" data-tier="A">
+        <summary><span class="id">H6</span><span class="name">Lookups can hand back a different record than the one picked</span><span class="tags"><span class="chip tier-A">Tier A</span><span class="chip st-open">Open</span><span class="chev" aria-hidden="true">›</span></span></summary>
+        <div class="body">
+          <section><h4>Problem</h4><ul>
+            <li><code>SearchLookUpClass.getSingleValue</code> reads the popup's focused row, not the picked one; the first pick after load can return another row.</li>
+            <li>With a non-unique value member (938 customers share a name) a payment or order can post to the wrong party with no error. Fixed only in Client Payments so far.</li>
+          </ul></section>
+          <section><h4>Harden</h4><ul>
+            <li>Fix the helper centrally (<code>EditValue</code> / <code>GetSelectedDataRow()</code>), then audit every lookup for a unique value member (composite keys, Known Bug #7) and <code>DisableTextEditor</code> (Known Bug #2). Posting screens first.</li>
+          </ul></section>
+          <section><h4>Done when</h4><ul>
+            <li>Per converted screen, the first pick after load returns the picked row and a duplicate-name pair resolves to the right key; the user gets the list for a UI pass.</li>
+          </ul></section>
+          <p class="evidence"><strong>Code 10-14:</strong> 131 calls in 55 files.</p>
+        </div>
+      </details>
+
+      <details class="item" data-tier="B">
+        <summary><span class="id">H7</span><span class="name">Bank recon loopholes</span><span class="tags"><span class="chip tier-B">Tier B</span><span class="chip st-open">Open</span><span class="chev" aria-hidden="true">›</span></span></summary>
+        <div class="body">
+          <section><h4>Problem</h4><ul>
+            <li><code>sp_Payment_PostBankReconEntry</code> silently does nothing on a second call for the same reference, account and side (Known Bug #9).</li>
+            <li>JV and multi-branch expense edits delete and re-post their recon rows, so a cleared item comes back open.</li>
+            <li>The manual-lines payment updates an outstanding-cheque amount without checking cleared / locked; delete and save of recon items skip the period lock.</li>
+            <li><code>sp_BankRecon_AutoMatch</code> (clears cheques from their own GL credit, not the bank) is still installed; only its buttons are hidden.</li>
+          </ul></section>
+          <section><h4>Harden</h4><ul>
+            <li>Refuse or report a second call that would change an amount; keep cleared items cleared across edits; lock checks on every recon writer; drop or disable Auto-Match (user's decision).</li>
+          </ul></section>
+        </div>
+      </details>
+
+      <details class="item" data-tier="B">
+        <summary><span class="id">H8</span><span class="name">Ledger rows point at tickets that don't exist; racy sequence numbers</span><span class="tags"><span class="chip tier-B">Tier B</span><span class="chip st-open">Open</span><span class="chev" aria-hidden="true">›</span></span></summary>
+        <div class="body">
+          <section><h4>Problem</h4><ul>
+            <li><code>spu_PostExpenseV2</code> writes the supplier-ledger ticket reference from a second ticket-number call.</li>
+            <li>Multi-branch expense posting shares one ticket number across branches; its edit takes one per branch.</li>
+            <li><code>func_getLastID</code> takes the next ledger sequence under <code>NOLOCK</code>.</li>
+          </ul></section>
+          <section><h4>Harden</h4><ul>
+            <li>Use the posted ticket's own number and backfill; one numbering rule for multi-branch (user); sequence under lock.</li>
+          </ul></section>
+          <p class="evidence"><strong>PRODUCTION 10-14:</strong> 389 expense ledger rows point at a missing ticket; NOLOCK still there.</p>
+        </div>
+      </details>
+
+      <details class="item" data-tier="B">
+        <summary><span class="id">H9</span><span class="name">The month lock covers the GL only</span><span class="tags"><span class="chip tier-B">Tier B</span><span class="chip st-open">Open</span><span class="chev" aria-hidden="true">›</span></span></summary>
+        <div class="body">
+          <section><h4>Problem</h4><ul>
+            <li>Once a month is closed, the triggers stop GL tickets only. Supplier and client ledgers, stock movements, recon items and invoice tables can still change for that month.</li>
+          </ul></section>
+          <section><h4>Harden</h4><ul>
+            <li>Agree with the user which tables follow the lock; same trigger pattern (lock row read <code>WITH (HOLDLOCK)</code>); keep the rule that a reversal is dated in its source month.</li>
+          </ul></section>
+          <p class="evidence"><strong>PRODUCTION 10-14:</strong> no month closed yet. Do this before the first close.</p>
+        </div>
+      </details>
+
+      <details class="item" data-tier="B">
+        <summary><span class="id">H10</span><span class="name">SQL built by string concatenation in C#</span><span class="tags"><span class="chip tier-B">Tier B</span><span class="chip st-open">Open</span><span class="chev" aria-hidden="true">›</span></span></summary>
+        <div class="body">
+          <section><h4>Problem</h4><ul>
+            <li>About 498 INSERT / UPDATE / DELETE statements are concatenated (most in HO forms, POS, Hotel, Orders). Known cases on posting paths: order approve / reject / invoice-number updates, <code>ViewLinkedPODetailsFrm.LoadLines</code>.</li>
+          </ul></section>
+          <section><h4>Harden</h4><ul>
+            <li>Parameterize posting and approval paths first (CLAUDE.md rule 2); leave scratch folders alone.</li>
+          </ul></section>
+        </div>
+      </details>
+
+      <details class="item" data-tier="B">
+        <summary><span class="id">H11</span><span class="name">Screens that report success after an error</span><span class="tags"><span class="chip tier-B">Tier B</span><span class="chip st-open">Open</span><span class="chev" aria-hidden="true">›</span></span></summary>
+        <div class="body">
+          <section><h4>Problem</h4><ul>
+            <li>26 empty <code>catch {}</code> blocks. Credit Memo shows "Payment Successfully Posted" after a swallowed SQL error (same bug fixed in Return Sales Order).</li>
+          </ul></section>
+          <section><h4>Harden</h4><ul>
+            <li>Success only after the commit returns; failures show the error number and message; posting screens first.</li>
+          </ul></section>
+        </div>
+      </details>
+
+      <details class="item" data-tier="C">
+        <summary><span class="id">H12</span><span class="name">Zero-value and zero-cost lines in sales and conversion costing</span><span class="tags"><span class="chip tier-C">Tier C</span><span class="chip st-open">Open</span><span class="chev" aria-hidden="true">›</span></span></summary>
+        <div class="body">
+          <section><h4>Problem</h4><ul>
+            <li>A zero-priced line's return puts stock back but never reverses its cost (<code>spu_SO_PostInvoiceReduction</code> returns early on gross 0).</li>
+            <li>Conversion output lots carry cost 0, so their sales post 0 COGS. POS V2 restocks at sale-time cost while the FIFO restore may use the current cost.</li>
+          </ul></section>
+          <section><h4>Decide first</h4><ul><li>Accountant: the costing rule for each case.</li></ul></section>
+        </div>
+      </details>
+
+      <details class="item" data-tier="C">
+        <summary><span class="id">H13</span><span class="name">The database trusts whichever user the exe names</span><span class="tags"><span class="chip tier-C">Tier C</span><span class="chip st-open">Open</span><span class="chev" aria-hidden="true">›</span></span></summary>
+        <div class="body">
+          <section><h4>Problem</h4><ul>
+            <li>Every proc takes <code>@User</code> from the client over one shared SQL login, so approvals, month reopen and audit columns record whatever is sent. POS V2 narrowed it (approver checked per branch, login and host logged).</li>
+          </ul></section>
+          <section><h4>Decide first</h4><ul><li>With the user: per-user logins, a session context set once per connection, or the web v2's own authentication. v2 must not inherit the gap.</li></ul></section>
+        </div>
+      </details>
+
+    </div>
+  </section>
+
+  <section class="block" aria-labelledby="orderTitle">
+    <h2 id="orderTitle">Suggested order</h2>
+    <div class="order" aria-label="H1, then H3, H2, H4, H5, H6">
+      <span class="step">H1</span><span class="arrow">→</span><span class="step">H3</span><span class="arrow">→</span><span class="step">H2</span><span class="arrow">→</span><span class="step">H4</span><span class="arrow">→</span><span class="step">H5</span><span class="arrow">→</span><span class="step">H6</span>
+    </div>
+    <p class="note">Then the user picks among H7–H13. H1 and H3 change shared plumbing that H4 and H5 build on; H2 is small and its failure is the most damaging.</p>
+  </section>
+
+  <section class="block" aria-labelledby="protoTitle">
+    <h2 id="protoTitle">Working together</h2>
+    <div class="cols">
+      <div class="panel">
+        <h3>Who owns what</h3>
+        <ul>
+          <li><strong>Fable</strong>: hardening, one backlog item at a time.</li>
+          <li><strong>ERP session</strong>: user requests, data repairs, deployments, Exception Center checks; verifies each item Fable hands back.</li>
+          <li><strong>The user</strong>: picks the next item, approves STAGING, runs PRODUCTION.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>Rules for every item</h3>
+        <ol>
+          <li>Claim it in the handoff file before touching code; the other session leaves its objects alone.</li>
+          <li>Read the live definition on DEV and STAGING first; repo copies can be older.</li>
+          <li>One shared <span class="mono">[NN]</span> script series; claim the number in the work log.</li>
+          <li>Stay compatible with the current exe and the web v2 (optional parameters, opt-in behaviour, <span class="mono">_OLD_</span> backups).</li>
+          <li>DEV → rolled-back STAGING rehearsal on the user's go → the user runs PRODUCTION; verify read-only.</li>
+          <li>Add an Exception Center check that proves the rule; record the rule in the work log.</li>
+          <li>Hand back with a result line; the ERP session marks it verified.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" aria-labelledby="doneTitle">
+    <h2 id="doneTitle">Already hardened</h2>
+    <div class="tablebox">
+      <table>
+        <thead><tr><th>Area</th><th>Guardrail in place</th><th>Scripts</th></tr></thead>
+        <tbody>
+          <tr><td>Supplier / client ledgers</td><td>Recalc triggers on insert, update and delete</td><td class="num">17, 18</td></tr>
+          <tr><td>GL month close</td><td>Period lock on tickets (59900); reversals dated like their source</td><td class="num">16, 51, 52</td></tr>
+          <tr><td>FIFO stock</td><td>Shared engine, per-product locks, warehouse and sticker rules</td><td class="num">13, 34, 37</td></tr>
+          <tr><td>Sales order / STS</td><td>Per-order locks; In Transit = live FIFO cost; cancel restores every lot</td><td class="num">19, 20, 24, 27</td></tr>
+          <tr><td>Multi-branch payment split</td><td>Last branch = settled − rounded shares</td><td class="num">61</td></tr>
+          <tr><td>Supplier reversal</td><td>Settled amount incl. FX variance; no double reversal</td><td class="num">62</td></tr>
+          <tr><td>Supplier ledger side</td><td>Payments written as debits</td><td class="num">71</td></tr>
+          <tr><td>Expense with no payable</td><td>Balance 0, never blank</td><td class="num">72</td></tr>
+          <tr><td>Cancelled cheques</td><td>Number used up; reuse refused (60631)</td><td class="num">55–57, 74</td></tr>
+          <tr><td>Bank recon</td><td>Cleared-in-month stamp, no silent moves, lock checks on clearing</td><td class="num">46, 48, 49</td></tr>
+          <tr><td>Telegraphic voucher</td><td>Settlement re-read from the locked balance; one recon entry per account</td><td class="num">sp_PostVoucherManual</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    <span>Statuses here are republished from the handoff file; the file is what both sessions update.</span>
+    <span>Republished by the ERP session when an item changes status.</span>
+  </footer>
+</div>
+
+<script>
+(function () {
+  var buttons = document.querySelectorAll('.filters button');
+  var items = document.querySelectorAll('#register .item');
+  function apply(f) {
+    buttons.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.f === f)); });
+    items.forEach(function (it) { it.hidden = !(f === 'all' || it.dataset.tier === f); });
+  }
+  buttons.forEach(function (b) { b.addEventListener('click', function () { apply(b.dataset.f); }); });
+})();
+</script>
