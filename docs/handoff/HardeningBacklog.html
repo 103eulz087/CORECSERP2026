@@ -133,7 +133,7 @@ footer { color: var(--muted); font-size: var(--step--1); border-top: 1px solid v
     <div class="meta">
       <span>As of <strong>2026-10-14</strong></span>
       <span>Evidence read on <strong>PRODUCTION</strong> (read-only)</span>
-      <span>Next script number <strong class="mono">[82]</strong></span>
+      <span>Next script number <strong class="mono">[86]</strong></span>
       <span>Source <code>docs/handoff/2026-10-14_Hardening_Handoff_to_Fable.md</code></span>
     </div>
   </header>
@@ -142,7 +142,7 @@ footer { color: var(--muted); font-size: var(--step--1); border-top: 1px solid v
     <div class="count a"><b>6</b><span>Tier A · money or a ledger can go wrong silently</span></div>
     <div class="count b"><b>5</b><span>Tier B · needs a specific sequence or action</span></div>
     <div class="count c"><b>2</b><span>Tier C · needs a decision first</span></div>
-    <div class="count"><b id="cOpen">13</b><span>Open · 0 in progress · 0 done</span></div>
+    <div class="count"><b id="cOpen">9</b><span>Open · 4 in progress · 0 done</span></div>
   </div>
 
   <section class="block" aria-labelledby="regTitle">
@@ -158,7 +158,7 @@ footer { color: var(--muted); font-size: var(--step--1); border-top: 1px solid v
     <div class="register" id="register">
 
       <details class="item" data-tier="A">
-        <summary><span class="id">H1</span><span class="name">GL ticket writer can post an unbalanced ticket and hides its errors</span><span class="tags"><span class="chip tier-A">Tier A</span><span class="chip st-open">Open</span><span class="chev" aria-hidden="true">›</span></span></summary>
+        <summary><span class="id">H1</span><span class="name">GL ticket writer can post an unbalanced ticket and hides its errors</span><span class="tags"><span class="chip tier-A">Tier A</span><span class="chip st-prog">In progress · Fable, DEV + STAGING done, PRODUCTION pending</span><span class="chev" aria-hidden="true">›</span></span></summary>
         <div class="body">
           <section><h4>Problem</h4><ul>
             <li><code>sp_PostCompoundTicket</code> (PV-AP payment legs, inventory posting, upload finalize) has no debit = credit check.</li>
@@ -179,7 +179,7 @@ footer { color: var(--muted); font-size: var(--step--1); border-top: 1px solid v
       </details>
 
       <details class="item" data-tier="A">
-        <summary><span class="id">H2</span><span class="name">Reversing an AR payment can reverse another customer's sales ticket</span><span class="tags"><span class="chip tier-A">Tier A</span><span class="chip st-open">Open</span><span class="chev" aria-hidden="true">›</span></span></summary>
+        <summary><span class="id">H2</span><span class="name">Reversing an AR payment can reverse another customer's sales ticket</span><span class="tags"><span class="chip tier-A">Tier A</span><span class="chip st-prog">In progress · Fable, DEV + STAGING done, PRODUCTION pending</span><span class="chev" aria-hidden="true">›</span></span></summary>
         <div class="body">
           <section><h4>Problem</h4><ul>
             <li><code>sp_ReversePaymentClient</code> mirrors every ticket and client-ledger row <code>WHERE ReferenceNumber = @refno</code>.</li>
@@ -197,7 +197,7 @@ footer { color: var(--muted); font-size: var(--step--1); border-top: 1px solid v
       </details>
 
       <details class="item" data-tier="A">
-        <summary><span class="id">H3</span><span class="name">Rollbacks and re-throws hide the real error, including the month lock</span><span class="tags"><span class="chip tier-A">Tier A</span><span class="chip st-open">Open</span><span class="chev" aria-hidden="true">›</span></span></summary>
+        <summary><span class="id">H3</span><span class="name">Rollbacks and re-throws hide the real error, including the month lock</span><span class="tags"><span class="chip tier-A">Tier A</span><span class="chip st-prog">In progress · Fable, DEV + STAGING done, PRODUCTION pending</span><span class="chev" aria-hidden="true">›</span></span></summary>
         <div class="body">
           <section><h4>Problem</h4><ul>
             <li>Named rollbacks (<code>ROLLBACK TRANSACTION PaySupplierV2</code>) raise 6401 when nested and hide the cause.</li>
@@ -213,7 +213,7 @@ footer { color: var(--muted); font-size: var(--step--1); border-top: 1px solid v
       </details>
 
       <details class="item" data-tier="A">
-        <summary><span class="id">H4</span><span class="name">Multi-step postings can stop halfway</span><span class="tags"><span class="chip tier-A">Tier A</span><span class="chip st-open">Open</span><span class="chev" aria-hidden="true">›</span></span></summary>
+        <summary><span class="id">H4</span><span class="name">Multi-step postings can stop halfway</span><span class="tags"><span class="chip tier-A">Tier A</span><span class="chip st-prog">In progress · Fable, DEV + STAGING done, PRODUCTION pending</span><span class="chev" aria-hidden="true">›</span></span></summary>
         <div class="body">
           <section><h4>Problem</h4><ul>
             <li><code>sp_PostSupplierPaymentWithManualLines</code>: the invoice payment commits, then the manual lines run on their own; a failure leaves cheque ≠ GL ("already posted, do not re-run", 60299).</li>

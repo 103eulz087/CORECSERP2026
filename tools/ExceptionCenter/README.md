@@ -41,8 +41,11 @@ Run it:
 | T03 | CRITICAL | Transfer received more than once |
 | T04 | HIGH | Received status and receipt ticket disagree |
 | T05 | CRITICAL | A multi-lot line was received as exactly one lot's qty (receive-screen bug fixed 2026-10-02) |
+| T06 | HIGH | Branch received rows on a transfer that is not DELIVERED: the receipt was never confirmed (the three receive steps are one transaction since [85], 2026-10-14) |
 | G01 | CRITICAL | Sales / STS ticket out of balance (DR ≠ CR) |
 | G02 | HIGH | VAT ticket posted after the all-VAT-exempt rule (2026-10-02) |
+| G03 | CRITICAL | A GL ticket of any module out of balance, all dates (the compound writers refuse it since [83], 2026-10-14) |
+| G04 | CRITICAL | An AR payment reversal mirrored another document under the same reference: a second master on the reversal ticket, or a reversal ledger row on another customer (scoped since [85], 2026-10-14) |
 
 ## Dates
 

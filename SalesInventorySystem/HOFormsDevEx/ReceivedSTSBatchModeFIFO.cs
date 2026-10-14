@@ -76,41 +76,18 @@ namespace SalesInventorySystem.HOFormsDevEx
             return lines;
         }
 
-        bool ConfirmBranchReceivedOrder()
+        // 2026-10-14 ([85], hardening H4): the ticked rows (received), the unticked rows
+        // (returned to the origin, line by line) and the confirmation (IT-BR / STS-SHORT /
+        // STS-OVER tickets, DELIVERED) are ONE call, spu_STS_ReceiveTransfer, which runs the
+        // same three procs this screen used to call one by one (spu_PostSTSReceiveFromFIFO,
+        // sp_ReverseSTSInventoryTransfer, sp_ConfirmBranchRecievedOrderJFC) in one
+        // transaction under the transfer's lock. A failure anywhere leaves nothing posted.
+        // The proc also refuses a stale screen (59624 a row's lines changed, 59626 a line
+        // not on the screen) and returns the lines the receive step skipped, as before.
+        // Rows come from funcview_InventoryDeliveryFIFOForReceivingV2: a row can be several
+        // lines (@GroupedRows = 1), LineCount = the lines it showed.
+        bool PostReceipt(int[] selectedRowHandles, int[] unselectedRowHandles)
         {
-            using (SqlConnection con = Database.getConnection())
-            using (SqlCommand com = new SqlCommand(
-                GlobalCache.CompanyName == "JFC" ? "sp_ConfirmBranchRecievedOrderJFC" : "sp_ConfirmBranchRecievedOrder", con))
-            {
-                com.CommandType = CommandType.StoredProcedure;
-                com.Parameters.AddWithValue("@parmdevno", "");
-                com.Parameters.AddWithValue("@parmpono", txtshipmentno.Text);
-                com.Parameters.AddWithValue("@parmbarcode", "");
-                com.Parameters.AddWithValue("@parmbranchcode", Login.assignedBranch);
-                com.Parameters.AddWithValue("@preparedby", Login.Fullname);
-
-                try
-                {
-                    con.Open();
-                    com.ExecuteNonQuery();
-                    return true;
-                }
-                catch (SqlException ex)
-                {
-                    BigAlert.Show("ERROR", ex.Message, MessageBoxIcon.Error);
-                    return false;
-                }
-            }
-        }
-
-        // Only rows the user left CHECKED are submitted as received. Calls
-        // spu_PostSTSReceiveFromFIFO (dedicated to this module) instead of
-        // sp_AddBranchInventoryBatch -- it re-derives ReferenceCode server-side
-        // from InventoryDeliveryFIFO and reconciles the destination Inventory
-        // row spu_PostSTSDispatch already created, rather than relying on the
-        // black-box legacy receive SP.
-        bool ReceiveSelectedItems(int[] selectedRowHandles)
-         {
             DataTable lines = new DataTable();
             lines.Columns.Add("SeqNo", typeof(int));
             lines.Columns.Add("DeliveryNo", typeof(string));
@@ -125,28 +102,49 @@ namespace SalesInventorySystem.HOFormsDevEx
                 string deliveryNo = gridViewRcvd.GetRowCellValue(handle, "DeliveryNo").ToString();
                 string productCode = gridViewRcvd.GetRowCellValue(handle, "ProductNo").ToString();
                 string barcode = gridViewRcvd.GetRowCellValue(handle, "BarcodeNo").ToString();
-                decimal actualQty = Convert.ToDecimal(gridViewRcvd.GetRowCellValue(handle, "ActualQty"));
-                decimal sellingPrice = Convert.ToDecimal(gridViewRcvd.GetRowCellValue(handle, "SellingPrice"));
+                object qtyCell = gridViewRcvd.GetRowCellValue(handle, "ActualQty");
+                object priceCell = gridViewRcvd.GetRowCellValue(handle, "SellingPrice");
+                decimal actualQty = qtyCell == null || qtyCell == DBNull.Value ? 0m : Convert.ToDecimal(qtyCell);
+                decimal sellingPrice = priceCell == null || priceCell == DBNull.Value ? 0m : Convert.ToDecimal(priceCell);
                 lines.Rows.Add(seqNo, deliveryNo, productCode, barcode, actualQty, sellingPrice);
             }
 
-            if (lines.Rows.Count == 0)
-                return true; // nothing checked -- not a failure, just nothing to receive
+            DataTable returnRows = new DataTable();
+            returnRows.Columns.Add("DeliveryNo", typeof(string));
+            returnRows.Columns.Add("SeqNo", typeof(int));
+            returnRows.Columns.Add("LineCount", typeof(int));
+
+            foreach (int handle in unselectedRowHandles)
+            {
+                string deliveryNo = gridViewRcvd.GetRowCellValue(handle, "DeliveryNo").ToString();
+                int groupSeqNo = Convert.ToInt32(gridViewRcvd.GetRowCellValue(handle, "SeqNo"));
+                returnRows.Rows.Add(deliveryNo, groupSeqNo, LinesInRows(new[] { handle }));
+            }
 
             using (SqlConnection con = Database.getConnection())
-            using (SqlCommand cmd = new SqlCommand("spu_PostSTSReceiveFromFIFO", con))
+            using (SqlCommand cmd = new SqlCommand("spu_STS_ReceiveTransfer", con))
             {
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.CommandTimeout = 120;
-                cmd.Parameters.AddWithValue("@PONumber", txtshipmentno.Text);
-                cmd.Parameters.AddWithValue("@BranchCode", Login.assignedBranch);
-                cmd.Parameters.AddWithValue("@ReceivedBy", Login.isglobalUserID);
+                cmd.CommandTimeout = 180;
+                cmd.Parameters.Add("@PONumber", SqlDbType.VarChar, 10).Value = txtshipmentno.Text;
+                cmd.Parameters.Add("@BranchCode", SqlDbType.VarChar, 10).Value = Login.assignedBranch;
+                cmd.Parameters.Add("@ReceivedBy", SqlDbType.VarChar, 40).Value = Login.isglobalUserID;
+                cmd.Parameters.Add("@PreparedBy", SqlDbType.VarChar, 30).Value = Login.Fullname;
 
-                SqlParameter tvpParam = cmd.Parameters.AddWithValue("@Lines", lines);
-                tvpParam.SqlDbType = SqlDbType.Structured;
-                tvpParam.TypeName = "dbo.tt_STSReceiveFIFOLines";
-                // rows come from funcview_InventoryDeliveryFIFOForReceivingV2: a row can be several lines
+                SqlParameter linesParam = cmd.Parameters.AddWithValue("@Lines", lines);
+                linesParam.SqlDbType = SqlDbType.Structured;
+                linesParam.TypeName = "dbo.tt_STSReceiveFIFOLines";
+
+                SqlParameter returnParam = cmd.Parameters.AddWithValue("@ReturnRows", returnRows);
+                returnParam.SqlDbType = SqlDbType.Structured;
+                returnParam.TypeName = "dbo.tt_STSReceiveReturnRows";
+
                 cmd.Parameters.Add("@GroupedRows", SqlDbType.Bit).Value = true;
+                // Roles are flipped from the dispatch side: the receiving branch is the
+                // destination, and HO (888) is always the origin of this HO-outbound STS flow
+                // (the same convention sp_ConfirmBranchOrderSTS hardcodes for its GL ticket).
+                cmd.Parameters.Add("@Origin", SqlDbType.VarChar, 10).Value = "888";
+                cmd.Parameters.Add("@UseJFC", SqlDbType.Bit).Value = GlobalCache.CompanyName == "JFC";
 
                 try
                 {
@@ -160,7 +158,7 @@ namespace SalesInventorySystem.HOFormsDevEx
                         if (skipped.Count > 0)
                         {
                             BigAlert.Show("SOME LINES SKIPPED",
-                                "The following line(s) were not received:\n" + string.Join("\n", skipped),
+                                "The following line(s) were not received (the rest of the transfer was posted):\n" + string.Join("\n", skipped),
                                 MessageBoxIcon.Warning);
                         }
                     }
@@ -168,121 +166,10 @@ namespace SalesInventorySystem.HOFormsDevEx
                 }
                 catch (SqlException ex)
                 {
-                    BigAlert.Show("RECEIVE FAILED", ex.Message, MessageBoxIcon.Error);
+                    BigAlert.Show("RECEIVE FAILED", "Nothing was posted (if the connection dropped, reopen the transfer to check). " + ex.Message, MessageBoxIcon.Error);
                     return false;
                 }
             }
-        }
-
-        // Rows left UNCHECKED never arrived -- reuses sp_ReverseSTSInventoryTransfer
-        // unchanged (same SP ReceivedSTSBatchMode.cs uses): restores origin
-        // Inventory, reverses the GL leg if the transfer was confirmed, and
-        // corrects DeliverySummary.Status once nothing is left for this dispatch.
-        // 2026-10-03: a grid row can stand for several lines (FIFO lines of one
-        // product are added up into one row), so each line of the row is returned:
-        // funcview_STSReceiveLines, GroupSeqNo = the row's SeqNo.
-        DataTable GetRowLines(string deliveryNo, int groupSeqNo)
-        {
-            DataTable lines = new DataTable();
-            using (SqlConnection con = Database.getConnection())
-            using (SqlCommand cmd = new SqlCommand(
-                "SELECT SeqNo, DeliveryNo, ReferenceNumber, ProductNo, QtyDelivered " +
-                "FROM dbo.funcview_STSReceiveLines(@PONumber) " +
-                "WHERE DeliveryNo = @DeliveryNo AND GroupSeqNo = @GroupSeqNo ORDER BY SeqNo", con))
-            {
-                cmd.CommandTimeout = 120;
-                cmd.Parameters.Add("@PONumber", SqlDbType.VarChar, 10).Value = txtshipmentno.Text;
-                cmd.Parameters.Add("@DeliveryNo", SqlDbType.VarChar, 20).Value = deliveryNo;
-                cmd.Parameters.Add("@GroupSeqNo", SqlDbType.Int).Value = groupSeqNo;
-                using (SqlDataAdapter da = new SqlDataAdapter(cmd))
-                    da.Fill(lines);
-            }
-            return lines;
-        }
-
-        bool ReturnUnreceivedItems(int[] unselectedRowHandles)
-        {
-            foreach (int handle in unselectedRowHandles)
-            {
-                string deliveryNo = gridViewRcvd.GetRowCellValue(handle, "DeliveryNo").ToString();
-                int groupSeqNo = Convert.ToInt32(gridViewRcvd.GetRowCellValue(handle, "SeqNo"));
-                DataTable rowLines;
-                try
-                {
-                    rowLines = GetRowLines(deliveryNo, groupSeqNo);
-                }
-                catch (SqlException ex)
-                {
-                    BigAlert.Show("RETURN FAILED", "Could not read the lines of an unchecked item: " + ex.Message, MessageBoxIcon.Error);
-                    return false;
-                }
-
-                // the row must still be the lines it showed (none received / returned meanwhile)
-                int shownLines = LinesInRows(new[] { handle });
-                if (rowLines.Rows.Count == 0 || rowLines.Rows.Count != shownLines)
-                {
-                    BigAlert.Show("RETURN FAILED",
-                        "Item " + gridViewRcvd.GetRowCellValue(handle, "ProductNo") + " changed since this screen was opened " +
-                        "(a line of it was already received or returned). Close the screen and open the transfer again.", MessageBoxIcon.Error);
-                    return false;
-                }
-
-                // each line is its own return: if one fails, say which lines of the row went back already
-                var returned = new List<string>();
-                foreach (DataRow line in rowLines.Rows)
-                {
-                    string error = ReturnLine(line);
-                    if (error != null)
-                    {
-                        string done = returned.Count == 0
-                            ? ""
-                            : "\n\nAlready returned to origin from this item: line(s) " + string.Join(", ", returned) +
-                              ". Open the transfer again to see what is left.";
-                        BigAlert.Show("RETURN FAILED",
-                            "Failed to return line " + line["SeqNo"] + " (" + line["ProductNo"] + ") back to origin: " + error + done,
-                            MessageBoxIcon.Error);
-                        return false;
-                    }
-                    returned.Add(line["SeqNo"].ToString());
-                }
-            }
-            return true;
-        }
-
-        // Returns null when the line went back, else the error message.
-        string ReturnLine(DataRow line)
-        {
-            using (SqlConnection con = Database.getConnection())
-            using (SqlCommand cmd = new SqlCommand("sp_ReverseSTSInventoryTransfer", con))
-            {
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.CommandTimeout = 120;
-                cmd.Parameters.AddWithValue("@parmdevno", line["DeliveryNo"].ToString());
-                cmd.Parameters.AddWithValue("@parmrefno", line["ReferenceNumber"].ToString());
-                cmd.Parameters.AddWithValue("@parmpono", txtshipmentno.Text);
-                cmd.Parameters.AddWithValue("@parmprodno", line["ProductNo"].ToString());
-                cmd.Parameters.AddWithValue("@parmqty", Convert.ToDecimal(line["QtyDelivered"]));
-                // Roles are flipped from the dispatch side: here the
-                // receiving branch IS the destination (@parmbranchcode),
-                // and HO (888) is always the origin for this HO-outbound
-                // STS flow -- same convention sp_ConfirmBranchOrderSTS
-                // itself hardcodes for its GL ticket branch.
-                cmd.Parameters.AddWithValue("@parmbranchcode", Login.assignedBranch);
-                cmd.Parameters.AddWithValue("@parmorigin", "888");
-                cmd.Parameters.AddWithValue("@preparedby", Login.Fullname);
-                cmd.Parameters.AddWithValue("@parmdevseqno", Convert.ToInt32(line["SeqNo"]));
-
-                try
-                {
-                    con.Open();
-                    cmd.ExecuteNonQuery();
-                }
-                catch (SqlException ex)
-                {
-                    return ex.Message;
-                }
-            }
-            return null;
         }
 
         private void simpleButton2_Click(object sender, EventArgs e)
@@ -310,13 +197,13 @@ namespace SalesInventorySystem.HOFormsDevEx
             if (!confirmRcv)
                 return;
 
-            if (!ReceiveSelectedItems(selectedRows))
-                return;
-
-            if (!ReturnUnreceivedItems(unselectedRows))
-                return;
-
-            if (!ConfirmBranchReceivedOrder())
+            // 2026-10-14 ([85], hardening H4): ONE call does the three steps in one transaction
+            // (receive the ticked rows, return the unticked rows to the origin, confirm the
+            // receipt). Before, ReceiveSelectedItems / ReturnUnreceivedItems /
+            // ConfirmBranchReceivedOrder each committed on their own, so a failure in a later
+            // step left the earlier ones posted (branch stock received, transfer still FOR
+            // DELIVERY, In Transit not cleared).
+            if (!PostReceipt(selectedRows, unselectedRows))
                 return;
 
             BigAlert.Show("INVENTORY RECEIVED", "ITEMS SUCCESSFULLY PROCESSED, PLEASE CHECK NOW YOUR INVENTORY!..", MessageBoxIcon.Information);
@@ -346,9 +233,9 @@ namespace SalesInventorySystem.HOFormsDevEx
                 contextMenuStrip1.Show(gridControlRcvd, e.Location);
         }
 
-        // Unchecks the row so it flows through ReturnUnreceivedItems() on
-        // submit instead of vanishing silently -- same fix ReceivedSTSBatchMode.cs
-        // already carries for this exact "floating inventory" gap.
+        // Unchecks the row so PostReceipt() sends it as an unticked row (returned
+        // to the origin) on submit instead of vanishing silently -- same fix
+        // ReceivedSTSBatchMode.cs already carries for this exact "floating inventory" gap.
         private void cancelLineToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (gridViewRcvd.FocusedRowHandle < 0) return;

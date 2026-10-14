@@ -324,7 +324,7 @@
       <DependentUpon>AccountingBoard.cs</DependentUpon>
     </Compile>
     <Compile Include="AccountingDevEx\LoanRevaluationFrm.cs">
-      <SubType>Form</SubType>
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="AccountingDevEx\GLPeriodClosingFrm.cs">
       <SubType>Form</SubType>

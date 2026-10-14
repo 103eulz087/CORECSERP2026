@@ -290,6 +290,18 @@ WHERE r.RcvQty < L.ShipQty - 0.001
               WHERE f2.PONumber = L.PONumber AND f2.DevDetSeqNo = L.SeqNo AND f2.isErrorCorrect = 0
                 AND ABS(f2.QtyDelivered - r.RcvQty) < 0.001);
 
+-- T06 (2026-10-14, hardening H4 / script [85]) branch received rows on a transfer that is not DELIVERED: the receive
+--     screen's three steps used to commit one by one (receive, return the unticked rows, confirm), so a failed confirm
+--     left the branch stock received, the transfer FOR DELIVERY and In Transit not cleared. spu_STS_ReceiveTransfer does
+--     the three in one transaction; a hit now means an old exe or a hand edit.
+INSERT #X (CheckCode, PONumber, Ref, Expected, Actual, Detail)
+SELECT 'T06', r.PONumber, ISNULL(d.Status, '?'), NULL, r.TotalItem,
+       'received rows (' + CONVERT(VARCHAR(10), r.DateReceived, 120) + ', ' + CAST(r.TotalItem AS VARCHAR(10)) + ' lines) on a transfer still ' + ISNULL(d.Status, '?') + ': the receipt was never confirmed'
+FROM dbo.ReceiveOrderSummary r
+INNER JOIN dbo.DeliverySummary d ON d.PONumber = r.PONumber
+WHERE EXISTS (SELECT 1 FROM dbo.TransferOrderSummary t WHERE t.PONumber = r.PONumber)
+  AND d.Status <> 'DELIVERED';
+
 ------------------------------------------------------------------
 -- G. GL tickets of these modules
 ------------------------------------------------------------------
@@ -303,6 +315,49 @@ WHERE tm.TicketDate >= @FromDate
   AND (tm.Mnemonic LIKE 'SI-%' OR tm.Mnemonic LIKE 'SO-%' OR tm.Mnemonic LIKE 'IT-%' OR tm.Mnemonic LIKE 'ITR-%' OR tm.Mnemonic LIKE 'STS-%')
 GROUP BY tm.TicketNumber, tm.BranchCode
 HAVING ABS(SUM(td.Debit) - SUM(td.Credit)) > 0.005;
+
+-- G03 (2026-10-14, hardening H1 / script [83]) any ticket of any module that does not balance, per ticket number (its legs
+--     may sit under several branches); the cross-branch expense (EXP-MANUAL-CROSS-BR) posts one ticket per branch and
+--     balances per reference, so it is grouped by reference. All dates. The writers now refuse such a ticket (50022);
+--     this keeps watching every other writer and hand-made rows.
+INSERT #X (CheckCode, PONumber, Ref, Expected, Actual, Detail)
+SELECT 'G03', ISNULL(x.Ref, ''), x.Key1, 0, CAST(x.Diff AS DECIMAL(18,2)), ISNULL(x.Mnemonic, '?') + ' DR - CR = ' + FORMAT(x.Diff, 'N2')
+FROM (
+    SELECT CAST(td.TicketNumber AS VARCHAR(20)) AS Key1, MAX(tm.ReferenceNumber) AS Ref, MAX(tm.Mnemonic) AS Mnemonic, SUM(td.Debit) - SUM(td.Credit) AS Diff
+    FROM dbo.TicketDetails td
+    LEFT JOIN (SELECT TicketNumber, MAX(Mnemonic) AS Mnemonic, MAX(ReferenceNumber) AS ReferenceNumber FROM dbo.TicketMaster GROUP BY TicketNumber) tm ON tm.TicketNumber = td.TicketNumber
+    WHERE ISNULL(tm.Mnemonic, '') <> 'EXP-MANUAL-CROSS-BR'
+    GROUP BY td.TicketNumber
+    HAVING ABS(SUM(td.Debit) - SUM(td.Credit)) > 0.005
+    UNION ALL
+    SELECT 'ref ' + tm.ReferenceNumber, tm.ReferenceNumber, 'EXP-MANUAL-CROSS-BR', SUM(td.Debit) - SUM(td.Credit)
+    FROM dbo.TicketMaster tm
+    INNER JOIN dbo.TicketDetails td ON td.TicketNumber = tm.TicketNumber AND td.BranchCode = tm.BranchCode
+    WHERE tm.Mnemonic = 'EXP-MANUAL-CROSS-BR'
+    GROUP BY tm.ReferenceNumber
+    HAVING ABS(SUM(td.Debit) - SUM(td.Credit)) > 0.005
+) x;
+
+-- G04 (2026-10-14, hardening H2 / script [85]) an AR payment reversal that mirrored another document: a reversal ticket
+--     with more than one master row (two documents under one reversal ticket number), or a 'REVERSAL ENTRY' ledger row
+--     on a customer other than the payment's, or not OR-coded. All dates. sp_ReversePaymentClient mirrors only the
+--     payment's own ticket since [85]; this keeps watching the history and hand-made rows.
+INSERT #X (CheckCode, PONumber, Ref, Expected, Actual, Detail)
+SELECT 'G04', ph.ReferenceNo, 'ticket ' + CAST(x.TicketNumber AS VARCHAR(20)), 1, x.nMasters,
+       'AR reversal ticket with ' + CAST(x.nMasters AS VARCHAR(10)) + ' master rows: another document under the payment''s reference was mirrored'
+FROM (SELECT tm.TicketNumber, tm.ReferenceNumber, COUNT(*) AS nMasters
+      FROM dbo.TicketMaster tm
+      WHERE tm.Status = 'REVERSED' AND tm.Mnemonic IS NULL AND tm.Particulars LIKE 'REVERSAL: %'
+      GROUP BY tm.TicketNumber, tm.ReferenceNumber
+      HAVING COUNT(*) > 1) x
+INNER JOIN dbo.PaymentHeader ph ON ph.ReferenceNo = x.ReferenceNumber AND ph.Status = 'REVERSED'
+UNION ALL
+SELECT 'G04', ph.ReferenceNo, 'customer ' + cl.AccountKey + ' / ' + cl.TransCode, NULL, cl.Debit - cl.Credit,
+       'AR reversal ledger row ' + CASE WHEN cl.AccountKey <> ph.CustomerKey THEN 'on another customer (the payer is ' + ph.CustomerKey + ')' ELSE 'not OR-coded' END
+FROM dbo.ClientLedger cl
+INNER JOIN dbo.PaymentHeader ph ON ph.ReferenceNo = cl.ReferenceNumber AND ph.Status = 'REVERSED'
+WHERE cl.Remarks = 'REVERSAL ENTRY'
+  AND (cl.AccountKey <> ph.CustomerKey OR cl.TransCode NOT LIKE 'OR-%');
 
 -- G02 VAT posting after the all-VAT-exempt rule
 INSERT #X (CheckCode, PONumber, Ref, Expected, Actual, Detail)
@@ -334,8 +389,11 @@ INSERT @Info VALUES
 ('T03', 'STS',    'CRITICAL', 'Transfer received more than once (two IT-BR tickets).', 'Reverse the duplicate receipt and its branch stock.'),
 ('T04', 'STS',    'HIGH',     'Received status and receipt ticket disagree.', 'Check the receive screen''s three calls finished (they are not atomic).'),
 ('T05', 'STS',    'CRITICAL', 'A multi-lot line was received as exactly one lot''s qty (the rest skipped as duplicates).', 'Complete the receipt for the remaining qty (branch stock, IT-BR); the 2026-10-02 fix stops new cases.'),
+('T06', 'STS',    'HIGH',     'Branch received rows on a transfer that is not DELIVERED: the receipt was never confirmed (no IT-BR ticket, In Transit not cleared).', 'Confirm the receipt (sp_ConfirmBranchRecievedOrderJFC) or undo the received rows; since [85] the receive screen posts the three steps in one transaction.'),
 ('G01', 'GL',     'CRITICAL', 'A Sales / STS ticket does not balance (DR <> CR).', 'Check the mnemonic''s mapping rows.'),
-('G02', 'GL',     'HIGH',     'A VAT ticket was posted after the all-VAT-exempt rule.', 'Something is still on an old procedure version or a manual entry.');
+('G02', 'GL',     'HIGH',     'A VAT ticket was posted after the all-VAT-exempt rule.', 'Something is still on an old procedure version or a manual entry.'),
+('G03', 'GL',     'CRITICAL', 'A GL ticket of any module does not balance (DR <> CR), all dates.', 'The compound writers refuse this since [83]; find the writer or the hand edit behind the ticket and correct it with a balancing entry.'),
+('G04', 'GL',     'CRITICAL', 'An AR payment reversal mirrored another document under the same reference (a second master on the reversal ticket, or a reversal ledger row on another customer).', 'Reverse the extra ticket lines / ledger row with a correcting entry; sp_ReversePaymentClient mirrors only the payment''s own ticket since [85].');
 
 SELECT i.CheckCode, i.Area, i.Severity, COUNT(x.CheckCode) AS Found, i.Meaning, i.Action
 FROM @Info i

@@ -52,20 +52,25 @@ namespace SalesInventorySystem.HOFormsDevEx
         //        con.Close();
         //    }
         //}
-        void ConfirmBranchReceivedOrder()
+        // 2026-10-14: checked BEFORE anything is saved (it used to run after the items were already received)
+        bool ValidateHeader()
         {
-            if (string.IsNullOrEmpty(txtcategory.Text))
+            if (string.IsNullOrEmpty(txtcategory.Text) || categorycode == null)
             {
                 XtraMessageBox.Show("Please select a Category.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
+                return false;
             }
-            else if (txtcategory.Text == "Return to Supplier" && string.IsNullOrEmpty(labelsupplier.Text))
+            if (txtcategory.Text == "Return to Supplier" && string.IsNullOrEmpty(txtsupplier.Text))
             {
                 XtraMessageBox.Show("Please select a Supplier.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
+                return false;
             }
+            return true;
+        }
 
-
+        // true only when the transfer was confirmed (sp_ConfirmBranchReceivedTransferInventory committed)
+        bool ConfirmBranchReceivedOrder()
+        {
             using (SqlConnection con = Database.getConnection())
             {
                 try
@@ -87,25 +92,47 @@ namespace SalesInventorySystem.HOFormsDevEx
 
                         com.ExecuteNonQuery();
                     }
+                    return true;
                 }
                 catch (Exception ex)
                 {
-                    XtraMessageBox.Show("Error: " + ex.Message);
+                    XtraMessageBox.Show("The items were saved, but the transfer was NOT confirmed:\n" + ex.Message,
+                        "Not Confirmed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
                 }
             }
         }
 
-        private void executeTransfer()
+        // Lines of the transfer as sent (TransferInventoryDetails), read fresh
+        int CountTransferLines(string transferNo)
+        {
+            using (SqlConnection con = Database.getConnection())
+            using (SqlCommand cmd = new SqlCommand("SELECT COUNT(*) FROM dbo.TransferInventoryDetails WHERE TransferNo = @t", con))
+            {
+                cmd.Parameters.Add("@t", SqlDbType.VarChar, 20).Value = transferNo;
+                con.Open();
+                return Convert.ToInt32(cmd.ExecuteScalar());
+            }
+        }
+
+        // 2026-10-14 bug fix (transfers 1192 / 1214 received only one line): the rows used to be read from what the
+        // grid SHOWED (view.RowCount), so a find-panel search, a column filter or grouping on screen sent only the
+        // visible rows, and the transfer was then closed as DELIVERED anyway. Now every loaded row is sent, whatever
+        // the grid shows, and the count must equal the transfer's lines. Returns true only when all lines were saved.
+        private bool executeTransfer()
         {
             try
             {
-                GridView view = gridControlRcvd.FocusedView as GridView;
+                GridView view = gridViewRcvd;
+                view.CloseEditor();          // an ActualQty still being typed is committed first
+                view.UpdateCurrentRow();
 
-                // 1. Guard clause: Ensure there is actually data to process
-                if (view == null || view.RowCount == 0)
+                // 1. every loaded row (list source), never the filtered / grouped visible rows
+                int rowCount = view.DataController.ListSourceRowCount;
+                if (rowCount == 0)
                 {
                     XtraMessageBox.Show("There are no items in the grid to receive.", "Empty List", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
+                    return false;
                 }
 
                 // 2. Create DataTable for TVP
@@ -114,18 +141,24 @@ namespace SalesInventorySystem.HOFormsDevEx
                 inventoryItems.Columns.Add("Barcode", typeof(string));
                 inventoryItems.Columns.Add("Qty", typeof(float));
 
-                // 3. LOOP THROUGH EVERY ROW IN THE GRID
-                for (int i = 0; i < view.RowCount; i++)
+                for (int i = 0; i < rowCount; i++)
                 {
-                    // IsDataRow ignores Group Headers or Auto-Filter rows
-                    if (view.IsDataRow(i))
-                    {
-                        string productCode = view.GetRowCellValue(i, "ProductNo")?.ToString() ?? "";
-                        string barcode = view.GetRowCellValue(i, "BarcodeNo")?.ToString() ?? "";
-                        float qty = Convert.ToSingle(view.GetRowCellValue(i, "ActualQty"));
+                    string productCode = view.GetListSourceRowCellValue(i, "ProductNo")?.ToString() ?? "";
+                    string barcode = view.GetListSourceRowCellValue(i, "BarcodeNo")?.ToString() ?? "";
+                    object q = view.GetListSourceRowCellValue(i, "ActualQty");
+                    float qty = (q == null || q == DBNull.Value) ? 0f : Convert.ToSingle(q);
+                    inventoryItems.Rows.Add(productCode, barcode, qty);
+                }
 
-                        inventoryItems.Rows.Add(productCode, barcode, qty);
-                    }
+                // 3. all of the transfer's lines must be on the list (a stale or partly loaded screen is refused)
+                int transferLines = CountTransferLines(txtshipmentno.Text);
+                if (inventoryItems.Rows.Count != transferLines)
+                {
+                    XtraMessageBox.Show(
+                        $"Transfer {txtshipmentno.Text} has {transferLines} line(s) but the screen holds {inventoryItems.Rows.Count}. " +
+                        "Nothing was saved. Close this window and open the transfer again.",
+                        "Lines Don't Match", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return false;
                 }
 
                 // 4. Call the batch stored procedure
@@ -147,15 +180,12 @@ namespace SalesInventorySystem.HOFormsDevEx
                         cmd.ExecuteNonQuery();
                     }
                 }
-                isdone = true;
-                XtraMessageBox.Show($"Successfully received {inventoryItems.Rows.Count} items!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                // Optional: Clear the grid or reload it from the database now that they are received
-                // gridControlRcvd.DataSource = null; 
+                return true;
             }
             catch (SqlException ex)
             {
-                XtraMessageBox.Show("Database Error: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                XtraMessageBox.Show("Database Error: " + ex.Message + "\n\nThe transfer was not confirmed.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
             }
         }
         //void executeTransfer()
@@ -177,7 +207,7 @@ namespace SalesInventorySystem.HOFormsDevEx
 
         //        for (int i = 0; i <= gridViewRcvd.RowCount - 1; i++)
         //        {
-        //            string productCode = gridViewRcvd.GetRowCellValue(i, "ProductNo").ToString();
+        //            string productCode = gridViewRcvd.GetRowCellValue(i, "ProductNo").ToString(); ss
         //            string barcode = gridViewRcvd.GetRowCellValue(i, "BarcodeNo").ToString();
         //            float qty = Convert.ToSingle(gridViewRcvd.GetRowCellValue(i, "ActualQty")); 
 
@@ -213,24 +243,31 @@ namespace SalesInventorySystem.HOFormsDevEx
         //    }
         //}
 
+        // 2026-10-14: validate -> save ALL lines -> confirm; each step stops the next one when it fails (before, the
+        // transfer was confirmed and the window closed with "Successfully Added!" even after an error)
         private void simpleButton2_Click(object sender, EventArgs e)
         {
-            int totalorders = Database.getCountData("SELECT COUNT(ProductNo) as Counter FROM dbo.TransferInventoryDetails  WHERE TransferNo=" + txtshipmentno.Text + "", "Counter");
+            if (!ValidateHeader())
+                return;
+            if (!HelperFunction.ConfirmDialog("Are you sure you want to save this Inventory?", "Confirm Inventory Entry"))
+                return;
 
-            bool confirmRcv = HelperFunction.ConfirmDialog("Are you sure you want to save this Inventory?", "Confirm Inventory Entry");
-
-            if (confirmRcv)
+            simpleButton2.Enabled = false;
+            try
             {
-                executeTransfer();
-                ConfirmBranchReceivedOrder();
-                XtraMessageBox.Show("Successfully Added!");
+                if (!executeTransfer())
+                    return;
+                if (!ConfirmBranchReceivedOrder())
+                    return;
+
+                isdone = true;
+                XtraMessageBox.Show($"Transfer {txtshipmentno.Text}: all items received.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 this.Close();
             }
-            else
+            finally
             {
-                return;
+                if (!IsDisposed) simpleButton2.Enabled = true;
             }
-            isdone = true;
         }
 
         private void gridViewRcvd_RowCellStyle(object sender, DevExpress.XtraGrid.Views.Grid.RowCellStyleEventArgs e)
