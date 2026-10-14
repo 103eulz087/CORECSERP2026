@@ -37,6 +37,7 @@ namespace SalesInventorySystem.AccountingDevEx
         //private const string PageReports = "navReports";
         //private const string PageReportsV2 = "navReportsV2";
         private const string PageGLTicketEntries = "navGLTicketEntries";
+        private const string PageLoanRevaluation = "navLoanRevaluation";   // 2026-10-14: moved here from Accounting Settings
 
         // ---------------------------------------------------------------
         // Content loading — the ONE place to touch (besides the Designer)
@@ -117,6 +118,12 @@ namespace SalesInventorySystem.AccountingDevEx
                 _accountingTicketReports.LoadData();
                 return _accountingTicketReports;
             },
+            [PageLoanRevaluation] = () =>
+            {
+                _loanRevaluation = new LoanRevaluationFrm();
+                _loanRevaluation.LoadData();
+                return _loanRevaluation;
+            },
         };
 
         // ---------------------------------------------------------------
@@ -157,6 +164,14 @@ namespace SalesInventorySystem.AccountingDevEx
             return _allowedKeys.Count == 0 || _allowedKeys.Contains(key);
         }
 
+        // Loan Revaluation posts GL tickets: admins and accounting users only (same rule as its old Accounting Settings menu)
+        private static bool IsAdminOrAccounting()
+        {
+            bool.TryParse(Login.isglobalAdmin, out bool isAdmin);
+            bool.TryParse(Login.isglobalAccounting, out bool isAcctg);
+            return isAdmin || isAcctg;
+        }
+
         private void BuildFluentLayout()
         {
             navFrameMain = new NavigationFrame { Name = "navFrameMain", Dock = DockStyle.Fill };
@@ -173,7 +188,8 @@ namespace SalesInventorySystem.AccountingDevEx
                 if (string.IsNullOrEmpty(key))
                     continue;
 
-                if (!IsKeyAllowed(key))
+                // Loan Revaluation: role only (admins + accounting), not the per-user list, like its old menu
+                if (key == PageLoanRevaluation ? !IsAdminOrAccounting() : !IsKeyAllowed(key))
                 {
                     element.Visible = false;
                     continue;
@@ -248,7 +264,7 @@ namespace SalesInventorySystem.AccountingDevEx
 
         private void SelectAndLoad(string key)
         {
-            if (!IsKeyAllowed(key))
+            if (key == PageLoanRevaluation ? !IsAdminOrAccounting() : !IsKeyAllowed(key))
                 return;
 
             if (!_pagesByKey.TryGetValue(key, out var page))
@@ -308,6 +324,7 @@ namespace SalesInventorySystem.AccountingDevEx
         //private HOFormsDevEx.PostExpenseDevExFrm _addExpenseBatchMode;
         private AccountingDevEx.ExpenseManualMultiBranchFrm _addExpenseBatchMode;
         private BankReconFormV2 _bankRecon;
+        private LoanRevaluationFrm _loanRevaluation;
 
         // ---------------------------------------------------------------
         // Form events

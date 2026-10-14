@@ -197,6 +197,8 @@ namespace SalesInventorySystem.AccountingDevEx
             {
                 com.CommandType = CommandType.StoredProcedure;
                 com.Parameters.Add("@parmcustkey", SqlDbType.VarChar).Value = txtcustid.Text;
+                // [79] 2026-10-14: also list the open balance-forward credits (InvoiceType 'BF CREDIT', negative Balance)
+                com.Parameters.Add("@IncludeCredits", SqlDbType.Bit).Value = true;
 
                 DataTable table = new DataTable();
                 con.Open();
@@ -305,6 +307,13 @@ namespace SalesInventorySystem.AccountingDevEx
             int row = e.RowHandle;
             if (row < 0) return;
 
+            if (e.Column.FieldName == "Pay" && IsCreditRow(row))
+            {
+                ApplyCreditTick(row, Convert.ToBoolean(e.Value));
+                ComputeTotal();
+                return;
+            }
+
             if (e.Column.FieldName == "Pay")
             {
                 bool isPay = Convert.ToBoolean(e.Value);
@@ -363,6 +372,7 @@ namespace SalesInventorySystem.AccountingDevEx
         {
             bool isPay = Convert.ToBoolean(gridView2.GetRowCellValue(row, "Pay"));
             if (!isPay) return;
+            if (IsCreditRow(row)) return;   // [79] a credit row's AmountPaid is the credit used, set by ApplyCreditTick
 
             double balance = Convert.ToDouble(gridView2.GetRowCellValue(row, "Balance") ?? 0);
             double ewt = Convert.ToDouble(gridView2.GetRowCellValue(row, "EWTAmount") ?? 0);
@@ -397,6 +407,53 @@ namespace SalesInventorySystem.AccountingDevEx
                 gridView2.SetRowCellValue(row, "AmountPaid", netPayment);
         }
 
+        // ── BALANCE-FORWARD CREDITS ([79], 2026-10-14) ──────────────────
+        // Peachtree credits loaded at go-live (negative invoices) are listed one by one so a customer
+        // can trace each credit by invoice. Ticking one applies it to the invoices ticked in the same
+        // payment: AmountPaid = the credit used, as a NEGATIVE amount (invoice 1,000 + credit -300 =
+        // amount to pay 700). It is saved as a negative INVOICE PAYMENT line; sp_AddPaymentClient
+        // re-checks it against the credit's live balance (92010-92014). Only the credit itself goes on
+        // a credit row: EWT, discount, offset, overpay and services stay on the invoice being paid.
+        const string BFCreditType = "BF CREDIT";
+
+        bool IsCreditRow(int row) =>
+            row >= 0 && gridView2.GetRowCellValue(row, "InvoiceType")?.ToString() == BFCreditType;
+
+        // What the ticked invoices still need in cash, i.e. how much credit can still be applied
+        // (the server's rule: credits can't take the amount to pay below 0). exceptRow is left out.
+        double CreditRoom(int exceptRow)
+        {
+            double room = 0;
+            for (int i = 0; i < gridView2.RowCount; i++)
+            {
+                if (i == exceptRow || !Convert.ToBoolean(gridView2.GetRowCellValue(i, "Pay"))) continue;
+                double amtPaid = Convert.ToDouble(gridView2.GetRowCellValue(i, "AmountPaid") ?? 0);
+                if (IsCreditRow(i))
+                    room += amtPaid;   // already negative
+                else
+                    room += amtPaid
+                          - Convert.ToDouble(gridView2.GetRowCellValue(i, "OverPay") ?? 0)
+                          - Convert.ToDouble(gridView2.GetRowCellValue(i, "OverPayIncome") ?? 0)
+                          - Convert.ToDouble(gridView2.GetRowCellValue(i, "ServicesAmount") ?? 0);
+            }
+            return Math.Round(room, 2);
+        }
+
+        // Tick = the whole credit, capped at what the ticked invoices still need; untick = nothing used.
+        // Written to the DataRow (same reason as RecalculateRow: SetRowCellValue from inside
+        // CellValueChanged doesn't always stick in this DevExpress version).
+        void ApplyCreditTick(int row, bool isPay)
+        {
+            DataRow dr = gridView2.GetDataRow(row);
+            if (dr == null) return;
+            foreach (string col in new[] { "EWTAmount", "DiscountAmount", "OffsetAmount", "OverPay", "OverPayIncome", "ServicesAmount" })
+                dr[col] = 0;
+
+            double credit = dr["Balance"] == DBNull.Value ? 0 : -Convert.ToDouble(dr["Balance"]);   // positive: what is left of the credit
+            double room = isPay ? CreditRoom(row) : 0;
+            dr["AmountPaid"] = (isPay && room > 0) ? -Math.Round(Math.Min(credit, room), 2) : 0;
+        }
+
         // ComputeTotal: txtamounttopay shows total NET cash across selected rows
         private void ComputeTotal()
         {
@@ -427,6 +484,42 @@ namespace SalesInventorySystem.AccountingDevEx
                 e.ErrorText = "Invalid number format.";
                 return;
             }
+
+            // [79] balance-forward credit: only the credit used, from 0 down to what is left of it
+            if (IsCreditRow(row))
+            {
+                double left = -Convert.ToDouble(view.GetRowCellValue(row, "Balance") ?? 0);
+                double room = CreditRoom(row);
+                if (field != "AmountPaid")
+                {
+                    e.Valid = false;
+                    e.ErrorText = "A balance-forward credit only takes the amount of credit used. Put EWT, discount, offset, overpay or services on the invoice being paid.";
+                }
+                else if (!Convert.ToBoolean(view.GetRowCellValue(row, "Pay")))
+                {
+                    e.Valid = false;
+                    e.ErrorText = "Please check the 'Pay' box first.";
+                }
+                else if (value > 0)
+                {
+                    e.Valid = false;
+                    e.ErrorText = "Enter the credit used as a negative amount (e.g. -300.00).";
+                }
+                else if (-value > left + 0.005)
+                {
+                    e.Valid = false;
+                    e.ErrorText = $"Only {left:N2} is left of this credit.";
+                }
+                else if (-value > room + 0.005)
+                {
+                    e.Valid = false;
+                    e.ErrorText = $"The invoices ticked only need {Math.Max(room, 0):N2}; the amount to pay can't go below 0.";
+                }
+                else
+                    e.Valid = true;
+                return;
+            }
+
             if (value < 0)
             {
                 e.Valid = false;
@@ -480,6 +573,14 @@ namespace SalesInventorySystem.AccountingDevEx
 
             object val = view.GetRowCellValue(e.RowHandle, "Pay");
             bool isPay = val != null && val != DBNull.Value && bool.TryParse(val.ToString(), out bool b) && b;
+
+            // [79] balance-forward credits: blue family (lavender = available, light blue = applied)
+            if (IsCreditRow(e.RowHandle))
+            {
+                e.Appearance.BackColor = isPay ? Color.FromArgb(198, 224, 255) : Color.Lavender;
+                e.Appearance.ForeColor = Color.FromArgb(0, 32, 96);
+                return;
+            }
 
             if (!isPay)
             {
@@ -556,6 +657,11 @@ namespace SalesInventorySystem.AccountingDevEx
         {
             HOFormsDevEx.ClientEditPayment clientedit = new ClientEditPayment();
             int focused = gridView2.FocusedRowHandle;
+            if (IsCreditRow(focused))   // [79]
+            {
+                XtraMessageBox.Show("A balance-forward credit only takes the amount of credit used; put EWT, discount or offset on the invoice being paid.");
+                return;
+            }
 
             clientedit.txtdelivdate.Text = gridView2.GetRowCellValue(focused, "TransactionDate").ToString();
             clientedit.txtinvoiceno.Text = gridView2.GetRowCellValue(focused, "InvoiceNo").ToString();
@@ -592,6 +698,7 @@ namespace SalesInventorySystem.AccountingDevEx
         private void clearFieldsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             int row = gridView2.FocusedRowHandle;
+            if (IsCreditRow(row)) return;   // [79] nothing but the credit used on a credit row
             gridView2.SetRowCellValue(row, "DiscountAmount", "0");
             gridView2.SetRowCellValue(row, "DiscountGLCode", "");
             gridView2.SetRowCellValue(row, "OffsetAmount", "0");
@@ -627,11 +734,38 @@ namespace SalesInventorySystem.AccountingDevEx
             double advncepymentval = 0;
             bool isSales = false;
             bool isCharge = false;
+            double totalCredit = 0;      // [79] balance-forward credits applied (positive)
+            double creditRoom = 0;       // [79] cash the ticked invoices need before credits
+            int invoiceCtr = 0;
 
             for (int i = 0; i < gridView2.RowCount; i++)
             {
                 bool isPay = gridView2.GetRowCellValue(i, "Pay").ToString() == "True";
                 if (!isPay) continue;
+
+                // [79] a ticked balance-forward credit: only the credit used, between 0 and what is left of it
+                if (IsCreditRow(i))
+                {
+                    double used = -Convert.ToDouble(gridView2.GetRowCellValue(i, "AmountPaid") ?? 0);
+                    double left = -Convert.ToDouble(gridView2.GetRowCellValue(i, "Balance") ?? 0);
+                    string inv = gridView2.GetRowCellValue(i, "InvoiceNo")?.ToString();
+                    if (Math.Round(used, 2) <= 0 || Math.Round(used, 2) > Math.Round(left, 2))
+                    {
+                        XtraMessageBox.Show(
+                            $"Balance-forward credit {inv}: the credit used must be between 0.01 and {left:N2} (entered as a negative amount), or untick it.",
+                            "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+                    ctr++;
+                    totalCredit += used;
+                    totalAmtPaid -= used;
+                    continue;
+                }
+                invoiceCtr++;
+                creditRoom += Convert.ToDouble(gridView2.GetRowCellValue(i, "AmountPaid") ?? 0)
+                            - Convert.ToDouble(gridView2.GetRowCellValue(i, "OverPay") ?? 0)
+                            - Convert.ToDouble(gridView2.GetRowCellValue(i, "OverPayIncome") ?? 0)
+                            - Convert.ToDouble(gridView2.GetRowCellValue(i, "ServicesAmount") ?? 0);
 
                 double rowOverpay = Convert.ToDouble(gridView2.GetRowCellValue(i, "OverPay") ?? 0);
                 double rowOverpayIncome = Convert.ToDouble(gridView2.GetRowCellValue(i, "OverPayIncome") ?? 0);
@@ -683,6 +817,23 @@ namespace SalesInventorySystem.AccountingDevEx
             // "net cash" on one side of zero while the SP's decimal math lands
             // on the other, which would surface as a confusing 92004 THROW
             // instead of the intended zero-cash confirm prompt.
+            // [79] credits need an invoice to go on, and can't take the amount to pay below 0
+            // (the server refuses the same, 92014). totalAmtPaid is already net of them.
+            if (totalCredit > 0 && invoiceCtr == 0)
+            {
+                XtraMessageBox.Show("A balance-forward credit has to be applied to an invoice: tick the invoice(s) being paid too.",
+                    "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            if (Math.Round(totalCredit, 2) > Math.Round(creditRoom, 2))
+            {
+                XtraMessageBox.Show(
+                    $"The balance-forward credits applied ({totalCredit:N2}) are more than the invoices ticked need ({Math.Max(creditRoom, 0):N2}). " +
+                    "Use less of a credit or untick one.",
+                    "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             double roundedNetCash = Math.Round(totalAmtPaid, 2);
             bool hasNetCash = roundedNetCash > 0;
 
@@ -694,7 +845,7 @@ namespace SalesInventorySystem.AccountingDevEx
             // than let it fall into the zero-net-cash confirm path, which is
             // meant for genuine EWT/Discount/Offset-only corrections, not an
             // empty selection.
-            if (!hasNetCash && Math.Round(totalDeductions, 2) == 0)
+            if (!hasNetCash && Math.Round(totalDeductions, 2) == 0 && Math.Round(totalCredit, 2) == 0)
             {
                 XtraMessageBox.Show(
                     "No amount, EWT, Discount, or Offset was entered for the selected invoice(s) - " +
@@ -720,8 +871,11 @@ namespace SalesInventorySystem.AccountingDevEx
             }
             if (!hasNetCash &&
                 !HelperFunction.ConfirmDialog(
-                    "This payment has no net cash amount (EWT/Discount/Offset only) - " +
-                    "Debit GL Code will not be posted. Continue?",
+                    totalCredit > 0
+                        ? "The balance-forward credits cover the invoice(s) in full - no cash is received and " +
+                          "no GL entry is made (the opening AR is already net of these credits). Continue?"
+                        : "This payment has no net cash amount (EWT/Discount/Offset only) - " +
+                          "Debit GL Code will not be posted. Continue?",
                     "Zero Net Cash"))
                 return;
 
@@ -747,7 +901,8 @@ namespace SalesInventorySystem.AccountingDevEx
             // fee) - AmountPaid is expected to exceed Balance by exactly
             // their combined total, so all must be added to the allowed
             // ceiling here instead of being treated as an error.
-            if (totalAmtPaid > totalBalance + totalOverpay + totalOverpayIncome + totalServicesAmount)
+            // [79] invoice rows only: credit rows are left out of totalBalance, so add their amount back
+            if (totalAmtPaid + totalCredit > totalBalance + totalOverpay + totalOverpayIncome + totalServicesAmount)
             {
                 XtraMessageBox.Show("Total Amount Paid cannot exceed Total Balance plus Overpay/OverPayIncome plus Services Amount.");
                 return;
@@ -984,6 +1139,15 @@ namespace SalesInventorySystem.AccountingDevEx
                 string invoiceNo = gridView2.GetRowCellValue(i, "InvoiceNo").ToString();
                 string orderNo = gridView2.GetRowCellValue(i, "OrderNo").ToString();
                 DateTime transDate = Convert.ToDateTime(gridView2.GetRowCellValue(i, "TransactionDate"));
+
+                // [79] balance-forward credit: one INVOICE PAYMENT line with the credit used as a NEGATIVE amount
+                if (IsCreditRow(i))
+                {
+                    decimal creditUsed = Math.Round(Convert.ToDecimal(gridView2.GetRowCellValue(i, "AmountPaid") ?? 0), 2);
+                    if (creditUsed < 0)
+                        InsertDetail(con, tran, paymentHeaderId, orderNo, invoiceNo, transDate, creditUsed, "INVOICE PAYMENT");
+                    continue;
+                }
 
                 decimal ewt = Convert.ToDecimal(gridView2.GetRowCellValue(i, "EWTAmount") ?? 0);
                 decimal discount = Convert.ToDecimal(gridView2.GetRowCellValue(i, "DiscountAmount") ?? 0);
@@ -1340,10 +1504,14 @@ namespace SalesInventorySystem.AccountingDevEx
                 foreach (DataRow line in lines.Rows)
                 {
                     string invoiceNo = line["InvoiceNo"]?.ToString()?.Trim();
-                    int rowHandle = gridView2.LocateByValue("InvoiceNo", invoiceNo);
+                    string orderNo = line["OrderNo"]?.ToString()?.Trim();
+                    // [80] 2026-10-14: match invoice no. AND PO. One invoice no. can have several rows (a returned PO
+                    // re-invoiced under the same no.); locating by invoice no. alone pre-filled the first one, and on
+                    // 10-08 a re-entered payment was posted on the returned row (C-048113) instead of the real invoice.
+                    int rowHandle = FindInvoiceRow(invoiceNo, orderNo);
                     if (rowHandle == DevExpress.XtraGrid.GridControl.InvalidRowHandle)
                     {
-                        notFound.Add(invoiceNo);
+                        notFound.Add(string.IsNullOrEmpty(orderNo) ? invoiceNo : $"{invoiceNo} (PO {orderNo})");
                         continue;
                     }
 
@@ -1370,6 +1538,18 @@ namespace SalesInventorySystem.AccountingDevEx
                     "(may have since been settled by another payment) and were not pre-filled:\n\n" +
                     string.Join(", ", notFound),
                     "Some Invoices Not Pre-filled", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        }
+
+        // [80] the grid row of one invoice: invoice no. AND PO (OrderNo), never the invoice no. alone
+        int FindInvoiceRow(string invoiceNo, string orderNo)
+        {
+            for (int i = 0; i < gridView2.RowCount; i++)
+            {
+                if (string.Equals(gridView2.GetRowCellValue(i, "InvoiceNo")?.ToString()?.Trim(), invoiceNo, StringComparison.OrdinalIgnoreCase)
+                    && string.Equals(gridView2.GetRowCellValue(i, "OrderNo")?.ToString()?.Trim(), orderNo, StringComparison.OrdinalIgnoreCase))
+                    return i;
+            }
+            return DevExpress.XtraGrid.GridControl.InvalidRowHandle;
         }
 
         static decimal DBNullToDecimal(object value) =>
@@ -1522,7 +1702,28 @@ namespace SalesInventorySystem.AccountingDevEx
 
         private void simpleButton5_Click(object sender, EventArgs e) { /* reserved */ }
         private void txtremakrs_EditValueChanged(object sender, EventArgs e) { }
-        private void gridView2_ShowingEditor(object sender, System.ComponentModel.CancelEventArgs e) { }
+        // [79] balance-forward credit rows: only Pay and AmountPaid (the credit used) can be edited, and a
+        // credit can't be ticked before there is an invoice ticked for it to cover.
+        private void gridView2_ShowingEditor(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            int row = gridView2.FocusedRowHandle;
+            if (!IsCreditRow(row)) return;
+
+            string field = gridView2.FocusedColumn?.FieldName;
+            if (field == "Pay")
+            {
+                bool ticked = Convert.ToBoolean(gridView2.GetRowCellValue(row, "Pay"));
+                if (!ticked && CreditRoom(row) <= 0)
+                {
+                    e.Cancel = true;
+                    XtraMessageBox.Show("Tick the invoice(s) to be paid first, then the balance-forward credit to apply to them.",
+                        "Balance-Forward Credit", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                return;
+            }
+            if (field != "AmountPaid")
+                e.Cancel = true;
+        }
         // ── DATA MODEL ───────────────────────────────────────────────────────
         class PaymentRow
         {

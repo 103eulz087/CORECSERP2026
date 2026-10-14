@@ -74,7 +74,7 @@ namespace SalesInventorySystem
             validate_userAccess();
             SetupGLPeriodClosingMenu();
             SetupPosV2ReportsMenu();
-            SetupLoanRevaluationMenu();
+            // 2026-10-14 (user): Loan Revaluation moved to the Accounting Board (menu "Loan Revaluation"); no Accounting Settings entry
             //checkAccess();
             //  ribbonPage1.Visible = false;
             //if (Convert.ToBoolean(Login.isglobalAdmin) != true) //ADMIN TOOLS TAB
@@ -1187,29 +1187,6 @@ namespace SalesInventorySystem
                 foreach (Form f in Application.OpenForms)
                     if (f is POSV2.PosV2ReportsForm) { f.Activate(); return; }
                 new POSV2.PosV2ReportsForm().Show();
-            };
-            ribbonControl.Items.Add(btn);
-            popupMenuAcctgSettings.ItemLinks.Add(btn);
-        }
-
-        // Loan Revaluation (SQL/[65]-2026-10-12h_LoanRevaluation.sql): month-end revaluation of foreign-currency loans,
-        // added in code like GL Period Closing so Main.Designer.cs stays untouched; admins and accounting users only..
-        private void SetupLoanRevaluationMenu()
-        {
-            bool isAdmin, isAcctg;
-            bool.TryParse(Login.isglobalAdmin, out isAdmin);
-            bool.TryParse(Login.isglobalAccounting, out isAcctg);
-            if (!isAdmin && !isAcctg) return;
-
-            var btn = new BarButtonItem { Caption = "Loan Revaluation" };
-            btn.ItemClick += (s, args) =>
-            {
-                // non-modal so other screens stay usable; no using block (it disposed the form as soon as Show() returned)
-                foreach (Form f in Application.OpenForms)
-                    if (f is AccountingDevEx.LoanRevaluationFrm) { f.Activate(); return; }
-                var frm = new AccountingDevEx.LoanRevaluationFrm();
-                frm.LoadData();
-                frm.Show();
             };
             ribbonControl.Items.Add(btn);
             popupMenuAcctgSettings.ItemLinks.Add(btn);

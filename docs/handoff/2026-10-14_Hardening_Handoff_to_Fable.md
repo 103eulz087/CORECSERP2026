@@ -29,7 +29,7 @@ the backlog and the coordination point. Read `CLAUDE.md` and `docs/CLAUDE_WORKLO
    STAGING; scripts in `SQL/` can be older than the live object (the user also edits procs directly). Patch the live
    text by anchors, or recreate from the live text, never from a repo copy you have not compared.
 3. **Script numbers are shared.** One series `[NN]-YYYY-MM-DD<letter>_Name.sql` in `SQL/`. Next free number on
-   2026-10-14: **[78]**. Claim it by adding the row to the work log's deployment table when you create the file.
+   2026-10-14: **[82]** ([78]-[81] used by the ERP session: shipment costing base, AR balance-forward credits, AR reversal scope, loan revaluation balance + control no.). Claim it by adding the row to the work log's deployment table when you create the file.
 4. **Backward compatible, always.** The WinForms exe and the coming web v2 share this database (CLAUDE.md "Roadmap").
    New parameters are optional; new behaviour is opt-in or provably identical for old callers; old procs are renamed
    `_OLD_<MMDDYYYYHHMMSS>` before recreating.
@@ -87,6 +87,7 @@ the backlog and the coordination point. Read `CLAUDE.md` and `docs/CLAUDE_WORKLO
 | Cancelled cheques | Number used up; trigger refuses reuse (60631) | 55–57, 74 |
 | Bank recon | Cleared-in-month stamp, no silent moves, lock checks on resolve / bulk | 46, 48, 49 |
 | Voucher (telegraphic) | Gross re-derived from UPDLOCK'd balance (Known Bug #10); one recon call per account (#9) | (sp_PostVoucherManual) |
+| Shipment costing base | `fn_InvShipmentBase()`: a shipment's per-kg cost uses its PO-branch lots, never every row with the ShipmentNo (STS copies count moved stock twice); drift + ambiguous-base checks in the AP provider | 78 (DEV + STAGING + PRODUCTION; its 2 checks reach the PRODUCTION portal when [78] is re-run after sql/43 + [70] + [77]) |
 
 ---
 
@@ -144,6 +145,8 @@ action. C = needs a user / accountant decision before code.
   every other reversal proc that selects by `ReferenceNumber` alone (search the Atlas).
 - **Acceptance.** Rolled-back test on DEV with a forced collision: only the payment's rows mirrored; the normal reversal
   produces identical rows to today's. Exception Center check: "reversal rows whose source is not a payment" = 0.
+- **Note (ERP session, 2026-10-14):** [79] (AR balance-forward credits, user's go on DEV) patches `sp_AddPaymentClient`, `sp_ReversePaymentClient` and `splist_ARAccounts`: credit-line rules under UPDLOCK, credits-only payment with no ticket, PayStatus keeps a part-used credit open. Behaviour for ordinary invoices unchanged. Rebase on the patched text (marker `[79]`) when this item is taken.
+- **Note (ERP session, 2026-10-14, [80]):** the invoice-row part of this item is done: `sp_ReversePaymentClient` now matches `TransactionChargeSales` by InvoiceNo + PONumber + customer (it moved other rows of the same invoice no. on PRODUCTION: C-048113, E2608-01-A), and the Edit pre-fill in `ClientPaymentsDevExAcctg` finds the row by invoice no. AND PO. Exception Center S06 watches it. Still open here: the ticket / ledger mirroring by `ReferenceNumber` alone.
 - **Result:** _
 
 ### H3. Error-handling standard (Tier A, a prerequisite for H4)
@@ -157,6 +160,7 @@ action. C = needs a user / accountant decision before code.
   Write it into `docs/standards/` and convert the listed procs (anchor patches; behaviour otherwise unchanged).
 - **Acceptance.** Each converted proc: success path identical (rolled-back old vs new); a forced 59900 surfaces as
   59900; called inside an outer transaction, no 6401.
+- **Note (ERP session, 2026-10-14):** [79] (AR balance-forward credits, user's go on DEV) patches `sp_AddPaymentClient`, `sp_ReversePaymentClient` and `splist_ARAccounts`: credit-line rules under UPDLOCK, credits-only payment with no ticket, PayStatus keeps a part-used credit open. Behaviour for ordinary invoices unchanged. Rebase on the patched text (marker `[79]`) when this item is taken.
 - **Result:** _
 
 ### H4. Multi-step postings that are not atomic (Tier A)
@@ -186,6 +190,7 @@ action. C = needs a user / accountant decision before code.
 - **Acceptance.** Rolled-back two-session test (load the grid, pay the same invoice elsewhere, submit) is refused;
   the normal path is identical. Exception Center: AP-INVOICE-VS-LEDGER (AP) and an AR equivalent (invoice balance =
   client ledger) stay 0.
+- **Note (ERP session, 2026-10-14):** [79] (AR balance-forward credits, user's go on DEV) patches `sp_AddPaymentClient`, `sp_ReversePaymentClient` and `splist_ARAccounts`: credit-line rules under UPDLOCK, credits-only payment with no ticket, PayStatus keeps a part-used credit open. Behaviour for ordinary invoices unchanged. Rebase on the patched text (marker `[79]`) when this item is taken.
 - **Result:** _
 
 ### H6. Lookups that pick the wrong record (Tier A, C#)

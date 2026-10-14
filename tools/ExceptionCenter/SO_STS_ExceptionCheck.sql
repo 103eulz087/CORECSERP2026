@@ -188,6 +188,28 @@ WHERE CASE WHEN s.Status = 'DELIVERED' THEN 1 ELSE 0 END <> CASE WHEN d.Status I
   AND NOT (d.Status = 'RETURNED' AND ISNULL(s.Status, '') <> 'DELIVERED'
            AND NOT EXISTS (SELECT 1 FROM dbo.TransactionChargeSales c WHERE c.ReferenceNo = s.PONumber));
 
+-- S06 (2026-10-14, script [80]) an invoice no. with more than one row (a returned PO re-invoiced under the same no., or
+--     another customer's row): a row's paid amount differs from its own payment lines (invoice + PO + customer, payments
+--     not reversed). The payment proc before 2026-09-23 23:40 and the reversal proc before [80] matched by invoice no. only
+--     and moved other rows (X-009660, C-048113, E2608-01-A on PRODUCTION). All dates: the set is small.
+;WITH multi AS (SELECT InvoiceNo FROM dbo.TransactionChargeSales GROUP BY InvoiceNo HAVING COUNT(*) > 1),
+pay AS (SELECT d.CustomerKey, d.InvoiceNo, d.PONumber,
+               SUM(CASE d.PaymentType WHEN 'INVOICE PAYMENT' THEN d.Amount WHEN 'EWT' THEN -d.Amount
+                                      WHEN 'DISCOUNT' THEN -d.Amount WHEN 'OFFSET' THEN -d.Amount ELSE 0 END) AS Paid
+        FROM dbo.ARPaymentDetails d
+        INNER JOIN dbo.PaymentHeader ph ON ph.PaymentHeaderID = d.PaymentHeaderID
+        WHERE ISNULL(ph.Status, '') <> 'REVERSED' AND d.InvoiceNo IN (SELECT InvoiceNo FROM multi)
+        GROUP BY d.CustomerKey, d.InvoiceNo, d.PONumber)
+INSERT #X (CheckCode, PONumber, Ref, Expected, Actual, Detail)
+SELECT 'S06', c.ReferenceNo, c.InvoiceNo, ISNULL(p.Paid, 0), c.AmountPaid,
+       'customer ' + c.CustomerKey + ': paid on the row vs its own payment lines (' + ISNULL(c.PayStatus, '') + ', balance '
+       + CONVERT(VARCHAR(30), c.Balance) + ')'
+FROM dbo.TransactionChargeSales c
+INNER JOIN multi m ON m.InvoiceNo = c.InvoiceNo
+LEFT JOIN pay p ON p.CustomerKey = c.CustomerKey AND p.InvoiceNo = c.InvoiceNo AND p.PONumber = c.ReferenceNo
+WHERE ABS(ISNULL(c.AmountPaid, 0) - ISNULL(p.Paid, 0)) > @Tol
+  AND (p.InvoiceNo IS NOT NULL OR ISNULL(c.TotalAmount, 0) = 0 OR ISNULL(c.AmountPaid, 0) < 0);   -- a row paid outside payment lines (cash sale) is not a finding
+
 ------------------------------------------------------------------
 -- T. STS (transfers)
 ------------------------------------------------------------------
@@ -306,6 +328,7 @@ INSERT @Info VALUES
 ('S03', 'Sales',  'HIGH',     'AR in the GL for the order (sale - credit memo - return) differs from the invoice.', 'Look for a missing / duplicate SI, SO-CM or SO-RET ticket.'),
 ('S04', 'Sales',  'HIGH',     'Cost of sales on the sales ticket differs from the invoice COGS rows.', 'Check the line cost at Save and any later re-costing.'),
 ('S05', 'Sales',  'MEDIUM',   'Order and delivery header disagree on DELIVERED.', 'Check whether confirm or a manual edit stopped half-way.'),
+('S06', 'Sales',  'HIGH',     'Invoice no. with several rows: a row''s paid amount differs from its own payment lines.', 'A payment / reversal moved another row of the same invoice no.; correct the row (see script [80]) and check the screen showed the real invoice.'),
 ('T01', 'STS',    'CRITICAL', 'Saved transfer: head-office In Transit differs from the cost of the stock actually shipped.', 'Run spu_STS_SyncInTransit for the PO after fixing the cause (duplicate Save, missed return).'),
 ('T02', 'STS',    'CRITICAL', 'Received transfer: In Transit did not clear to 0.', 'Look for a missing receipt, short/over ticket or a receipt on the wrong PO.'),
 ('T03', 'STS',    'CRITICAL', 'Transfer received more than once (two IT-BR tickets).', 'Reverse the duplicate receipt and its branch stock.'),

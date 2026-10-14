@@ -19,7 +19,9 @@ namespace SalesInventorySystem.AccountingDevEx
     /// module has no Edit / Copy: a revaluation is corrected by reversing it and posting again).
     /// Built in code (no designer file). Accounting Settings menu, admins + accounting (Main.SetupLoanRevaluationMenu).
     /// </summary>
-    public class LoanRevaluationFrm : XtraForm
+    // 2026-10-14 (user): a page of the Accounting Board (was a window opened from Accounting Settings), so an
+    // XtraUserControl like the board's other screens.
+    public class LoanRevaluationFrm : XtraUserControl
     {
         private readonly LookUpEdit cboLoan = new LookUpEdit();
         private readonly LabelControl lblLoanInfo = new LabelControl();
@@ -30,6 +32,10 @@ namespace SalesInventorySystem.AccountingDevEx
 
         private readonly DateEdit dtReval = new DateEdit();
         private readonly SpinEdit spnRate = new SpinEdit();
+        // [81] 2026-10-14 (user): the foreign balance is an editable box (pre-filled with the loan's), plus a Control No.
+        private readonly SpinEdit spnForeign = new SpinEdit();
+        private readonly LabelControl lblForeignCap = Caption("Loan balance to revalue:");
+        private readonly TextEdit txtControlNo = new TextEdit();
         private readonly TextEdit txtDescription = new TextEdit();
         private readonly LabelControl lblPreview = new LabelControl();
         private readonly SimpleButton btnPost = new SimpleButton { Text = "Post Revaluation" };
@@ -52,11 +58,9 @@ namespace SalesInventorySystem.AccountingDevEx
         {
             Text = "Loan Revaluation";
             Size = new Size(1150, 740);
-            MinimumSize = new Size(900, 600);
-            StartPosition = FormStartPosition.CenterParent;
             BuildLayout();
             Load += (s, e) => LoadData();   // fallback only; the caller calls LoadData() (Known Bug Pattern #1)
-            Shown += (s, e) => SizeGrids();
+            VisibleChanged += (s, e) => { if (Visible) SizeGrids(); };
         }
 
         // ── layout ───────────────────────────────────────────────
@@ -88,14 +92,32 @@ namespace SalesInventorySystem.AccountingDevEx
             top.Controls.Add(lblGLCheck, 0, 2); top.SetColumnSpan(lblGLCheck, 2);
 
             // New Revaluation tab: label / editor rows, the preview (fills), the Post button
-            var form = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, RowCount = 5, Padding = new Padding(12, 10, 12, 10) };
+            var form = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, RowCount = 7, Padding = new Padding(12, 10, 12, 10) };
             form.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 230));
             form.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-            form.RowStyles.Add(new RowStyle(SizeType.Absolute, 38));
-            form.RowStyles.Add(new RowStyle(SizeType.Absolute, 38));
-            form.RowStyles.Add(new RowStyle(SizeType.Absolute, 38));
+            for (int i = 0; i < 5; i++) form.RowStyles.Add(new RowStyle(SizeType.Absolute, 38));   // date, balance, rate, control no., description
             form.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
             form.RowStyles.Add(new RowStyle(SizeType.Absolute, 48));
+
+            // [81] the balance to revalue: pre-filled with the loan's, editable (a principal payment lowers it)
+            spnForeign.Width = 180;
+            spnForeign.Anchor = AnchorStyles.Left;
+            spnForeign.Properties.IsFloatValue = true;
+            spnForeign.Properties.Increment = 0;
+            spnForeign.Properties.MinValue = 0;
+            spnForeign.Properties.MaxValue = 99999999999m;
+            spnForeign.Properties.Mask.EditMask = "n2";
+            spnForeign.Properties.Mask.UseMaskAsDisplayFormat = true;
+            spnForeign.Properties.Buttons.Clear();
+            spnForeign.Properties.Appearance.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+            spnForeign.Properties.Appearance.Options.UseTextOptions = true;
+            spnForeign.EditValueChanged += (s, e) => { if (!_quiet) UpdatePreview(); };
+
+            txtControlNo.Width = 220;
+            txtControlNo.Anchor = AnchorStyles.Left;
+            txtControlNo.Properties.MaxLength = 30;
+            txtControlNo.Properties.CharacterCasing = CharacterCasing.Upper;
+            txtControlNo.EditValueChanged += (s, e) => { if (!_quiet) UpdatePreview(); };
 
             dtReval.Width = 150;
             dtReval.Anchor = AnchorStyles.Left;
@@ -133,12 +155,16 @@ namespace SalesInventorySystem.AccountingDevEx
 
             form.Controls.Add(Caption("Revaluation date (month end):"), 0, 0);
             form.Controls.Add(dtReval, 1, 0);
-            form.Controls.Add(Caption("Month-end rate (pesos per unit):"), 0, 1);
-            form.Controls.Add(spnRate, 1, 1);
-            form.Controls.Add(Caption("Description (blank = automatic):"), 0, 2);
-            form.Controls.Add(txtDescription, 1, 2);
-            form.Controls.Add(lblPreview, 0, 3); form.SetColumnSpan(lblPreview, 2);
-            form.Controls.Add(btnPost, 0, 4);
+            form.Controls.Add(lblForeignCap, 0, 1);
+            form.Controls.Add(spnForeign, 1, 1);
+            form.Controls.Add(Caption("Month-end rate (pesos per unit):"), 0, 2);
+            form.Controls.Add(spnRate, 1, 2);
+            form.Controls.Add(Caption("Control No.:"), 0, 3);
+            form.Controls.Add(txtControlNo, 1, 3);
+            form.Controls.Add(Caption("Description (blank = automatic):"), 0, 4);
+            form.Controls.Add(txtDescription, 1, 4);
+            form.Controls.Add(lblPreview, 0, 5); form.SetColumnSpan(lblPreview, 2);
+            form.Controls.Add(btnPost, 0, 6);
             tabNew.Controls.Add(form);
 
             // Posted tab: history on top, its GL lines below
@@ -304,7 +330,7 @@ namespace SalesInventorySystem.AccountingDevEx
                                $"branch {r["BranchCode"]} - {r["BranchName"]}   ·   {r["LiabilityAccount"]} - {r["LiabilityAccountName"]}";
             bool ties = php == gl;
             lblGLCheck.Text = ties ? $"GL {r["LiabilityAccount"]} on branch {r["BranchCode"]}: {gl:N2} (same as the loan)"
-                                   : $"GL {r["LiabilityAccount"]} on branch {r["BranchCode"]}: {gl:N2} — differs from the loan by {gl - php:N2}: something else was posted to that account";
+                                   : $"GL {r["LiabilityAccount"]} on branch {r["BranchCode"]}: {gl:N2} — differs from the loan by {gl - php:N2}: a principal payment (type the loan's new balance) or something else was posted to that account";
             lblGLCheck.Appearance.ForeColor = ties ? Color.SeaGreen : Color.Firebrick;
             lblGLCheck.Appearance.Options.UseForeColor = true;
 
@@ -314,6 +340,9 @@ namespace SalesInventorySystem.AccountingDevEx
             {
                 dtReval.DateTime = MonthEnd(Convert.ToDateTime(r["LastTxnDate"]).AddDays(1));
                 spnRate.EditValue = null;
+                spnForeign.EditValue = Dec(r["ForeignBalance"]);   // [81] pre-filled, editable
+                lblForeignCap.Text = $"Loan balance to revalue ({r["Currency"]}):";
+                txtControlNo.Text = "";
                 txtDescription.Text = "";
             }
             finally { _quiet = false; }
@@ -335,6 +364,17 @@ namespace SalesInventorySystem.AccountingDevEx
             finally { _quiet = false; }
         }
 
+        // [81] the typed balance to revalue (null = blank or 0)
+        private decimal? Foreign
+        {
+            get
+            {
+                if (spnForeign.EditValue == null || spnForeign.EditValue == DBNull.Value) return null;
+                decimal v = Math.Round(spnForeign.Value, 2);
+                return v > 0 ? v : (decimal?)null;
+            }
+        }
+
         private decimal? Rate
         {
             get
@@ -353,16 +393,25 @@ namespace SalesInventorySystem.AccountingDevEx
             if (!HasPosition(r)) { lblPreview.Text = ""; return; }
             if (!HasDate) { lblPreview.Text = "Pick the revaluation date (a month end)."; return; }
             if (Rate == null) { lblPreview.Text = "Enter the month-end rate to see the entry."; return; }
-            decimal fBal = Dec(r["ForeignBalance"]), php = Dec(r["PhpBalance"]);
+            if (Foreign == null) { lblPreview.Text = "Enter the loan balance to revalue (greater than 0)."; return; }
+            decimal recBal = Dec(r["ForeignBalance"]), fBal = Foreign.Value, php = Dec(r["PhpBalance"]);
             decimal lastRate = Dec(r["LastRate"]), rate = Rate.Value;
+            // [81] a changed balance (principal payment) is measured against GL, which already holds the payment (same as the proc)
+            bool principalChanged = fBal != recBal;
+            decimal basis = principalChanged ? Dec(r["GLBalance"]) : php;
             // same rounding as the proc: T-SQL ROUND(@fBal * @Rate, 2) rounds half away from zero
-            decimal newBal = Math.Round(fBal * rate, 2, MidpointRounding.AwayFromZero), change = newBal - php;
+            decimal newBal = Math.Round(fBal * rate, 2, MidpointRounding.AwayFromZero), change = newBal - basis;
             string liab = $"{r["LiabilityAccount"]} - {r["LiabilityAccountName"]}";
             string entry = change > 0
                 ? $"DR {r["LossAccount"]} - {r["LossAccountName"]}   {change:N2}\n   CR {liab}   {change:N2}"
                 : $"DR {liab}   {-change:N2}\n   CR {r["GainAccount"]} - {r["GainAccountName"]}   {-change:N2}";
             lblPreview.Text =
-                $"{r["Currency"]} {fBal:N2} × {rate:0.0000##} = new peso balance {newBal:N2}   (was {php:N2} at {lastRate:0.0000##}; rate change {rate - lastRate:+0.0000##;-0.0000##;0})\n\n" +
+                $"{r["Currency"]} {fBal:N2} × {rate:0.0000##} = new peso balance {newBal:N2}   (was {php:N2} at {lastRate:0.0000##}; rate change {rate - lastRate:+0.0000##;-0.0000##;0})\n" +
+                (principalChanged
+                    ? $"Balance changed from {r["Currency"]} {recBal:N2} ({fBal - recBal:+#,##0.00;-#,##0.00}): the entry is measured against GL {r["LiabilityAccount"]} = {basis:N2}, " +
+                      "which must already hold the principal payment.\n"
+                    : "") +
+                (string.IsNullOrWhiteSpace(txtControlNo.Text) ? "" : $"Control No. {txtControlNo.Text.Trim()}\n") + "\n" +
                 (change == 0 ? "No change: nothing to post at this rate." :
                  $"{(change > 0 ? "Forex LOSS" : "Forex GAIN")} {Math.Abs(change):N2}, dated {dtReval.DateTime:MM/dd/yyyy}, branch {r["BranchCode"]}:\n   {entry}");
             if (change != 0)
@@ -389,6 +438,12 @@ namespace SalesInventorySystem.AccountingDevEx
                 spnRate.Focus();
                 return;
             }
+            if (Foreign == null)
+            {
+                XtraMessageBox.Show("Enter the loan balance to revalue (greater than 0).", "Missing Balance", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                spnForeign.Focus();
+                return;
+            }
             if (XtraMessageBox.Show($"Post this revaluation?\n\n{lblPreview.Text}", "Confirm Revaluation",
                     MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                 return;
@@ -405,6 +460,10 @@ namespace SalesInventorySystem.AccountingDevEx
                     cmd.Parameters.Add("@User", SqlDbType.VarChar, 60).Value = Login.Fullname ?? "";
                     cmd.Parameters.Add("@Description", SqlDbType.VarChar, 300).Value =
                         string.IsNullOrWhiteSpace(txtDescription.Text) ? (object)DBNull.Value : txtDescription.Text.Trim();
+                    // [81] needs SQL [81] (the proc's two new parameters)
+                    var f = cmd.Parameters.Add("@ForeignBalance", SqlDbType.Decimal); f.Precision = 18; f.Scale = 2; f.Value = Foreign.Value;
+                    cmd.Parameters.Add("@ControlNo", SqlDbType.VarChar, 30).Value =
+                        string.IsNullOrWhiteSpace(txtControlNo.Text) ? (object)DBNull.Value : txtControlNo.Text.Trim();
                 });
                 string msg = dt.Rows.Count > 0 ? Convert.ToString(dt.Rows[0]["Message"]) : "Revaluation posted.";
                 XtraMessageBox.Show(msg, "Posted", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -464,6 +523,12 @@ namespace SalesInventorySystem.AccountingDevEx
             Num(viewTxn, "PhpBalance", "N2", false);
             foreach (var hide in new[] { "TxnID", "ReversedBy", "ReversedAt", "ReverseReason" })
                 if (viewTxn.Columns[hide] != null) viewTxn.Columns[hide].Visible = false;
+            if (viewTxn.Columns["ControlNo"] != null)   // [81] next to the reference no.
+            {
+                viewTxn.Columns["ControlNo"].Caption = "Control No";
+                if (viewTxn.Columns["ReferenceNumber"] != null)
+                    viewTxn.Columns["ControlNo"].VisibleIndex = viewTxn.Columns["ReferenceNumber"].VisibleIndex;
+            }
             if (viewTxn.Columns["TxnDate"] != null)
             {
                 viewTxn.Columns["TxnDate"].DisplayFormat.FormatType = DevExpress.Utils.FormatType.DateTime;

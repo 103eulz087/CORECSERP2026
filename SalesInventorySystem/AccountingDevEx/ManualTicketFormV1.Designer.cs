@@ -106,14 +106,14 @@
             this.tableLayoutPanelMain.Controls.Add(this.panelToolbar, 0, 3);
             this.tableLayoutPanelMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanelMain.Location = new System.Drawing.Point(0, 0);
-            this.tableLayoutPanelMain.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.tableLayoutPanelMain.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.tableLayoutPanelMain.Name = "tableLayoutPanelMain";
             this.tableLayoutPanelMain.RowCount = 4;
-            this.tableLayoutPanelMain.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 64F));
-            this.tableLayoutPanelMain.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 241F));
+            this.tableLayoutPanelMain.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 52F));
+            this.tableLayoutPanelMain.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 196F));
             this.tableLayoutPanelMain.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanelMain.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 54F));
-            this.tableLayoutPanelMain.Size = new System.Drawing.Size(1492, 985);
+            this.tableLayoutPanelMain.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 44F));
+            this.tableLayoutPanelMain.Size = new System.Drawing.Size(1279, 800);
             this.tableLayoutPanelMain.TabIndex = 0;
             // 
             // panelBanner
@@ -121,27 +121,27 @@
             this.panelBanner.Controls.Add(this.lblBannerTitle);
             this.panelBanner.Controls.Add(this.lblBannerSub);
             this.panelBanner.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelBanner.Location = new System.Drawing.Point(2, 4);
-            this.panelBanner.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.panelBanner.Location = new System.Drawing.Point(2, 3);
+            this.panelBanner.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.panelBanner.Name = "panelBanner";
-            this.panelBanner.Size = new System.Drawing.Size(1488, 56);
+            this.panelBanner.Size = new System.Drawing.Size(1275, 46);
             this.panelBanner.TabIndex = 0;
             // 
             // lblBannerTitle
             // 
-            this.lblBannerTitle.Location = new System.Drawing.Point(15, 15);
-            this.lblBannerTitle.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.lblBannerTitle.Location = new System.Drawing.Point(13, 12);
+            this.lblBannerTitle.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.lblBannerTitle.Name = "lblBannerTitle";
-            this.lblBannerTitle.Size = new System.Drawing.Size(96, 16);
+            this.lblBannerTitle.Size = new System.Drawing.Size(79, 13);
             this.lblBannerTitle.TabIndex = 0;
             this.lblBannerTitle.Text = "Manual Ticketing";
             // 
             // lblBannerSub
             // 
-            this.lblBannerSub.Location = new System.Drawing.Point(15, 36);
-            this.lblBannerSub.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.lblBannerSub.Location = new System.Drawing.Point(13, 29);
+            this.lblBannerSub.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.lblBannerSub.Name = "lblBannerSub";
-            this.lblBannerSub.Size = new System.Drawing.Size(456, 16);
+            this.lblBannerSub.Size = new System.Drawing.Size(385, 13);
             this.lblBannerSub.TabIndex = 1;
             this.lblBannerSub.Text = "Purchase Adjustments (APACCOUNTS) · Expense Adjustments (ExpenseMaster)";
             // 
@@ -149,10 +149,10 @@
             // 
             this.panelHeader.Controls.Add(this.flowLayoutPanelHeader);
             this.panelHeader.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelHeader.Location = new System.Drawing.Point(2, 68);
-            this.panelHeader.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.panelHeader.Location = new System.Drawing.Point(2, 55);
+            this.panelHeader.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.panelHeader.Name = "panelHeader";
-            this.panelHeader.Size = new System.Drawing.Size(1488, 233);
+            this.panelHeader.Size = new System.Drawing.Size(1275, 190);
             this.panelHeader.TabIndex = 1;
             // 
             // flowLayoutPanelHeader
@@ -169,115 +169,115 @@
             this.flowLayoutPanelHeader.Controls.Add(this.txtRemarks);
             this.flowLayoutPanelHeader.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flowLayoutPanelHeader.Location = new System.Drawing.Point(0, 0);
-            this.flowLayoutPanelHeader.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.flowLayoutPanelHeader.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.flowLayoutPanelHeader.Name = "flowLayoutPanelHeader";
-            this.flowLayoutPanelHeader.Padding = new System.Windows.Forms.Padding(12);
-            this.flowLayoutPanelHeader.Size = new System.Drawing.Size(1488, 233);
+            this.flowLayoutPanelHeader.Padding = new System.Windows.Forms.Padding(10, 10, 10, 10);
+            this.flowLayoutPanelHeader.Size = new System.Drawing.Size(1275, 190);
             this.flowLayoutPanelHeader.TabIndex = 0;
             // 
             // radSourceType
             // 
-            this.radSourceType.Location = new System.Drawing.Point(14, 16);
-            this.radSourceType.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.radSourceType.Location = new System.Drawing.Point(12, 13);
+            this.radSourceType.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.radSourceType.Name = "radSourceType";
-            this.radSourceType.Size = new System.Drawing.Size(174, 49);
+            this.radSourceType.Size = new System.Drawing.Size(149, 40);
             this.radSourceType.TabIndex = 0;
             // 
             // cmbAdjType
             // 
-            this.cmbAdjType.Location = new System.Drawing.Point(192, 16);
-            this.cmbAdjType.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.cmbAdjType.Location = new System.Drawing.Point(165, 13);
+            this.cmbAdjType.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cmbAdjType.Name = "cmbAdjType";
-            this.cmbAdjType.Size = new System.Drawing.Size(162, 22);
+            this.cmbAdjType.Size = new System.Drawing.Size(139, 20);
             this.cmbAdjType.TabIndex = 1;
             // 
             // cmbSupplier
             // 
-            this.cmbSupplier.Location = new System.Drawing.Point(358, 16);
-            this.cmbSupplier.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.cmbSupplier.Location = new System.Drawing.Point(308, 13);
+            this.cmbSupplier.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cmbSupplier.Name = "cmbSupplier";
             this.cmbSupplier.Properties.PopupView = this.cmbSupplierView;
-            this.cmbSupplier.Size = new System.Drawing.Size(232, 22);
+            this.cmbSupplier.Size = new System.Drawing.Size(199, 20);
             this.cmbSupplier.TabIndex = 2;
             // 
             // cmbSupplierView
             // 
-            this.cmbSupplierView.DetailHeight = 431;
             this.cmbSupplierView.FocusRectStyle = DevExpress.XtraGrid.Views.Grid.DrawFocusRectStyle.RowFocus;
             this.cmbSupplierView.Name = "cmbSupplierView";
+            this.cmbSupplierView.OptionsEditForm.PopupEditFormWidth = 686;
             this.cmbSupplierView.OptionsSelection.EnableAppearanceFocusedCell = false;
             this.cmbSupplierView.OptionsView.ShowGroupPanel = false;
             // 
             // cmbInvoice
             // 
-            this.cmbInvoice.Location = new System.Drawing.Point(594, 16);
-            this.cmbInvoice.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.cmbInvoice.Location = new System.Drawing.Point(511, 13);
+            this.cmbInvoice.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cmbInvoice.Name = "cmbInvoice";
             this.cmbInvoice.Properties.PopupView = this.cmbInvoiceView;
-            this.cmbInvoice.Size = new System.Drawing.Size(232, 22);
+            this.cmbInvoice.Size = new System.Drawing.Size(199, 20);
             this.cmbInvoice.TabIndex = 3;
             // 
             // cmbInvoiceView
             // 
-            this.cmbInvoiceView.DetailHeight = 431;
             this.cmbInvoiceView.FocusRectStyle = DevExpress.XtraGrid.Views.Grid.DrawFocusRectStyle.RowFocus;
             this.cmbInvoiceView.Name = "cmbInvoiceView";
+            this.cmbInvoiceView.OptionsEditForm.PopupEditFormWidth = 686;
             this.cmbInvoiceView.OptionsSelection.EnableAppearanceFocusedCell = false;
             this.cmbInvoiceView.OptionsView.ShowGroupPanel = false;
             // 
             // lblInvoiceBalance
             // 
-            this.lblInvoiceBalance.Location = new System.Drawing.Point(830, 16);
-            this.lblInvoiceBalance.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.lblInvoiceBalance.Location = new System.Drawing.Point(714, 13);
+            this.lblInvoiceBalance.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.lblInvoiceBalance.Name = "lblInvoiceBalance";
-            this.lblInvoiceBalance.Size = new System.Drawing.Size(0, 16);
+            this.lblInvoiceBalance.Size = new System.Drawing.Size(0, 13);
             this.lblInvoiceBalance.TabIndex = 4;
             // 
             // txtAdjAmount
             // 
-            this.txtAdjAmount.Location = new System.Drawing.Point(834, 16);
-            this.txtAdjAmount.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.txtAdjAmount.Location = new System.Drawing.Point(718, 13);
+            this.txtAdjAmount.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.txtAdjAmount.Name = "txtAdjAmount";
-            this.txtAdjAmount.Size = new System.Drawing.Size(117, 22);
+            this.txtAdjAmount.Size = new System.Drawing.Size(100, 20);
             this.txtAdjAmount.TabIndex = 5;
             // 
             // cmbAPImpact
             // 
-            this.cmbAPImpact.Location = new System.Drawing.Point(955, 16);
-            this.cmbAPImpact.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.cmbAPImpact.Location = new System.Drawing.Point(822, 13);
+            this.cmbAPImpact.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cmbAPImpact.Name = "cmbAPImpact";
-            this.cmbAPImpact.Size = new System.Drawing.Size(117, 22);
+            this.cmbAPImpact.Size = new System.Drawing.Size(100, 20);
             this.cmbAPImpact.TabIndex = 6;
             // 
             // txtOrigTicket
             // 
-            this.txtOrigTicket.Location = new System.Drawing.Point(1076, 16);
-            this.txtOrigTicket.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.txtOrigTicket.Location = new System.Drawing.Point(926, 13);
+            this.txtOrigTicket.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.txtOrigTicket.Name = "txtOrigTicket";
-            this.txtOrigTicket.Size = new System.Drawing.Size(139, 22);
+            this.txtOrigTicket.Size = new System.Drawing.Size(119, 20);
             this.txtOrigTicket.TabIndex = 7;
             // 
             // txtDocRef
             // 
-            this.txtDocRef.Location = new System.Drawing.Point(1219, 16);
-            this.txtDocRef.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.txtDocRef.Location = new System.Drawing.Point(1049, 13);
+            this.txtDocRef.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.txtDocRef.Name = "txtDocRef";
-            this.txtDocRef.Size = new System.Drawing.Size(139, 22);
+            this.txtDocRef.Size = new System.Drawing.Size(119, 20);
             this.txtDocRef.TabIndex = 8;
             // 
             // txtRemarks
             // 
-            this.txtRemarks.Location = new System.Drawing.Point(14, 73);
-            this.txtRemarks.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.txtRemarks.Location = new System.Drawing.Point(12, 59);
+            this.txtRemarks.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.txtRemarks.Name = "txtRemarks";
-            this.txtRemarks.Size = new System.Drawing.Size(349, 22);
+            this.txtRemarks.Size = new System.Drawing.Size(299, 20);
             this.txtRemarks.TabIndex = 9;
             // 
             // splitContainerControl1
             // 
             this.splitContainerControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainerControl1.Location = new System.Drawing.Point(2, 309);
-            this.splitContainerControl1.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.splitContainerControl1.Location = new System.Drawing.Point(2, 251);
+            this.splitContainerControl1.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.splitContainerControl1.Name = "splitContainerControl1";
             // 
             // splitContainerControl1.Panel1
@@ -289,8 +289,8 @@
             // 
             this.splitContainerControl1.Panel2.Controls.Add(this.tableLayoutPanelRight);
             this.splitContainerControl1.Panel2.Text = "Panel2";
-            this.splitContainerControl1.Size = new System.Drawing.Size(1488, 618);
-            this.splitContainerControl1.SplitterPosition = 700;
+            this.splitContainerControl1.Size = new System.Drawing.Size(1275, 502);
+            this.splitContainerControl1.SplitterPosition = 600;
             this.splitContainerControl1.TabIndex = 2;
             // 
             // tableLayoutPanelLeft
@@ -302,22 +302,22 @@
             this.tableLayoutPanelLeft.Controls.Add(this.gridLegs, 0, 2);
             this.tableLayoutPanelLeft.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanelLeft.Location = new System.Drawing.Point(0, 0);
-            this.tableLayoutPanelLeft.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.tableLayoutPanelLeft.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.tableLayoutPanelLeft.Name = "tableLayoutPanelLeft";
             this.tableLayoutPanelLeft.RowCount = 3;
-            this.tableLayoutPanelLeft.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
-            this.tableLayoutPanelLeft.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 85F));
+            this.tableLayoutPanelLeft.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanelLeft.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 69F));
             this.tableLayoutPanelLeft.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanelLeft.Size = new System.Drawing.Size(700, 618);
+            this.tableLayoutPanelLeft.Size = new System.Drawing.Size(600, 502);
             this.tableLayoutPanelLeft.TabIndex = 0;
             // 
             // lblLegs
             // 
             this.lblLegs.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lblLegs.Location = new System.Drawing.Point(2, 4);
-            this.lblLegs.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.lblLegs.Location = new System.Drawing.Point(2, 3);
+            this.lblLegs.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.lblLegs.Name = "lblLegs";
-            this.lblLegs.Size = new System.Drawing.Size(696, 17);
+            this.lblLegs.Size = new System.Drawing.Size(596, 14);
             this.lblLegs.TabIndex = 0;
             this.lblLegs.Text = "GL LEGS";
             // 
@@ -330,90 +330,90 @@
             this.flowLayoutPanelLegBar.Controls.Add(this.btnAddLeg);
             this.flowLayoutPanelLegBar.Controls.Add(this.btnRemoveLeg);
             this.flowLayoutPanelLegBar.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.flowLayoutPanelLegBar.Location = new System.Drawing.Point(2, 29);
-            this.flowLayoutPanelLegBar.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.flowLayoutPanelLegBar.Location = new System.Drawing.Point(2, 23);
+            this.flowLayoutPanelLegBar.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.flowLayoutPanelLegBar.Name = "flowLayoutPanelLegBar";
-            this.flowLayoutPanelLegBar.Size = new System.Drawing.Size(696, 77);
+            this.flowLayoutPanelLegBar.Size = new System.Drawing.Size(596, 63);
             this.flowLayoutPanelLegBar.TabIndex = 1;
             // 
             // cmbLegAccount
             // 
-            this.cmbLegAccount.Location = new System.Drawing.Point(2, 4);
-            this.cmbLegAccount.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.cmbLegAccount.Location = new System.Drawing.Point(2, 3);
+            this.cmbLegAccount.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cmbLegAccount.Name = "cmbLegAccount";
             this.cmbLegAccount.Properties.PopupView = this.cmbLegAccountView;
-            this.cmbLegAccount.Size = new System.Drawing.Size(174, 22);
+            this.cmbLegAccount.Size = new System.Drawing.Size(149, 20);
             this.cmbLegAccount.TabIndex = 0;
             // 
             // cmbLegAccountView
             // 
-            this.cmbLegAccountView.DetailHeight = 431;
             this.cmbLegAccountView.FocusRectStyle = DevExpress.XtraGrid.Views.Grid.DrawFocusRectStyle.RowFocus;
             this.cmbLegAccountView.Name = "cmbLegAccountView";
+            this.cmbLegAccountView.OptionsEditForm.PopupEditFormWidth = 686;
             this.cmbLegAccountView.OptionsSelection.EnableAppearanceFocusedCell = false;
             this.cmbLegAccountView.OptionsView.ShowGroupPanel = false;
             // 
             // cmbLegDC
             // 
-            this.cmbLegDC.Location = new System.Drawing.Point(180, 4);
-            this.cmbLegDC.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.cmbLegDC.Location = new System.Drawing.Point(155, 3);
+            this.cmbLegDC.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cmbLegDC.Name = "cmbLegDC";
-            this.cmbLegDC.Size = new System.Drawing.Size(92, 22);
+            this.cmbLegDC.Size = new System.Drawing.Size(79, 20);
             this.cmbLegDC.TabIndex = 1;
             // 
             // txtLegAmount
             // 
-            this.txtLegAmount.Location = new System.Drawing.Point(276, 4);
-            this.txtLegAmount.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.txtLegAmount.Location = new System.Drawing.Point(238, 3);
+            this.txtLegAmount.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.txtLegAmount.Name = "txtLegAmount";
-            this.txtLegAmount.Size = new System.Drawing.Size(117, 22);
+            this.txtLegAmount.Size = new System.Drawing.Size(100, 20);
             this.txtLegAmount.TabIndex = 2;
             // 
             // txtLegDesc
             // 
-            this.txtLegDesc.Location = new System.Drawing.Point(397, 4);
-            this.txtLegDesc.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.txtLegDesc.Location = new System.Drawing.Point(342, 3);
+            this.txtLegDesc.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.txtLegDesc.Name = "txtLegDesc";
-            this.txtLegDesc.Size = new System.Drawing.Size(174, 22);
+            this.txtLegDesc.Size = new System.Drawing.Size(149, 20);
             this.txtLegDesc.TabIndex = 3;
             // 
             // btnAddLeg
             // 
-            this.btnAddLeg.Location = new System.Drawing.Point(575, 4);
-            this.btnAddLeg.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.btnAddLeg.Location = new System.Drawing.Point(495, 3);
+            this.btnAddLeg.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.btnAddLeg.Name = "btnAddLeg";
-            this.btnAddLeg.Size = new System.Drawing.Size(110, 36);
+            this.btnAddLeg.Size = new System.Drawing.Size(94, 29);
             this.btnAddLeg.TabIndex = 4;
             this.btnAddLeg.Text = "Add";
             this.btnAddLeg.Click += new System.EventHandler(this.btnAddLeg_Click_1);
             // 
             // btnRemoveLeg
             // 
-            this.btnRemoveLeg.Location = new System.Drawing.Point(2, 48);
-            this.btnRemoveLeg.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.btnRemoveLeg.Location = new System.Drawing.Point(2, 38);
+            this.btnRemoveLeg.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.btnRemoveLeg.Name = "btnRemoveLeg";
-            this.btnRemoveLeg.Size = new System.Drawing.Size(110, 36);
+            this.btnRemoveLeg.Size = new System.Drawing.Size(94, 29);
             this.btnRemoveLeg.TabIndex = 5;
             this.btnRemoveLeg.Text = "Remove";
             // 
             // gridLegs
             // 
             this.gridLegs.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridLegs.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
-            this.gridLegs.Location = new System.Drawing.Point(2, 114);
+            this.gridLegs.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
+            this.gridLegs.Location = new System.Drawing.Point(2, 92);
             this.gridLegs.MainView = this.viewLegs;
-            this.gridLegs.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.gridLegs.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.gridLegs.Name = "gridLegs";
-            this.gridLegs.Size = new System.Drawing.Size(696, 500);
+            this.gridLegs.Size = new System.Drawing.Size(596, 407);
             this.gridLegs.TabIndex = 2;
             this.gridLegs.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.viewLegs});
             // 
             // viewLegs
             // 
-            this.viewLegs.DetailHeight = 431;
             this.viewLegs.GridControl = this.gridLegs;
             this.viewLegs.Name = "viewLegs";
+            this.viewLegs.OptionsEditForm.PopupEditFormWidth = 686;
             // 
             // tableLayoutPanelRight
             // 
@@ -423,61 +423,61 @@
             this.tableLayoutPanelRight.Controls.Add(this.gridPending, 0, 1);
             this.tableLayoutPanelRight.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanelRight.Location = new System.Drawing.Point(0, 0);
-            this.tableLayoutPanelRight.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.tableLayoutPanelRight.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.tableLayoutPanelRight.Name = "tableLayoutPanelRight";
             this.tableLayoutPanelRight.RowCount = 2;
-            this.tableLayoutPanelRight.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
+            this.tableLayoutPanelRight.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanelRight.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanelRight.Size = new System.Drawing.Size(776, 618);
+            this.tableLayoutPanelRight.Size = new System.Drawing.Size(665, 502);
             this.tableLayoutPanelRight.TabIndex = 0;
             // 
             // lblPend
             // 
             this.lblPend.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lblPend.Location = new System.Drawing.Point(2, 4);
-            this.lblPend.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.lblPend.Location = new System.Drawing.Point(2, 3);
+            this.lblPend.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.lblPend.Name = "lblPend";
-            this.lblPend.Size = new System.Drawing.Size(772, 17);
+            this.lblPend.Size = new System.Drawing.Size(661, 14);
             this.lblPend.TabIndex = 0;
             this.lblPend.Text = "PENDING APPROVAL";
             // 
             // gridPending
             // 
             this.gridPending.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridPending.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
-            this.gridPending.Location = new System.Drawing.Point(2, 29);
+            this.gridPending.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
+            this.gridPending.Location = new System.Drawing.Point(2, 23);
             this.gridPending.MainView = this.viewPending;
-            this.gridPending.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.gridPending.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.gridPending.Name = "gridPending";
-            this.gridPending.Size = new System.Drawing.Size(772, 585);
+            this.gridPending.Size = new System.Drawing.Size(661, 476);
             this.gridPending.TabIndex = 1;
             this.gridPending.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.viewPending});
             // 
             // viewPending
             // 
-            this.viewPending.DetailHeight = 431;
             this.viewPending.GridControl = this.gridPending;
             this.viewPending.Name = "viewPending";
+            this.viewPending.OptionsEditForm.PopupEditFormWidth = 686;
             // 
             // panelToolbar
             // 
             this.panelToolbar.Controls.Add(this.lblStatus);
             this.panelToolbar.Controls.Add(this.flowLayoutPanelToolbar);
             this.panelToolbar.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelToolbar.Location = new System.Drawing.Point(2, 935);
-            this.panelToolbar.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.panelToolbar.Location = new System.Drawing.Point(2, 759);
+            this.panelToolbar.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.panelToolbar.Name = "panelToolbar";
-            this.panelToolbar.Size = new System.Drawing.Size(1488, 46);
+            this.panelToolbar.Size = new System.Drawing.Size(1275, 38);
             this.panelToolbar.TabIndex = 3;
             // 
             // lblStatus
             // 
             this.lblStatus.Dock = System.Windows.Forms.DockStyle.Right;
-            this.lblStatus.Location = new System.Drawing.Point(1452, 0);
-            this.lblStatus.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.lblStatus.Location = new System.Drawing.Point(1244, 0);
+            this.lblStatus.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.lblStatus.Name = "lblStatus";
-            this.lblStatus.Size = new System.Drawing.Size(36, 16);
+            this.lblStatus.Size = new System.Drawing.Size(31, 13);
             this.lblStatus.TabIndex = 0;
             this.lblStatus.Text = "Status";
             // 
@@ -490,54 +490,54 @@
             this.flowLayoutPanelToolbar.Controls.Add(this.btnRefresh);
             this.flowLayoutPanelToolbar.Dock = System.Windows.Forms.DockStyle.Left;
             this.flowLayoutPanelToolbar.Location = new System.Drawing.Point(0, 0);
-            this.flowLayoutPanelToolbar.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.flowLayoutPanelToolbar.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.flowLayoutPanelToolbar.Name = "flowLayoutPanelToolbar";
-            this.flowLayoutPanelToolbar.Size = new System.Drawing.Size(114, 46);
+            this.flowLayoutPanelToolbar.Size = new System.Drawing.Size(98, 38);
             this.flowLayoutPanelToolbar.TabIndex = 1;
             // 
             // btnPost
             // 
-            this.btnPost.Location = new System.Drawing.Point(2, 4);
-            this.btnPost.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.btnPost.Location = new System.Drawing.Point(2, 3);
+            this.btnPost.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.btnPost.Name = "btnPost";
-            this.btnPost.Size = new System.Drawing.Size(110, 36);
+            this.btnPost.Size = new System.Drawing.Size(94, 29);
             this.btnPost.TabIndex = 0;
             this.btnPost.Text = "Post Ticket";
             // 
             // btnApprove
             // 
-            this.btnApprove.Location = new System.Drawing.Point(2, 48);
-            this.btnApprove.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.btnApprove.Location = new System.Drawing.Point(2, 38);
+            this.btnApprove.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.btnApprove.Name = "btnApprove";
-            this.btnApprove.Size = new System.Drawing.Size(110, 36);
+            this.btnApprove.Size = new System.Drawing.Size(94, 29);
             this.btnApprove.TabIndex = 1;
             this.btnApprove.Text = "Approve";
             // 
             // btnReject
             // 
-            this.btnReject.Location = new System.Drawing.Point(2, 92);
-            this.btnReject.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.btnReject.Location = new System.Drawing.Point(2, 73);
+            this.btnReject.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.btnReject.Name = "btnReject";
-            this.btnReject.Size = new System.Drawing.Size(110, 36);
+            this.btnReject.Size = new System.Drawing.Size(94, 29);
             this.btnReject.TabIndex = 2;
             this.btnReject.Text = "Reject";
             // 
             // btnRefresh
             // 
-            this.btnRefresh.Location = new System.Drawing.Point(2, 136);
-            this.btnRefresh.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.btnRefresh.Location = new System.Drawing.Point(2, 108);
+            this.btnRefresh.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.btnRefresh.Name = "btnRefresh";
-            this.btnRefresh.Size = new System.Drawing.Size(110, 36);
+            this.btnRefresh.Size = new System.Drawing.Size(94, 29);
             this.btnRefresh.TabIndex = 3;
             this.btnRefresh.Text = "Refresh";
             // 
             // ManualTicketFormV1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1492, 985);
+            this.ClientSize = new System.Drawing.Size(1279, 800);
             this.Controls.Add(this.tableLayoutPanelMain);
-            this.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.Name = "ManualTicketFormV1";
             this.Text = "Manual Ticketing v1";
             this.tableLayoutPanelMain.ResumeLayout(false);

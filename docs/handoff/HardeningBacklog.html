@@ -133,7 +133,7 @@ footer { color: var(--muted); font-size: var(--step--1); border-top: 1px solid v
     <div class="meta">
       <span>As of <strong>2026-10-14</strong></span>
       <span>Evidence read on <strong>PRODUCTION</strong> (read-only)</span>
-      <span>Next script number <strong class="mono">[78]</strong></span>
+      <span>Next script number <strong class="mono">[82]</strong></span>
       <span>Source <code>docs/handoff/2026-10-14_Hardening_Handoff_to_Fable.md</code></span>
     </div>
   </header>
@@ -407,6 +407,7 @@ footer { color: var(--muted); font-size: var(--step--1); border-top: 1px solid v
           <tr><td>Cancelled cheques</td><td>Number used up; reuse refused (60631)</td><td class="num">55–57, 74</td></tr>
           <tr><td>Bank recon</td><td>Cleared-in-month stamp, no silent moves, lock checks on clearing</td><td class="num">46, 48, 49</td></tr>
           <tr><td>Telegraphic voucher</td><td>Settlement re-read from the locked balance; one recon entry per account</td><td class="num">sp_PostVoucherManual</td></tr>
+          <tr><td>Shipment costing base</td><td>Per-kg cost from the PO branch's lots, never STS copies; drift and ambiguous-base checks</td><td class="num">78</td></tr>
         </tbody>
       </table>
     </div>

@@ -1475,9 +1475,13 @@ namespace SalesInventorySystem.AccountingDevEx
                 };
                 foreach (var kv in captions)
                     if (viewSum.Columns[kv.Key] != null) viewSum.Columns[kv.Key].Caption = kv.Value;
-                // 2026-10-10: "Selected" (tick, then Bulk Resolve) is replaced by the Cleared box
-                foreach (string hide in new[] { "Selected", "ItemType", "BatchKey", "FirstDate", "CheckNo", "ReferenceNo", "OpenAmount", "OpenReconIDs" })
-                    if (viewSum.Columns[hide] != null) viewSum.Columns[hide].Visible = false;
+                // 2026-10-14 (user): show only these, in this order; every other column stays in the data (the
+                // clearing logic reads them) but is hidden. Replaces the 2026-10-10 hide list.
+                string[] shown = { "IsCleared", "LastDate", "BatchNo", "Payee", "Debit", "Credit", "Status" };
+                foreach (DevExpress.XtraGrid.Columns.GridColumn col in viewSum.Columns)
+                    col.Visible = Array.IndexOf(shown, col.FieldName) >= 0;
+                for (int i = 0; i < shown.Length; i++)
+                    if (viewSum.Columns[shown[i]] != null) viewSum.Columns[shown[i]].VisibleIndex = i;
 
                 var colSel = viewSum.Columns["IsCleared"];
                 var repo = new DevExpress.XtraEditors.Repository.RepositoryItemCheckEdit();

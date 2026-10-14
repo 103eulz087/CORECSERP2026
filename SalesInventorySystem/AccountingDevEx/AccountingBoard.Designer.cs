@@ -35,6 +35,7 @@ namespace SalesInventorySystem.AccountingDevEx
         private AccordionControlElement menuManualTicket;
         private AccordionControlElement menuBankRecon;
         private AccordionControlElement menuGLTicketEntries;
+        private AccordionControlElement menuLoanRevaluation;
 
         protected override void Dispose(bool disposing)
         {
@@ -63,6 +64,7 @@ namespace SalesInventorySystem.AccountingDevEx
             this.menuManualTicket = new DevExpress.XtraBars.Navigation.AccordionControlElement();
             this.menuBankRecon = new DevExpress.XtraBars.Navigation.AccordionControlElement();
             this.menuGLTicketEntries = new DevExpress.XtraBars.Navigation.AccordionControlElement();
+            this.menuLoanRevaluation = new DevExpress.XtraBars.Navigation.AccordionControlElement();
             ((System.ComponentModel.ISupportInitialize)(this.fluentDesignFormControl1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.accordionControl1)).BeginInit();
             this.SuspendLayout();
@@ -96,7 +98,8 @@ namespace SalesInventorySystem.AccountingDevEx
             this.groupExpense,
             this.menuManualTicket,
             this.menuBankRecon,
-            this.menuGLTicketEntries});
+            this.menuGLTicketEntries,
+            this.menuLoanRevaluation});
             this.accordionControl1.Location = new System.Drawing.Point(0, 39);
             this.accordionControl1.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.accordionControl1.Name = "accordionControl1";
@@ -203,6 +206,13 @@ namespace SalesInventorySystem.AccountingDevEx
             this.menuGLTicketEntries.Style = DevExpress.XtraBars.Navigation.ElementStyle.Item;
             this.menuGLTicketEntries.Tag = "navGLTicketEntries";
             this.menuGLTicketEntries.Text = "GL Ticket Entries";
+            //
+            // menuLoanRevaluation
+            //
+            this.menuLoanRevaluation.Name = "menuLoanRevaluation";
+            this.menuLoanRevaluation.Style = DevExpress.XtraBars.Navigation.ElementStyle.Item;
+            this.menuLoanRevaluation.Tag = "navLoanRevaluation";
+            this.menuLoanRevaluation.Text = "Loan Revaluation";
             // 
             // AccountingBoard
             // 
