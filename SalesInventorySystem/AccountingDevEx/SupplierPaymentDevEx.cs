@@ -1047,7 +1047,7 @@ namespace SalesInventorySystem.AccountingDevEx
                 {
                     ShowRowError(i, $"Amount Paid ({gross:N2} incl. EWT/Discount/Offset) exceeds Balance ({balance:N2}).");
                     XtraMessageBox.Show(
-                        $"Invoice {invoiceNo}: the amount being settled ({gross:N2}) exceeds its Balance ({balance:N2}).\nLower Amount Paid, or put the excess in the OverPay (Credit) or OverPay (Expense) column.",
+                        $"Invoice {invoiceNo}: the amount being settled ({gross:N2}) exceeds its Balance ({balance:N2}).\nLower Amount Paid, or put the excess in the OverPay (Credit) column.",
                         "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return false;
                 }
@@ -1350,7 +1350,9 @@ namespace SalesInventorySystem.AccountingDevEx
             }
             if (gridViewMaster.Columns["Type"] != null)
             {
-                gridViewMaster.Columns["Type"].Visible = true;
+                // 2026-10-16 (user): hidden on screen (still read for the purchase / expense split, and still in the
+                // column chooser); the printout of a mixed voucher still shows it (print code below)
+                gridViewMaster.Columns["Type"].Visible = false;
                 gridViewMaster.Columns["Type"].Caption = "Kind";
                 gridViewMaster.Columns["Type"].OptionsColumn.AllowEdit = false;
             }
@@ -1360,7 +1362,14 @@ namespace SalesInventorySystem.AccountingDevEx
             Classes.DevXGridViewSettings.ShowFooterTotal(gridViewMaster, ColOverPayExpense);
             Classes.DevXGridViewSettings.ShowFooterTotal(gridViewMaster, ColAdvanceApplied);
             if (gridViewMaster.Columns[ColOverPay] != null) gridViewMaster.Columns[ColOverPay].Caption = "OverPay (Credit)";
-            if (gridViewMaster.Columns[ColOverPayExpense] != null) gridViewMaster.Columns[ColOverPayExpense].Caption = "OverPay (Expense)";
+            if (gridViewMaster.Columns[ColOverPayExpense] != null)
+            {
+                gridViewMaster.Columns[ColOverPayExpense].Caption = "OverPay (Expense)";
+                // 2026-10-16 (user): hidden, not in the column chooser either; it stays 0 on every row, so the
+                // posting sends no write-off (the column and the server's rules are kept)
+                gridViewMaster.Columns[ColOverPayExpense].Visible = false;
+                gridViewMaster.Columns[ColOverPayExpense].OptionsColumn.ShowInCustomizationForm = false;
+            }
             if (gridViewMaster.Columns[ColAdvanceApplied] != null) gridViewMaster.Columns[ColAdvanceApplied].Caption = "Advance Applied";
             gridViewMaster.BestFitColumns();   // re-fit: captions above are longer than the field names populate() sized for
         }
@@ -1692,7 +1701,7 @@ namespace SalesInventorySystem.AccountingDevEx
 
                 if (Math.Round(gross - balance, 2) > 0)
                     ShowRowError(e.RowHandle, $"Amount Paid ({gross:N2} incl. EWT/Discount/Offset) exceeds Balance ({balance:N2})."
-                        + " Put the excess in OverPay (Credit) or OverPay (Expense).");
+                        + " Put the excess in OverPay (Credit).");
                 else
                     gridViewMaster.ClearColumnErrors();
 

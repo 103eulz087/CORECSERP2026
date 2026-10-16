@@ -227,6 +227,9 @@ namespace SalesInventorySystem.AccountingDevEx
             }
 
             gridView2.Columns["Pay"].ColumnEdit = chkPay;
+            // 2026-10-16 (user): captions only; the field names (and what each posts) are unchanged
+            if (gridView2.Columns["OverPay"] != null) gridView2.Columns["OverPay"].Caption = "Overpay(Credits)";
+            if (gridView2.Columns["OverPayIncome"] != null) gridView2.Columns["OverPayIncome"].Caption = "Overpay(OtherIncome)";
             gridView2.BestFitColumns();
         }
 
@@ -798,7 +801,7 @@ namespace SalesInventorySystem.AccountingDevEx
                 if ((rowOffset > 0 ? 1 : 0) + (rowOverpay > 0 ? 1 : 0) + (rowOverpayIncome > 0 ? 1 : 0) > 1)
                 {
                     XtraMessageBox.Show(
-                        $"Row for invoice {gridView2.GetRowCellValue(i, "InvoiceNo")}: Offset, OverPay, and OverPayIncome cannot be combined on the same invoice - choose only one.",
+                        $"Row for invoice {gridView2.GetRowCellValue(i, "InvoiceNo")}: Offset, Overpay(Credits) and Overpay(OtherIncome) cannot be combined on the same invoice - choose only one.",
                         "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
@@ -881,7 +884,7 @@ namespace SalesInventorySystem.AccountingDevEx
 
             if (advpymntctr > 1)
             {
-                XtraMessageBox.Show("OverPay/OverPayIncome must be assigned to only one invoice.");
+                XtraMessageBox.Show("Overpay(Credits) / Overpay(OtherIncome) must be assigned to only one invoice.");
                 return;
             }
             if (isSales && isCharge)
@@ -904,7 +907,7 @@ namespace SalesInventorySystem.AccountingDevEx
             // [79] invoice rows only: credit rows are left out of totalBalance, so add their amount back
             if (totalAmtPaid + totalCredit > totalBalance + totalOverpay + totalOverpayIncome + totalServicesAmount)
             {
-                XtraMessageBox.Show("Total Amount Paid cannot exceed Total Balance plus Overpay/OverPayIncome plus Services Amount.");
+                XtraMessageBox.Show("Total Amount Paid cannot exceed Total Balance plus Overpay(Credits) / Overpay(OtherIncome) plus Services Amount.");
                 return;
             }
 

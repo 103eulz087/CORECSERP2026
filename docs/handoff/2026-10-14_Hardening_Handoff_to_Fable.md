@@ -112,6 +112,7 @@ Status values: `OPEN` · `FABLE: IN PROGRESS (date)` · `DONE (Fable)` · `VERIF
 | H11 | Swallowed exceptions that report success | B | OPEN |
 | H12 | Zero-value and zero-cost edge cases in sales / conversion costing | C | OPEN |
 | H13 | Trust model: `@User` comes from the client over a shared SQL login | C (design) | OPEN |
+| H14 | Supplier voucher reversal mirrors the manual line's cash-advance ticket twice | A | CLOSED 2026-10-16 (ERP session): not reachable with real numbering, a test artifact; no proc change |
 
 Tier A = money or a ledger can go wrong silently today. B = a loophole that needs a specific sequence or a manual
 action. C = needs a user / accountant decision before code.
@@ -327,6 +328,24 @@ action. C = needs a user / accountant decision before code.
 - **Hardening.** A design note with the user before code (per-user logins, `SESSION_CONTEXT` set once per connection,
   or v2's own auth). v2 must not inherit the gap.
 - **Result:** _
+
+### H14. Supplier voucher reversal mirrors the cash-advance ticket twice (Tier A, ERP session)
+
+- **Problem** (found by the [97] test T08c, 2026-10-15). `sp_ReverseCombinedSupplierVoucher` runs
+  `sp_CancelledChequesCS` (→ `sp_ReverseTicketsAP`: every ticket under reference + voucher id, the manual line's
+  CASH ADVANCE ticket included) and then `sp_ReverseCashAdvanceEntry`, which mirrors the CASH ADVANCE ticket again. A
+  voucher with an invoice leg AND a manual line therefore leaves the manual amount in the GL after its reversal (DEV,
+  rolled back: 200.00 line → bank +200 / 10101 −200; 2 reversal tickets for 1 cash-advance ticket). Since [85]'s
+  wrapper (the pre-[85] sequence did the same). Never happened live: PRODUCTION 0 double reversals of 240 cash-advance
+  references and 0 live vouchers with both legs; STAGING 1 live (38735, test data) (read-only 2026-10-16).
+- **Objects:** `sp_ReverseCombinedSupplierVoucher`, `sp_ReverseCashAdvanceEntry` (released 2026-10-16, nothing changed).
+- **Result (ERP session, 2026-10-16): CLOSED, not a bug with real numbering.** `sp_ReverseTicketsAP` mirrors
+  ReferenceNumber = reference AND ReferenceKey = **voucher id**; `sp_PostCashAdvance` keys the CASH ADVANCE ticket
+  ReferenceKey = **reference**. The invoice step picks the cash-advance ticket up only when reference = voucher id,
+  which the test did (99976 / 99976) and real counters never do (PRODUCTION: cash-advance references 9,497–44,138,
+  voucher ids ≤ 1,101; 0 cash advances with reference = voucher id on any tier). Test corrected (T08 / T08c use
+  vouchers 99985 / 99986): T08c PASS on DEV and STAGING, rolled back. No script; [98] stays free. Note for web v2: a
+  voucher id numbered like its reference would reintroduce it.
 
 ---
 

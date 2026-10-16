@@ -764,6 +764,74 @@ namespace SalesInventorySystem.POS
             HelperFunction.exporttoexcel(gridView2, filename);
         }
 
+        // 2026-10-16 (user): Cash Receipts / Sales Journal tab › Export to Excel (the button had no handler).
+        // Exports what the grid shows (the report last generated): data-aware .xlsx, real numbers, groups open
+        // with their subtotals, footer totals, a title + filter row above. The title is captured at Generate,
+        // so switching the radio afterwards doesn't mislabel the file.
+        private string _crExportTitle, _crExportFilter;
+
+        private void simpleButton1_Click(object sender, EventArgs e)
+        {
+            if (gridControl1.DataSource == null || gridView1.RowCount == 0 || string.IsNullOrEmpty(_crExportTitle))
+            {
+                XtraMessageBox.Show("Generate the report first.", "Export to Excel", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            using (var sfd = new SaveFileDialog
+            {
+                Filter = "Excel workbook (*.xlsx)|*.xlsx",
+                FileName = $"{_crExportTitle.Replace(" ", "")}_{datefromcashreceipts.Value:yyyyMMdd}-{datetocashreceipts.Value:yyyyMMdd}.xlsx"
+            })
+            {
+                if (sfd.ShowDialog(this) != DialogResult.OK) return;
+                try
+                {
+                    ExportCashReceiptsTab(sfd.FileName);
+                }
+                catch (Exception ex)
+                {
+                    XtraMessageBox.Show($"Export failed: {ex.Message}", "Export to Excel", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                if (XtraMessageBox.Show("Exported. Open the file now?", "Export to Excel", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                {
+                    try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(sfd.FileName) { UseShellExecute = true }); }
+                    catch (Exception ex) { XtraMessageBox.Show(ex.Message, "Export to Excel", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+                }
+            }
+        }
+
+        // the export itself (no dialogs, so a harness can call it)
+        private void ExportCashReceiptsTab(string fileName)
+        {
+            var options = new DevExpress.XtraPrinting.XlsxExportOptionsEx
+            {
+                ExportType = DevExpress.Export.ExportType.DataAware,
+                SheetName = _crExportTitle,
+                GroupState = DevExpress.Export.GroupState.ExpandAll
+            };
+            options.CustomizeSheetHeader += ev =>
+            {
+                var bold = new DevExpress.Export.XlFormattingObject { Font = new DevExpress.Export.XlCellFont { Bold = true, Size = 12 } };
+                ev.ExportContext.AddRow(new[] { new DevExpress.Printing.ExportHelpers.CellObject { Value = _crExportTitle.ToUpperInvariant(), Formatting = bold } });
+                ev.ExportContext.AddRow(new[] { new DevExpress.Printing.ExportHelpers.CellObject { Value = _crExportFilter } });
+                ev.ExportContext.AddRow();
+            };
+            gridControl1.ExportToXlsx(fileName, options);
+        }
+
+        // the title + filter line of the export, as generated
+        private void SetCashReceiptsExportTitle(string title)
+        {
+            string branch = GetCashReceiptsBranchCode();
+            string dates = $"{datefromcashreceipts.Value:MMM d, yyyy} to {datetocashreceipts.Value:MMM d, yyyy}";
+            string by = title == "Cash Receipts" ? (radDateFilterInvoice.Checked ? " by invoice date" : " by payment date") : "";
+            _crExportTitle = title;
+            _crExportFilter = $"{dates}{by} | branch {(branch == "ALL" ? "ALL" : branch)} | printed {DateTime.Now:yyyy-MM-dd HH:mm} by {Login.Fullname}";
+        }
+
         private void simpleButton2_Click(object sender, EventArgs e)
         {
             if(radcashreceipts.Checked==true)
@@ -785,7 +853,8 @@ namespace SalesInventorySystem.POS
                
                 gridView1.Columns.Clear();
                 LoadCustomerCashReceipts(); //new
-                
+                SetCashReceiptsExportTitle("Cash Receipts");
+
                 gridView1.BestFitColumns();
                 gridView1.ExpandAllGroups();
             }
@@ -811,6 +880,7 @@ namespace SalesInventorySystem.POS
 
                 gridView1.Columns.Clear();
                 LoadCustomerSalesJournal();
+                SetCashReceiptsExportTitle("Sales Journal");
 
                 // 2026-10-15 (user, script [91]): the inventory lot's ReferenceCode, one row per lot taken
                 if (gridView1.Columns["ReferenceCode"] != null)

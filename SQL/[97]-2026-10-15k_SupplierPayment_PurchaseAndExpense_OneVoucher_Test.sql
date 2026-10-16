@@ -4,9 +4,9 @@
    Run in SSMS on DEV or STAGING AFTER [97] is applied. Every test runs inside BEGIN TRAN ... ROLLBACK, so nothing is
    left behind; the last result sets show PASS / BUG SHOWN / SKIP / FAIL per test. Do NOT run on PRODUCTION.
    "BUG SHOWN" = the _OLD_10152026220000 backup of sp_CancelledChequesCS reproduces what [97] closes.
-   T08c checks a fault that is NOT [97]'s (a reversal of a voucher with a manual line mirrors the cash-advance ticket
-   twice; its one-kind control voucher shows the same): PRE-EXISTING while the control fails the same way, PASS once
-   that reversal is fixed, FAIL only if the mixed voucher differs from the control.
+   T08 / T08c use voucher ids 99985 / 99986, NOT their reference 99976, as real vouchers do (2026-10-16): with
+   reference = voucher id the invoice reversal also mirrors the manual line's CASH ADVANCE ticket (keyed by the
+   reference), so the first version of this test showed a double reversal that real numbering never produces.
 
    Fixtures picked automatically (first result set shows them):
      - a supplier (SupplierID = SupplierKey) with BOTH an open purchase invoice and an open expense invoice;
@@ -17,7 +17,7 @@
      - bank account 101020101 and a non-bank cash-advance account for the manual line.
    Optional: @PickSupplier / @PickPurchaseSeq / @PickExpenseRef force one record. Missing fixture -> SKIP.
    Each payment pays 1,000.00 of the purchase and 500.00 of the expense (less when the balance is lower).
-   Test reference numbers 99971 - 99979 must be unused (checked first).
+   Test reference numbers 99971 - 99979 and voucher ids 99985 / 99986 must be unused (checked first).
    ================================================================ */
 SET NOCOUNT ON;
 SET XACT_ABORT OFF;   -- the tests catch the refusals themselves
@@ -47,13 +47,13 @@ INSERT @r VALUES ('I0 install check', 'PASS', '4 objects carry [97], 4 backups _
 -- 1. fixtures and pre-checks
 ------------------------------------------------------------------
 IF (SELECT COUNT(*) FROM TransactionPaymentAP WHERE ReferenceNumber BETWEEN 99971 AND 99979)
- + (SELECT COUNT(*) FROM APPaymentDetails WHERE ReferenceNumber BETWEEN '99971' AND '99979' OR VoucherID BETWEEN '99971' AND '99979')
+ + (SELECT COUNT(*) FROM APPaymentDetails WHERE ReferenceNumber BETWEEN '99971' AND '99979' OR VoucherID BETWEEN '99971' AND '99989')
  + (SELECT COUNT(*) FROM TicketMaster WHERE ReferenceNumber IN ('99971','99972','99973','99974','99975','99976','99977','99978','99979'))
  + (SELECT COUNT(*) FROM SupplierLedger WHERE ReferenceNumber IN ('99971','99972','99973','99974','99975','99976','99977','99978','99979'))
- + (SELECT COUNT(*) FROM CheckVoucher WHERE ReferenceNumber IN ('99971','99972','99973','99974','99975','99976','99977','99978','99979') OR VoucherID BETWEEN 99971 AND 99979)
- + (SELECT COUNT(*) FROM CashVoucher WHERE ReferenceNumber IN ('99971','99972','99973','99974','99975','99976','99977','99978','99979') OR VoucherID BETWEEN 99971 AND 99979)
- + (SELECT COUNT(*) FROM BankStatementRecon WHERE ReferenceNo IN ('99971','99972','99973','99974','99975','99976','99977','99978','99979') OR SourceRef IN ('99971','99972','99973','99974','99975','99976','99977','99978','99979'))
- + (SELECT COUNT(*) FROM CashAdvance WHERE ReferenceNo IN ('99971','99972','99973','99974','99975','99976','99977','99978','99979') OR VoucherID IN ('99971','99972','99973','99974','99975','99976','99977','99978','99979'))
+ + (SELECT COUNT(*) FROM CheckVoucher WHERE ReferenceNumber IN ('99971','99972','99973','99974','99975','99976','99977','99978','99979') OR VoucherID BETWEEN 99971 AND 99989)
+ + (SELECT COUNT(*) FROM CashVoucher WHERE ReferenceNumber IN ('99971','99972','99973','99974','99975','99976','99977','99978','99979') OR VoucherID BETWEEN 99971 AND 99989)
+ + (SELECT COUNT(*) FROM BankStatementRecon WHERE ReferenceNo IN ('99971','99972','99973','99974','99975','99976','99977','99978','99979','99985','99986') OR SourceRef IN ('99971','99972','99973','99974','99975','99976','99977','99978','99979'))
+ + (SELECT COUNT(*) FROM CashAdvance WHERE ReferenceNo IN ('99971','99972','99973','99974','99975','99976','99977','99978','99979') OR VoucherID IN ('99971','99972','99973','99974','99975','99976','99977','99978','99979','99985','99986'))
  + (SELECT COUNT(*) FROM PaymentReversalAudit WHERE ReferenceNumber IN ('99971','99972','99973','99974','99975','99976','99977','99978','99979')) > 0
 BEGIN INSERT @r VALUES ('fixtures', 'ERROR', 'test references 99971 - 99979 are in use here'); SELECT * FROM @r; RETURN; END
 IF EXISTS (SELECT 1 FROM GLPeriodLock WHERE LockedThroughDate >= @today)
@@ -333,12 +333,12 @@ BEGIN TRY
     INSERT INTO @MLn (BranchCode, AccountCode, Amount, Particulars) VALUES (@branch, @caAcct, 200.00, 'TEST97 manual');
     -- @InvoiceLegAmount deliberately off by 1.00: the header / OC must follow what the lines paid (Known Bug #5)
     SET @d1 = @tot + 1.00;
-    EXEC dbo.sp_PostSupplierPaymentWithManualLines @parmrefno = '99976', @parmvoucherid = '99976', @parmsupplierid = @sup, @parmsuppliername = @supName,
+    EXEC dbo.sp_PostSupplierPaymentWithManualLines @parmrefno = '99976', @parmvoucherid = '99985', @parmsupplierid = @sup, @parmsuppliername = @supName,
          @parmcheckcoding = 'T97CV76', @parmcheckno = 'T97C76', @parmcheckdate = @today, @parmcontrolno = NULL, @parmcheckremarks = 'TEST97', @parmpreparedby = @user,
          @parmglcode = @bank, @parmpaymethod = 'MIXED', @parmforliquidation = 0, @parmvouchertype = 'CHECK', @parmPayingBranch = @branch,
          @InvoiceLegAmount = @d1, @InvoiceLines = @ILn, @ManualLines = @MLn, @InvoiceLineExtras = @IXn, @PurchaseLines = @PLn, @PurchaseLineExtras = @PXn;
-    SELECT @n = COUNT(*), @d1 = SUM(Amount) FROM CheckVoucher WHERE ReferenceNumber = '99976' AND VoucherID = 99976;
-    SELECT @n2 = COUNT(*), @d2 = SUM(Amount) FROM BankStatementRecon WHERE ReferenceNo = '99976' AND SourceRef = '99976' AND ItemType = 'OC' AND IsResolved = 0;
+    SELECT @n = COUNT(*), @d1 = SUM(Amount) FROM CheckVoucher WHERE ReferenceNumber = '99976' AND VoucherID = 99985;
+    SELECT @n2 = COUNT(*), @d2 = SUM(Amount) FROM BankStatementRecon WHERE ReferenceNo = '99985' AND SourceRef = '99976' AND ItemType = 'OC' AND IsResolved = 0;
     SELECT @d3 = SUM(ISNULL(td.Credit, 0) - ISNULL(td.Debit, 0)) FROM TicketDetails td
     WHERE td.AccountCode = @bank AND EXISTS (SELECT 1 FROM TicketMaster tm WHERE tm.TicketNumber = td.TicketNumber AND tm.BranchCode = td.BranchCode AND tm.ReferenceNumber = '99976');
     SELECT @n3 = COUNT(*), @d4 = SUM(Amount) FROM CashAdvance WHERE ReferenceNo = '99976';
@@ -347,7 +347,7 @@ BEGIN TRY
                       CONCAT('expected ', @tot + 200, ' (invoice leg sent as ', @tot + 1, '): header ', @n, ' / ', @d1, ', open OC ', @n2, ' / ', @d2, ' [', @s, '], bank credit ', @d3, ', cash advance ', @n3, ' / ', @d4,
                              ', payment row (the screen total as sent, as on a one-kind voucher) ', (SELECT SUM(Amount) FROM TransactionPaymentAP WHERE ReferenceNumber = 99976)));
 
-    EXEC dbo.sp_ReverseCombinedSupplierVoucher @parmsupplierid = @sup, @parmreferenceno = '99976', @parmvoucherid = '99976', @parmvouchertype = 'EXPENSE',
+    EXEC dbo.sp_ReverseCombinedSupplierVoucher @parmsupplierid = @sup, @parmreferenceno = '99976', @parmvoucherid = '99985', @parmvouchertype = 'EXPENSE',
          @parmcheckno = 'T97C76', @parmglcode = @bank, @parmbranch = @branch, @parmreason = 'TEST97 T08 (rolled back)', @parmuser = @user;
     SELECT @d3 = Balance FROM APAccounts WHERE SupplierID = @sup AND SequenceNo = @pseq;
     SELECT @d4 = Balance FROM ExpenseSummary WHERE SupplierID = @sup AND BatchReferenceID = @ebatch AND InvoiceNo = @einv;
@@ -370,8 +370,8 @@ IF @@TRANCOUNT > 0 ROLLBACK;
 ------------------------------------------------------------------
 -- T08c GL after reversing a voucher WITH a manual line: every account of the reference must net to 0.
 --      Control: the same on a ONE-KIND voucher (expense + manual line), which [97] does not change. If both show the
---      same leftover, it is NOT [97]: sp_CancelledChequesCS (sp_ReverseTicketsAP, every ticket under the reference,
---      the CASH ADVANCE ticket included) and then sp_ReverseCashAdvanceEntry both mirror the cash-advance ticket.
+--      same leftover, it is NOT [97]. Voucher id <> reference here (real numbering): sp_ReverseTicketsAP mirrors
+--      reference + voucher id only, the CASH ADVANCE ticket (reference + reference) is mirrored once, by sp_ReverseCashAdvanceEntry.
 ------------------------------------------------------------------
 BEGIN TRAN;
 BEGIN TRY
@@ -379,17 +379,17 @@ BEGIN TRY
     INSERT INTO @ILn (BranchCode, InvoiceNo, InvoiceDate, SequenceReferenceNumber, BatchReferenceID, ActualCost, AmountPaid, EWTAmount, DiscountAmount, OffsetAmount, Description, Variance, DiscountAccountCode)
     VALUES (@ebranch, @einv, @edate, @eref, @ebatch, @eamt, @ePay, 0, 0, 0, 'TEST97', 0, NULL);
     INSERT INTO @MLn (BranchCode, AccountCode, Amount, Particulars) VALUES (@branch, @caAcct, 200.00, 'TEST97 manual');
-    EXEC dbo.sp_PostSupplierPaymentWithManualLines @parmrefno = '99976', @parmvoucherid = '99976', @parmsupplierid = @sup, @parmsuppliername = @supName,
+    EXEC dbo.sp_PostSupplierPaymentWithManualLines @parmrefno = '99976', @parmvoucherid = '99986', @parmsupplierid = @sup, @parmsuppliername = @supName,
          @parmcheckcoding = 'T97CV76', @parmcheckno = 'T97C76', @parmcheckdate = @today, @parmcontrolno = NULL, @parmcheckremarks = 'TEST97', @parmpreparedby = @user,
          @parmglcode = @bank, @parmpaymethod = 'EXPENSE', @parmforliquidation = 0, @parmvouchertype = 'CHECK', @parmPayingBranch = @branch,
          @InvoiceLegAmount = @ePay, @InvoiceLines = @ILn, @ManualLines = @MLn, @InvoiceLineExtras = @IXn;
-    EXEC dbo.sp_ReverseCombinedSupplierVoucher @parmsupplierid = @sup, @parmreferenceno = '99976', @parmvoucherid = '99976', @parmvouchertype = 'EXPENSE',
+    EXEC dbo.sp_ReverseCombinedSupplierVoucher @parmsupplierid = @sup, @parmreferenceno = '99976', @parmvoucherid = '99986', @parmvouchertype = 'EXPENSE',
          @parmcheckno = 'T97C76', @parmglcode = @bank, @parmbranch = @branch, @parmreason = 'TEST97 T08c (rolled back)', @parmuser = @user;
     SELECT @n = COUNT(*), @s = STRING_AGG(CONCAT(a.AccountCode, ' ', a.net), ', ') FROM (SELECT td.AccountCode, CAST(SUM(ISNULL(td.Debit, 0)) - SUM(ISNULL(td.Credit, 0)) AS DECIMAL(18,2)) AS net FROM TicketDetails td
                                 WHERE EXISTS (SELECT 1 FROM TicketMaster tm WHERE tm.TicketNumber = td.TicketNumber AND tm.BranchCode = td.BranchCode AND tm.ReferenceNumber = '99976')
                                 GROUP BY td.AccountCode HAVING ABS(SUM(ISNULL(td.Debit, 0)) - SUM(ISNULL(td.Credit, 0))) > 0.004) a;
     SELECT @n2 = COUNT(*) FROM TicketMaster WHERE ReferenceNumber = '99976' AND Mnemonic = 'CASH ADVANCE' AND Product = 'REVERSAL';
-    INSERT @r VALUES ('T08c GL nets to 0 after reversing a voucher with a manual line (pre-existing, not [97])', CASE WHEN ISNULL(@mixNets, -1) = 0 AND @n = 0 THEN 'PASS' WHEN ISNULL(@mixNets, -1) = @n AND @n > 0 THEN 'PRE-EXISTING' ELSE 'FAIL' END,
+    INSERT @r VALUES ('T08c GL nets to 0 after reversing a voucher with a manual line (each ticket reversed once)', CASE WHEN ISNULL(@mixNets, -1) = 0 AND @n = 0 THEN 'PASS' WHEN ISNULL(@mixNets, -1) = @n AND @n > 0 THEN 'PRE-EXISTING' ELSE 'FAIL' END,
                       CONCAT('mixed voucher: ', ISNULL(@mixNets, -1), ' accounts not at 0 (', ISNULL(@mixNetDetail, '-'), '); one-kind control voucher: ', @n, ' (', ISNULL(@s, '-'), '), cash-advance reversal tickets ', @n2,
                              ' for 1 cash-advance ticket'));
 END TRY BEGIN CATCH INSERT @r VALUES ('T08c', 'ERROR', CONCAT(ERROR_NUMBER(), ' ', ERROR_MESSAGE())); END CATCH
@@ -552,13 +552,13 @@ END
 ------------------------------------------------------------------
 Report:
 SELECT @n = (SELECT COUNT(*) FROM TransactionPaymentAP WHERE ReferenceNumber BETWEEN 99971 AND 99979)
-          + (SELECT COUNT(*) FROM APPaymentDetails WHERE ReferenceNumber BETWEEN '99971' AND '99979' OR VoucherID BETWEEN '99971' AND '99979')
+          + (SELECT COUNT(*) FROM APPaymentDetails WHERE ReferenceNumber BETWEEN '99971' AND '99979' OR VoucherID BETWEEN '99971' AND '99989')
           + (SELECT COUNT(*) FROM TicketMaster WHERE ReferenceNumber IN ('99971','99972','99973','99974','99975','99976','99977','99978','99979'))
           + (SELECT COUNT(*) FROM SupplierLedger WHERE ReferenceNumber IN ('99971','99972','99973','99974','99975','99976','99977','99978','99979'))
-          + (SELECT COUNT(*) FROM CheckVoucher WHERE ReferenceNumber IN ('99971','99972','99973','99974','99975','99976','99977','99978','99979') OR VoucherID BETWEEN 99971 AND 99979)
-          + (SELECT COUNT(*) FROM CashVoucher WHERE ReferenceNumber IN ('99971','99972','99973','99974','99975','99976','99977','99978','99979') OR VoucherID BETWEEN 99971 AND 99979)
-          + (SELECT COUNT(*) FROM BankStatementRecon WHERE ReferenceNo IN ('99971','99972','99973','99974','99975','99976','99977','99978','99979') OR SourceRef IN ('99971','99972','99973','99974','99975','99976','99977','99978','99979'))
-          + (SELECT COUNT(*) FROM CashAdvance WHERE ReferenceNo IN ('99971','99972','99973','99974','99975','99976','99977','99978','99979'))
+          + (SELECT COUNT(*) FROM CheckVoucher WHERE ReferenceNumber IN ('99971','99972','99973','99974','99975','99976','99977','99978','99979') OR VoucherID BETWEEN 99971 AND 99989)
+          + (SELECT COUNT(*) FROM CashVoucher WHERE ReferenceNumber IN ('99971','99972','99973','99974','99975','99976','99977','99978','99979') OR VoucherID BETWEEN 99971 AND 99989)
+          + (SELECT COUNT(*) FROM BankStatementRecon WHERE ReferenceNo IN ('99971','99972','99973','99974','99975','99976','99977','99978','99979','99985','99986') OR SourceRef IN ('99971','99972','99973','99974','99975','99976','99977','99978','99979'))
+          + (SELECT COUNT(*) FROM CashAdvance WHERE ReferenceNo IN ('99971','99972','99973','99974','99975','99976','99977','99978','99979') OR VoucherID IN ('99985','99986'))
           + (SELECT COUNT(*) FROM PaymentReversalAudit WHERE ReferenceNumber IN ('99971','99972','99973','99974','99975','99976','99977','99978','99979'));
 SELECT @n2 = (SELECT COUNT(*) FROM APAccounts WHERE SupplierID = @sup AND SequenceNo = @pseq AND (Balance <> @pbal OR PayStatus <> @pstat))
            + (SELECT COUNT(*) FROM ExpenseSummary WHERE SupplierID = @sup AND BatchReferenceID = @ebatch AND InvoiceNo = @einv AND (Balance <> @ebal OR Status <> @estat))

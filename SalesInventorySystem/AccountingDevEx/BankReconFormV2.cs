@@ -1068,6 +1068,8 @@ namespace SalesInventorySystem.AccountingDevEx
         // Outstanding Checks tab, or the Bank-Side Items tab. Data-aware .xlsx (real numbers,
         // groups expanded, footer sums kept), with the period and the summary-box figures on top.
         // ================================================================
+        // 2026-10-16 (user): Export offers the accountants' "Account Reconciliation Report" (D:\SQLREF\2.png,
+        // Peachtree's layout) first; the grid export stays as the second choice.
         private void BtnExportXlsx_Click(object sender, EventArgs e)
         {
             if (_headerID == 0)
@@ -1076,6 +1078,15 @@ namespace SalesInventorySystem.AccountingDevEx
                 return;
             }
 
+            var menu = new ContextMenuStrip();
+            menu.Items.Add("Account Reconciliation Report (accountants' format)...", null, (s, ev) => ExportAccountReconReport());
+            menu.Items.Add("Grid as shown on screen...", null, (s, ev) => ExportGridXlsx());
+            menu.Closed += (s, ev) => BeginInvoke((Action)(() => menu.Dispose()));
+            menu.Show(btnExportXlsx, new System.Drawing.Point(0, btnExportXlsx.Height));
+        }
+
+        private void ExportGridXlsx()
+        {
             DevExpress.XtraGrid.GridControl grid;
             GridView view;
             string what;
@@ -1159,6 +1170,86 @@ namespace SalesInventorySystem.AccountingDevEx
             ctx.AddRow(new[] { C("Difference (Adjusted Bank - Adjusted Book)", bold), C(diff, moneyBold),
                                C(Math.Abs(diff) < 0.01m ? "RECONCILED" : "OUT OF BALANCE", bold) });
             ctx.AddRow();
+        }
+
+        // ================================================================
+        // ACCOUNT RECONCILIATION REPORT (2026-10-16, user: the accountants' format, D:\SQLREF\2.png)
+        // GL side from sp_rpt_BankRecon_GLMovement (script [99]): Beginning GL + Cash Receipts - Cash
+        // Disbursements + Add (Less) Other = Ending GL (all branches, the month of the period). Bank side
+        // from the items on screen, the same ones the summary box counts: open deposits in transit, open
+        // outstanding checks, and the open bank-side items as "Add (Less) Other" (a bank credit memo is a
+        // LESS here, debit memos / charges / NSF / auto-debits an ADD: the screen books them on the book
+        // side, this layout brings the bank to the GL). Unreconciled difference = Ending GL - (Ending Bank
+        // + deposits - checks + other) = minus the screen's Difference. Sheet 2 lists the GL lines by journal.
+        // ================================================================
+        private void ExportAccountReconReport()
+        {
+            if (_previewBankBal != null && _previewBankBal.Value != _bankBal)
+            {
+                XtraMessageBox.Show("The bank statement balance on screen is not saved yet.\n\nSave it first: the report uses the saved balance.",
+                    "Account Reconciliation Report", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            string fileName;
+            using (var sfd = new SaveFileDialog
+            {
+                Filter = "Excel workbook (*.xlsx)|*.xlsx",
+                FileName = $"AccountReconciliation_{_account}_{_period:yyyy-MM}.xlsx"
+            })
+            {
+                if (sfd.ShowDialog(this) != DialogResult.OK) return;
+                fileName = sfd.FileName;
+            }
+
+            string error;
+            Cursor.Current = Cursors.WaitCursor;
+            try { error = WriteAccountReconReport(fileName); }
+            catch (Exception ex) { error = $"Export failed: {ex.Message}"; }
+            finally { Cursor.Current = Cursors.Default; }
+            if (error != null)
+            {
+                XtraMessageBox.Show(error, "Account Reconciliation Report", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            SetStatus($"Exported to {fileName}");
+            if (XtraMessageBox.Show("Exported. Open the file now?", "Account Reconciliation Report", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(fileName) { UseShellExecute = true }); }
+                catch (Exception ex) { SetStatus(ex.Message, err: true); }
+            }
+        }
+
+        // Reads the GL side, builds the bank side from the loaded period and writes the workbook; returns null
+        // when done, else the message to show (no dialogs here, so a harness can call it). The layout and the
+        // workbook are Classes/AccountReconReport.cs, shared with Accounting Reports › Bank Reconciliation.
+        private string WriteAccountReconReport(string fileName)
+        {
+            var report = new AccountReconReport { AccountCode = _account, PeriodEnd = _period, BankBalance = _bankBal };
+            try
+            {
+                if (!report.TryLoadGLMovement())
+                    return "This database does not have the report's procedure yet (script [99], sp_rpt_BankRecon_GLMovement).\n\nUse \"Grid as shown on screen\" until it is installed.";
+            }
+            catch (SqlException ex) { return $"Could not read the GL movement: {ex.Message}"; }
+            catch (InvalidOperationException ex) { return ex.Message; }
+
+            // bank side: the same open items as RefreshSummary
+            foreach (DataRow r in _dtDIT.Rows)
+                if (!(r["IsResolved"] is bool b && b)) report.AddItem("DIT", r);
+            foreach (DataRow r in _dtOC.Rows)
+                if (!(r["IsResolved"] is bool b && b)) report.AddItem("OC", r);
+            foreach (DataRow r in _dtBankSide.Rows)
+                if (!(r["IsResolved"] is bool b && b)) report.AddItem(Convert.ToString(r["ItemType"]), r);
+            report.SortItems();
+
+            if (_isLocked && Math.Abs(_bookBal - report.EndingGL) >= 0.01m)
+                report.Notes.Add($"Note: the GL changed after this period was locked (locked GL balance {_bookBal:N2}, GL today {report.EndingGL:N2}).");
+            report.Footer = $"Bank Recon {(_isLocked ? "LOCKED" : "OPEN")} | GL all branches | prepared {DateTime.Now:yyyy-MM-dd HH:mm} by {Login.Fullname}";
+
+            report.WriteXlsx(fileName);
+            return null;
         }
 
         private void SetStatus(string msg, bool err = false)

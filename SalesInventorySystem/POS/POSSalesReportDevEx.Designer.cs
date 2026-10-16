@@ -897,6 +897,7 @@
             this.simpleButton1.Size = new System.Drawing.Size(142, 26);
             this.simpleButton1.TabIndex = 448;
             this.simpleButton1.Text = "Export to Excel";
+            this.simpleButton1.Click += new System.EventHandler(this.simpleButton1_Click);
             // 
             // simpleButton2
             // 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 using DevExpress.XtraEditors;
 using DevExpress.XtraGrid.Views.Grid;
@@ -193,6 +194,18 @@ namespace SalesInventorySystem.HOFormsDevEx
         // True while gridControlReport is showing an All-Branches pivot result --
         // Export uses it to pick the data-aware XLSX path (frozen columns).
         private bool _isPivotResultShown = false;
+        // True while gridControlReport is showing a Trial Balance: no right-click menu (no ticket behind its rows).
+        private bool _isTrialBalanceShown = false;
+        // The Bank Reconciliation on screen in the accountants' layout (null for every other report); Export to
+        // Excel writes its workbook.
+        private AccountReconReport _accountRecon;
+        // 2026-10-16 (user): "View Related Entries" on the Income Statement pivot = the GL lines behind the
+        // right-clicked figure (account x branch column x the pivot's own date range).
+        private DateTime _pivotDateFrom, _pivotDateTo;      // the range the pivot on screen was generated for
+        private string _menuColumnFieldName;                // the column under the right-click
+        private Dictionary<string, string> _pivotBranchByLabel;   // pivot column label -> BranchCode
+        private static readonly HashSet<string> G_PIVOT_ALL_BRANCH_COLUMNS =
+            new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "Grand Total", "AccountCode", "AccountDescription", "RowType", "ISSection" };
         public void LoadData()
         {
             if (_dataLoaded)
@@ -236,17 +249,28 @@ namespace SalesInventorySystem.HOFormsDevEx
         {
             if (e.Button != MouseButtons.Right) return;
             if (gridControlReport.DataSource == null) return;
+            if (_isTrialBalanceShown || _accountRecon != null) return;   // no ticket behind these rows
 
             var hitInfo = gridViewReport.CalcHitInfo(e.Location);
             if (hitInfo.InRow || hitInfo.InRowCell)
             {
                 gridViewReport.FocusedRowHandle = hitInfo.RowHandle;
+                _menuColumnFieldName = hitInfo.Column?.FieldName;
+                _reportContextMenu.Items[0].Text = _isPivotResultShown
+                    ? "View Related Entries (GL lines of this figure)"
+                    : "View Related Entries (Same Ticket)";
                 _reportContextMenu.Show(gridControlReport, e.Location);
             }
         }
         private void ViewRelatedEntries_Click(object sender, EventArgs e)
         {
             if (gridViewReport.FocusedRowHandle < 0) return;
+
+            if (_isPivotResultShown)
+            {
+                ShowPivotFigureEntries();
+                return;
+            }
 
             if (gridViewReport.Columns["TicketNumber"] == null)
             {
@@ -268,6 +292,10 @@ namespace SalesInventorySystem.HOFormsDevEx
                 return;
             }
 
+            LoadAndShowTicket(ticketNumber);
+        }
+        private void LoadAndShowTicket(string ticketNumber)
+        {
             DataTable header, lines;
             try
             {
@@ -365,6 +393,198 @@ namespace SalesInventorySystem.HOFormsDevEx
                 popup.Controls.Add(btnClose);
 
                 popup.ShowDialog(this);
+            }
+        }
+
+        // ── Pivot drill-down (2026-10-16, user): the GL lines behind one Income Statement pivot figure ──
+        //    Account = the row's AccountCode (subtotal / total rows have none); branch = the right-clicked
+        //    column (a branch column -> that branch; Grand Total or the account columns -> all branches);
+        //    dates = the range the pivot was generated for. Lines from sp_rpt_GLDetailTransactionRealTime, the
+        //    same proc as the GL Detail Transaction report, so the totals tie to the pivot's NetAmount.
+        private void ShowPivotFigureEntries()
+        {
+            string accountCode = gridViewReport.GetFocusedRowCellValue("AccountCode")?.ToString();
+            if (string.IsNullOrWhiteSpace(accountCode))
+            {
+                XtraMessageBox.Show("This row is a subtotal or total, not a single account.\n\nRight-click an account's figure to see its GL entries.",
+                    "Not Available", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            string branchCode = null;      // null = all branches
+            string branchText = "All branches";
+            string col = _menuColumnFieldName;
+            if (!string.IsNullOrEmpty(col) && !G_PIVOT_ALL_BRANCH_COLUMNS.Contains(col))
+            {
+                var map = GetPivotBranchMap();
+                if (map == null) return;
+                if (!map.TryGetValue(col, out branchCode))
+                {
+                    XtraMessageBox.Show($"Column '{col}' is not a branch column.", "Not Available",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+                branchText = branchCode + " - " + col;
+            }
+
+            string accountText = accountCode + " - " + gridViewReport.GetFocusedRowCellValue("AccountDescription");
+            object figureObj = !string.IsNullOrEmpty(col) && !G_PIVOT_ALL_BRANCH_COLUMNS.Contains(col)
+                ? gridViewReport.GetFocusedRowCellValue(col)
+                : gridViewReport.GetFocusedRowCellValue("Grand Total");
+
+            DataTable lines;
+            try
+            {
+                Cursor.Current = Cursors.WaitCursor;
+                using (var con = Database.getConnection())
+                using (var cmd = new SqlCommand("sp_rpt_GLDetailTransactionRealTime", con) { CommandType = CommandType.StoredProcedure, CommandTimeout = 180 })
+                {
+                    cmd.Parameters.Add("@BranchCode", SqlDbType.VarChar, 5).Value = (object)branchCode ?? DBNull.Value;
+                    cmd.Parameters.Add("@AccountCode", SqlDbType.VarChar, 20).Value = accountCode;
+                    cmd.Parameters.Add("@DateFrom", SqlDbType.Date).Value = _pivotDateFrom;
+                    cmd.Parameters.Add("@DateTo", SqlDbType.Date).Value = _pivotDateTo;
+                    cmd.Parameters.Add("@IncludeZeroActivity", SqlDbType.Bit).Value = false;
+
+                    var all = new DataTable();
+                    new SqlDataAdapter(cmd).Fill(all);
+
+                    // keep the GL lines only (the proc also returns Beginning / Period / Ending rows)
+                    lines = all.Clone();
+                    if (all.Columns.Contains("TicketNumber"))
+                        foreach (DataRow r in all.Rows)
+                            if (r["TicketNumber"] != DBNull.Value && !string.IsNullOrWhiteSpace(r["TicketNumber"].ToString()))
+                                lines.ImportRow(r);
+                }
+            }
+            catch (SqlException ex)
+            {
+                XtraMessageBox.Show($"Could not load the GL entries: {ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            finally
+            {
+                Cursor.Current = Cursors.Default;
+            }
+
+            decimal debit = 0m, credit = 0m;
+            foreach (DataRow r in lines.Rows)
+            {
+                if (lines.Columns.Contains("Debit Amt") && r["Debit Amt"] != DBNull.Value) debit += Convert.ToDecimal(r["Debit Amt"]);
+                if (lines.Columns.Contains("Credit Amt") && r["Credit Amt"] != DBNull.Value) credit += Convert.ToDecimal(r["Credit Amt"]);
+            }
+            string figureText = figureObj == null || figureObj == DBNull.Value ? "-" : Convert.ToDecimal(figureObj).ToString("N2");
+
+            ShowGLLinesPopup(
+                $"GL Entries — {accountCode} · {branchText}",
+                $"Account: {accountText}   |   Branch: {branchText}   |   {_pivotDateFrom:yyyy-MM-dd} to {_pivotDateTo:yyyy-MM-dd}\n" +
+                $"Figure on the pivot: {figureText}   |   {lines.Rows.Count} GL line(s): Debit {debit:N2}, Credit {credit:N2}, Debit − Credit {debit - credit:N2}   (right-click a line for its whole ticket)",
+                lines);
+        }
+
+        // Pivot column label -> BranchCode. The pivot proc labels a branch column with its BranchName, or its
+        // BranchCode when the name is blank, and refuses two branches with the same label, so the map is 1:1.
+        private Dictionary<string, string> GetPivotBranchMap()
+        {
+            if (_pivotBranchByLabel != null) return _pivotBranchByLabel;
+            try
+            {
+                var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                using (var con = Database.getConnection())
+                using (var cmd = new SqlCommand(
+                    "SELECT BranchCode, ISNULL(NULLIF(LTRIM(RTRIM(BranchName)), ''), BranchCode) AS Label FROM dbo.Branches", con))
+                {
+                    con.Open();
+                    using (var rd = cmd.ExecuteReader())
+                        while (rd.Read())
+                        {
+                            string label = rd["Label"].ToString();
+                            if (!map.ContainsKey(label)) map[label] = rd["BranchCode"].ToString();
+                        }
+                }
+                _pivotBranchByLabel = map;
+                return map;
+            }
+            catch (SqlException ex)
+            {
+                XtraMessageBox.Show($"Could not load the branches: {ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return null;
+            }
+        }
+
+        private void ShowGLLinesPopup(string title, string headerText, DataTable lines)
+        {
+            using (var popup = new XtraForm())
+            {
+                popup.Text = title;
+                popup.Size = new Size(1000, 560);
+                popup.StartPosition = FormStartPosition.CenterParent;
+                popup.MinimizeBox = false;
+                popup.MaximizeBox = true;
+
+                var lblHeader = new LabelControl
+                {
+                    Dock = DockStyle.Top,
+                    AutoSizeMode = DevExpress.XtraEditors.LabelAutoSizeMode.None,
+                    Height = 60,
+                    Padding = new Padding(10),
+                    Text = headerText
+                };
+
+                var gridControl = new DevExpress.XtraGrid.GridControl { Dock = DockStyle.Fill };
+                var gridView = new GridView(gridControl);
+                gridControl.MainView = gridView;
+                gridControl.ViewCollection.Add(gridView);
+                gridView.OptionsBehavior.Editable = false;
+                gridView.OptionsView.ShowGroupPanel = false;
+                gridView.OptionsView.ShowFooter = true;
+                gridControl.DataSource = lines;
+
+                // Columns exist only once the popup is on screen (PopulateColumns gotcha): build and format on Shown.
+                popup.Shown += (s, e) =>
+                {
+                    gridView.PopulateColumns();
+                    FormatGridColumns(gridView);
+                    foreach (string hidden in new[] { "Account ID", "Account Description", "Balance", "TicketNumber" })
+                        if (gridView.Columns[hidden] != null) gridView.Columns[hidden].Visible = false;
+                    foreach (string name in new[] { "Debit Amt", "Credit Amt" })
+                    {
+                        var c = gridView.Columns[name];
+                        if (c == null) continue;
+                        c.Summary.Clear();
+                        c.Summary.Add(DevExpress.Data.SummaryItemType.Sum, name, "{0:N2}");
+                    }
+                    gridView.BestFitColumns();
+                    var desc = gridView.Columns["Trans Description"];
+                    if (desc != null && desc.Width > TransDescriptionWidth) desc.Width = TransDescriptionWidth;
+                };
+
+                // right-click a line -> its whole ticket (the existing "Same Ticket" view)
+                var lineMenu = new ContextMenuStrip();
+                lineMenu.Items.Add("View Related Entries (Same Ticket)", null, (s, e) =>
+                {
+                    string tn = gridView.GetFocusedRowCellValue("TicketNumber")?.ToString();
+                    if (!string.IsNullOrWhiteSpace(tn)) LoadAndShowTicket(tn);
+                });
+                gridControl.MouseUp += (s, e) =>
+                {
+                    if (e.Button != MouseButtons.Right) return;
+                    var hit = gridView.CalcHitInfo(e.Location);
+                    if (!hit.InRow && !hit.InRowCell) return;
+                    gridView.FocusedRowHandle = hit.RowHandle;
+                    lineMenu.Show(gridControl, e.Location);
+                };
+
+                var btnClose = new SimpleButton { Text = "Close", Dock = DockStyle.Bottom, Height = 36 };
+                btnClose.Click += (s, e) => popup.Close();
+
+                popup.Controls.Add(gridControl);
+                popup.Controls.Add(lblHeader);
+                popup.Controls.Add(btnClose);
+
+                popup.ShowDialog(this);
+                lineMenu.Dispose();
             }
         }
         private void AccountingReportsFormV2_Load(object sender, EventArgs e)
@@ -616,6 +836,8 @@ namespace SalesInventorySystem.HOFormsDevEx
                     var ds = new DataSet();
                     new SqlDataAdapter(cmd).Fill(ds);
 
+                    _pivotDateFrom = dteDateFrom.DateTime.Date;   // the drill-down uses the range this pivot was built for
+                    _pivotDateTo = dteDateTo.DateTime.Date;
                     BindResults(ds, cfg, isPivotResult: true);
                 }
 
@@ -639,12 +861,15 @@ namespace SalesInventorySystem.HOFormsDevEx
         //    ResultShape enum and each ReportConfig's Shape value. ──
         private void BindResults(DataSet ds, ReportConfig cfg, bool isPivotResult = false)
         {
+            _accountRecon = null;
             gridViewReport.Columns.Clear();
             gridViewSummary.Columns.Clear();
 
             switch (cfg.Shape)
             {
                 case ResultShape.SingleSet:
+                    if (cfg.SpName == "sp_rpt_BalanceSheetRealTimeSingleGrid" && ds.Tables.Count > 0)
+                        ArrangeBalanceSheet(ds.Tables[0]);
                     gridControlReport.DataSource = ds.Tables.Count > 0 ? ds.Tables[0] : null;
                     gridControlSummary.DataSource = null;
                     break;
@@ -675,8 +900,20 @@ namespace SalesInventorySystem.HOFormsDevEx
                             $"{hdr["AccountCode"]} - {hdr["AccountDescription"]} · " +
                             $"Branch: {cboBranchCode.Text} · Generated {DateTime.Now:g}";
                     }
-                    gridControlReport.DataSource = ds.Tables.Count >= 2 ? ds.Tables[1] : null;
-                    gridControlSummary.DataSource = ds.Tables.Count >= 3 ? ds.Tables[2] : null;
+                    // 2026-10-16 (user): shown and exported in the accountants' ACCOUNT RECONCILIATION REPORT
+                    // layout, the same as Bank Recon › Export (Classes/AccountReconReport.cs); the old item
+                    // list + summary only if the layout can't be built.
+                    _accountRecon = BuildAccountRecon(ds);
+                    if (_accountRecon != null)
+                    {
+                        gridControlReport.DataSource = _accountRecon.ToTable();
+                        gridControlSummary.DataSource = null;
+                    }
+                    else
+                    {
+                        gridControlReport.DataSource = ds.Tables.Count >= 2 ? ds.Tables[1] : null;
+                        gridControlSummary.DataSource = ds.Tables.Count >= 3 ? ds.Tables[2] : null;
+                    }
                     break;
 
                 case ResultShape.Standard2Set:
@@ -722,6 +959,30 @@ namespace SalesInventorySystem.HOFormsDevEx
             // as "0.00"/"1.00" instead of being hidden.
             if (gridViewReport.Columns["IsContraCOGS"] != null)
                 gridViewReport.Columns["IsContraCOGS"].Visible = false;
+            // 2026-10-16 (user): Balance Sheet shows Amount only (RawEndingBalance = the unsigned debit - credit,
+            // kept in the data).
+            if (gridViewReport.Columns["RawEndingBalance"] != null)
+                gridViewReport.Columns["RawEndingBalance"].Visible = false;
+            // 2026-10-16 (user): Trial Balance shows Ending Balance only; its TB Debit / TB Credit split
+            // stays in the data (the Summary panel's Total Debit / Total Credit / Difference still tie).
+            foreach (string tbCol in new[] { "TB Debit", "TB Credit" })
+                if (gridViewReport.Columns[tbCol] != null)
+                    gridViewReport.Columns[tbCol].Visible = false;
+            // 2026-10-16 (user): Trial Balance also hides As Of Date / Branch Code / Is Abnormal Balance, in the
+            // main grid and the Summary grid (the date and branch are already in the filters above), and its
+            // rows have no ticket behind them, so the right-click "View Related Entries" menu is off for it.
+            _isTrialBalanceShown = cfg.SpName == "sp_rpt_TrialBalanceRealTime";
+            if (_isTrialBalanceShown)
+                foreach (var view in new[] { gridViewReport, gridViewSummary })
+                    foreach (string tbCol in new[] { "As Of Date", "Branch Code", "Is Abnormal Balance" })
+                        if (view.Columns[tbCol] != null)
+                            view.Columns[tbCol].Visible = false;
+            // 2026-10-16 (user, script [98]): GL Detail Transaction's Owner (= TicketMaster.Owner) comes last from
+            // the proc (old exes keep their column positions); show it right after Account Description.
+            var ownerCol = gridViewReport.Columns["Owner"];
+            var acctDescCol = gridViewReport.Columns["Account Description"];
+            if (ownerCol != null && acctDescCol != null && acctDescCol.Visible)
+                ownerCol.VisibleIndex = acctDescCol.VisibleIndex + 1;
 
             gridViewReport.OptionsView.ColumnAutoWidth = false;
             gridViewSummary.OptionsView.ColumnAutoWidth = false;
@@ -754,6 +1015,165 @@ namespace SalesInventorySystem.HOFormsDevEx
         }
 
         private const int TransDescriptionWidth = 260;
+
+        // 2026-10-16 (user): the Balance Sheet in statement form, with headings. The proc's rows are kept
+        // (amounts, subtotals, grand totals, the DIFFERENCE check) and only re-ordered / labelled here:
+        //   ASSETS
+        //     CURRENT ASSETS        lines, TOTAL CURRENT ASSETS
+        //     NON-CURRENT ASSETS    lines, TOTAL NON-CURRENT ASSETS
+        //   TOTAL ASSETS
+        //   LIABILITIES AND EQUITY
+        //     LIABILITIES
+        //       CURRENT LIABILITIES     lines, TOTAL CURRENT LIABILITIES
+        //       NON-CURRENT LIABILITIES lines, TOTAL NON-CURRENT LIABILITIES
+        //     TOTAL LIABILITIES (= the two liability subtotals)
+        //     EQUITY                lines, TOTAL EQUITY
+        //   TOTAL LIABILITIES & EQUITY, DIFFERENCE
+        // Heading rows carry RowType HEADING (gold, like the grand totals) or HEADER (section band) and no amount.
+        // 2026-10-16 (user): Bank Reconciliation in the accountants' layout. From sp_rpt_BankReconciliationRealTime:
+        // set 1 = account / dates, set 2 = the open items as of Date To (the Bank Recon screen's rule), set 3 = the
+        // statement balance. GL side from sp_rpt_BankRecon_GLMovement ([99]); without it, the report's own GL
+        // figures (receipts = every debit, disbursements = every credit) with a note. Each item's reference comes
+        // from the Bank Recon screen's own rows (sp_BankRecon_GetPeriod, by ReconID: Control No / CR No for
+        // deposits, CV # / cheque no. for checks), so the two files show the same lines. Null = can't build it.
+        private AccountReconReport BuildAccountRecon(DataSet ds)
+        {
+            if (ds.Tables.Count < 3 || ds.Tables[0].Rows.Count == 0 || ds.Tables[2].Rows.Count == 0) return null;
+            try
+            {
+                var hdr = ds.Tables[0].Rows[0];
+                var sum = ds.Tables[2].Rows[0];
+                var items = ds.Tables[1];
+                var report = new AccountReconReport
+                {
+                    AccountCode = Convert.ToString(hdr["AccountCode"]),
+                    AccountName = Convert.ToString(hdr["AccountDescription"]),
+                    PeriodEnd = Convert.ToDateTime(hdr["DateTo"]).Date,
+                    BankBalance = AccountReconReport.Dec(sum["BankStatementBalance"])
+                };
+                DateTime dateFrom = Convert.ToDateTime(hdr["DateFrom"]).Date;
+                var monthStart = new DateTime(report.PeriodEnd.Year, report.PeriodEnd.Month, 1);
+
+                if (!report.TryLoadGLMovement())
+                {
+                    report.BeginningGL = AccountReconReport.Dec(sum["BeginningGLBalance"]);
+                    report.CashReceipts = AccountReconReport.Dec(sum["CashReceipts"]);
+                    report.CashDisbursements = AccountReconReport.Dec(sum["CashDisbursements"]);
+                    report.OtherGL = AccountReconReport.Dec(sum["OtherGL"]);
+                    report.EndingGL = AccountReconReport.Dec(sum["EndingGLBalance"]);
+                    report.Notes.Add("Note: Cash Receipts / Disbursements are every GL debit / credit of the dates picked: this database doesn't have script [99] yet (the receipts / disbursements / other split), and has no GL Movement sheet.");
+                }
+                else if (dateFrom != monthStart)
+                    report.Notes.Add($"Note: the GL side covers the month of Date To ({monthStart:MMMM d} to {report.PeriodEnd:MMMM d, yyyy}), not the Date From picked ({dateFrom:MMMM d, yyyy}).");
+                if (sum["BankStatementBalance"] == DBNull.Value)
+                    report.Notes.Add($"Note: no bank statement balance is saved for {report.PeriodEnd:MMMM d, yyyy} (Bank Recon screen), so Ending Bank Balance is 0.00.");
+
+                // the screen's rows, for the references
+                var screenRows = new Dictionary<int, DataRow>();
+                foreach (string branch in items.Rows.Cast<DataRow>().Select(r => Convert.ToString(r["BranchCode"]).Trim()).Distinct())
+                {
+                    try
+                    {
+                        using (var con = Database.getConnection())
+                        using (var cmd = new SqlCommand("sp_BankRecon_GetPeriod", con) { CommandType = CommandType.StoredProcedure, CommandTimeout = 180 })
+                        {
+                            cmd.Parameters.Add("@BranchCode", SqlDbType.Char, 3).Value = branch;
+                            cmd.Parameters.Add("@AccountCode", SqlDbType.VarChar, 20).Value = report.AccountCode;
+                            cmd.Parameters.Add("@PeriodEnd", SqlDbType.Date).Value = report.PeriodEnd;
+                            var sds = new DataSet();
+                            con.Open();
+                            new SqlDataAdapter(cmd).Fill(sds);
+                            for (int i = 1; i < sds.Tables.Count; i++)
+                                if (sds.Tables[i].Columns.Contains("ReconID"))
+                                    foreach (DataRow r in sds.Tables[i].Rows)
+                                        if (r["ReconID"] != DBNull.Value) screenRows[Convert.ToInt32(r["ReconID"])] = r;
+                        }
+                    }
+                    catch (SqlException) { /* references fall back to the report's own ReferenceNo */ }
+                }
+                foreach (DataRow r in items.Rows)
+                {
+                    int id = r["ReconID"] == DBNull.Value ? 0 : Convert.ToInt32(r["ReconID"]);
+                    report.AddItem(Convert.ToString(r["ItemType"]), screenRows.TryGetValue(id, out var sr) ? sr : r);
+                }
+                report.SortItems();
+
+                // the layout's unreconciled difference must be the report's own, with the sign turned
+                decimal reportDiff = AccountReconReport.Dec(sum["UnreconciledDifference"]);
+                if (Math.Abs(report.Unreconciled + reportDiff) >= 0.01m)
+                    report.Notes.Add($"Note: the unreconciled difference here ({report.Unreconciled:N2}) differs from the reconciliation's own ({-reportDiff:N2}); please report this.");
+
+                string branchText = chkAllBranches.Checked ? "ALL" : cboBranchCode.Text;
+                report.Footer = $"Accounting Reports › Bank Reconciliation | items: branch {branchText} | GL all branches | prepared {DateTime.Now:yyyy-MM-dd HH:mm} by {Login.Fullname}";
+                return report;
+            }
+            catch (Exception ex)
+            {
+                XtraMessageBox.Show($"The Account Reconciliation layout could not be built ({ex.Message}); showing the item list instead.",
+                    "Bank Reconciliation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return null;
+            }
+        }
+
+        private static void ArrangeBalanceSheet(DataTable t)
+        {
+            if (t.Columns["RowType"] == null || t.Columns["BSSection"] == null
+                || t.Columns["AccountDescription"] == null || t.Columns["Amount"] == null) return;
+
+            var source = t.Rows.Cast<DataRow>().Select(r => r.ItemArray).ToList();
+            int iType = t.Columns["RowType"].Ordinal, iSec = t.Columns["BSSection"].Ordinal;
+            int iDesc = t.Columns["AccountDescription"].Ordinal, iAmt = t.Columns["Amount"].Ordinal;
+            string Type(object[] r) => Convert.ToString(r[iType]).ToUpperInvariant();
+            string Sec(object[] r) => Convert.ToString(r[iSec]);
+            string Desc(object[] r) => Convert.ToString(r[iDesc]).ToUpperInvariant();
+
+            var result = new List<object[]>();
+            object[] NewRow(string rowType, string section, string text, object amount)
+            {
+                var r = new object[t.Columns.Count];
+                for (int i = 0; i < r.Length; i++) r[i] = DBNull.Value;
+                r[iType] = rowType; r[iSec] = section; r[iDesc] = text; r[iAmt] = amount ?? DBNull.Value;
+                return r;
+            }
+            decimal SubtotalOf(string section) =>
+                source.Where(r => Type(r) == "SUBTOTAL" && Sec(r) == section && r[iAmt] != DBNull.Value)
+                      .Select(r => Convert.ToDecimal(r[iAmt])).DefaultIfEmpty(0m).Sum();
+            void Section(string section, string heading)
+            {
+                result.Add(NewRow("HEADER", section, heading, null));
+                result.AddRange(source.Where(r => Type(r) == "DETAIL" && Sec(r) == section));
+                foreach (var st in source.Where(r => Type(r) == "SUBTOTAL" && Sec(r) == section))
+                {
+                    st[iDesc] = "TOTAL " + heading;
+                    result.Add(st);
+                }
+            }
+            object[] GrandTotal(string label) => source.FirstOrDefault(r => Type(r).StartsWith("GRANDTOTAL") && Desc(r) == label);
+
+            result.Add(NewRow("HEADING", "1-Current Assets", "ASSETS", null));
+            Section("1-Current Assets", "CURRENT ASSETS");
+            Section("2-Non-Current Assets", "NON-CURRENT ASSETS");
+            var totalAssets = GrandTotal("TOTAL ASSETS");
+            if (totalAssets != null) result.Add(totalAssets);
+
+            result.Add(NewRow("HEADING", "3-Current Liabilities", "LIABILITIES AND EQUITY", null));
+            result.Add(NewRow("HEADER", "3-Current Liabilities", "LIABILITIES", null));
+            Section("3-Current Liabilities", "CURRENT LIABILITIES");
+            Section("4-Non-Current Liabilities", "NON-CURRENT LIABILITIES");
+            result.Add(NewRow("SUBTOTAL", "4-Non-Current Liabilities", "TOTAL LIABILITIES",
+                SubtotalOf("3-Current Liabilities") + SubtotalOf("4-Non-Current Liabilities")));
+            Section("5-Equity", "EQUITY");
+            var totalLE = GrandTotal("TOTAL LIABILITIES & EQUITY");
+            if (totalLE != null) result.Add(totalLE);
+
+            // anything not placed above (e.g. the DIFFERENCE row, or a row a future proc version adds) goes last,
+            // in the proc's order, so nothing is ever dropped
+            foreach (var r in source)
+                if (!result.Contains(r)) result.Add(r);
+
+            t.Rows.Clear();
+            foreach (var r in result) t.Rows.Add(r);
+        }
 
         // ═══════════════════════════════════════════════════════════════
         // COSMETIC FORMATTING — applied to every report uniformly, since
@@ -863,7 +1283,7 @@ namespace SalesInventorySystem.HOFormsDevEx
                 string rt = rowTypeVal.ToString().ToUpperInvariant();
                 isStructuralRow = rt == "OPENING" || rt == "HEADER" || rt == "PERIOD" || rt == "ENDING" || rt == "SUBTOTAL"
                     || rt == "SECTION_SUBTOTAL" || rt == "SUBSECTION_SUBTOTAL";
-                isGrandTotalRow = rt == "GRANDTOTAL" || rt == "GRANDTOTAL_DIFF";
+                isGrandTotalRow = rt == "GRANDTOTAL" || rt == "GRANDTOTAL_DIFF" || rt == "HEADING";   // HEADING: Balance Sheet ASSETS / LIABILITIES AND EQUITY
                 isGrandTotalDiffRow = rt == "GRANDTOTAL_DIFF";
             }
             else
@@ -993,6 +1413,22 @@ namespace SalesInventorySystem.HOFormsDevEx
             {
                 if (sfd.ShowDialog() != DialogResult.OK) return;
 
+                // Bank Reconciliation -> Excel: the accountants' workbook (report + GL Movement sheet), the same
+                // file Bank Recon › Export writes. PDF prints the grid, which shows the same layout.
+                if (_accountRecon != null && sfd.FileName.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase))
+                {
+                    try
+                    {
+                        _accountRecon.WriteXlsx(sfd.FileName);
+                        XtraMessageBox.Show("Exported successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        XtraMessageBox.Show($"Export failed: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    return;
+                }
+
                 // Pivot -> Excel: data-aware export, so the header row and
                 // AccountCode/AccountDescription (pinned left in BindResults) come out as
                 // frozen panes. The print-layout path below can't freeze anything.
@@ -1095,7 +1531,7 @@ namespace SalesInventorySystem.HOFormsDevEx
                 if (e.RowHandle < 0 || gridViewReport.Columns["RowType"] == null) return;
 
                 string rt = gridViewReport.GetRowCellValue(e.RowHandle, "RowType")?.ToString().ToUpperInvariant() ?? "";
-                bool isGrandTotal = rt == "GRANDTOTAL" || rt == "GRANDTOTAL_DIFF";
+                bool isGrandTotal = rt == "GRANDTOTAL" || rt == "GRANDTOTAL_DIFF" || rt == "HEADING";
                 bool isStructural = rt == "SUBTOTAL" || rt == "SECTION_SUBTOTAL" || rt == "SUBSECTION_SUBTOTAL"
                                  || rt == "HEADER" || rt == "OPENING" || rt == "PERIOD" || rt == "ENDING";
                 if (!isGrandTotal && !isStructural) return;
