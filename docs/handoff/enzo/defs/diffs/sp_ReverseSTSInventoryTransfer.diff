@@ -1,0 +1,243 @@
+--- enzo/sp_ReverseSTSInventoryTransfer.sql	2026-10-15 23:07:08.750990300 +0800
++++ prod/sp_ReverseSTSInventoryTransfer.sql	2026-10-15 23:07:13.462236400 +0800
+@@ -12,171 +10,111 @@
+     @parmdevseqno    INT,
+     @parmbarcode     VARCHAR(100) = NULL
+ AS
++/*
++    JFC: every line, barcode-scanned or not, is restored lot by lot through
++    sp_CancelDeliveryFIFOJFC (the barcode path used to reset a lot to its full
++    original quantity), then spu_STS_SyncInTransit reverses exactly that cost
++    from In Transit when the transfer was already saved.
++    Other companies: unchanged (barcode / plain cancel + ITR from the corrected lots).
++    Callers: AddBranchOrderSTS, ReceivedSTSBatchMode(FIFO), Reporting/StocksOrder,
++    DispatchPerBarcode. Same parameters as before.
++*/
+ BEGIN
+-    SET XACT_ABORT OFF;
+-    -- XACT_ABORT OFF -- sp_CancelDelivery/sp_CancelDeliveryFIFOJFC/
+-    -- sp_CancelDeliveryByBarcode and sp_PostCompoundTicket are called inside
+-    -- this transaction; rollback is managed explicitly in CATCH (same
+-    -- nested-SP rationale documented in sp_ConfirmOrder / sp_CreditMemo /
+-    -- sp_ReturnSalesOrder).
++    SET XACT_ABORT OFF;   -- rollback is managed explicitly in CATCH (nested cancel / posting procs)
+     SET NOCOUNT ON;
+-
+     BEGIN TRY
+         BEGIN TRANSACTION;
+ 
+-        -- ── Snapshot which FIFO layers are still un-corrected BEFORE the
+-        --    refund, in the same scope sp_CancelDelivery itself uses.
+-        --    Keyed on SequenceNumber (the real identity column) -- NOT
+-        --    SequenceReferenceNumber, which is just a FK to the underlying
+-        --    Inventory layer and can repeat across many unrelated
+-        --    deliveries/products that drew from the same layer. ──
+-        SELECT SequenceNumber
+-        INTO #BeforeSnapshot
+-        FROM InventoryDeliveryFIFO
+-        WHERE DeliveryNo = @parmdevno
+-          AND PONumber = @parmpono
+-          AND BranchCode = @parmbranchcode
+-          AND ProductNo = @parmprodno
+-          AND isErrorCorrect = 0;
+-
+-        -- ── Delegate the actual inventory refund + DeliveryDetails cleanup
+-        --    to the existing, already-correct cancel SPs -- no logic
+-        --    duplicated here, including FIFO-vs-scan-vs-barcode handling ──
++        -- same per-PO lock as Save / receive / spu_STS_SyncInTransit
++        DECLARE @LockRes NVARCHAR(255) = N'STSTRANSIT:' + @parmpono, @Lock INT;
++        EXEC @Lock = sp_getapplock @Resource = @LockRes, @LockMode = 'Exclusive', @LockOwner = 'Transaction', @LockTimeout = 15000;
++        IF @Lock < 0
++            THROW 59606, 'Another save, return or receive for this transfer is in progress. Please try again.', 1;
++
++        IF EXISTS (SELECT 1 FROM DeliverySummary WHERE DeliveryNo = @parmdevno AND PONumber = @parmpono AND Status = 'DELIVERED')
++            THROW 58163, 'This transfer has already been received by the branch; a line can no longer be returned here.', 1;
++
+         DECLARE @companyname VARCHAR(50);
+         SELECT TOP 1 @companyname = CompanyName FROM CompanyProfile;
+ 
+-        IF @parmbarcode IS NOT NULL AND LEN(@parmbarcode) > 0
+-        BEGIN
+-            EXEC dbo.sp_CancelDeliveryByBarcode
+-                @parmbranchcode = @parmbranchcode, @parmorigin = @parmorigin,
+-                @parmdevno = @parmdevno, @parmrefno = @parmrefno, @parmpono = @parmpono,
+-                @parmbarcode = @parmbarcode, @preparedby = @preparedby;
+-        END
+-        ELSE IF @companyname = 'JFC'
++        IF @companyname = 'JFC'
+         BEGIN
+             EXEC dbo.sp_CancelDeliveryFIFOJFC
+                 @parmdevno = @parmdevno, @parmrefno = @parmrefno, @parmpono = @parmpono,
+                 @parmprodno = @parmprodno, @parmqty = @parmqty, @parmbranchcode = @parmbranchcode,
+                 @parmorigin = @parmorigin, @preparedby = @preparedby, @parmdevseqno = @parmdevseqno;
++
++            DECLARE @Today DATE = CAST(GETDATE() AS DATE);
++            IF EXISTS (SELECT 1 FROM TransferOrderSummary WHERE PONumber = @parmpono AND ISNULL(isProcess, 0) = 1)
++                EXEC dbo.spu_STS_SyncInTransit
++                    @PONumber = @parmpono, @DeliveryNo = @parmdevno, @DestBranch = @parmbranchcode,
++                    @User = @preparedby, @TicketDate = @Today;
+         END
+         ELSE
+         BEGIN
++            SELECT SequenceNumber INTO #BeforeSnapshot
++            FROM InventoryDeliveryFIFO
++            WHERE DeliveryNo = @parmdevno AND PONumber = @parmpono AND BranchCode = @parmbranchcode
++              AND ProductNo = @parmprodno AND isErrorCorrect = 0;
++
++            IF @parmbarcode IS NOT NULL AND LEN(@parmbarcode) > 0
++                EXEC dbo.sp_CancelDeliveryByBarcode
++                    @parmbranchcode = @parmbranchcode, @parmorigin = @parmorigin,
++                    @parmdevno = @parmdevno, @parmrefno = @parmrefno, @parmpono = @parmpono,
++                    @parmbarcode = @parmbarcode, @preparedby = @preparedby;
++            ELSE
+             EXEC dbo.sp_CancelDelivery
+                 @parmdevno = @parmdevno, @parmrefno = @parmrefno, @parmpono = @parmpono,
+                 @parmprodno = @parmprodno, @parmqty = @parmqty, @parmbranchcode = @parmbranchcode,
+                 @parmorigin = @parmorigin, @preparedby = @preparedby, @parmdevseqno = @parmdevseqno;
+-        END
+ 
+-        -- ── Delta: exactly which layers THIS call just flipped to corrected.
+-        --    Works whether the underlying SP refunded one scan (non-FIFO) or
+-        --    every not-yet-corrected layer for this product/delivery (FIFO). ──
+-        SELECT f.SequenceNumber, f.TotalCost, f.isVat
+-        INTO #JustCorrected
+-        FROM InventoryDeliveryFIFO f
+-        INNER JOIN #BeforeSnapshot b ON f.SequenceNumber = b.SequenceNumber
++            SELECT f.SequenceNumber, f.TotalCost, f.isVat INTO #JustCorrected
++            FROM InventoryDeliveryFIFO f INNER JOIN #BeforeSnapshot b ON f.SequenceNumber = b.SequenceNumber
+         WHERE f.isErrorCorrect = 1;
+ 
+-        DECLARE @wasProcessed BIT;
+-        SELECT @wasProcessed = isProcess FROM TransferOrderSummary WHERE PONumber = @parmpono;
+-
+-        IF ISNULL(@wasProcessed, 0) = 1 AND EXISTS (SELECT 1 FROM #JustCorrected)
++            IF EXISTS (SELECT 1 FROM TransferOrderSummary WHERE PONumber = @parmpono AND ISNULL(isProcess, 0) = 1)
++               AND EXISTS (SELECT 1 FROM #JustCorrected)
+         BEGIN
+-            DECLARE @totalcostvat MONEY, @totalcostvatex MONEY, @effectivitydate DATE;
+-
+-            SELECT
+-                @totalcostvat   = ISNULL(SUM(CASE WHEN isVat = 1 THEN TotalCost ELSE 0 END), 0),
++                DECLARE @totalcostvat MONEY, @totalcostvatex MONEY, @effectivitydate DATE, @outrefnum VARCHAR(10), @Particulars VARCHAR(400);
++                SELECT @totalcostvat   = ISNULL(SUM(CASE WHEN isVat = 1 THEN TotalCost ELSE 0 END), 0),
+                 @totalcostvatex = ISNULL(SUM(CASE WHEN isVat = 0 THEN TotalCost ELSE 0 END), 0)
+             FROM #JustCorrected;
+-
+             SELECT TOP 1 @effectivitydate = EffectivityDate FROM TransferOrderSummary WHERE PONumber = @parmpono;
+             SET @effectivitydate = ISNULL(@effectivitydate, CAST(GETDATE() AS DATE));
+-
+-            DECLARE @outrefnum VARCHAR(10), @Particulars VARCHAR(400);
+             EXEC GetReferenceNumber @outrefnum OUTPUT;
+-
+-            --IF @totalcostvat > 0
+-            --BEGIN
+-            --    DECLARE @AmtsVAT dbo.tt_AmountBreakdown, @TokVAT dbo.tt_TokenResolution, @FlgVAT dbo.tt_ConditionFlags;
+-            --    INSERT @AmtsVAT VALUES ('GROSS', @totalcostvat);
+-            --    SET @Particulars = 'Inventory Transfer RETURN - PO#' + @parmpono + ' (from Branch ' + @parmbranchcode + ') - VATable';
+-
+-            --    EXEC [dbo].[sp_PostCompoundTicket]
+-            --        @Mnemonic        = 'ITR-HO-VAT',
+-            --        @TicketDate      = @effectivitydate,
+-            --        @BranchCode      = '888',
+-            --        @ReferenceNumber = @outrefnum,
+-            --        @ReferenceKey    = @parmpono,
+-            --        @Particulars     = @Particulars,
+-            --        @Owner           = 'CS IN TRANSIT',
+-            --        @PreparedBy      = @preparedby,
+-            --        @Amounts         = @AmtsVAT,
+-            --        @Tokens          = @TokVAT,
+-            --        @Flags           = @FlgVAT,
+-            --        @LedgerType      = NULL,
+-            --        @LedgerEntityID  = NULL,
+-            --        @LedgerInvoiceNo = NULL,
+-            --        @LedgerBatchRef  = @parmpono,
+-            --        @LedgerSeqRef    = 1;
+-            --END
+-
+-            --IF @totalcostvatex > 0
+-            --BEGIN
+-            --    DECLARE @AmtsVE dbo.tt_AmountBreakdown, @TokVE dbo.tt_TokenResolution, @FlgVE dbo.tt_ConditionFlags;
+-            --    INSERT @AmtsVE VALUES ('GROSS', @totalcostvatex);
+-            --    SET @Particulars = 'Inventory Transfer RETURN - PO#' + @parmpono + ' (from Branch ' + @parmbranchcode + ') - VAT Exempt';
+-
+-            --    EXEC [dbo].[sp_PostCompoundTicket]
+-            --        @Mnemonic        = 'ITR-HO-VATEX',
+-            --        @TicketDate      = @effectivitydate,
+-            --        @BranchCode      = '888',
+-            --        @ReferenceNumber = @outrefnum,
+-            --        @ReferenceKey    = @parmpono,
+-            --        @Particulars     = @Particulars,
+-            --        @Owner           = 'CS IN TRANSIT',
+-            --        @PreparedBy      = @preparedby,
+-            --        @Amounts         = @AmtsVE,
+-            --        @Tokens          = @TokVE,
+-            --        @Flags           = @FlgVE,
+-            --        @LedgerType      = NULL,
+-            --        @LedgerEntityID  = NULL,
+-            --        @LedgerInvoiceNo = NULL,
+-            --        @LedgerBatchRef  = @parmpono,
+-            --        @LedgerSeqRef    = 2;
+-            --END
+-        END
+-
+-        -- ── NEW: correct the header status once nothing is left to
+-        --    deliver/return for this dispatch. Idempotent (WHERE Status <>
+-        --    'RETURNED'); fires regardless of whether the dispatch was ever
+-        --    confirmed (PENDING) or already FOR DELIVERY, matching the
+-        --    explicit ask: "if there are no more items it should be
+-        --    returned status." ──
+-        IF NOT EXISTS (
+-            SELECT 1 FROM DeliveryDetails
+-            WHERE DeliveryNo = @parmdevno AND PONumber = @parmpono
+-              AND isReturned = 0 AND isCancelled = 0
+-        )
++                DECLARE @AmtsVAT dbo.tt_AmountBreakdown, @TokVAT dbo.tt_TokenResolution, @FlgVAT dbo.tt_ConditionFlags;
++                DECLARE @AmtsVE dbo.tt_AmountBreakdown, @TokVE dbo.tt_TokenResolution, @FlgVE dbo.tt_ConditionFlags;
++                IF @totalcostvat > 0
+         BEGIN
+-           UPDATE DeliverySummary
+-            SET Status = case when status = 'DELIVERED' then 'RETURNED'
+-			else Status end
+-            WHERE DeliveryNo = @parmdevno AND PONumber = @parmpono
++                    INSERT @AmtsVAT VALUES ('GROSS', @totalcostvat);
++                    SET @Particulars = 'Inventory Transfer RETURN - PO#' + @parmpono + ' (from Branch ' + @parmbranchcode + ') - VATable';
++                    EXEC [dbo].[sp_PostCompoundTicket] @Mnemonic = 'ITR-HO-VAT', @TicketDate = @effectivitydate, @BranchCode = '888',
++                        @ReferenceNumber = @outrefnum, @ReferenceKey = @parmpono, @Particulars = @Particulars, @Owner = 'CS IN TRANSIT',
++                        @PreparedBy = @preparedby, @Amounts = @AmtsVAT, @Tokens = @TokVAT, @Flags = @FlgVAT,
++                        @LedgerType = NULL, @LedgerEntityID = NULL, @LedgerInvoiceNo = NULL, @LedgerBatchRef = @parmpono, @LedgerSeqRef = 1;
++                END
++                IF @totalcostvatex > 0
++                BEGIN
++                    INSERT @AmtsVE VALUES ('GROSS', @totalcostvatex);
++                    SET @Particulars = 'Inventory Transfer RETURN - PO#' + @parmpono + ' (from Branch ' + @parmbranchcode + ') - VAT Exempt';
++                    EXEC [dbo].[sp_PostCompoundTicket] @Mnemonic = 'ITR-HO-VATEX', @TicketDate = @effectivitydate, @BranchCode = '888',
++                        @ReferenceNumber = @outrefnum, @ReferenceKey = @parmpono, @Particulars = @Particulars, @Owner = 'CS IN TRANSIT',
++                        @PreparedBy = @preparedby, @Amounts = @AmtsVE, @Tokens = @TokVE, @Flags = @FlgVE,
++                        @LedgerType = NULL, @LedgerEntityID = NULL, @LedgerInvoiceNo = NULL, @LedgerBatchRef = @parmpono, @LedgerSeqRef = 2;
++                END
++            END
+         END
+ 
+-        DROP TABLE IF EXISTS #BeforeSnapshot;
+-        DROP TABLE IF EXISTS #JustCorrected;
++        IF NOT EXISTS (SELECT 1 FROM DeliveryDetails
++                       WHERE DeliveryNo = @parmdevno AND PONumber = @parmpono AND isReturned = 0 AND isCancelled = 0)
++            UPDATE DeliverySummary
++            SET Status = CASE WHEN Status = 'FOR DELIVERY' THEN 'FOR DELIVERY' ELSE 'PENDING' END
++            WHERE DeliveryNo = @parmdevno AND PONumber = @parmpono AND Status <> 'RETURNED';
+ 
+         COMMIT TRANSACTION;
+     END TRY
+     BEGIN CATCH
+-        IF XACT_STATE() <> 0
+-            ROLLBACK TRANSACTION;
+-        DROP TABLE IF EXISTS #BeforeSnapshot;
+-        DROP TABLE IF EXISTS #JustCorrected;
+-
+-        -- Bare THROW (not RAISERROR) preserves the original error number --
+-        -- callers distinguishing failure reasons (e.g. this proc's own
+-        -- callers, or future ones) get the real error, not a generic 50000.
++        IF XACT_STATE() <> 0 ROLLBACK TRANSACTION;
+         THROW;
+     END CATCH
+ END

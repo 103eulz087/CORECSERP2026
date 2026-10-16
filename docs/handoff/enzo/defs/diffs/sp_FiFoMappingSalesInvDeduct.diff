@@ -1,0 +1,28 @@
+--- enzo/sp_FiFoMappingSalesInvDeduct.sql	2026-10-15 23:07:09.075861600 +0800
++++ prod/sp_FiFoMappingSalesInvDeduct.sql	2026-10-15 23:07:13.855278000 +0800
+@@ -133,22 +133,13 @@
+         IF (@parmoption = '2')
+         BEGIN
+             UPDATE POS
+-            SET POS.isUpload = 1
+-              --  POS.Cost = S.TotalCost--(S.TotalCost / NULLIF(S.TotalQty, 0)) -- FIXED: Prevent divide by zero crash
++            SET POS.isUpload = 1,
++                POS.Cost = (S.TotalCost / NULLIF(S.TotalQty, 0)) -- FIXED: Prevent divide by zero crash
+             FROM POSSalesSummary POS
+             INNER JOIN (
+-                SELECT SeqNo
++                SELECT SeqNo, SUM(TempCost) AS TotalCost, SUM(QtySold) AS TotalQty
+                 FROM #SalesSummary GROUP BY SeqNo
+             ) S ON POS.SalesID = S.SeqNo;
+-
+-            
+-            update a SET a.Cost=isnull(b.Cost,0),a.isUpload=1
+-            from dbo.POSSalesSummary a
+-            inner join dbo.InventoryLedgerDeduct b
+-	            on a.BranchCode=b.Branch
+-	            and a.SalesID=b.SalesID
+-            WHERE a.BranchCode=@parmbranchcode
+-            and a.DateOrder=@parmtransdate
+         END;
+ 
+         UPDATE ReInventoryMonitoring 

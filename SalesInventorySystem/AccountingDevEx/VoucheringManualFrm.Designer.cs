@@ -53,6 +53,8 @@
         private DevExpress.XtraEditors.MemoEdit txtRemarks;
         private DevExpress.XtraEditors.SimpleButton btnLoadInvoices;
         private DevExpress.XtraEditors.LabelControl lblCreditGLCode;
+        private DevExpress.XtraEditors.LabelControl lblAmountCaption;
+        private System.Windows.Forms.Label lblAmountToApply;
         private DevExpress.XtraEditors.SearchLookUpEdit cboCreditGLCode;
         private DevExpress.XtraGrid.Views.Grid.GridView gridViewCreditGLPopup;
 
@@ -108,6 +110,8 @@
             this.txtRemarks = new DevExpress.XtraEditors.MemoEdit();
             this.btnLoadInvoices = new DevExpress.XtraEditors.SimpleButton();
             this.lblCreditGLCode = new DevExpress.XtraEditors.LabelControl();
+            this.lblAmountCaption = new DevExpress.XtraEditors.LabelControl();
+            this.lblAmountToApply = new System.Windows.Forms.Label();
             this.cboCreditGLCode = new DevExpress.XtraEditors.SearchLookUpEdit();
             this.gridViewCreditGLPopup = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.grpInvoices = new DevExpress.XtraEditors.GroupControl();
@@ -224,6 +228,8 @@
             this.grpHeader.Controls.Add(this.btnLoadInvoices);
             this.grpHeader.Controls.Add(this.lblCreditGLCode);
             this.grpHeader.Controls.Add(this.cboCreditGLCode);
+            this.grpHeader.Controls.Add(this.lblAmountCaption);
+            this.grpHeader.Controls.Add(this.lblAmountToApply);
             this.grpHeader.Dock = System.Windows.Forms.DockStyle.Top;
             this.grpHeader.Location = new System.Drawing.Point(0, 0);
             this.grpHeader.Name = "grpHeader";
@@ -424,6 +430,26 @@
             this.lblCreditGLCode.Size = new System.Drawing.Size(86, 16);
             this.lblCreditGLCode.TabIndex = 20;
             this.lblCreditGLCode.Text = "Credit GLCode:";
+            //
+            // lblAmountCaption
+            //
+            this.lblAmountCaption.Location = new System.Drawing.Point(668, 132);
+            this.lblAmountCaption.Name = "lblAmountCaption";
+            this.lblAmountCaption.Size = new System.Drawing.Size(49, 16);
+            this.lblAmountCaption.TabIndex = 23;
+            this.lblAmountCaption.Text = "Amount:";
+            //
+            // lblAmountToApply
+            //
+            this.lblAmountToApply.AutoSize = true;
+            this.lblAmountToApply.Font = new System.Drawing.Font("Tahoma", 11F, System.Drawing.FontStyle.Bold);
+            this.lblAmountToApply.ForeColor = System.Drawing.Color.Red;
+            this.lblAmountToApply.Location = new System.Drawing.Point(764, 128);
+            this.lblAmountToApply.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.lblAmountToApply.Name = "lblAmountToApply";
+            this.lblAmountToApply.Size = new System.Drawing.Size(52, 23);
+            this.lblAmountToApply.TabIndex = 24;
+            this.lblAmountToApply.Text = "0.00";
             // 
             // cboCreditGLCode
             // 

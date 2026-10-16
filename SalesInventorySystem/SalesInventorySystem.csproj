@@ -326,6 +326,12 @@
     <Compile Include="AccountingDevEx\LoanRevaluationFrm.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="AccountingDevEx\AccountingRegistersFrm.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="HOFormsDevEx\AccountOfficersDevEx.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="AccountingDevEx\GLPeriodClosingFrm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -754,6 +760,7 @@
     <Compile Include="Classes\EmailSetup.cs" />
     <Compile Include="Classes\FileObject.cs" />
     <Compile Include="Classes\GlobalCache.cs" />
+    <Compile Include="Classes\StartupSplash.cs" />
     <Compile Include="Classes\GlobalVariables.cs" />
     <Compile Include="Classes\HelperFunction.cs" />
     <Compile Include="Classes\IDGenerator.cs" />

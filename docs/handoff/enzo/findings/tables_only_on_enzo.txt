@@ -1,0 +1,14 @@
+BranchInventoryIN
+BranchInventoryIN010Copy
+CTE2Duplicate
+ConversionDetails_07072026
+CreditMemoBackup_08252026
+Inventory010_07302026
+InventoryINMonthEnd_07312026
+InventoryIN_04302026
+InventoryWith_INVIN_REFCODE_04302026
+ProductCategory_OLD06262026
+Products_OLD_06262026
+ReceiveCategoryMasterBAK
+SalesBatchAnalysis
+SalesManagement

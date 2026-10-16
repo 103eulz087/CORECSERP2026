@@ -1,0 +1,228 @@
+--- enzo/sp_FiFoMappingHRI.sql	2026-10-15 23:07:08.336654600 +0800
++++ prod_jfc/sp_FiFoMappingHRI_JFC.sql	2026-10-15 23:14:28.268652000 +0800
+@@ -1,118 +1,122 @@
+-
+-CREATE PROCEDURE [dbo].[sp_FiFoMappingHRI]  
+-	@parmtransdate date,
+-	@parmorigin char(3),
+-	@parmbranchcode char(3),
+-	@parmprodcode char(5),
+-	@parmqty decimal(18,3),
+-	@parmdevno varchar(10),
+-	@parmpono varchar(10),
+-	@parmdevdetseqno int
++CREATE PROCEDURE [dbo].[sp_FiFoMappingHRI_JFC]  --CREATE  exec sp_FiFoMappingSTS '5/3/2025','888','005','12931',10,'576700','450338'
++	@parmtransdate date
++	,@parmorigin char(3)
++	,@parmbranchcode char(3)
++	,@parmprodcode char(5)
++	,@parmshipmentno varchar(10)
++	,@parmqty float
++	,@parmsellingprice decimal(12,2)
++	,@parmdevno varchar(10)
++	,@parmpono varchar(10)
++	,@parmdevseqno int = 0
+ AS
+ BEGIN
+-	SET NOCOUNT ON; 
+-
+-	-- Safely handle nested transactions! 
+-	-- If the parent SP already started a transaction, we don't want to break it.
+-	DECLARE @TranCounter INT = @@TRANCOUNT;
+-	IF @TranCounter > 0
+-		SAVE TRANSACTION ProcedureSave;
+-	ELSE
+-		BEGIN TRANSACTION;
+-
+-	BEGIN TRY
++	-- example
++	--exec sp_FiFoMapping '01/31/2020','001','','','2';  for All
++	--exec.sp_FiFo5 '','001','00008','10','1';  for Single Product
++
++	-- SET NOCOUNT ON added to prevent extra result sets from
++	-- interfering with SELECT statements.
++	SET NOCOUNT OFF;
++	BEGIN TRAN
+ 		----------------------------------------------------
+-		DECLARE @SeqNo bigint = NULL;
+-		DECLARE @ChildProduct char(5);
+-		DECLARE @RunningQtySold decimal(18,3);
+-		DECLARE @TotalCost decimal(18,3);
+-		DECLARE @sprice decimal(18,2);
++	DECLARE @SeqNo bigint=null, @Branch char(3), @DateOrder date, @ParentProduct char(5), @ChildProduct char(5), @QtyBase float, @QtySold float, @ChildStatus int;
++	DECLARE @TotalCost float, @RunningQtySold float, @TotalCostOverQtySold float;
++	DECLARE @iSeqNo bigint, @iQty float, @iAvailable float, @iCost float;
++	DECLARE @I int, @rowno int, @rownoStart int, @productcnt int; -- this is for LOOP
++	-- START --------------------------------------------------
+ 		
+-		-- 1. Create a clean table variable to hold the items to deduct
+ 		DECLARE @tblSalesSummary TABLE(
+-			rowno int identity(1,1),
++		rowno int identity,
++		SeqNo bigint NULL,
++		Branch [char](3) NULL,
++		ShipmentNo [varchar](10) NULL,
++		DateOrder [date] NULL,
++		--
++		ParentProduct [char](5) NULL,
+ 			ChildProduct [char](5) NULL,
+-			QtyToDeduct [decimal](18,3) NULL,
+-			TempCost [decimal](18,3) NULL
++		QtyBase [float] NULL,
++		QtySold [float] NULL,
++		TempCost [float] NULL,
++		-- Only for temporary
++		--HasChild [int] NULL,
++		IsTemp [int] NULL
+ 		);
+ 	
+-		-- =========================================================================
+-		-- 2. THE BOM EXPANSION (Fast IF/ELSE replaces the messy CTE)
+-		-- =========================================================================
+-		IF EXISTS (SELECT 1 FROM InventoryMapping WITH(NOLOCK) WHERE ParentProductCode = @parmprodcode)
++
++	INSERT INTO @tblSalesSummary(SeqNo,  Branch,ShipmentNo ,ParentProduct, QtySold, IsTemp)
++	SELECT 0, @parmbranchcode,@parmshipmentno, @parmprodcode, @parmqty, 1;
++
++	SET @rownoStart=(@@ROWCOUNT + 1); -- Get Rows
++
++	;WITH cte AS(
++		SELECT ss.*, IIF(im.min IS NULL, 0, 1) haschild
++		FROM @tblSalesSummary ss
++		LEFT JOIN(
++			SELECT ParentProductCode, MIN(ChildProductCode) min
++			FROM InventoryMapping im with(nolock)
++			WHERE ParentProductCode IS NOT NULL
++			GROUP BY ParentProductCode
++		) im ON im.ParentProductCode=ss.ParentProduct
++	)
++
++	INSERT INTO @tblSalesSummary
++	(SeqNo, Branch,  DateOrder, ParentProduct, ChildProduct, QtyBase, QtySold)
++	SELECT * FROM (
++					SELECT SeqNo, Branch, DateOrder, ParentProduct, null as ChildProduct, null as QtyBase, QtySold as QtySold
++					FROM cte WHERE haschild=0
++					UNION ALL
++					SELECT ss.SeqNo, ss.Branch, ss.DateOrder, ss.ParentProduct, im.ChildProductCode, im.Quantity, ss.QtySold as QtySold
++					FROM InventoryMapping im
++					LEFT JOIN (SELECT * FROM cte  with(nolock) WHERE haschild=1) ss
++					ON ss.ParentProduct=im.ParentProductCode
++					WHERE (im.ParentProductCode IS NOT NULL AND ss.SeqNo IS NOT NULL)
++	)r ORDER BY SeqNo
++
++	DELETE FROM @tblSalesSummary WHERE ISNULL(IsTemp,0)=1
++
++	--DECLARE @sprice decimal(10,2)
++	DECLARE @LastSeqNo bigint = null;
++	SET @rowno=0; SET @I=@rownoStart;
++	SET @productcnt=0; SET @ChildStatus=0;
++	WHILE (@rowno IS NOT NULL)
+ 		BEGIN
+-			-- It's a Combo Meal! Insert all the child ingredients.
+-			INSERT INTO @tblSalesSummary (ChildProduct, QtyToDeduct)
+-			SELECT 
+-				ChildProductCode, 
+-				(Quantity * @parmqty) -- Multiply the recipe amount by the quantity ordered
+-			FROM InventoryMapping WITH(NOLOCK)
+-			WHERE ParentProductCode = @parmprodcode;
+-		END
+-		ELSE
++		SET @TotalCost = 0.00;
++		IF(ISNULL(@rowno,0)<>0 AND @ChildStatus=0)
+ 		BEGIN
+-			-- It's just a normal single product! Insert it as-is.
+-			INSERT INTO @tblSalesSummary (ChildProduct, QtyToDeduct)
+-			VALUES (@parmprodcode, @parmqty);
+-		END
+-	
+-		-- =========================================================================
+-		-- 3. THE CLEAN WHILE LOOP
+-		-- =========================================================================
+-		DECLARE @MinID INT = 1, @MaxID INT;
+-		SELECT @MaxID = MAX(rowno) FROM @tblSalesSummary;
++			DECLARE @ProductDescription varchar(max), @Unit varchar(255);
++			SET @RunningQtySold = (IIF(@ChildProduct IS NULL, 1, @QtyBase) * @QtySold); -- @QtySold;
++			SET @ChildProduct=ISNULL(@ChildProduct, @ParentProduct);
++			--select TOP 1 @sprice=SellingPrice FROM Products  with(nolock) WHERE BranchCode=@Branch and ProductCode=@ChildProduct
++			exec dbo.sp_SalesQtyToInventoryQtyHRI_JFC @SeqNo, @parmorigin,@parmbranchcode,@parmshipmentno, @ChildProduct, @RunningQtySold,@parmsellingprice,@parmdevno,@parmpono, @TotalCost output, @parmDevDetSeqNo=@parmdevseqno;
++
++			SET @LastSeqNo=@SeqNo; SET @productcnt+=1;
++			-- update temp cost
++			UPDATE TOP(1) @tblSalesSummary
++			SET TempCost=@TotalCost
++			WHERE(rowno=@rowno);
++		END;
+ 		
+-		WHILE @MinID <= @MaxID
++		SET @rowno=null; SET @SeqNo=null;  -- use to break a loop;
++		SELECT TOP(1) @rowno=rowno --loop
++			,@SeqNo=SeqNo
++			,@Branch=Branch
++			,@DateOrder=DateOrder
++			,@ParentProduct=ParentProduct
++			,@ChildProduct=ChildProduct
++			,@QtyBase=ISNULL(QtyBase, 0)
++			,@QtySold=ISNULL(QtySold, 0)
++		FROM @tblSalesSummary WHERE(rowno=@I); --loop
++		IF(ISNULL(@LastSeqNo, @SeqNo)<>ISNULL(@SeqNo, 0))
+ 		BEGIN
+-			-- Grab the current item from our list
+-			SELECT 
+-				@ChildProduct = ChildProduct,
+-				@RunningQtySold = QtyToDeduct
+-			FROM @tblSalesSummary 
+-			WHERE rowno = @MinID;
+-				
+-			-- Get the selling price
+-			SELECT TOP 1 @sprice = ISNULL(SellingPrice, 0) 
+-			FROM Products WITH(NOLOCK) 
+-			WHERE BranchCode = @parmbranchcode AND ProductCode = @ChildProduct;
+-				
+-			-- Execute the actual FIFO Deduction for this specific child product
+-			EXEC dbo.sp_SalesQtyToInventoryQtyHRI
+-				@SeqNo OUTPUT, 
+-				@parmorigin, 
+-				@parmbranchcode, 
+-				@ChildProduct, 
+-				@RunningQtySold, 
+-				@sprice, 
+-				@parmdevno, 
+-				@parmpono, 
+-				@parmdevdetseqno,
+-				@TotalCost OUTPUT;
++			-- SET Special
++			SET @productcnt=0;
++		END;
++		IF(@rowno IS NULL)BREAK;-- break loop
++		SET @I+=1; -- Use for Increment Row of @tblSalesSummary
++	END;
+ 				
+-			-- Save the cost back to the temp table (if needed later)
+-			UPDATE @tblSalesSummary 
+-			SET TempCost = @TotalCost
+-			WHERE rowno = @MinID;
+ 			
+-			-- Move to the next ingredient
+-			SET @MinID += 1; 
+-		END;
++	COMMIT TRAN
+ 		
+-		-- Safely commit ONLY if we started the transaction ourselves
+-		IF @TranCounter = 0
+-			COMMIT TRANSACTION;
+-			
+-	END TRY
+-	BEGIN CATCH
+-		-- Safely rollback without crashing the parent SP!
+-		IF @TranCounter = 0
+-			ROLLBACK TRANSACTION;
+-		ELSE
+-			IF XACT_STATE() <> -1
+-				ROLLBACK TRANSACTION ProcedureSave;
+-			
+-		-- Bubble the error up to the parent procedure
+-		DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
+-		RAISERROR (@ErrorMessage, 16, 1);
+-	END CATCH
+ END;
+\ No newline at end of file

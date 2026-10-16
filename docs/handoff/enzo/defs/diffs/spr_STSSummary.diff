@@ -1,0 +1,36 @@
+--- enzo/spr_STSSummary.sql	2026-10-15 23:07:09.990165000 +0800
++++ prod/spr_STSSummary.sql	2026-10-15 23:07:14.992549400 +0800
+@@ -1,4 +1,32 @@
+- 
++-- =============================================
++-- Author:      Eulz Avancena (original); rewritten 2026-08-11
++-- Description: Feeds StocksOrder.cs (the print/summary shown when
++--              POForApprovalSTS.cs's showSTSDetails() opens a For Delivery
++--              row) -- branches between a genuine STS transfer
++--              (TransferOrderSummary/TransferOrderDetails) and a regular
++--              Products sales order (PurchaseOrderSummary/PurchaseOrderDetails)
++--              depending on which table the PONumber actually belongs to.
++--
++-- CHANGELOG FROM spr_STSSummary (legacy, now spr_STSSummary_OLD_08112026):
++--   [BUG] @isSTS was derived from PurchaseOrderSummary.BranchCode IS NOT NULL
++--   -- but STS transfers are never rows in PurchaseOrderSummary at all (0
++--   overlap between the two tables' PONumbers, verified against real data).
++--   So that SELECT simply never matched a row for a genuine STS PO, leaving
++--   @isSTS at its DECLARE-time default of 0 -- which happened to route into
++--   the TransferOrderSummary branch, but only by accident (the "IF @isSTS=0"
++--   branch used TransferOrderSummary, "ELSE" used PurchaseOrderSummary --
++--   backwards from what the variable name implies, and dependent on a
++--   fallthrough default rather than an actual check).
++--   FIX: @isSTS is now set directly from EXISTS (SELECT 1 FROM
++--   TransferOrderSummary WHERE PONumber=@parmpono) -- the real source of
++--   truth for "is this PO a genuine STS transfer" -- and the branches are
++--   swapped to match (IF @isSTS=1 -> TransferOrderSummary, ELSE ->
++--   PurchaseOrderSummary).
++--   Also dropped: a stale commented-out "Update Dispatch" UPDATE block
++--   (superseded by Dispatch being populated directly from dd.QtyDelivered
++--   when #temptable is filled) and leftover debug-artifact inline comments
++--   with no documentation value.
++-- =============================================
+ CREATE    PROC [dbo].[spr_STSSummary]
+     @parmpono VARCHAR(10)
+ AS

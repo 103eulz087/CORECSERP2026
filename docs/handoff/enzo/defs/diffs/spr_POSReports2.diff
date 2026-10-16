@@ -1,0 +1,747 @@
+--- enzo/spr_POSReports2.sql	2026-10-15 23:07:10.450694800 +0800
++++ prod/spr_POSReports2.sql	2026-10-15 23:07:15.543586400 +0800
+@@ -2,8 +2,8 @@
+ 
+ CREATE PROCEDURE [dbo].[spr_POSReports2]
+     @parmbrcode       varchar(5),
+-    @datefrom         date,
+-    @dateto           date,
++	@datefrom varchar(10),
++	@dateto varchar(10),
+     @parmprocessby    varchar(20),
+     @parmoption       int,
+     @parmpercashier   bit,
+@@ -11,111 +11,638 @@
+     @parmmachinename  varchar(30)
+ AS
+ BEGIN
++	
+     SET NOCOUNT ON;
++	SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
++	if(@parmoption=1)--'GROUPCATEGORY'
++	begin
++	 if(@parmispermachine = 0 AND @parmpercashier = 0) --PER BRANCH ONLY
++	 begin
++		 SELECT Category,SUM(QtySold) AS QtySold,SUM(CAST(TotalAmount as money)) as TotalAmount,isVat
++		 FROM POSSalesSummary2 
++		 WHERE BranchCode=@parmbrcode 
++			 and CAST(DateOrder as date) between @datefrom and @dateto
++		 GROUP BY Category,isVat
+ 
+-    DECLARE @dateToPlus date = DATEADD(day, 1, @dateto);
+--- reusable predicate via inline logic
+-    DECLARE @useMachine bit = @parmispermachine;
+-    DECLARE @useCashier bit = @parmpercashier;
+-	IF (@parmoption = 1)
+-	BEGIN
+-		SELECT
+-			Category,
+-			SUM(QtySold)            AS QtySold,
+-			SUM(TotalAmount)        AS TotalAmount,
+-			isVat
+-		FROM dbo.POSSalesSummary2
+-		WHERE BranchCode = @parmbrcode
+-		  AND DateOrder >= @datefrom
+-		  AND DateOrder <  @dateToPlus
+-		  AND (@useMachine = 0 OR MachineUsed = @parmmachinename)
+-		  AND (@useCashier = 0 OR ProcessedBy = @parmprocessby)
++	 end
++	 else if(@parmispermachine = 1 AND @parmpercashier = 0) --PER BRANCH AND PER MACHINE
++	 begin
++		 SELECT Category,SUM(QtySold) AS QtySold,SUM(CAST(TotalAmount as money)) as TotalAmount,isVat
++		 FROM POSSalesSummary2
++		 WHERE BranchCode=@parmbrcode 
++			 and CAST(DateOrder as date) between @datefrom and @dateto
++			 and MachineUsed=@parmmachinename 
+ 		GROUP BY Category, isVat
+-	END
+-	ELSE IF (@parmoption = 2)
+-	BEGIN
+-		SELECT
+-			isVat,
+-			SUM(TotalAmount) AS TotalAmount
+-		FROM dbo.POSSalesSummary2
+-		WHERE BranchCode = @parmbrcode
+-		  AND DateOrder >= @datefrom
+-		  AND DateOrder <  @dateToPlus
+-		  AND (@useMachine = 0 OR MachineUsed = @parmmachinename)
+-		  AND (@useCashier = 0 OR ProcessedBy = @parmprocessby)
++	 end
++	 else if(@parmispermachine = 1 AND @parmpercashier = 1)  --PER BRANCH, PER MACHINE AND PER CASHIER
++	 begin
++		 SELECT Category,SUM(QtySold) AS QtySold,SUM(CAST(TotalAmount as money)) as TotalAmount,isVat
++		 FROM POSSalesSummary2
++		 WHERE BranchCode=@parmbrcode 
++			 and CAST(DateOrder as date) between @datefrom and @dateto
++			 and MachineUsed=@parmmachinename 
++			 and ProcessedBy=@parmprocessby 
++		 GROUP BY Category,isVat
++	 end
++	 else if(@parmpercashier = 1 AND @parmispermachine = 0)  --WITH CASHIER AND NO PER MACHINE
++	 begin
++		  SELECT Category,SUM(QtySold) AS QtySold,SUM(CAST(TotalAmount as money)) as TotalAmount,isVat
++		 FROM POSSalesSummary2
++		 WHERE BranchCode=@parmbrcode 
++			 and CAST(DateOrder as date) between @datefrom and @dateto
++			 and ProcessedBy=@parmprocessby 
++		 GROUP BY Category,isVat
++	 end
++	 else 
++	 begin
++		SELECT Category,SUM(QtySold) AS TotalKilos,SUM(CAST(TotalAmount as money)) as TotalAmount,isVat
++		 FROM POSSalesSummary
++		 WHERE BranchCode=@parmbrcode 
++			 and CAST(DateOrder as date) between @datefrom and @dateto
++		 GROUP BY Category,isVat
++	 end
++	end
++	else if(@parmoption=2)--'FULLTRANSACTION'
++	begin
++		if(@parmispermachine = 0 AND @parmpercashier = 0) --PER BRANCH ONLY
++		begin
++			SELECT SUM(CAST(TotalAmount as money)) as TotalAmount,isVat
++			 FROM POSSalesSummary2 
++			 WHERE BranchCode=@parmbrcode 
++				 and CAST(DateOrder as date) between @datefrom and @dateto
+ 		GROUP BY isVat
+-	END
+-	ELSE IF (@parmoption = 3)
+-	BEGIN
+-		SELECT
+-			a.ProductCode,
+-			a.Category,
+-			a.Description,
+-			SUM(a.QtySold) AS Qty,
+-			a.Cost,
+-			b.SellingPrice,
+-			SUM(a.QtySold * a.Cost) AS TotalCost,
+-			SUM(a.SubTotal)         AS TotalAmount,
+-			SUM(a.SubTotal) - SUM(a.QtySold * a.Cost) AS Profit,
+-			a.isVat
+-		FROM dbo.POSSalesSummary2 a
+-		INNER JOIN dbo.Products b
++		end
++		else if(@parmispermachine = 1 AND @parmpercashier = 0) --PER BRANCH, PER MACHINE 
++		begin
++			SELECT  SUM(CAST(TotalAmount as money)) as TotalAmount,isVat
++			 FROM POSSalesSummary 
++			 WHERE BranchCode=@parmbrcode 
++				 and CAST(DateOrder as date) between @datefrom and @dateto
++				 and MachineUsed=@parmmachinename 
++			 GROUP BY isVat
++		end
++		else if(@parmispermachine = 1 AND @parmpercashier = 1)  --PER BRANCH PER MACHINE AND PER CASHIER
++		begin
++			SELECT  SUM(CAST(TotalAmount as money)) as TotalAmount,isVat
++			 FROM POSSalesSummary2 
++			 WHERE BranchCode=@parmbrcode 
++			 and CAST(DateOrder as date) between @datefrom and @dateto
++			 and ProcessedBy=@parmprocessby  
++			 and MachineUsed=@parmmachinename 
++			 GROUP BY isVat
++		end
++		else if(@parmpercashier = 1 AND @parmispermachine = 0)  --PER BRANCH AND PER CASHIER ONLY
++		begin
++			SELECT  SUM(CAST(TotalAmount as money)) as TotalAmount,isVat
++			 FROM POSSalesSummary2 
++			 WHERE BranchCode=@parmbrcode 
++			 and CAST(DateOrder as date) between @datefrom and @dateto
++			 and ProcessedBy=@parmprocessby 
++			 GROUP BY isVat
++		end
++		else
++		begin 
++			SELECT  SUM(CAST(TotalAmount as money)) as TotalAmount,isVat --PER BRANCH ONLY
++			 FROM POSSalesSummary2 
++			 WHERE BranchCode=@parmbrcode 
++			 and CAST(DateOrder as date) between @datefrom and @dateto
++			
++			 GROUP BY isVat
++		end
++	
++	 end
++	 else if(@parmoption=3)--'GROUPITEM'
++	 begin 
++	  if(@parmispermachine = 0 AND @parmpercashier = 0) --PER BRANCH ONLY
++		begin
++			--select ProductCode
++			--	,Description
++			--	,SUM(QtySold) as Qty
++			--	--,SUM(CAST(TotalAmount as money)) as TotalAmount
++			--	--,SUM(CAST(TaxTotal as money)) as Tax
++			--	,SUM(CAST(SubTotal as money)) as SubTotal
++			--	,isVat 
++			-- FROM POSSalesSummary 
++			-- WHERE  BranchCode=@parmbrcode 
++			--	and CAST(DateOrder as date) between @datefrom and @dateto
++			-- GROUP BY ProductCode,Description,isVat 
++			 select  a.ProductCode
++				,a.Category
++				,a.Description
++				,SUM(a.QtySold) as Qty
++				,a.Cost
++				,b.SellingPrice
++				,SUM(a.QtySold)*a.Cost as TotalCost
++				,SUM(CAST(a.SubTotal as money)) as TotalAmount
++				, (SUM(CAST(a.SubTotal as money))) - (SUM(a.QtySold)*a.Cost) as Profit
++				,a.isVat 
++			 FROM POSSalesSummary2 a 
++			 INNER JOIN Products b 
+ 			ON a.BranchCode = b.BranchCode
+-		   AND a.ProductCode = b.ProductCode
++				and a.ProductCode=b.ProductCode
+ 		WHERE a.BranchCode = @parmbrcode
+-		  AND a.DateOrder >= @datefrom
+-		  AND a.DateOrder <  @dateToPlus
+-		  AND (@useMachine = 0 OR a.MachineUsed = @parmmachinename)
+-		  AND (@useCashier = 0 OR a.ProcessedBy = @parmprocessby)
+-		GROUP BY
+-			a.ProductCode, a.Category, a.Description,
+-			a.isVat, b.SellingPrice, a.Cost
+-	END
+-	ELSE IF (@parmoption = 4)
+-	BEGIN
+-		SELECT *
+-		FROM dbo.SalesTransactionSummary2
++				and CAST(a.DateOrder as date) between  @datefrom and @dateto
++			 GROUP BY a.ProductCode,a.Description,a.isVat,b.SellingPrice,a.Cost,a.Category
++		end
++		else if(@parmispermachine = 1 AND @parmpercashier = 0) --WITH MACHINE CATEGORY AND NO CASHIER
++		begin
++			--select ProductCode
++			--	,Description
++			--	,SUM(QtySold) as Qty
++			--	--,SUM(CAST(TotalAmount as money)) as TotalAmount
++			--	--,SUM(CAST(TaxTotal as money)) as Tax
++			--	,SUM(CAST(SubTotal as money)) as SubTotal
++			--	,isVat 
++			--  FROM POSSalesSummary 
++			--  WHERE  BranchCode=@parmbrcode 
++			--	and CAST(DateOrder as date) between @datefrom and @dateto
++			--    and MachineUsed=@parmmachinename
++			--  GROUP BY ProductCode,Description,isVat
++			 select  a.ProductCode
++				,a.Category
++				,a.Description
++				,SUM(a.QtySold) as Qty
++				,a.Cost
++				,b.SellingPrice
++				,SUM(a.QtySold)*a.Cost as TotalCost
++				,SUM(CAST(a.SubTotal as money)) as TotalAmount
++				, (SUM(CAST(a.SubTotal as money))) - (SUM(a.QtySold)*a.Cost) as Profit
++				,a.isVat 
++			 FROM POSSalesSummary2 a 
++			 INNER JOIN Products b 
++				ON a.BranchCode=b.BranchCode
++				and a.ProductCode=b.ProductCode
++			 WHERE  a.BranchCode=@parmbrcode 
++				and CAST(a.DateOrder as date) between  @datefrom and @dateto
++				and MachineUsed=@parmmachinename
++			 GROUP BY a.ProductCode,a.Description,a.isVat,b.SellingPrice,a.Cost,a.Category
++		end
++		else if(@parmispermachine = 1 AND @parmpercashier = 1)  --PER BRANCH, PER MACHINE, PER CASHIER
++		begin
++			--select ProductCode
++			--	,Description
++			--	,SUM(QtySold) as Qty
++			--	--,SUM(CAST(TotalAmount as money)) as TotalAmount
++			--	--,SUM(CAST(TaxTotal as money)) as Tax
++			--	,SUM(CAST(SubTotal as money)) as SubTotal
++			--	,isVat 
++			--  FROM POSSalesSummary 
++			--  WHERE  BranchCode=@parmbrcode 
++			--	and CAST(DateOrder as date) between @datefrom and @dateto
++			--    and MachineUsed=@parmmachinename
++			--	and ProcessedBy=@parmprocessby
++			--  GROUP BY ProductCode,Description,isVat
++			select  a.ProductCode
++				,a.Category
++				,a.Description
++				,SUM(a.QtySold) as Qty
++				,a.Cost
++				,b.SellingPrice
++				,SUM(a.QtySold)*a.Cost as TotalCost
++				,SUM(CAST(a.SubTotal as money)) as TotalAmount
++				, (SUM(CAST(a.SubTotal as money))) - (SUM(a.QtySold)*a.Cost) as Profit
++				,a.isVat 
++			 FROM POSSalesSummary2 a 
++			 INNER JOIN Products b 
++				ON a.BranchCode=b.BranchCode
++				and a.ProductCode=b.ProductCode
++			 WHERE  a.BranchCode=@parmbrcode 
++				and CAST(a.DateOrder as date) between  @datefrom and @dateto
++				and MachineUsed=@parmmachinename
++				and ProcessedBy=@parmprocessby
++			 GROUP BY a.ProductCode,a.Description,a.isVat,b.SellingPrice,a.Cost,a.Category
++
++			
++		end
++		else if(@parmpercashier = 1 AND @parmispermachine = 0)  --PER BRANCH AND PER CASHIER ONLY
++		begin
++			--select ProductCode
++			--	,Description
++			--	,SUM(QtySold) as Qty
++			--	--,SUM(CAST(TotalAmount as money)) as TotalAmount
++			--	--,SUM(CAST(TaxTotal as money)) as Tax
++			--	,SUM(CAST(SubTotal as money)) as SubTotal
++			--	,isVat 
++			--  FROM POSSalesSummary 
++			--  WHERE  BranchCode=@parmbrcode 
++			--	and CAST(DateOrder as date) between @datefrom and @dateto
++			--	and ProcessedBy=@parmprocessby
++			--  GROUP BY ProductCode,Description,isVat
++			select  a.ProductCode
++				,a.Category
++				,a.Description
++				,SUM(a.QtySold) as Qty
++				,a.Cost
++				,b.SellingPrice
++				,SUM(a.QtySold)*a.Cost as TotalCost
++				,SUM(CAST(a.SubTotal as money)) as TotalAmount
++				, (SUM(CAST(a.SubTotal as money))) - (SUM(a.QtySold)*a.Cost) as Profit
++				,a.isVat 
++			 FROM POSSalesSummary2 a 
++			 INNER JOIN Products b 
++				ON a.BranchCode=b.BranchCode
++				and a.ProductCode=b.ProductCode
++			 WHERE  a.BranchCode=@parmbrcode 
++				and CAST(a.DateOrder as date) between  @datefrom and @dateto
++				and ProcessedBy=@parmprocessby
++			 GROUP BY a.ProductCode,a.Description,a.isVat,b.SellingPrice,a.Cost,a.Category
++		end
++		else
++		begin	
++			--select ProductCode
++			--	,Description
++			--	,SUM(QtySold) as QtySold
++			--	--,SUM(CAST(TotalAmount as money)) as TotalAmount
++			--	--,SUM(CAST(TaxTotal as money)) as Tax
++			--	,SUM(CAST(SubTotal as money)) as SubTotal
++			--	,isVat 
++			-- FROM POSSalesSummary 
++			-- WHERE  BranchCode=@parmbrcode 
++			--	and CAST(DateOrder as date) between @datefrom and @dateto
++			-- GROUP BY ProductCode,Description,isVat
++			 select  a.ProductCode
++				,a.Description
++				,SUM(a.QtySold) as Qty
++				,a.Cost
++				,b.SellingPrice
++				,SUM(a.QtySold)*a.Cost as TotalCost
++				,SUM(CAST(a.SubTotal as money)) as TotalAmount
++				, (SUM(CAST(a.SubTotal as money))) - (SUM(a.QtySold)*a.Cost) as Profit
++				,a.isVat 
++			 FROM POSSalesSummary2 a 
++			 INNER JOIN Products b 
++				ON a.BranchCode=b.BranchCode
++				and a.ProductCode=b.ProductCode
++			 WHERE  a.BranchCode=@parmbrcode 
++				and CAST(a.DateOrder as date) between  @datefrom and @dateto
++			 GROUP BY a.ProductCode,a.Description,a.isVat,b.SellingPrice,a.Cost
++		end
++	 end
++
++	 
++	else if(@parmoption=4)--'CASHIERSALES'
++	begin 
++		 if(@parmispermachine = 0 AND @parmpercashier = 0) --PER BRANCH ONLY
++		begin
++			 select *
++			 FROM SalesTransactionSummary2 
+ 		WHERE BranchCode = @parmbrcode
+-		  AND DateOpen >= @datefrom
+-		  AND DateOpen <  @dateToPlus
+-		  AND (@useMachine = 0 OR MachineUsed = @parmmachinename)
+-		  AND (@useCashier = 0 OR UserID = @parmprocessby)
+-	END
+-	ELSE IF (@parmoption = 6)
+-	BEGIN
+-		SELECT
+-			DateExecute, BranchCode, CounterNo, MachineUsed,
+-			BeginningBalance, Credit, EndingBalance,
+-			BeginningSINo, EndingSINo,
+-			SoldItems, ReturnedItems,
+-			TotalCashSales, TotalCreditSales,
+-			TotalSales, TotalNetSales,
+-			VatExemptSale, VatableSale, VatInput,
+-			ExecuteBy
+-		FROM dbo.POSZReadingTransactions2
+-		WHERE BranchCode = @parmbrcode
+-		  AND DateExecute >= @datefrom
+-		  AND DateExecute <  @dateToPlus
+-		  AND (@useMachine = 0 OR MachineUsed = @parmmachinename)
+-		ORDER BY DateExecute
+-	END
+-	ELSE IF (@parmoption IN (7,8,9))
+-	BEGIN
+-		DECLARE @DiscountType varchar(20) =
+-			CASE @parmoption
+-				WHEN 7 THEN 'SENIOR'
+-				WHEN 8 THEN 'PWD'
+-				WHEN 9 THEN 'REGULAR'
+-			END;
++			 and CAST(DateOpen as date) between @datefrom and @dateto
+ 
++		end
++		else if(@parmispermachine = 1 AND @parmpercashier = 0) --PER BRANCH AND PER MACHINE
++		begin
++			 select *
++			 FROM SalesTransactionSummary2 
++			  WHERE BranchCode=@parmbrcode 
++			  and CAST(DateOpen as date) between @datefrom and @dateto
++			  and MachineUsed=@parmmachinename
++		end
++		else if(@parmispermachine = 1 AND @parmpercashier = 1)  --PER BRANCH PER MACHINE AND PER CASHIER
++		begin
++			 select *
++			 FROM SalesTransactionSummary2 
++			  WHERE BranchCode=@parmbrcode 
++			  and CAST(DateOpen as date) between @datefrom and @dateto
++			  and UserID=@parmprocessby 
++			  and MachineUsed=@parmmachinename
++
++		end 
++		 else if(@parmpercashier = 1 AND @parmispermachine = 0)  --PER BRANCH AND PER CASHIER ONLY
++		begin
++			 select *
++			 FROM SalesTransactionSummary2 
++			  WHERE BranchCode=@parmbrcode 
++			  and CAST(DateOpen as date) between @datefrom and @dateto
++			  and UserID=@parmprocessby 
++		end
++		else
++		begin
++			 select *
++			 FROM SalesTransactionSummary2 
++			 WHERE CAST(DateOpen as date) between @datefrom and @dateto
++		end
++	end
++	else if(@parmoption=5)--'XREAD'
++	begin
++		if(@parmispermachine = 0 AND @parmpercashier = 0) --PER BRANCH ONLY
++		 begin
++			 SELECT *
++			 FROM SalesTransactionSummary2
++			 WHERE BranchCode=@parmbrcode 
++			 and TransactionDate between dbo.func_ConvertDateTimeToChar('DATE',@datefrom)   AND dbo.func_ConvertDateTimeToChar('DATE',@dateto)   
++		 end
++		 else if(@parmispermachine = 1 AND @parmpercashier = 0) --PER BRANCH ONLY AND PER MACHINE
++		 begin
+ 		SELECT *
+-		FROM dbo.SalesDiscount2
+-		WHERE DiscountType = @DiscountType
++			 FROM SalesTransactionSummary2
++			 WHERE BranchCode=@parmbrcode 
++			 and TransactionDate between dbo.func_ConvertDateTimeToChar('DATE',@datefrom)   AND dbo.func_ConvertDateTimeToChar('DATE',@dateto) 
++			 and MachineUsed = @parmmachinename  
++		 end
++		 else if(@parmispermachine = 1 AND @parmpercashier = 1) --PER BRANCH AND PER CASHIER ONLY
++		 begin
++			 SELECT *
++			 FROM SalesTransactionSummary2
++			 WHERE BranchCode=@parmbrcode 
++			 and TransactionDate between dbo.func_ConvertDateTimeToChar('DATE',@datefrom)   AND dbo.func_ConvertDateTimeToChar('DATE',@dateto)   
++			 and MachineUsed = @parmmachinename
++			 and UserID=@parmprocessby
++		 end
++	end
++	else if(@parmoption=6)--'ZREAD'
++	begin
++		if(@parmispermachine = 0 AND @parmpercashier = 0) --PER BRANCH AND PER MACHINE
++		 begin
++			 SELECT DateExecute,BranchCode,CounterNo,MachineUsed,BeginningBalance,Credit,EndingBalance
++			 ,BeginningSINo,EndingSINo,BeginningReturnTransNo,EndingReturnTransNo,SoldItems,ReturnedItems,
++			 SCDiscItems,PWDDiscItems,TotalCashSales,TotalCreditSales,TotalSales,TotalReturnedSales
++			 ,TotalSCDiscount,TotalPWDDiscount,TotalRegDiscount,VatExemptSale,VatableSale,VatInput,
++			 VatAdjustment,TotalNetSales,ExecuteBy
++			 FROM POSZReadingTransactions2
++			 WHERE BranchCode=@parmbrcode 
++			 and DateExecute between dbo.func_ConvertDateTimeToChar('DATE',@datefrom)   AND dbo.func_ConvertDateTimeToChar('DATE',@dateto)   
++			 --and MachineUsed = @parmmachinename
++			 ORDER BY DateExecute ASC
++		 end
++		 else if(@parmispermachine = 1 AND @parmpercashier = 0) --PER BRANCH AND PER MACHINE
++		 begin
++			 SELECT DateExecute,BranchCode,CounterNo,MachineUsed,BeginningBalance,Credit,EndingBalance
++			 ,BeginningSINo,EndingSINo,BeginningReturnTransNo,EndingReturnTransNo,SoldItems,ReturnedItems,
++			 SCDiscItems,PWDDiscItems,TotalCashSales,TotalCreditSales,TotalSales,TotalReturnedSales
++			 ,TotalSCDiscount,TotalPWDDiscount,TotalRegDiscount,VatExemptSale,VatableSale,VatInput,
++			 VatAdjustment,TotalNetSales,ExecuteBy
++			 FROM POSZReadingTransactions2
++			 WHERE BranchCode=@parmbrcode 
++			 and DateExecute between dbo.func_ConvertDateTimeToChar('DATE',@datefrom)   AND dbo.func_ConvertDateTimeToChar('DATE',@dateto)   
++			 and MachineUsed = @parmmachinename
++			 ORDER BY DateExecute ASC
++		 end
++	end
++	else if(@parmoption=7)--'SENIOR'
++	begin
++		 if(@parmispermachine = 0 AND @parmpercashier = 0) --PER BRANCH ONLY
++		 begin
++			 SELECT *
++			 FROM SalesDiscount2
++			 WHERE DiscountType='SENIOR'
++			 AND isErrorCorrect=0
++			 AND BranchCode=@parmbrcode 
++			 and CAST(DateExecute as date) between @datefrom and @dateto
++		 end
++		 else if(@parmispermachine = 1 AND @parmpercashier = 0) --PER BRANCH AND PER MACHINE ONLY
++		 begin
++			 SELECT *
++			 FROM SalesDiscount2
++			 WHERE DiscountType='SENIOR'
++			 AND isErrorCorrect=0
++			 and  BranchCode=@parmbrcode 
++			 and CAST(DateExecute as date) between @datefrom and @dateto
++			 and MachineUsed = @parmmachinename
++		 end
++		 else if(@parmispermachine = 1 AND @parmpercashier = 1)  --PER BRANCH PER MACHINE AND PER CASHIER ONLY
++		 begin
++			 SELECT *
++			 FROM SalesDiscount2
++			 WHERE DiscountType='SENIOR'
++			 AND isErrorCorrect=0
++			 and BranchCode=@parmbrcode 
++			 and CAST(DateExecute as date) between @datefrom and @dateto
++			 and MachineUsed = @parmmachinename
++			 and Cashier=@parmprocessby
++		 end
++	end
++	else if(@parmoption=8)--'PWD'
++	begin
++		 if(@parmispermachine = 0 AND @parmpercashier = 0) --PER BRANCH ONLY
++		 begin
++			 SELECT *
++			 FROM SalesDiscount2
++			 WHERE DiscountType='PWD'
+ 		  AND isErrorCorrect = 0
+ 		  AND BranchCode = @parmbrcode
+-		  AND DateExecute >= @datefrom
+-		  AND DateExecute <  @dateToPlus
+-		  AND (@useMachine = 0 OR MachineUsed = @parmmachinename)
+-		  AND (@useCashier = 0 OR Cashier = @parmprocessby)
++			 and CAST(DateExecute as date) between @datefrom and @dateto
++		 end
++		 else if(@parmispermachine = 1 AND @parmpercashier = 0) --PER BRANCH AND PER MACHINE ONLY
++		 begin
++			 SELECT *
++			 FROM SalesDiscount2
++			 WHERE DiscountType='PWD'
++			 AND isErrorCorrect=0
++			 and  BranchCode=@parmbrcode 
++			 and CAST(DateExecute as date) between @datefrom and @dateto
++			 and MachineUsed = @parmmachinename
++		 end
++		 else if(@parmispermachine = 1 AND @parmpercashier = 1)  --PER BRANCH PER MACHINE AND PER CASHIER
++		 begin
++			 SELECT *
++			 FROM SalesDiscount2
++			 WHERE DiscountType='PWD'
++			 AND isErrorCorrect=0
++			 and BranchCode=@parmbrcode 
++			 and CAST(DateExecute as date) between @datefrom and @dateto
++			 and MachineUsed = @parmmachinename
++			 and Cashier=@parmprocessby
++		 end
+ 	END
++    --
++	else if(@parmoption=9)--'REGULAR'
++	begin
++		 if(@parmispermachine = 0 AND @parmpercashier = 0) --PER BRANCH ONLY
++		 begin
++			 SELECT *
++			 FROM SalesDiscount2
++			 WHERE DiscountType='REGULAR'
++			 AND isErrorCorrect=0
++			 AND BranchCode=@parmbrcode 
++			 and CAST(DateExecute as date) between @datefrom and @dateto
++		 end
++		 else if(@parmispermachine = 1 AND @parmpercashier = 0) --PER BRANCH AND PER MACHINE ONLY
++		 begin
++			 SELECT *
++			 FROM SalesDiscount
++			 WHERE DiscountType='REGULAR'
++			 AND isErrorCorrect=0
++			 and  BranchCode=@parmbrcode 
++			 and CAST(DateExecute as date) between @datefrom and @dateto
++			 and MachineUsed = @parmmachinename
++		 end
++		 else if(@parmispermachine = 1 AND @parmpercashier = 1)  --PER BRANCH PER MACHINE AND PER CASHIER
++		 begin
++			 SELECT *
++			 FROM SalesDiscount2
++			 WHERE DiscountType='REGULAR'
++			 AND isErrorCorrect=0
++			 and BranchCode=@parmbrcode 
++			 and CAST(DateExecute as date) between @datefrom and @dateto
++			 and MachineUsed = @parmmachinename
++			 and Cashier=@parmprocessby
++		 end
++	end
++	--
++	--
++	else if(@parmoption=10)--'MERCHANT'
++	begin
++		 if(@parmispermachine = 0 AND @parmpercashier = 0) --PER BRANCH ONLY
++		 BEGIN
++			 SELECT *
++			 FROM dbo.POSMerchantTransactions2
++			 WHERE BranchCode=@parmbrcode 
++			 and CAST(TransactionDate as date) between @datefrom and @dateto
++		 end
++		 else if(@parmispermachine = 1 AND @parmpercashier = 0) --PER BRANCH AND PER MACHINE ONLY
++		 begin
++			 SELECT *
++			 FROM dbo.POSMerchantTransactions2
++			 WHERE  BranchCode=@parmbrcode 
++			 and CAST(DateAdded as date) between @datefrom and @dateto
++			 and MachineUsed = @parmmachinename
++		 end
++		 else if(@parmispermachine = 1 AND @parmpercashier = 1)  --PER BRANCH PER MACHINE AND PER CASHIER
++		 begin
++			 SELECT *
++			 FROM dbo.POSMerchantTransactions2
++			 WHERE AddedBy=@parmprocessby
++			 and BranchCode=@parmbrcode 
++			 and CAST(DateAdded as date) between @datefrom and @dateto
++			 and MachineUsed = @parmmachinename
++			 
++		 end
++	end
++	--
++	else if(@parmoption=11)--'REFUND' select * FROM POSReturnTransaction
++	begin
++		 if(@parmispermachine = 0 AND @parmpercashier = 0) --PER BRANCH
++		 begin
++			  select a.BranchCode,a.ReturnTransactionNo,a.OrderNo,a.TransactionNo,b.TotalReturnedAmount,a.DateExecute,a.ExecuteBy,a.MachineUsed
++			  FROM POSReturnTransaction2 a
++			  INNER JOIN BatchSalesSummary2 b	
++				ON a.OrderNo=b.ReferenceNo
++				and a.BranchCode=b.BranchCode
++				and a.MachineUsed=b.MachineUsed
++			 WHERE a.BranchCode=@parmbrcode 
++			 and CAST(a.DateExecute as date) between @datefrom and @dateto
++		 end
++		 else if(@parmispermachine = 1 AND @parmpercashier = 0) --PER BRANCH AND PER MACHINE
++		 begin
++			 select a.BranchCode,a.ReturnTransactionNo,a.OrderNo,a.TransactionNo,b.TotalReturnedAmount,a.DateExecute,a.ExecuteBy,a.MachineUsed
++			  FROM POSReturnTransaction2 a
++			  INNER JOIN BatchSalesSummary2 b	
++				ON a.OrderNo=b.ReferenceNo
++				and a.BranchCode=b.BranchCode
++				and a.MachineUsed=b.MachineUsed
++			 WHERE a.BranchCode=@parmbrcode 
++			 and CAST(a.DateExecute as date) between @datefrom and @dateto
++			 and a.MachineUsed = @parmmachinename
++		 end
++		 else if(@parmispermachine = 1 AND @parmpercashier = 1)  --PER BRANCH PER MACHINE AND PER CASHIER
++		 begin
++			select a.BranchCode,a.ReturnTransactionNo,a.OrderNo,a.TransactionNo,b.TotalReturnedAmount,a.DateExecute,a.ExecuteBy,a.MachineUsed
++			  FROM POSReturnTransaction2 a
++			  INNER JOIN BatchSalesSummary2 b	
++				ON a.OrderNo=b.ReferenceNo
++				and a.BranchCode=b.BranchCode
++				and a.MachineUsed=b.MachineUsed
++			 WHERE a.BranchCode=@parmbrcode 
++			 and CAST(a.DateExecute as date) between @datefrom and @dateto
++			 and a.ExecuteBy=@parmprocessby
++		 end
++	end
++	else if(@parmoption=12)--'CREDITCARD'
++	begin
++		 if(@parmispermachine = 0 AND @parmpercashier = 0) --PER BRANCH 
++		 begin
++			 SELECT *
++			 FROM POSCreditCardTransactions2
++			 WHERE BranchCode=@parmbrcode 
++			 and CAST(TransactionDate as date) between @datefrom and @dateto
++		 end
++		 else if(@parmispermachine = 1 AND @parmpercashier = 0) --PER BRANCH AND PER MACHINE
++		 begin
++			  SELECT *
++			 FROM POSCreditCardTransactions2
++			 WHERE BranchCode=@parmbrcode 
++			 and CAST(TransactionDate as date) between @datefrom and @dateto
++			 and MachineUsed = @parmmachinename
++		 end
++		 else if(@parmispermachine = 1 AND @parmpercashier = 1)  --PER BRANCH PER MACHINE AND PER CASHIER
++		 begin
++			 SELECT *
++			 FROM POSCreditCardTransactions2
++			 WHERE BranchCode=@parmbrcode 
++			 and CAST(TransactionDate as date) between @datefrom and @dateto
++			 and MachineUsed = @parmmachinename
++			 and ProcessedBy=@parmprocessby
++		 end
++	end
++	else if(@parmoption=13)--'SALESSUMMARY'
++	begin
++	 if(@parmispermachine = 1 AND @parmpercashier = 0) --PER BRANCH AND PER MACHINE ONLY
++	 begin
++			  SELECT DateExecute
++			 ,BeginningSINo as FromSI
++			 ,EndingSINo as ToSI
++			 ,EndingBalance as NetAmount
++			 ,TotalSCDiscount as SC
++			 ,TotalPWDDiscount as PWD
++			 ,TotalDiscount as Others
++			 ,TotalReturnedSales as Refund
++			 ,VatAdjustment
++			 ,EndingBalance+TotalSCDiscount+TotalPWDDiscount+TotalDiscount+TotalReturnedSales+VatAdjustment as TotalIncome
++			 ,0 as OtherIncome
++			 ,EndingBalance+TotalSCDiscount+TotalPWDDiscount+TotalDiscount+TotalReturnedSales+VatAdjustment as GrossAmount
++			 ,VatableSale as VATableSales
++			 ,TotalVatSales as VATAmount
++			 ,VatExemptSale as VATExempt
++			 ,ZeroRatedSale as ZeroRated
++			 ,TotalVatSales as VATPayable
++			 ,0 as SalesOverrun
++			 ,VatableSale+VatExemptSale+ZeroRatedSale as TotalSales
++			 ,CounterNo
++		 FROM POSZReadingTransactions2
++		 WHERE BranchCode=@parmbrcode 
++		 and CAST(DateExecute as date) between  @datefrom AND @dateto
++		 and MachineUsed = @parmmachinename
++	 end
++
++	end
++	else if(@parmoption=14)--'SALESIN'
++	begin
++	 if(@parmispermachine = 0 AND @parmpercashier = 0) --PER BRANCH
++	 begin
++			  SELECT *
++		 FROM SalesIN2
++		 WHERE BranchCode=@parmbrcode 
++		 and CAST(SalesDate as date) between  @datefrom AND @dateto
++		 
++	 end
++	 else if(@parmispermachine = 1 AND @parmpercashier = 0) --PER BRANCH AND PER MACHINE
++		 begin
++			 SELECT *
++			 FROM SalesIN2
++			 WHERE BranchCode=@parmbrcode 
++			 and CAST(SalesDate as date) between  @datefrom AND @dateto
++			 and MachineUsed = @parmmachinename
++		 end
++	end
++	else if(@parmoption=15)--'ACTIVITYLOGS'
++	begin
++	 if(@parmispermachine = 0 AND @parmpercashier = 0) --PER BRANCH
++	 begin
++		 SELECT BranchCode,TransactionNo,Type,DateAdded,MachineUsed,ExecuteBy
++		 FROM POSTransaction2
++		 WHERE BranchCode=@parmbrcode 
++		 and CAST(DateAdded as date) between  @datefrom AND @dateto
++		 
++	 end
++	 else if(@parmispermachine = 1 AND @parmpercashier = 0) --PER BRANCH AND PER MACHINE
++		 begin
++			 SELECT BranchCode,TransactionNo,Type,DateAdded,MachineUsed,ExecuteBy
++			 FROM POSTransaction2
++			 WHERE BranchCode=@parmbrcode 
++			 and CAST(DateAdded as date) between  @datefrom AND @dateto
++			 and MachineUsed = @parmmachinename
++		 end
++	end
++
+ END

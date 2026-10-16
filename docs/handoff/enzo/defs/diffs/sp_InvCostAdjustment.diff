@@ -1,0 +1,402 @@
+--- enzo/sp_InvCostAdjustment.sql	2026-10-15 23:07:09.728565400 +0800
++++ prod/sp_InvCostAdjustment.sql	2026-10-15 23:07:14.677490900 +0800
+@@ -57,205 +57,213 @@
+ 	INSERT INTO InventoryAdjustment VALUES(@parmbranchcode,@parmshipmentno,@parmprodcode,@proddesc,@parmoldqty,@parmoldcostkg,0,@parmnewcostvalue,@parmoldqty,@parmnewcostvalue,@parmnewcostvalue*@parmoldqty,'',GETDATE(),@isvat,'COST ADJUSTMENT',1,0)
+ 			
+ 	
+-	declare @refno varchar(10)
+-	exec GetReferenceNumber @refno output
+ 	if(@isvat=1)
+ 	begin
+-		--VATABLE ENTRY
+-		SELECT @debitacctcode=DebitGLAccount,@creditacctcode=CreditGLAccount FROM TransactionDefinition WHERE TransCode='Inv' --AND BranchCode=@parmbranch
+-		SELECT @debitacctcode1=DebitGLAccount,@creditacctcode1=CreditGLAccount FROM TransactionDefinition WHERE TransCode='InvV' --AND BranchCode=@parmbranch
+-		---------------------
+-		select @transdescvatreversal=Description,@debitacctcodevat=DebitGLAccount,@creditacctcodevat=CreditGLAccount FROM TransactionDefinition WHERE TransCode = 'CstAdjTran'
+-		select @transdescvatinputreversal=Description,@debitacctcodevatinput=DebitGLAccount,@creditacctcodevatinput=CreditGLAccount FROM TransactionDefinition WHERE TransCode = 'CstAdjV'
+-
+-		set @vatexadj = @actualcost / 1.12 --book to ticket reversal entry
+-		set @vatinputadj = @vatexadj * 0.12 --book to ticket reversal enry
+-		set @newvatexadj = (@actualqty * @parmnewcostvalue) / 1.12
+-		set @newvatinputadj = @newvatexadj * 0.12
+-
+-		--if @parmnewcostvalue > @oldcostvalue
++		UPDATE Inventory SET Cost=@parmnewcostvalue/1.12 WHERE ShipmentNo=@parmshipmentno and Product=@parmprodcode
++	end
++	else
++	begin
++		UPDATE Inventory SET Cost=@parmnewcostvalue WHERE ShipmentNo=@parmshipmentno and Product=@parmprodcode
++	end
++	--declare @refno varchar(10)
++	--exec GetReferenceNumber @refno output
++	--if(@isvat=1)
+ 		--begin
+-		--	--credit to supplierledger
+-		--	--select * FROM supplierledger
+-		--			set @transid=dbo.func_getLastID(@parmsupplierid);
+-		--			INSERT INTO SupplierLedger 
+-		--			VALUES
+-		--			(
+-		--			@transid --trn_seq_no
+-		--			,@suppkey--SupplierKey
+-		--			,@parmsupplierid--SupplierID
+-		--			,GETDATE()--PostingDate
+-		--			,'Inv VatEx Credit Cost Adjustment Reversal '+@parmshipmentno--Description
+-		--			,'ADJ'--TransCode
+-		--			,GETDATE()--TransactionDate
+-		--			,@refno--ReferenceNumber
+-		--			,@parmshipmentno--ReferenceKey
+-		--			,@invoiceno -- InvoiceNo
+-		--			,0--BeginningBalance
+-		--			,@vatexadj--Debit
+-		--			,0--Credit
+-		--			,0--EndingBalance
+-		--			,@parmuser--TransactedBy
+-		--			,'*'--ApprovedBy
+-		--			,@vatexadj--TotalAmount
+-		--			,'PARTIAL'--PaymentType
+-		--			,0--ErrorCorrectTag
+-		--			,' ' --TicketNumber	
+-		--			) 
+-
+-		--			set @transid=dbo.func_getLastID(@parmsupplierid);
+-		--			INSERT INTO SupplierLedger 
+-		--			VALUES
+-		--			(
+-		--			@transid --trn_seq_no
+-		--			,@suppkey--SupplierKey
+-		--			,@parmsupplierid--SupplierID
+-		--			,GETDATE()--PostingDate
+-		--			,'Inv VatInput Credit Cost Adjustment Reversal '+@parmshipmentno--Description
+-		--			,'ADJ'--TransCode
+-		--			,GETDATE()--TransactionDate
+-		--			,@refno--ReferenceNumber
+-		--			,@parmshipmentno--ReferenceKey
+-		--			,@invoiceno -- InvoiceNo
+-		--			,0--BeginningBalance
+-		--			,@vatinputadj--Debit
+-		--			,0--Credit
+-		--			,0--EndingBalance
+-		--			,@parmuser--TransactedBy
+-		--			,'*'--ApprovedBy
+-		--			,@vatinputadj--TotalAmount
+-		--			,'PARTIAL'--PaymentType
+-		--			,0--ErrorCorrectTag
+-		--			,' ' --TicketNumber	
+-		--			) 
+-
+-		--	INSERT INTO SupplierLedger VALUES(@parmsupplierid,GETDATE(),'Inv VatEx Credit Cost Adjustment Reversal','ADJ',GETDATE(),'',0,@vatexadj,0,0,@parmuser,'*',@vatexadj,'UNPAID',0)
+-		--	INSERT INTO SupplierLedger VALUES(@parmsupplierid,GETDATE(),'Inv VatInput Credit Cost Adjustment Reversal','ADJ',GETDATE(),'',0,@vatinputadj,0,0,@parmuser,'*',@vatexadj,'UNPAID',0)
+-		--	INSERT INTO SupplierLedger VALUES(@parmsupplierid,GETDATE(),'Inv VatEx Credit Cost New Adjustment','ADJ',GETDATE(),'',0,0,@newvatexadj,0,@parmuser,'*',@newvatexadj,'UNPAID',0)
+-		--	INSERT INTO SupplierLedger VALUES(@parmsupplierid,GETDATE(),'Inv VatInput Credit Cost New Adjustment','ADJ',GETDATE(),'',0,0,@newvatinputadj,0,@parmuser,'*',@newvatinputadj,'UNPAID',0)
++	--	--VATABLE ENTRY
++	--	SELECT @debitacctcode=DebitGLAccount,@creditacctcode=CreditGLAccount FROM TransactionDefinition WHERE TransCode='Inv' --AND BranchCode=@parmbranch
++	--	SELECT @debitacctcode1=DebitGLAccount,@creditacctcode1=CreditGLAccount FROM TransactionDefinition WHERE TransCode='InvV' --AND BranchCode=@parmbranch
++	--	---------------------
++	--	select @transdescvatreversal=Description,@debitacctcodevat=DebitGLAccount,@creditacctcodevat=CreditGLAccount FROM TransactionDefinition WHERE TransCode = 'CstAdjTran'
++	--	select @transdescvatinputreversal=Description,@debitacctcodevatinput=DebitGLAccount,@creditacctcodevatinput=CreditGLAccount FROM TransactionDefinition WHERE TransCode = 'CstAdjV'
++
++	--	set @vatexadj = @actualcost / 1.12 --book to ticket reversal entry
++	--	set @vatinputadj = @vatexadj * 0.12 --book to ticket reversal enry
++	--	set @newvatexadj = (@actualqty * @parmnewcostvalue) / 1.12
++	--	set @newvatinputadj = @newvatexadj * 0.12
++
++	--	--if @parmnewcostvalue > @oldcostvalue
++	--	--begin
++	--	--	--credit to supplierledger
++	--	--	--select * FROM supplierledger
++	--	--			set @transid=dbo.func_getLastID(@parmsupplierid);
++	--	--			INSERT INTO SupplierLedger 
++	--	--			VALUES
++	--	--			(
++	--	--			@transid --trn_seq_no
++	--	--			,@suppkey--SupplierKey
++	--	--			,@parmsupplierid--SupplierID
++	--	--			,GETDATE()--PostingDate
++	--	--			,'Inv VatEx Credit Cost Adjustment Reversal '+@parmshipmentno--Description
++	--	--			,'ADJ'--TransCode
++	--	--			,GETDATE()--TransactionDate
++	--	--			,@refno--ReferenceNumber
++	--	--			,@parmshipmentno--ReferenceKey
++	--	--			,@invoiceno -- InvoiceNo
++	--	--			,0--BeginningBalance
++	--	--			,@vatexadj--Debit
++	--	--			,0--Credit
++	--	--			,0--EndingBalance
++	--	--			,@parmuser--TransactedBy
++	--	--			,'*'--ApprovedBy
++	--	--			,@vatexadj--TotalAmount
++	--	--			,'PARTIAL'--PaymentType
++	--	--			,0--ErrorCorrectTag
++	--	--			,' ' --TicketNumber	
++	--	--			) 
++
++	--	--			set @transid=dbo.func_getLastID(@parmsupplierid);
++	--	--			INSERT INTO SupplierLedger 
++	--	--			VALUES
++	--	--			(
++	--	--			@transid --trn_seq_no
++	--	--			,@suppkey--SupplierKey
++	--	--			,@parmsupplierid--SupplierID
++	--	--			,GETDATE()--PostingDate
++	--	--			,'Inv VatInput Credit Cost Adjustment Reversal '+@parmshipmentno--Description
++	--	--			,'ADJ'--TransCode
++	--	--			,GETDATE()--TransactionDate
++	--	--			,@refno--ReferenceNumber
++	--	--			,@parmshipmentno--ReferenceKey
++	--	--			,@invoiceno -- InvoiceNo
++	--	--			,0--BeginningBalance
++	--	--			,@vatinputadj--Debit
++	--	--			,0--Credit
++	--	--			,0--EndingBalance
++	--	--			,@parmuser--TransactedBy
++	--	--			,'*'--ApprovedBy
++	--	--			,@vatinputadj--TotalAmount
++	--	--			,'PARTIAL'--PaymentType
++	--	--			,0--ErrorCorrectTag
++	--	--			,' ' --TicketNumber	
++	--	--			) 
++
++	--	--	INSERT INTO SupplierLedger VALUES(@parmsupplierid,GETDATE(),'Inv VatEx Credit Cost Adjustment Reversal','ADJ',GETDATE(),'',0,@vatexadj,0,0,@parmuser,'*',@vatexadj,'UNPAID',0)
++	--	--	INSERT INTO SupplierLedger VALUES(@parmsupplierid,GETDATE(),'Inv VatInput Credit Cost Adjustment Reversal','ADJ',GETDATE(),'',0,@vatinputadj,0,0,@parmuser,'*',@vatexadj,'UNPAID',0)
++	--	--	INSERT INTO SupplierLedger VALUES(@parmsupplierid,GETDATE(),'Inv VatEx Credit Cost New Adjustment','ADJ',GETDATE(),'',0,0,@newvatexadj,0,@parmuser,'*',@newvatexadj,'UNPAID',0)
++	--	--	INSERT INTO SupplierLedger VALUES(@parmsupplierid,GETDATE(),'Inv VatInput Credit Cost New Adjustment','ADJ',GETDATE(),'',0,0,@newvatinputadj,0,@parmuser,'*',@newvatinputadj,'UNPAID',0)
++	--	--end
++	--	--else
++	--	--begin
++	--	--	INSERT INTO SupplierLedger VALUES(@parmsupplierid,GETDATE(),'Inv VatEx Debit Cost Adjustment Reversal','ADJ',GETDATE(),'',0,@vatexadj,0,0,@parmuser,'*',@vatexadj,'UNPAID',0)
++	--	--	INSERT INTO SupplierLedger VALUES(@parmsupplierid,GETDATE(),'Inv VatInput Debit Cost Adjustment Reversal','ADJ',GETDATE(),'',0,@vatinputadj,0,0,@parmuser,'*',@vatexadj,'UNPAID',0)
++	--	--	INSERT INTO SupplierLedger VALUES(@parmsupplierid,GETDATE(),'Inv VatEx Debit Cost New Adjustment','ADJ',GETDATE(),'',0,0,@newvatexadj,0,@parmuser,'*',@newvatexadj,'UNPAID',0)
++	--	--	INSERT INTO SupplierLedger VALUES(@parmsupplierid,GETDATE(),'Inv VatInput Debit Cost New Adjustment','ADJ',GETDATE(),'',0,0,@newvatinputadj,0,@parmuser,'*',@newvatinputadj,'UNPAID',0)
++	--	--end
++	--	--Update ShipmentOrder SET AmountPaid=case when AmountPaid <> 0 then AmountPaid-@actualcost else 0 end,Balance=case when Balance <> 0 then Balance-@actualcost else 0 end WHERE ShipmentNo=@parmshipmentno
++	--	--Update ShipmentOrder SET AmountPaid=case when AmountPaid <> 0 then AmountPaid+(@actualqty * @parmnewcostvalue) else 0 end,Balance=case when Balance <> 0 then  Balance+(@actualqty * @parmnewcostvalue) else 0 end  WHERE ShipmentNo=@parmshipmentno
++	 
++
++	--	UPDATE APACCOUNTS
++	--		SET AmountPaid=case when AmountPaid <> 0 then AmountPaid-@actualcost else 0 end
++	--		,Balance=case when Balance <> 0 then Balance-@actualcost else 0 end 
++	--	WHERE ShipmentNo=@parmshipmentno
++	--	and SupplierID=@parmsupplierid
++
++		
++	--	UPDATE APACCOUNTS
++	--		SET AmountPaid=case when AmountPaid <> 0 then AmountPaid+(@actualqty * @parmnewcostvalue) else 0 end
++	--		,Balance=case when Balance <> 0 then  Balance+(@actualqty * @parmnewcostvalue) else 0 end  
++	--	WHERE ShipmentNo=@parmshipmentno
++	--	and SupplierID=@parmsupplierid
++
++	--		--VAT EX ENTRY REVERSAL
++		
++	--	exec GetTicketNumber @ticketnum output
++	--	INSERT INTO TicketMaster values(@DeliveryDate,'0',@parmbranchcode,@parmbranchcode,@ticketnum,@refno,@parmshipmentno,@suppliername,@transdescvatreversal+' with Shipment #:'+@parmshipmentno,@parmuser,'*','*','UPDATED','CstAdjTran','')
++	--	insert INTO TicketDetails values(@DeliveryDate,'0',@parmbranchcode,@parmshipmentno,@ticketnum,@refno,@debitacctcodevat,ROUND(@vatexadj,2),0,'') --DEBIT
++	--	insert INTO TicketDetails values(@DeliveryDate,'0',@parmbranchcode,@parmshipmentno,@ticketnum,@refno,@creditacctcodevat,0,ROUND(@vatexadj,2),'') --CREDIT
++	--	--VAT INPUT ENTRY REVERSAL
++	--	exec GetTicketNumber @ticketnum output
++	--	INSERT INTO TicketMaster values(@DeliveryDate,'0',@parmbranchcode,@parmbranchcode,@ticketnum,@refno,@parmshipmentno,@suppliername,@transdescvatinputreversal+' with Shipment #:'+@parmshipmentno,@parmuser,'*','*','UPDATED','CstAdjV','')
++	--	insert INTO TicketDetails values(@DeliveryDate,'0',@parmbranchcode,@parmshipmentno,@ticketnum,@refno,@debitacctcodevatinput,ROUND(@vatinputadj,2),0,'') --DEBIT
++	--	insert INTO TicketDetails values(@DeliveryDate,'0',@parmbranchcode,@parmshipmentno,@ticketnum,@refno,@creditacctcodevatinput,0,ROUND(@vatinputadj,2),'') --CREDIT
++	
++	--	--VAT EX ENTRY NEW ADJUSTMENT
++	--	exec GetTicketNumber @ticketnum output
++	--	INSERT INTO TicketMaster values(@DeliveryDate,'0',@parmbranchcode,@parmbranchcode,@ticketnum,@refno,@parmshipmentno,@suppliername,@transdescvatreversal+' with Shipment #:'+@parmshipmentno,@parmuser,'*','*','UPDATED','CstAdjTran','')
++	--	insert INTO TicketDetails values(@DeliveryDate,'0',@parmbranchcode,@parmshipmentno,@ticketnum,@refno,@debitacctcode,ROUND(@newvatexadj,2),0,'') --DEBIT
++	--	insert INTO TicketDetails values(@DeliveryDate,'0',@parmbranchcode,@parmshipmentno,@ticketnum,@refno,@creditacctcode,0,ROUND(@newvatexadj,2),'') --CREDIT
++	--	--VAT EX ENTRY NEW ADJUSTMENT OF VAT INPUT
++	--	exec GetTicketNumber @ticketnum output
++	--	INSERT INTO TicketMaster values(@DeliveryDate,'0',@parmbranchcode,@parmbranchcode,@ticketnum,@refno,@parmshipmentno,@suppliername,@transdescvatinputreversal+' with Shipment #:'+@parmshipmentno,@parmuser,'*','*','UPDATED','CstAdjV','')
++	--	insert INTO TicketDetails values(@DeliveryDate,'0',@parmbranchcode,@parmshipmentno,@ticketnum,@refno,@debitacctcode1,ROUND(@newvatinputadj,2),0,'') --DEBIT
++	--	insert INTO TicketDetails values(@DeliveryDate,'0',@parmbranchcode,@parmshipmentno,@ticketnum,@refno,@creditacctcode1,0,ROUND(@newvatinputadj,2),'') --CREDIT
++	
+ 		--end
+ 		--else
+ 		--begin
+-		--	INSERT INTO SupplierLedger VALUES(@parmsupplierid,GETDATE(),'Inv VatEx Debit Cost Adjustment Reversal','ADJ',GETDATE(),'',0,@vatexadj,0,0,@parmuser,'*',@vatexadj,'UNPAID',0)
+-		--	INSERT INTO SupplierLedger VALUES(@parmsupplierid,GETDATE(),'Inv VatInput Debit Cost Adjustment Reversal','ADJ',GETDATE(),'',0,@vatinputadj,0,0,@parmuser,'*',@vatexadj,'UNPAID',0)
+-		--	INSERT INTO SupplierLedger VALUES(@parmsupplierid,GETDATE(),'Inv VatEx Debit Cost New Adjustment','ADJ',GETDATE(),'',0,0,@newvatexadj,0,@parmuser,'*',@newvatexadj,'UNPAID',0)
+-		--	INSERT INTO SupplierLedger VALUES(@parmsupplierid,GETDATE(),'Inv VatInput Debit Cost New Adjustment','ADJ',GETDATE(),'',0,0,@newvatinputadj,0,@parmuser,'*',@newvatinputadj,'UNPAID',0)
+-		--end
+-		--Update ShipmentOrder SET AmountPaid=case when AmountPaid <> 0 then AmountPaid-@actualcost else 0 end,Balance=case when Balance <> 0 then Balance-@actualcost else 0 end WHERE ShipmentNo=@parmshipmentno
+-		--Update ShipmentOrder SET AmountPaid=case when AmountPaid <> 0 then AmountPaid+(@actualqty * @parmnewcostvalue) else 0 end,Balance=case when Balance <> 0 then  Balance+(@actualqty * @parmnewcostvalue) else 0 end  WHERE ShipmentNo=@parmshipmentno
+-	 
+-
+-		UPDATE APACCOUNTS
+-			SET AmountPaid=case when AmountPaid <> 0 then AmountPaid-@actualcost else 0 end
+-			,Balance=case when Balance <> 0 then Balance-@actualcost else 0 end 
+-		WHERE ShipmentNo=@parmshipmentno
+-		and SupplierID=@parmsupplierid
+-
+-		
+-		UPDATE APACCOUNTS
+-			SET AmountPaid=case when AmountPaid <> 0 then AmountPaid+(@actualqty * @parmnewcostvalue) else 0 end
+-			,Balance=case when Balance <> 0 then  Balance+(@actualqty * @parmnewcostvalue) else 0 end  
+-		WHERE ShipmentNo=@parmshipmentno
+-		and SupplierID=@parmsupplierid
+-
+-			--VAT EX ENTRY REVERSAL
+-		
+-		exec GetTicketNumber @ticketnum output
+-		INSERT INTO TicketMaster values(@DeliveryDate,'0',@parmbranchcode,@parmbranchcode,@ticketnum,@refno,@parmshipmentno,@suppliername,@transdescvatreversal+' with Shipment #:'+@parmshipmentno,@parmuser,'*','*','UPDATED','CstAdjTran','')
+-		insert INTO TicketDetails values(@DeliveryDate,'0',@parmbranchcode,@parmshipmentno,@ticketnum,@refno,@debitacctcodevat,ROUND(@vatexadj,2),0,'') --DEBIT
+-		insert INTO TicketDetails values(@DeliveryDate,'0',@parmbranchcode,@parmshipmentno,@ticketnum,@refno,@creditacctcodevat,0,ROUND(@vatexadj,2),'') --CREDIT
+-		--VAT INPUT ENTRY REVERSAL
+-		exec GetTicketNumber @ticketnum output
+-		INSERT INTO TicketMaster values(@DeliveryDate,'0',@parmbranchcode,@parmbranchcode,@ticketnum,@refno,@parmshipmentno,@suppliername,@transdescvatinputreversal+' with Shipment #:'+@parmshipmentno,@parmuser,'*','*','UPDATED','CstAdjV','')
+-		insert INTO TicketDetails values(@DeliveryDate,'0',@parmbranchcode,@parmshipmentno,@ticketnum,@refno,@debitacctcodevatinput,ROUND(@vatinputadj,2),0,'') --DEBIT
+-		insert INTO TicketDetails values(@DeliveryDate,'0',@parmbranchcode,@parmshipmentno,@ticketnum,@refno,@creditacctcodevatinput,0,ROUND(@vatinputadj,2),'') --CREDIT
+-	
+-		--VAT EX ENTRY NEW ADJUSTMENT
+-		exec GetTicketNumber @ticketnum output
+-		INSERT INTO TicketMaster values(@DeliveryDate,'0',@parmbranchcode,@parmbranchcode,@ticketnum,@refno,@parmshipmentno,@suppliername,@transdescvatreversal+' with Shipment #:'+@parmshipmentno,@parmuser,'*','*','UPDATED','CstAdjTran','')
+-		insert INTO TicketDetails values(@DeliveryDate,'0',@parmbranchcode,@parmshipmentno,@ticketnum,@refno,@debitacctcode,ROUND(@newvatexadj,2),0,'') --DEBIT
+-		insert INTO TicketDetails values(@DeliveryDate,'0',@parmbranchcode,@parmshipmentno,@ticketnum,@refno,@creditacctcode,0,ROUND(@newvatexadj,2),'') --CREDIT
+-		--VAT EX ENTRY NEW ADJUSTMENT OF VAT INPUT
+-		exec GetTicketNumber @ticketnum output
+-		INSERT INTO TicketMaster values(@DeliveryDate,'0',@parmbranchcode,@parmbranchcode,@ticketnum,@refno,@parmshipmentno,@suppliername,@transdescvatinputreversal+' with Shipment #:'+@parmshipmentno,@parmuser,'*','*','UPDATED','CstAdjV','')
+-		insert INTO TicketDetails values(@DeliveryDate,'0',@parmbranchcode,@parmshipmentno,@ticketnum,@refno,@debitacctcode1,ROUND(@newvatinputadj,2),0,'') --DEBIT
+-		insert INTO TicketDetails values(@DeliveryDate,'0',@parmbranchcode,@parmshipmentno,@ticketnum,@refno,@creditacctcode1,0,ROUND(@newvatinputadj,2),'') --CREDIT
+ 	
+-	end
+-	else 
+-	begin
++	--	SELECT @debitacctcode=DebitGLAccount,@creditacctcode=CreditGLAccount FROM TransactionDefinition WHERE TransCode='InvVE'
++	--	---------------------
++	--	set @vatexadj = @actualcost
++	--	set @newvatexadj = @actualqty * @parmnewcostvalue
++
++	--	--VAT EXEMPT EXNTRY
++	--	--if @parmnewcostvalue > @oldcostvalue
++	--	--begin
++	--	--	--credit to supplierledger
++	--	--	--select * FROM supplierledger
++	--	--	INSERT INTO SupplierLedger VALUES(@parmsupplierid,GETDATE(),'Inv VatExempt Credit Cost Adjustment Reversal','ADJ',GETDATE(),'',0,@vatexadj,0,0,@parmuser,'*',@vatexadj,'UNPAID',0)
++	--	--	INSERT INTO SupplierLedger VALUES(@parmsupplierid,GETDATE(),'Inv VatExempt Credit Cost New Adjustment','ADJ',GETDATE(),'',0,0,@newvatexadj,0,@parmuser,'*',@vatexadj,'UNPAID',0)
++	--	--end
++	--	--else
++	--	--begin
++	--	--	INSERT INTO SupplierLedger VALUES(@parmsupplierid,GETDATE(),'Inv VatExempt Credit Cost Adjustment Reversal','ADJ',GETDATE(),'',0,@vatexadj,0,0,@parmuser,'*',@vatexadj,'UNPAID',0)
++	--	--	INSERT INTO SupplierLedger VALUES(@parmsupplierid,GETDATE(),'Inv VatExempt Debit Cost New Adjustment','ADJ',GETDATE(),'',0,0,@newvatexadj,0,@parmuser,'*',@newvatinputadj,'UNPAID',0)
++	--	--end
++	--	--Update ShipmentOrder SET AmountPaid=AmountPaid-@vatexadj,Balance=Balance-@vatexadj WHERE ShipmentNo=@parmshipmentno
++	--	--Update ShipmentOrder SET AmountPaid=AmountPaid+@newvatexadj,Balance=Balance+@newvatexadj WHERE ShipmentNo=@parmshipmentno
++
++	--	UPDATE APACCOUNTS 
++	--		SET AmountPaid=case when AmountPaid <> 0 then AmountPaid-@vatexadj end
++	--		,Balance=case when AmountPaid <> 0 then Balance-@vatexadj end
++	--	WHERE ShipmentNo=@parmshipmentno
++
++	--	UPDATE APACCOUNTS 
++	--		SET AmountPaid=case when AmountPaid <> 0 then AmountPaid+@newvatexadj end
++	--		,Balance= case when AmountPaid <> 0 then Balance+@newvatexadj end
++	--	WHERE ShipmentNo=@parmshipmentno
++	--	--INV EXEMPT ADJUSTMENT
++	--	exec GetTicketNumber @ticketnum output
++	--	INSERT INTO TicketMaster values(@DeliveryDate,'0',@parmbranchcode,@parmbranchcode,@ticketnum,@refno,@parmshipmentno,@suppliername,@transdescvatreversal+' with Shipment #:'+@parmshipmentno,@parmuser,'*','*','UPDATED','CstAdjTran','')
++	--	insert INTO TicketDetails values(@DeliveryDate,'0',@parmbranchcode,@parmshipmentno,@ticketnum,@refno,@creditacctcode,ROUND(@vatexadj,2),0,'') --DEBIT
++	--	insert INTO TicketDetails values(@DeliveryDate,'0',@parmbranchcode,@parmshipmentno,@ticketnum,@refno,@debitacctcode,0,ROUND(@vatexadj,2),'') --CREDIT
++	--	--VAT EX ENTRY NEW ADJUSTMENT OF VAT INPUT
++	--	exec GetTicketNumber @ticketnum output
++	--	INSERT INTO TicketMaster values(@DeliveryDate,'0',@parmbranchcode,@parmbranchcode,@ticketnum,@refno,@parmshipmentno,@suppliername,@transdescvatinputreversal+' with Shipment #:'+@parmshipmentno,@parmuser,'*','*','UPDATED','CstAdjV','')
++	--	insert INTO TicketDetails values(@DeliveryDate,'0',@parmbranchcode,@parmshipmentno,@ticketnum,@refno,@debitacctcode,ROUND(@newvatexadj,2),0,'') --DEBIT
++	--	insert INTO TicketDetails values(@DeliveryDate,'0',@parmbranchcode,@parmshipmentno,@ticketnum,@refno,@creditacctcode,0,ROUND(@newvatexadj,2),'') --CREDIT
+ 		
+-		SELECT @debitacctcode=DebitGLAccount,@creditacctcode=CreditGLAccount FROM TransactionDefinition WHERE TransCode='InvVE'
+-		---------------------
+-		set @vatexadj = @actualcost
+-		set @newvatexadj = @actualqty * @parmnewcostvalue
+-
+-		--VAT EXEMPT EXNTRY
+-		--if @parmnewcostvalue > @oldcostvalue
++	--end
++	--if(@isvat=1)
+ 		--begin
+-		--	--credit to supplierledger
+-		--	--select * FROM supplierledger
+-		--	INSERT INTO SupplierLedger VALUES(@parmsupplierid,GETDATE(),'Inv VatExempt Credit Cost Adjustment Reversal','ADJ',GETDATE(),'',0,@vatexadj,0,0,@parmuser,'*',@vatexadj,'UNPAID',0)
+-		--	INSERT INTO SupplierLedger VALUES(@parmsupplierid,GETDATE(),'Inv VatExempt Credit Cost New Adjustment','ADJ',GETDATE(),'',0,0,@newvatexadj,0,@parmuser,'*',@vatexadj,'UNPAID',0)
++	--	UPDATE Inventory SET Cost=@parmnewcostvalue/1.12 WHERE ShipmentNo=@parmshipmentno and Product=@parmprodcode
+ 		--end
+ 		--else
+ 		--begin
+-		--	INSERT INTO SupplierLedger VALUES(@parmsupplierid,GETDATE(),'Inv VatExempt Credit Cost Adjustment Reversal','ADJ',GETDATE(),'',0,@vatexadj,0,0,@parmuser,'*',@vatexadj,'UNPAID',0)
+-		--	INSERT INTO SupplierLedger VALUES(@parmsupplierid,GETDATE(),'Inv VatExempt Debit Cost New Adjustment','ADJ',GETDATE(),'',0,0,@newvatexadj,0,@parmuser,'*',@newvatinputadj,'UNPAID',0)
++	--	UPDATE Inventory SET Cost=@parmnewcostvalue WHERE ShipmentNo=@parmshipmentno and Product=@parmprodcode
+ 		--end
+-		--Update ShipmentOrder SET AmountPaid=AmountPaid-@vatexadj,Balance=Balance-@vatexadj WHERE ShipmentNo=@parmshipmentno
+-		--Update ShipmentOrder SET AmountPaid=AmountPaid+@newvatexadj,Balance=Balance+@newvatexadj WHERE ShipmentNo=@parmshipmentno
+-
+-		UPDATE APACCOUNTS 
+-			SET AmountPaid=case when AmountPaid <> 0 then AmountPaid-@vatexadj end
+-			,Balance=case when AmountPaid <> 0 then Balance-@vatexadj end
+-		WHERE ShipmentNo=@parmshipmentno
+-
+-		UPDATE APACCOUNTS 
+-			SET AmountPaid=case when AmountPaid <> 0 then AmountPaid+@newvatexadj end
+-			,Balance= case when AmountPaid <> 0 then Balance+@newvatexadj end
+-		WHERE ShipmentNo=@parmshipmentno
+-		--INV EXEMPT ADJUSTMENT
+-		exec GetTicketNumber @ticketnum output
+-		INSERT INTO TicketMaster values(@DeliveryDate,'0',@parmbranchcode,@parmbranchcode,@ticketnum,@refno,@parmshipmentno,@suppliername,@transdescvatreversal+' with Shipment #:'+@parmshipmentno,@parmuser,'*','*','UPDATED','CstAdjTran','')
+-		insert INTO TicketDetails values(@DeliveryDate,'0',@parmbranchcode,@parmshipmentno,@ticketnum,@refno,@creditacctcode,ROUND(@vatexadj,2),0,'') --DEBIT
+-		insert INTO TicketDetails values(@DeliveryDate,'0',@parmbranchcode,@parmshipmentno,@ticketnum,@refno,@debitacctcode,0,ROUND(@vatexadj,2),'') --CREDIT
+-		--VAT EX ENTRY NEW ADJUSTMENT OF VAT INPUT
+-		exec GetTicketNumber @ticketnum output
+-		INSERT INTO TicketMaster values(@DeliveryDate,'0',@parmbranchcode,@parmbranchcode,@ticketnum,@refno,@parmshipmentno,@suppliername,@transdescvatinputreversal+' with Shipment #:'+@parmshipmentno,@parmuser,'*','*','UPDATED','CstAdjV','')
+-		insert INTO TicketDetails values(@DeliveryDate,'0',@parmbranchcode,@parmshipmentno,@ticketnum,@refno,@debitacctcode,ROUND(@newvatexadj,2),0,'') --DEBIT
+-		insert INTO TicketDetails values(@DeliveryDate,'0',@parmbranchcode,@parmshipmentno,@ticketnum,@refno,@creditacctcode,0,ROUND(@newvatexadj,2),'') --CREDIT
+-	
+-	end
+-	if(@isvat=1)
+-	begin
+-		UPDATE Inventory SET Cost=@parmnewcostvalue/1.12 WHERE ShipmentNo=@parmshipmentno and Product=@parmprodcode
+-	end
+-	else
+-	begin
+-		UPDATE Inventory SET Cost=@parmnewcostvalue WHERE ShipmentNo=@parmshipmentno and Product=@parmprodcode
+-	end
+ 	
+-		UPDATE PODETAILS 
+-			SET ActualCost=@parmnewcostvalue
+-			,ActualTotalCost=@parmnewcostvalue*ActualQuantity
+-		WHERE ShipmentNo=@parmshipmentno 
+-		and OrderCode=@parmprodcode
+-
+-		--UPDATE OrderDetails SET CostKg=@parmnewcostvalue,ActualCost=@parmnewcostvalue*ActualQty WHERE ShipmentNo=@parmshipmentno and ProductCode=@parmprodcode
+-		--declare @totalcost money
+-		--select @totalcost=SUM(ActualCost) FROM OrderDetails WHERE ShipmentNo=@parmshipmentno
+-		--UPDATE ShipmentOrder SET TotalCost=@totalcost,ActualCost=@totalcost WHERE ShipmentNo=@parmshipmentno  
+-		UPDATE POSUMMARY SET  
+-		TotalActualCost=(SELECT SUM(ActualTotalCost) FROM PODETAILS WHERE ShipmentNo=@parmshipmentno)
+-		--(SELECT SUM(Quantity*Cost) FROM Inventory WHERE ShipmentNo=@parmshipmentno and Product=@parmprodcode)
+-		WHERE ShipmentNo=@parmshipmentno
+-
+-		UPDATE APACCOUNTS 
+-		SET ActualCost=(SELECT SUM(ActualTotalCost) FROM PODETAILS WHERE ShipmentNo=@parmshipmentno)
+-		--(SELECT SUM(Quantity*Cost) FROM Inventory WHERE ShipmentNo=@parmshipmentno and Product=@parmprodcode)
+-		,Balance=(SELECT SUM(ActualTotalCost) FROM PODETAILS WHERE ShipmentNo=@parmshipmentno)
+-		--(SELECT SUM(Quantity*Cost) FROM Inventory WHERE ShipmentNo=@parmshipmentno and Product=@parmprodcode)
+-		WHERE ShipmentNo=@parmshipmentno 
++	--	UPDATE PODETAILS 
++	--		SET ActualCost=@parmnewcostvalue
++	--		,ActualTotalCost=@parmnewcostvalue*ActualQuantity
++	--	WHERE ShipmentNo=@parmshipmentno 
++	--	and OrderCode=@parmprodcode
++
++	--	--UPDATE OrderDetails SET CostKg=@parmnewcostvalue,ActualCost=@parmnewcostvalue*ActualQty WHERE ShipmentNo=@parmshipmentno and ProductCode=@parmprodcode
++	--	--declare @totalcost money
++	--	--select @totalcost=SUM(ActualCost) FROM OrderDetails WHERE ShipmentNo=@parmshipmentno
++	--	--UPDATE ShipmentOrder SET TotalCost=@totalcost,ActualCost=@totalcost WHERE ShipmentNo=@parmshipmentno  
++	--	UPDATE POSUMMARY SET  
++	--	TotalActualCost=(SELECT SUM(ActualTotalCost) FROM PODETAILS WHERE ShipmentNo=@parmshipmentno)
++	--	--(SELECT SUM(Quantity*Cost) FROM Inventory WHERE ShipmentNo=@parmshipmentno and Product=@parmprodcode)
++	--	WHERE ShipmentNo=@parmshipmentno
++
++	--	UPDATE APACCOUNTS 
++	--	SET ActualCost=(SELECT SUM(ActualTotalCost) FROM PODETAILS WHERE ShipmentNo=@parmshipmentno)
++	--	--(SELECT SUM(Quantity*Cost) FROM Inventory WHERE ShipmentNo=@parmshipmentno and Product=@parmprodcode)
++	--	,Balance=(SELECT SUM(ActualTotalCost) FROM PODETAILS WHERE ShipmentNo=@parmshipmentno)
++	--	--(SELECT SUM(Quantity*Cost) FROM Inventory WHERE ShipmentNo=@parmshipmentno and Product=@parmprodcode)
++	--	WHERE ShipmentNo=@parmshipmentno 
+ 	
+ END

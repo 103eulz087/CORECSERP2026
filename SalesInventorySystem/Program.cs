@@ -29,6 +29,11 @@ namespace SalesInventorySystem
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
+            // 2026-10-15: "please wait" from the first moment until the Login is on screen (closed in Login.Shown).
+            // After an update exeUpdater vanishes and nothing showed until the Login; a click elsewhere then
+            // left the Login behind other windows and the restart looked stopped.
+            Classes.StartupSplash.Show();
+
             DevExpress.UserSkins.BonusSkins.Register();
             //UserLookAndFeel.Default.SetSkinStyle(SkinStyle.);
             // Black skin = NOT production, so users can tell at a glance where they are connected.
@@ -41,6 +46,7 @@ namespace SalesInventorySystem
 
 
             // 1. Load your global cache first!
+            Classes.StartupSplash.SetStatus("Connecting to the database...");
             GlobalCache.InitializeCompanyData();
 
             var app = new SingleInstanceApp();

@@ -181,7 +181,7 @@ WITH ex AS (
                  INNER JOIN dbo.TicketDetails AS td ON td.TicketNumber = tm.TicketNumber AND td.ReferenceNumber = tm.ReferenceNumber
                  WHERE tm.ReferenceNumber = es.ReferenceNumber AND tm.ReferenceKey = es.InvoiceNo AND tm.Mnemonic = 'SINGLE'
                    AND td.AccountCode IN (SELECT a.AccountCode FROM dbo.fn_InventoryCostAccounts() AS a)) AS t
-    WHERE es.PostingMode = 'SINGLE' AND ISNULL(es.ShipmentNo, '') NOT IN ('', 'CONVERSION')
+    WHERE es.PostingMode = 'SINGLE' AND ISNULL(es.ShipmentNo, '') NOT IN ('', 'CONVERSION') AND ISNULL(es.Status, '') <> 'CANCELLED'   -- [96]
     GROUP BY es.ShipmentNo),
 po AS (
     SELECT p.ShipmentNo, MAX(p.Status) AS Status, MAX(p.SupplierID) AS SupplierID

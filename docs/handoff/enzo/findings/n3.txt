@@ -1,0 +1,12 @@
+sp_SalesQtyToInventoryQtyHRI_JFC
+sp_FiFoMappingHRI_JFC
+sp_SalesQtyToInventoryQtySTS_JFC
+sp_FiFoMappingSTS_JFC
+sp_AddBranchOrderHRI_JFC
+sp_AddBranchOrder_JFC
+sp_ConfirmBranchRecievedOrderJFC
+sp_ConversionProcess_JFC
+sp_SubmitConversionRaw_JFC
+sp_CancelDeliveryFIFOJFC
+spview_SalesInvoiceJFC
+sp_BulkInsertPODetails_JFC

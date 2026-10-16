@@ -1,0 +1,17 @@
+--- enzo/spu_UpdatePrimalCutCosting.sql	2026-10-15 23:07:09.677982700 +0800
++++ prod/spu_UpdatePrimalCutCosting.sql	2026-10-15 23:07:14.615974200 +0800
+@@ -129,10 +129,10 @@
+ 
+                     SET @affectedrows = @@ROWCOUNT;
+ 
+-                    --UPDATE dbo.Inventory
+-                    --SET isWarehouse = 1
+-                    --WHERE Product = @productcode AND ShipmentNo = @ShipmentNo AND Branch = @Branch AND isWarehouse = 0
+-                    --  AND (@BatchCode = 0 OR BatchCode = @BatchCode);
++                    UPDATE dbo.Inventory
++                    SET isWarehouse = 1
++                    WHERE Product = @productcode AND ShipmentNo = @ShipmentNo AND Branch = @Branch AND isWarehouse = 0
++                      AND (@BatchCode = 0 OR BatchCode = @BatchCode);
+ 
+                     SET @transferred = 1;
+                     SET @reason = 'Transferred to Commissary';

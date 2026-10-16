@@ -363,6 +363,8 @@ namespace SalesInventorySystem.HOFormsDevEx
                     gridViewPosted.Columns["VoucherDate"].DisplayFormat.FormatType = DevExpress.Utils.FormatType.DateTime;
                     gridViewPosted.Columns["VoucherDate"].DisplayFormat.FormatString = "MM/dd/yyyy";
                 }
+                // [86] 2026-10-14: Prepared By / Date Prepared / Last Modified By / Last Modified Date
+                ManualJournalVoucherMultiBranchFrm.FormatAuditColumns(gridViewPosted);
 
                 gridViewPosted.BestFitColumns();
                 gridControlPostedDetails.DataSource = null;

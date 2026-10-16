@@ -1,0 +1,210 @@
+ENZO vs JFC in the C# (SalesInventorySystem) - read-only investigation, 2026-10-15
+Paths relative to D:\CORECSXWINDOWSAPP\SalesInventorySystem. No credentials copied.
+Supporting raw files in this folder:
+  grep_company_literals.txt  every live company comparison (63 lines)
+  branch_context.txt         each company branch with ~15 lines of context (passwords redacted)
+  main_menu_map.txt          every Main.cs ribbon handler -> item name / caption / group -> forms opened
+  procs_per_form.txt         SQL object names (string literals) per module form
+  hardcoded_888.txt          every '888' literal (119)
+  iswarehouse.txt            every isWarehouse literal (93, incl. isWarehouseOfficer)
+  sticker_rules.txt          A01/B01/19-digit barcode rules in C#
+
+=====================================================================
+1. HOW THE COMPANY IS IDENTIFIED
+=====================================================================
+A. GlobalCache.CompanyName  (THE switch used by business code)
+   - Set: Classes/GlobalCache.cs:12-45, "SELECT TOP 1 CompanyName FROM CompanyProfile" (no WHERE, no ORDER BY).
+     On error or no row -> "DEFAULT_COMPANY" (lines 34, 43).
+   - Called once: Program.cs:50, right after the skin choice (Program.cs:41-45) and BEFORE StartupForm loads
+     checkVersion.txt and before Login_Load. Uses Database.getConnection(), which caches the connection string
+     for the whole process (Classes/Database.cs:225 _cachedConnectionString) -> company = whatever DB
+     HKCU\AAITCRE\ConnSettingsMain points to at start-up.
+   - Values compared in code: "JFC", "ENZO", "VROSS" (case-sensitive ==, except Orders/AddBranchOrderSTSBatchMode.cs:44
+     OrdinalIgnoreCase). Comment there says "ENZO (ENZODEV)".
+   - Readers: ~60 places, see section 2.
+   - Maintained by HOFormsDevEx/AddCompanyDevFrm.cs:60-140 (string-built INSERT/UPDATE/DELETE on CompanyProfile).
+   - Second, inconsistent read: forms keep their own field
+       string company = Database.getSingleQuery("CompanyProfile","CompanyName <> ''","CompanyName")
+     Orders/AddOrder.cs:35, AddOrderSTS.cs:18, POForApproval.cs:37, POForApprovalSTS.cs:24, ViewBranchOrder.cs:18,
+     ViewBranchOrderSTS.cs:23, LoginDevEx.cs:30, LoginOrig.cs:33. Only ViewBranchOrder.cs:381/403 (and dead LoginOrig.cs:251) use it.
+     Branches/BranchInventory.cs:165 reads CompanyProfile WHERE BranchCode='888' (print header only).
+   - DEFAULT_COMPANY behaves like ENZO on every "== JFC ? x : legacy" branch, but gets NOTHING where the code
+     tests == "ENZO" (e.g. Main.cs:1562 Inventory IN button opens no form).
+
+B. GlobalConfig.Token  (install / update channel; used only for connection set-up)
+   - Class: Classes/GlobalVariables.cs:57-85. Loaded from <exe dir>\checkVersion.txt by StartupForm.cs:36-37.
+     Token = first path segment of any https URL line (regex https://host/<token>/). The file's
+     VersionCheckerUrl / DownloadUrlFormat carry the token -> the update channel is per client.
+   - This laptop's bin\Debug\checkVersion.txt token = 1234567890XX ("ITCORE STORE").
+   - Shown in Main status bar (Main.cs:115) and sent to the update check (Main.cs:242-244).
+   - Token values = base64 of a 9-digit id (some with the first char altered):
+       NTE5MTYwNDY4 -> 519160468  JFC   (Login.cs:122 comment "JFC AND ENZOSTAGING AND ITCORE")
+       Nzc0Njk4NjY0 -> 774698664  ENZOSTAGING (old block comment Login.cs:814)  ** grouped with JFC in the live code **
+       ODU2NDE4OTA3 -> 856418907  ENZO            MzMyODgyODc0 -> 332882874 ENZOCOMM
+       HTQwNzExMTYx -> (altered)  ENZOHRI         MjYxMjQ3MTkz -> 261247193 ENZOKIM
+       OTQ1NDczOTYy -> 945473962  ENZOKIM         B2Y2NjYxMzY3 -> (altered) ENZOb2
+       MTQ2NzgwNjAz -> 146780603  ENZO STORE (standalone POS)
+       ODM1NTI0ODYz -> 835524863  VROSS STORE     NjQwOTg4MzU1 -> 640988355 KRAFT STORE
+       ONEzNTE4NjEx -> (altered)  ONELOVE STORE   1234567890XX -> ITCORE STORE (not base64)
+       ATk1NjU1NTU1 / MzEyNzU2Njk1 / iTAyNjU5Mjk5 -> VROSSACCTG / VROSSCORP / VROSSINV
+   - LIVE uses (Login_Load, Login.cs:86-150):
+       Login.cs:91-97   tokens MTQ2NzgwNjAz, ODM1NTI0ODYz, 1234567890XX, ONEzNTE4NjEx, NjQwOTg4MzU1
+                        -> Database.RunLocalDatabaseMigrations() (Classes/Database.cs:137-190: ALTER POSType add
+                        isAutoSystemDeduct, ALTER POSCreditCardTransactions add isUpload) on ConnSettingsMain.
+                        NB 1234567890XX is this dev laptop -> runs on every login against whatever DB Main points to.
+       Login.cs:123-139 tokens NTE5MTYwNDY4 (JFC) and Nzc0Njk4NjY0 (ENZOSTAGING) -> ConnRegistry.SetTarget +
+                        SetTargetConnSettingsServer to the JFC PRODUCTION server/database, with a HARD-CODED SQL
+                        login at Login.cs:131-132 and 137-138 (values not copied). Written to the registry only; the
+                        running process keeps its cached connection, so it takes effect at the next start.
+   - DEAD uses: Login.cs:684-~900 is inside /* */ (old Login_Load with per-token targets, more hard-coded logins
+     at 729-833); Login_OLD_09012026.cs; ConnRegistry.cs:75-76 / ConnRegistry_OLD_09012026.cs commented.
+
+C. Registry / skin
+   - HKCU\AAITCRE\ConnSettingsMain (dbconn / servername / dbname), ConnSettingsServer (cloud/HO, used by
+     POSEndOfDay.cs:886 and POS sync); written by Connection.cs and ConnRegistry (Classes/ConnRegistry.cs).
+   - Program.cs:41-45: WXICompact skin only when dbname == "PRODJFC_COREX", else Black ("not production").
+     ENZO production (CORECSERP_001) would open in the "not production" skin.
+   - HKCU\AAITCRE\POSV2 Enabled (POSV2/PosV2Config.cs:43) -> Main.openPOS (Main.cs:684-692) opens POS V2.
+
+D. Login flags: NO company flag (no isJFC / isEnzo). Login.cs:30 statics are role flags from dbo.Users
+   (isAdmin, isGlobalOfficer, isBranchOfficer, isWarehouseOfficer, isMaker, isChecker, isCashier, isApprover,
+   isAccounting) + assignedBranch. Login.compname is declared but never assigned (assignments commented, 416/518).
+   POS/POSErrrorCorrect.cs:424 calls a local "isHRI" = POSType.isEnableInvoicePrinting=1 (a feature flag, not a company).
+
+E. Menu: Main.validate_userAccess (Main.cs:440-484) reads UserMenuAccess per user (isAdmin/isSales/isInventory/
+   isAccounting/isHotel/isReporting/isForwarding/isClientDataSheet = '|'-separated item names) and readMenu
+   (Main.cs:394-438) shows only listed items. Hard-coded user "eulz" sees Admin (Main.cs:471). Ribbon items are
+   NOT company-gated, except the Inventory IN handler (Main.cs:1562-1575). The Setup*Menu helpers
+   (Main.cs:1156-1252) gate by admin/accounting flags only.
+
+=====================================================================
+2. COMPANY-CONDITIONAL BRANCHES (live code)
+=====================================================================
+PURCHASE ORDER
+ HOFormsDevEx/AddPurchaseOrder.cs:62   JFC: grid = all Products of branch, Cost 0, 'kg' (new flow, cost from expenses);
+                                       else func_viewPurchaseOrder(branch, supplier) with supplier cost.
+ HOFormsDevEx/AddPurchaseOrder.cs:325  TVP dbo.PODetailsType_JFC vs dbo.PODetailsType (and table builder _JFC)
+ HOFormsDevEx/AddPurchaseOrder.cs:343  sp_BulkInsertPODetails_JFC vs sp_BulkInsertPODetails
+ HOFormsDevEx/VIEWPO.cs:211, 232       funcview_PODetails_JFC vs funcview_PODetails
+ AccountingDevEx/ViewLinkedPODetailsFrm.cs:83  same pair
+RECEIVING (HO inventory in from PO)
+ HOFormsDevEx/AddInventoryDevEx.cs:46  VROSS: barcode boxes unticked
+ HOFormsDevEx/AddInventoryDevEx.cs:81  ENZO: Pallet No required
+ HOFormsDevEx/AddInventoryDevEx.cs:366/375  ENZO: ORDER BY SequenceNumber DESC + group by Description, PalletNo count
+ HOFormsDevEx/AddInventoryDevEx.cs:630 JFC: PrintQrJFC vs PrintQr
+ HOForms/AddPrimalCutInventory.cs:62   ENZO: product list limited to ProductCategoryCode 10/11/12
+STS (stock transfer)
+ Orders/AddItemsBranchOrderSTS.cs:117/121  blank unit -> VROSS 'pcs', ENZO 'kgs' (JFC/other: left blank)
+ Orders/STSForApprovalDetails.cs:188   ENZO or JFC: hide Barcode column on print
+ Orders/POForApprovalSTS.cs:440, ViewBranchOrderSTS.cs:154  non-VROSS: hide BarcodeNo + TotalCost on STS print
+ Orders/ViewBranchOrderSTS.cs:42 (double-click), :353 (Single Mode)  JFC -> openBranchOrderV2() = AddBranchOrderSTSV2
+                                       (:567/583); else openBranchOrder("STS") = AddBranchOrderSTS (:511/521)
+ Orders/ViewBranchOrderSTS.cs:494      HRI order (openHRIOrder, branch '999'): funcview_populateProductsInPO_JFC vs _InPO
+ Orders/ViewBranchOrderSTS.cs:542      funcview_populateProductsInPOJFC vs funcview_populateProductsInPO
+                                       (JFC branch now unreachable: JFC goes to V2)
+ Orders/AddBranchOrderSTS.cs:153       grid: funcview_ProcessOrderItemsSales (JFC) vs inline DeliveryDetails SELECT
+ Orders/AddBranchOrderSTS.cs:243/266   sp_AddBranchOrder_JFC (+@parmshipmentno) vs sp_AddBranchOrder
+ Orders/AddBranchOrderSTS.cs:952       cancel scanned line: JFC A01/B01 -> by barcode else FIFO return; others always by barcode
+ Orders/AddBranchOrderSTSBatchMode.cs:44  ENZO: categories 10/11/12 restricted
+ Orders/AddBranchOrderSTSV2.cs:140     default FIFO type JFC Manual, else Auto
+ Orders/ReceivedSTS.cs:166             right-click: JFC shows only "FIFO" item -> ReceivedSTSBatchModeFIFO;
+                                       others only item[0] -> ReceivedSTSBatchMode
+ HOFormsDevEx/ReceivedSTSBatchMode.cs:38   sp_ConfirmBranchRecievedOrderJFC vs sp_ConfirmBranchRecievedOrder
+ HOFormsDevEx/ReceivedSTSBatchModeFIFO.cs:147  @UseJFC = (CompanyName=="JFC") passed to spu_STS_ReceiveTransfer
+SALES ORDER
+ Orders/ViewBranchOrder.cs:173 (double-click), :255 (Process this Order)  JFC -> AddBranchOrderV2 (:38/55); else AddBranchOrder (:183/200)
+ Orders/ViewBranchOrder.cs:220         funcview_populateProductsJFC vs funcview_populateProducts (JFC branch unreachable now)
+ Orders/ViewBranchOrder.cs:381/403     (local 'company') non-JFC: For Delivery / Rejected list all branches; JFC: own branch
+ Orders/AddBranchOrder.cs:128          grid funcview_ProcessOrderItemsSales (JFC) vs inline DeliveryDetails SELECT
+ Orders/AddBranchOrder.cs:171/181      sp_AddBranchOrderHRI_JFC (+@parmshipmentno) vs sp_AddBranchOrderHRI
+ Orders/AddBranchOrder.cs:275          sp_CancelDeliveryFIFOJFC vs sp_CancelDelivery
+ Orders/AddBranchOrder.cs:577          non-JFC: client-side stock check Inventory isWarehouse='1' AND Available>0
+ Orders/AddBranchOrderV2.cs:142        default FIFO type JFC Manual, else Auto
+ Orders/POForApproval.cs:601/611/617   spview_SalesInvoiceJFC vs spview_SalesInvoice; JFC footer count; JFC invoice date = EffectivityDate
+ HOForms/ViewForDeliveryDetails.cs:194/202/208  same invoice pair; JFC footer; JFC InvoiceDate
+ Reporting/SalesInvoiceDexEx.cs:46     JFC: DevExReportTemplate.SalesInvoiceJFC (Epson LQ310 layout) vs default template
+ POS/POSConfirmPaymentResto.cs:719     spview_SalesInvoiceJFC vs spview_SalesInvoice
+CONVERSION (legacy HOForms/HOConversion.cs)
+ :786   source grid per ShipmentNo+ReferenceCode+Product (JFC) vs per Product filtered by category (else)
+ :1192/1213/1225/1336  JFC adds ShipmentNo / ReferenceCode to the one-to-many TVP rows and source
+ :1376  dbo.sp_SubmitConversionRaw_JFC vs dbo.sp_SubmitConversionRaw
+ :1397  JFC only: @CuttingFee
+ :1416  TVP dbo.TVP_Conversion_OneToManyLines_JFC vs dbo.TVP_Conversion_OneToManyLines
+INVENTORY VIEW / IN
+ Main.cs:1562-1575  Inventory IN button: ENZO or JFC -> ReInventoryIn; VROSS -> POS.POSInventoryIN; other -> nothing
+ Branches/BranchInventory.cs:49   view_BranchInventoryJFC vs view_BranchInventory
+OTHER
+ HOForms/ChangePassword.cs:39     password policy skipped for VROSS
+ Reporting/StocksOrder.cs:127     VROSS: ProductCode / QtyReceived not printed
+ LoginOrig.cs:251 (dead form, never opened)
+
+=====================================================================
+3. MODULE TABLE (ENZO modules)
+=====================================================================
+Module | ENZO form -> procs | JFC form -> procs | how chosen
+-------|-------------------|------------------|-----------
+Create PO (Main btnAddPurchaseOrder, Main.cs:900) | HOFormsDevEx.AddPurchaseOrder: func_viewPurchaseOrder, sp_PeekShipmentNo, SP_ADDPOSUM, sp_BulkInsertPODetails + PODetailsType, sp_GetShipmentNo | same form: Products (cost 0), sp_BulkInsertPODetails_JFC + PODetailsType_JFC, rest same | code branch (AddPurchaseOrder.cs:62/325/343)
+View approved PO (btnViewPurchaseList, Main.cs:963) | HOFormsDevEx.VIEWPO: funcview_PODetails; CONFIRMPO -> SP_CONFIRMPO; VIEWPODETAILS inline UPDATE POSUMMARY; spout_APAccounts (VIEWPO.cs:401); legacy HOForms.AddInventory (VIEWPO.cs:268 -> SP_POSTINVENTORY) | same form: funcview_PODetails_JFC; POFinalizeCostFrm (sp_GetPOFinalCostItems, spu_ConfirmPOFinalCost) - not company-gated | code branch for details only
+Received inventory (btnReceiveInventory, Main.cs:1356) | ReceivedInventoryDevEx (view_ReceivedShipment, view_PODETAILS) -> AddInventoryDevEx: sp_GetReferenceNumber, sp_AddTempInventory, sp_ImportCarcassInventory, sp_CheckBatchUploadedItems, funcview_populateProducts, sp_AddHOCarcassInventory, SP_POSTINVENTORY (:409), func_GenerateBarcode; or AddInventoryDevExBatchMode (SP_POSTINVENTORY :186) | same forms | same; ENZO pallet rule/sort, JFC QR print (code branch)
+Request STS (btnRequestStockTransfer, Main.cs:2855) | Orders.AddOrderSTSBatchMode: sp_GetPurchaseOrderNumber + inline "INSERT INTO TransferOrderSummary VALUES(@p1..@p17)" (:68) -> AddItemsBranchOrderSTS: funcview_STSProductAndInventory, inline #tmp + INSERT TransferOrderDetails | same | same (unit default only). Orders.AddOrderSTS (sp_AddTransferOrderRequest + tt_TransferOrderLines) has NO opener in code
+View / approve STS (btnViewSTSOrder, Main.cs:4109) | POForApprovalSTS (funcview_TransferOrderDetailsSTS, spr_STSSummary) -> STSForApprovalDetails (sp_ApproveTransferOrder + tt_TransferApprovalLines) | same | same
+Process STS (btnProcessSTS, Main.cs:2863) | ViewBranchOrderSTS -> AddBranchOrderSTS: sp_GetDeliveryNumber, sp_AddBranchOrder, sp_AddBranchOrderByBarcode, sp_ConfirmBranchOrderSTS, sp_ReverseSTSInventoryTransfer, view_CommissaryInventory, func_GenerateBarcodeSTS, funcview_populateProductsInPO; Batch Mode -> AddBranchOrderSTSBatchMode: funcview_TransferOrderDetailsSTSBatchMode, sp_AddBranchOrderBatch + TransferItemType, sp_ConfirmBranchOrderSTS; HRI: btnPendingHRI -> openHRIOrder (AddBranchOrderSTS, branch '999') | AddBranchOrderSTSV2: funcview_STSV2_Products / _ProductLots / _DeliveryLines, fn_InvEligibleLots, spu_PostSTSLineV2, spu_ReverseSTSLineV2, sp_ConfirmBranchOrderSTS, func_GenerateBarcodeSTS; Batch Mode same as ENZO | code branch in ViewBranchOrderSTS.cs:42/353; Batch Mode not gated
+Received STS (btnReceivedSTS, Main.cs:4093) | Orders.ReceivedSTS -> ReceivedSTSBatchMode: funcview_DeliveryDetailsForReceiving (ReceivedSTS.cs:188), sp_AddBranchInventoryBatch + InventoryItemType, sp_ConfirmBranchRecievedOrder, sp_ReverseSTSInventoryTransfer (@parmorigin '888') | ReceivedSTSBatchModeFIFO: funcview_InventoryDeliveryFIFOForReceivingV2, spu_STS_ReceiveTransfer + tt_STSReceiveFIFOLines + tt_STSReceiveReturnRows (@Origin '888', @UseJFC) | code branch ReceivedSTS.cs:166 (menu item visibility)
+Branch transfer inventory | HO->branch: Transfer Per Pallet (TransferPerPalletDevExFixed: sp_GetTransNumber, sp_StagePalletForTransfer, sp_CommitTransferPallet; isWarehouse 1/0), Transfer Per Barcode (TransferByBarcode: funcview_TransferInventoryByBarcode, sp_StageBarcodeForTransfer, sp_CommitTransferBatch), Request Transfer (TransferUpdateDevEx: sp_InventoryTransferFIFO, sp_CheckInventoryTransfer, sp_TransferByPallet); branch->branch / return: TransferBranchToBranchInvDevEx (sp_GetTransferInventoryNumber, func_GenerateBarcodeReturnTransfer, sp_AddBranchTransferInventory, sp_ConfirmBranchTransferInventory, sp_CancelTranferInventoryItems) and ReceivedTransferBranchInventory -> ReceivedTransferInventoryBatchMode (sp_AddBranchTransferInventoryBatch + TransferInventoryItemType, sp_ConfirmBranchReceivedTransferInventory) | same | same (no branch)
+Stock out | StockOut Items -> InventoryOut: sp_FiFoMappingStockOut, sp_InsertStockOutSummary, sp_GetBadOrderNumber, funcview_populateProductsForStockOut; Stock-Out Per Barcode -> StockOutPerBarcode (sp_GetStockOut*, spu_PostStockOutBarcode + tt_StockOutBarcodeLines, spu_ReverseStockOutBarcode, vw_StockOutBarcodeSummary) | same | per-user menu only
+Inventory IN / re-inventory | Inventory IN -> ReInventoryIn: funcview_InventoryIN, funcview_InventoryINManualEntry, sp_GetInventoryINNumber, sp_UploadTempInventoryIN, sp_ReInventoryAnalyzer, sp_CommitReInventoryIN, sp_StageBarcodeForReInventoryIN, func_GenerateBarcodeReInventoryIN, sp_StageManualEntryForReInventoryIN, sp_CommitReInventoryINManualEntry; Inventory IN Adjustment -> InventoryIN (sp_UploadInventoryINAdj + inline INSERT InventoryIN); Branch Inventory IN -> BranchInventoryIN (funcview_BranchInventoryIN, sp_BranchInventoryINProcess + InventoryINType) | same | Main.cs:1562 (ENZO||JFC same form)
+Conversion | btnConversion -> HOConversion: sp_GetConversionNumber, sp_ConversionProcess, func_GenerateBarcodeConversion, sp_SubmitConversionRaw + TVP_Conversion_OneToManyLines / _ManyToOneLines | HOConversion -> sp_SubmitConversionRaw_JFC + TVP_Conversion_OneToManyLines_JFC (+@CuttingFee); btnConversionPerBarcode -> ConversionPerBarcode (spu_PostConversionBarcode w/ @DateConversion [67], spu_ReverseConversionBarcode) + ConversionPerBarcodeFinalize (spu_FinalizeConversionBarcode = GL CONV-FINALIZE) | code branch inside HOConversion; which button = per-user menu
+POS / EOD deduction | PointOfSale (sp_AddSalesInvoice, sp_GetPOSTransactionNo, sp_Cancel/Delete/VoidPOSTransaction, spr_POSCloseTransaction) on the store's local DB; END OF DAY -> POS.POSEndOfDay (spr_POSZReading, sp_Backup + BackupType; gate POSType.isAutoSystemDeduct else ReInventoryMonitoring.isDeducted on ConnSettingsServer, POSEndOfDay.cs:886-1124); uploads POSDataManagementAutomation (sp_ReplicateSalesBatch + ManipItemType), BatchUploading (sp_BatchUpload, spu_ComputeBatchUpload), POSUploadChecker (sp_POSUploadChecker); HO deduction Deduct Inventory -> DeductInventoryDevEx (sp_Analyze, spr_InventoryUnitActivity, spu_ComputeSalesCosting, sp_FiFoMappingSalesInvDeduct) | same; POS V2 if registry POSV2 Enabled=1 | token (standalone store migrations) + POSType flags + registry; no CompanyName branch
+Sales orders | AddOrder (sp_AddSalesOrderRequest + tt_PurchaseOrderLines, ...); POForApproval (spview_SalesInvoice); ViewBranchOrder -> AddBranchOrder: sp_AddBranchOrderHRI, sp_AddHRIOrderByBarcode, sp_ConfirmBranchOrder, sp_CancelDelivery, funcview_populateProducts; ConfirmOrderDevEx (sp_ConfirmOrder); ReturnSalesOrder (sp_ReturnSalesOrder + tt_ReturnSalesOrderLines + tt_ReturnSalesOrderQty) | AddBranchOrderV2: funcview_SOV2_*, fn_InvEligibleLots, spu_PostSOLineV2, spu_ReverseSOLineV2, sp_ConfirmBranchOrder; spview_SalesInvoiceJFC; same confirm / return | code branch ViewBranchOrder.cs:173/255. sp_FiFoMappingHRI: not referenced in C# (only inside SQL, not verifiable here)
+Xero upload | POSDevEx.POSXReadReportDevEx (btnPOSReportReading Main.cs:1430): report types from table SalesReportType (:70) -> spr_POSReports @parmoption = ReportID (:1459-1467); the hidden combobox lists "XERO SalesInvoice" (Designer :599); export ExportToXls (:1811). No other Xero code. | same | data-driven (SalesReportType rows)
+
+=====================================================================
+4. HARD-CODED ASSUMPTIONS THAT WOULD HURT ENZO ON THE JFC PATH
+=====================================================================
+- Login.cs:123-139: token Nzc0Njk4NjY0 (labelled ENZOSTAGING in the old block) is grouped with JFC and the
+  registry is rewritten to the JFC PRODUCTION database (+ hard-coded login lines 131-132 / 137-138).
+- Program.cs:41-45 skin keyed to "PRODJFC_COREX".
+- Company read before the token / registry rewrite; connection string cached for the process (Database.cs:225).
+- 888 = head office everywhere (119 literals, hardcoded_888.txt), e.g. ReceivedSTSBatchModeFIFO.cs:146 @Origin "888",
+  ReceivedSTSBatchMode.cs:136, AddOrderSTSBatchMode.cs:52/161, TransferBranchToBranchInvDevEx.cs:68,
+  TransferUpdateDevEx.cs:53/165/169/511-564, ReInventoryIn.cs:98, InventoryIN.cs:28/82, DeductInventoryDevEx.cs:459,
+  AddBranchOrderSTS.cs:143/498/506, ViewBranchOrder.cs:290/297/388/410, InventoryQtyAdjustmentDevEx.cs:36. ENZO also
+  uses 888 as HO (work log [82]) - fine today, but not configurable.
+- IsWarehouse: JFC V2 engine eligibility = Available>0 AND IsWarehouse=1 (SQL side, work log Feature 8); ENZO keeps
+  3rd-party storage at IsWarehouse=0 (TransferPerPalletDevExFixed.cs:36-108 offers both). Non-JFC client-side check
+  AddBranchOrder.cs:577 isWarehouse='1'.
+- Sticker rule: AddBranchOrderSTS.cs:956 A01/B01 (JFC branch); TransferUpdateDevEx.cs:543 19-digit (all);
+  SQL fn_InvIsStickerBarcode (A01 / 19-digit) used by the V2 engine (work log [37]).
+- GL: JFC-only flows post GL (STS V2 / SO V2 via sp_ConfirmBranchOrderSTS / sp_ConfirmBranchOrder / sp_ConfirmOrder
+  all-VATEX rule, ConversionPerBarcodeFinalize CONV-FINALIZE, POFinalizeCostFrm). ENZO has no accounting: on ENZO's
+  DB these need JournalEntryMapping rows or must be skipped.
+- _JFC proc / TVP / view names on the JFC path (all gated): sp_BulkInsertPODetails_JFC, PODetailsType_JFC,
+  funcview_PODetails_JFC, sp_AddBranchOrder_JFC, sp_AddBranchOrderHRI_JFC, sp_CancelDeliveryFIFOJFC,
+  sp_ConfirmBranchRecievedOrderJFC, sp_SubmitConversionRaw_JFC, TVP_Conversion_OneToManyLines_JFC,
+  spview_SalesInvoiceJFC, view_BranchInventoryJFC, funcview_populateProductsJFC, funcview_populateProductsInPO_JFC,
+  funcview_populateProductsInPOJFC, SalesInvoiceJFC (report), PrintQrJFC.
+- Shared forms recently changed for JFC that call objects ENZO's DB may not have (unconditional):
+  ProductsDevEx.cs:211 spu_AddProductAllBranches [94]; AddSupplierDevEx.cs:94-109 sp_addSupplier @parmisboth and
+  :177-198 UPDATE ... isPayableBoth [93]; Orders/ReturnSalesOrder.cs:363 tt_ReturnSalesOrderQty [36];
+  ConversionPerBarcode @DateConversion / DateEntered [67]; ReceivedTransferInventoryBatchMode -> 59451 guard [82]
+  (ENZO pending). Needs a read-only check on ENZO's DB.
+- ENZO path objects that do not exist on the JFC tiers (work log): funcview_DeliveryDetailsForReceiving
+  (ReceivedSTS.cs:188); SP_CONFIRMPO no longer compiles on JFC tiers (CONFIRMPO.cs:29).
+- Positional INSERT: AddOrderSTSBatchMode.cs:68 INSERT INTO TransferOrderSummary VALUES(17 params) - breaks if
+  either DB adds a column.
+- DEFAULT_COMPANY fallback = legacy (ENZO-like) path but no Inventory IN form.
+- Main.cs:471 hard-coded user "eulz".
+
+=====================================================================
+5. ALREADY PREPARED FOR MULTI-COMPANY
+=====================================================================
+- CompanyProfile.CompanyName -> GlobalCache.CompanyName (one switch, ~60 call sites) + AddCompanyDevFrm.
+- checkVersion.txt token = per-client install + update channel (VersionCheckerUrl / DownloadUrl).
+- Per-machine registry keys (ConnSettingsMain/Server, POSV2) - pattern for per-site flags (PosV2Config).
+- POSType flags (isAutoSystemDeduct, isEnableInvoicePrinting, isEnablePrinting, UploadPerShifting, POSType 1/2,
+  DisplayPoolPort, CashBeginAmount); InventorySettings (isFIFO, isRealTimeDeduction,
+  POSStandAloneSetup/POSInventorySettings.cs:27-51).
+- UserMenuAccess per-user ribbon lists (Main.cs:440-484) - menu can already differ per DB without code.
+- SQL-side opt-ins: spu_STS_ReceiveTransfer @UseJFC; FIFO engine @SkipBarcodedLots; optional TVPs/params;
+  JournalEntryMapping for GL accounts; SalesReportType rows drive POS report options (incl. Xero).
+- Parallel _JFC objects mean the two flows already coexist by name in one exe.

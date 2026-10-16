@@ -1,0 +1,52 @@
+--- enzo/sp_addSupplier.sql	2026-10-15 23:07:10.346861100 +0800
++++ prod/sp_addSupplier.sql	2026-10-15 23:07:15.417185200 +0800
+@@ -12,30 +10,31 @@
+ 	@parmlineofbusiness varchar(50),
+ 	@parmisvat bit,
+ 	@parmislocal bit,
+-	@exectype varchar(20) 
++	@exectype varchar(20),
++	@parmisboth bit = NULL      -- [93] 2026-10-15: paid by Cash / Check AND Telegraphic; NULL = keep (0 for a new supplier)
+ AS
+-
+-declare @idinc int
+-set @idinc=1
+-
+-declare @id varchar(10)
+-set @id = '000'
+-
+-declare @supplierid varchar(10)
+-set @supplierid=@id+@idinc
+-
++/*
++    The Supplier screen (HOFormsDevEx/AddSupplierDevEx): ADD inserts a supplier; UPDATE (not used by the screen today)
++    updates one. [93] 2026-10-15: explicit column list on the INSERT (it was INSERT INTO Supplier VALUES (...), which a
++    new column breaks) and the optional @parmisboth (Supplier.isPayableBoth); an older exe that omits it keeps working.
++*/
+ BEGIN
+-	-- SET NOCOUNT ON added to prevent extra result sets from
+-	-- interfering with SELECT statements.
++	SET NOCOUNT ON;
++
+ 	if(@exectype='ADD')
+ 	begin
+-		--select * FROM Supplier truncate table Supplier
+-		INSERT INTO Supplier VALUES(@parmsuppkey,@parmid,@parmsuppliername,@parmaddress,@parmcontact,@parmofficer,@parmtinno,@parmtradename,@parmlineofbusiness,@parmisvat,@parmislocal)
++		INSERT INTO dbo.Supplier
++			(SupplierKey, SupplierID, SupplierName, Address, ContactNo, Officer, TinNo, TradeName, LineOfBusiness,
++			 isVat, isLocal, PaymentMode, isPayableBoth)
++		VALUES
++			(@parmsuppkey, @parmid, @parmsuppliername, @parmaddress, @parmcontact, @parmofficer, @parmtinno, @parmtradename, @parmlineofbusiness,
++			 @parmisvat, @parmislocal, 'MANUAL', ISNULL(@parmisboth, 0))
+ 	end
+ 	else if(@exectype='UPDATE') 
+ 	begin
+-		UPDATE Supplier set SupplierName=@parmsuppliername,Address=@parmaddress,ContactNo=@parmcontact,Officer=@parmofficer,TinNo=@parmtinno,TradeName=@parmtradename,LineOfBusiness=@parmlineofbusiness,
+-		isVat=@parmisvat,isLocal=@parmislocal WHERE SupplierKey=@parmsuppkey
++		UPDATE dbo.Supplier set SupplierName=@parmsuppliername,Address=@parmaddress,ContactNo=@parmcontact,Officer=@parmofficer,TinNo=@parmtinno,
++		TradeName=@parmtradename,LineOfBusiness=@parmlineofbusiness,isVat=@parmisvat,isLocal=@parmislocal,
++		isPayableBoth=ISNULL(@parmisboth, isPayableBoth)
++		WHERE SupplierKey=@parmsuppkey
+ 	end
+-
+ END

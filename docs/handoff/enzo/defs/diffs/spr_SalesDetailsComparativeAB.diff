@@ -1,0 +1,16 @@
+--- enzo/spr_SalesDetailsComparativeAB.sql	2026-10-15 23:07:10.499661000 +0800
++++ prod/spr_SalesDetailsComparativeAB.sql	2026-10-15 23:07:15.604160600 +0800
+@@ -1,4 +1,4 @@
+-CREATE PROC [dbo].[spr_SalesDetailsComparativeAB] --exec [spr_SalesDetailsComparativeAB] '030','POS3','2026-08-01','2026-08-31'
++CREATE PROC spr_SalesDetailsComparativeAB
+ 	@parmbrcode char(3)
+ 	,@parmmachinename varchar(30)
+ 	,@datefrom date
+@@ -21,7 +21,6 @@
+ 			 INNER JOIN POSZReadingTransactions2 b with(nolock) 
+ 				ON a.BranchCode=b.BranchCode
+ 				and a.BeginningSINo=b.BeginningSINo
+-				and a.EndingSINo=b.EndingSINo
+ 				and a.MachineUsed=b.MachineUsed
+ 			 WHERE a.BranchCode=@parmbrcode 
+ 			 and a.DateExecute between @datefrom and @dateto

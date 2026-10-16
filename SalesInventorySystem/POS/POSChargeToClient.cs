@@ -42,7 +42,9 @@ namespace SalesInventorySystem.POS
         private void POSChargeToClient_Load(object sender, EventArgs e)
         {
             //lbltranscode.Text = PointOfSale._transcode;
-            Database.displaySearchlookupEdit("SELECT CustomerKey,CustomerName FROM Customers", txtcust, "CustomerName", "CustomerName");
+            // 2026-10-15 (H6): keyed on CustomerKey, not the name (988 customers share a name on PRODUCTION); no free text
+            Database.displaySearchlookupEdit("SELECT CustomerKey,CustomerName FROM Customers", txtcust, "CustomerName", "CustomerKey");
+            txtcust.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;
         }
 
 
@@ -77,7 +79,7 @@ namespace SalesInventorySystem.POS
         private void txtcust_EditValueChanged(object sender, EventArgs e)
         {
             custkey=SearchLookUpClass.getSingleValue(txtcust, "CustomerKey");
-            customercode = custkey.ToString();
+            customercode = custkey?.ToString() ?? "";   // 2026-10-15 (H6): null when nothing picked / cleared
         }
 
         private void btnsubmit_Click(object sender, EventArgs e)

@@ -1,0 +1,27 @@
+--- enzo/sp_FiFoMappingSTS.sql	2026-10-15 23:07:08.236043200 +0800
++++ prod_jfc/sp_FiFoMappingSTS_JFC.sql	2026-10-15 23:14:28.402977100 +0800
+@@ -1,9 +1,10 @@
+ 
+-CREATE PROCEDURE [dbo].[sp_FiFoMappingSTS]  
++CREATE PROCEDURE [dbo].[sp_FiFoMappingSTS_JFC]  
+ 	@parmtransdate date,
+ 	@parmorigin char(3),
+ 	@parmbranchcode char(3),
+ 	@parmprodcode char(5),
++	@parmshipmentno varchar(10),
+ 	@parmqty decimal(18,3),
+ 	@parmdevno varchar(10),
+ 	@parmpono varchar(10),
+@@ -77,10 +78,11 @@
+ 			WHERE BranchCode = @parmbranchcode AND ProductCode = @ChildProduct;
+ 				
+ 			-- Execute the actual FIFO Deduction for this specific child product
+-			EXEC dbo.sp_SalesQtyToInventoryQtySTS 
++			EXEC dbo.sp_SalesQtyToInventoryQtySTS_JFC 
+ 				@SeqNo OUTPUT, 
+ 				@parmorigin, 
+ 				@parmbranchcode, 
++				@parmshipmentno,
+ 				@ChildProduct, 
+ 				@RunningQtySold, 
+ 				@sprice, 

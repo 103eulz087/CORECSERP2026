@@ -52,6 +52,7 @@
             this.label9 = new System.Windows.Forms.Label();
             this.txtsupplierkey = new System.Windows.Forms.TextBox();
             this.chcklocalsupplier = new System.Windows.Forms.CheckBox();
+            this.chckpayableboth = new System.Windows.Forms.CheckBox();
             this.txtlineofbusiness = new System.Windows.Forms.TextBox();
             this.txttradename = new System.Windows.Forms.TextBox();
             this.chckisvat = new System.Windows.Forms.CheckBox();
@@ -267,6 +268,7 @@
             this.groupControl1.Controls.Add(this.label9);
             this.groupControl1.Controls.Add(this.txtsupplierkey);
             this.groupControl1.Controls.Add(this.chcklocalsupplier);
+            this.groupControl1.Controls.Add(this.chckpayableboth);
             this.groupControl1.Controls.Add(this.txtlineofbusiness);
             this.groupControl1.Controls.Add(this.txttradename);
             this.groupControl1.Controls.Add(this.chckisvat);
@@ -327,6 +329,17 @@
             this.chcklocalsupplier.TabIndex = 29;
             this.chcklocalsupplier.Text = "isLocal Supplier?";
             this.chcklocalsupplier.UseVisualStyleBackColor = true;
+            //
+            // chckpayableboth
+            //
+            this.chckpayableboth.AutoSize = true;
+            this.chckpayableboth.Location = new System.Drawing.Point(450, 221);
+            this.chckpayableboth.Margin = new System.Windows.Forms.Padding(7, 7, 7, 7);
+            this.chckpayableboth.Name = "chckpayableboth";
+            this.chckpayableboth.Size = new System.Drawing.Size(420, 29);
+            this.chckpayableboth.TabIndex = 32;
+            this.chckpayableboth.Text = "Pay by Cash/Check AND Telegraphic";
+            this.chckpayableboth.UseVisualStyleBackColor = true;
             // 
             // txtlineofbusiness
             // 
@@ -478,6 +491,7 @@
         private System.Windows.Forms.TextBox txtlineofbusiness;
         private System.Windows.Forms.TextBox txttradename;
         private System.Windows.Forms.CheckBox chcklocalsupplier;
+        private System.Windows.Forms.CheckBox chckpayableboth;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.TextBox txtsupplierkey;
     }

@@ -1,0 +1,11 @@
+--- enzo/trg_AutoAddProducts.sql	2026-10-15 23:07:10.299322500 +0800
++++ prod/trg_AutoAddProducts.sql	2026-10-15 23:07:15.356389600 +0800
+@@ -4,7 +4,7 @@
+ -- Description:	<Description,,>
+ -- =============================================
+ CREATE TRIGGER [dbo].[trg_AutoAddProducts]
+-   ON  [dbo].[Branches]
++   ON  dbo.Branches
+    AFTER INSERT
+ AS 
+ 	declare @branchcode varchar(5)

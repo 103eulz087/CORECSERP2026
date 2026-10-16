@@ -267,10 +267,13 @@ namespace SalesInventorySystem.AccountingDevEx
 
         private void BindSupplierLookup()
         {
+            // 2026-10-15 (user, SQL [93]): telegraphic pays IMPORT suppliers, plus a local / import supplier marked
+            // "Pay by Cash/Check and Telegraphic" (Supplier.isPayableBoth); local ones go through Supplier Payment
             Database.displaySearchlookupEdit(
                 @"SELECT SupplierKey, SupplierID, SupplierName,
                          SupplierKey + ' - ' + SupplierName AS SupplierDisplay
-                  FROM Supplier",
+                  FROM Supplier
+                  WHERE isLocal = 0 OR isPayableBoth = 1",
                 cboSupplier, "SupplierDisplay", "SupplierKey");
         }
         private void BindCreditGLCodeLookup()
@@ -589,6 +592,9 @@ namespace SalesInventorySystem.AccountingDevEx
                             partialNotes.Add($"{gridViewInvoices.GetRowCellValue(i, "InvoiceNo")}: paying {pAmt:N2}, {pBal - pAmt:N2} stays open");
                         }
                     }
+
+            // Total Amount to Apply of the ticked invoices (same as SupplierPaymentDevEx's txtamounttopay).
+            lblAmountToApply.Text = totalAmountToApply.ToString("N2");
 
             if (totalAmountToApply <= 0)
             {

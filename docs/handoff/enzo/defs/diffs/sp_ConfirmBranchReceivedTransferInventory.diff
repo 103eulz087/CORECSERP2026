@@ -1,0 +1,62 @@
+--- enzo/sp_ConfirmBranchReceivedTransferInventory.sql	2026-10-15 23:07:08.547699200 +0800
++++ prod/sp_ConfirmBranchReceivedTransferInventory.sql	2026-10-15 23:07:13.216128700 +0800
+@@ -9,6 +10,9 @@
+     @suppliername     VARCHAR(100)
+ )
+ AS
++/*  [82] 2026-10-14: a transfer is confirmed (DELIVERED, stock added) only when EVERY line of it was received. Before, a
++    receipt that saved one line (ENZO 1192 on 10-12, 1214 on 10-14: the screen sent only the rows its filter showed) was
++    still closed as DELIVERED and dropped off the For Receiving list. Refused with 59451, nothing changed. */
+ BEGIN
+     SET XACT_ABORT ON;
+     SET NOCOUNT ON;
+@@ -21,6 +25,33 @@
+     BEGIN TRANSACTION;
+ 
+     -------------------------------------------------------------------------
++    -- [82] every line of the transfer must have been received (same product + barcode)
++    -------------------------------------------------------------------------
++    DECLARE @lines INT, @missing INT, @firstMissing VARCHAR(200), @msg NVARCHAR(400);
++    SELECT @lines = COUNT(*) FROM dbo.TransferInventoryDetails d WHERE d.TransferNo = @parmtransno;
++    SELECT @missing = COUNT(*)
++    FROM dbo.TransferInventoryDetails d
++    WHERE d.TransferNo = @parmtransno
++      AND NOT EXISTS (SELECT 1 FROM dbo.ReceivedTransferInventoryDetails r WITH (UPDLOCK, HOLDLOCK)
++                      WHERE r.TransferNo = d.TransferNo AND r.Barcode = d.BarcodeNo AND r.ProductCode = d.ProductNo);
++
++    IF ISNULL(@lines, 0) = 0 OR ISNULL(@missing, 0) > 0
++    BEGIN
++        SELECT TOP 1 @firstMissing = d.ProductName + ' (' + d.BarcodeNo + ')'
++        FROM dbo.TransferInventoryDetails d
++        WHERE d.TransferNo = @parmtransno
++          AND NOT EXISTS (SELECT 1 FROM dbo.ReceivedTransferInventoryDetails r
++                          WHERE r.TransferNo = d.TransferNo AND r.Barcode = d.BarcodeNo AND r.ProductCode = d.ProductNo)
++        ORDER BY d.SeqNo;
++        ROLLBACK TRANSACTION;
++        SET @msg = N'Transfer ' + @parmtransno + N': ' + CAST(ISNULL(@lines, 0) - ISNULL(@missing, 0) AS NVARCHAR(10)) + N' of '
++                 + CAST(ISNULL(@lines, 0) AS NVARCHAR(10)) + N' line(s) were received'
++                 + ISNULL(N' (not received: ' + @firstMissing + CASE WHEN @missing > 1 THEN N' and ' + CAST(@missing - 1 AS NVARCHAR(10)) + N' more' ELSE N'' END + N')', N'')
++                 + N'. The transfer was not confirmed; receive all its lines first.';
++        THROW 59451, @msg, 1;
++    END
++
++    -------------------------------------------------------------------------
+     -- Get category behavior
+     -------------------------------------------------------------------------
+     SELECT
+@@ -97,6 +128,15 @@
+               FROM Inventory i
+               WHERE i.ReferenceCode = 'rcv-' + @parmtransno
+                 AND i.Barcode = r.Barcode
++          )
++          -- [82] nor when that line's barcode already has stock at this branch under another reference (ENZO: 3,133 lines
++          -- of 310 transfers carry 'stsfifo'), so confirming a transfer again never adds its stock twice
++          AND NOT EXISTS
++          (
++              SELECT 1
++              FROM Inventory i
++              WHERE i.Branch = @parmbranchcode
++                AND i.Barcode = r.Barcode
+           );
+ 
+         ---------------------------------------------------------------------

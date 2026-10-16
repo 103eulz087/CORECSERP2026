@@ -1,0 +1,37 @@
+--- enzo/spu_PostStockOutBarcode.sql	2026-10-15 23:07:09.226687900 +0800
++++ prod/spu_PostStockOutBarcode.sql	2026-10-15 23:07:14.059591400 +0800
+@@ -1,5 +1,4 @@
+-
+-CREATE PROCEDURE [dbo].[spu_PostStockOutBarcode]
++CREATE PROCEDURE dbo.spu_PostStockOutBarcode
+     @RefNo      VARCHAR(20),
+     @BranchCode VARCHAR(50),
+     @Category   VARCHAR(100),
+@@ -36,7 +35,7 @@
+             SELECT 1
+             FROM @Lines AS l
+             INNER JOIN dbo.Inventory AS i ON i.SequenceNumber = l.InventorySeqNo
+-            WHERE i.Branch <> @BranchCode OR i.Available < l.Qty OR i.IsStock = 0 and i.IsWarehouse=1
++            WHERE i.Branch <> @BranchCode OR i.Available < l.Qty OR i.IsStock = 0
+         )
+             THROW 59504, 'One of the scanned items no longer has enough available stock. Please rescan.', 1;
+ 
+@@ -73,7 +72,7 @@
+             i.LastMovementDate = GETDATE()
+         FROM dbo.Inventory AS i WITH (UPDLOCK, ROWLOCK)
+         INNER JOIN @Lines AS l ON l.InventorySeqNo = i.SequenceNumber
+-        WHERE i.Branch = @BranchCode AND i.IsStock = 1 AND i.Available >= l.Qty AND i.IsWarehouse = 1;
++        WHERE i.Branch = @BranchCode AND i.IsStock = 1 AND i.Available >= l.Qty;
+ 
+         IF @@ROWCOUNT <> @LineCount
+             THROW 59504, 'One of the scanned items no longer has enough available stock (it may have changed concurrently). Please rescan.', 1;
+@@ -81,8 +80,7 @@
+         UPDATE dbo.Inventory
+         SET IsStock = 0
+         WHERE SequenceNumber IN (SELECT InventorySeqNo FROM @Lines)
+-          AND Available <= 0
+-          AND IsWarehouse = 1;
++          AND Available <= 0;
+ 
+         COMMIT TRANSACTION;
+ 

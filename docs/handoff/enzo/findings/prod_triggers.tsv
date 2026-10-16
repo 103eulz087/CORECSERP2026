@@ -1,0 +1,22 @@
+### RS 1
+trg	tbl	is_disabled	modified	evts
+trg_AutoAddProducts	Branches	False	2026-04-27 13:59	INSERT
+InsertCashWalletLedger	CashWalletLedger	False	2018-02-13 11:41	INSERT
+trg_CheckVoucher_NoCancelledChequeReuse	CheckVoucher	False	2026-10-13 23:48	INSERT,UPDATE
+InsertClientLedger_OLD_09302026190000	ClientLedger	True	2026-09-30 23:37	INSERT
+trg_ClientLedger_Recalc	ClientLedger	False	2026-09-30 23:37	INSERT,UPDATE,DELETE
+InsertClientLedger_07122026	ClientLedger	True	2026-07-13 11:45	INSERT
+sp_TrgInsertClientInfo	Customers	False	2026-09-06 15:48	INSERT
+trg_DeliveryDetails_SOTotals	DeliveryDetails	False	2026-10-15 15:07	INSERT,UPDATE,DELETE
+trg_DeliverySummary_SOTotals	DeliverySummary	False	2026-10-15 15:07	INSERT,UPDATE
+InsertInventoryLedger	InventoryTrail	False	2018-11-23 16:15	INSERT
+trg_ManualJournalVoucher_NoDeleteAfterReversal	ManualJournalVoucher	False	2026-10-15 18:16	DELETE
+trg_insProduct	Products	True	2026-04-27 13:55	INSERT
+sp_TrgInsertSupplierInfo	Supplier	False	2026-09-16 10:06	INSERT
+trg_SupplierLedger_Recalc	SupplierLedger	False	2026-09-30 23:26	INSERT,UPDATE,DELETE
+InsertSupplierLedger_OLD_09302026180000	SupplierLedger	True	2026-09-30 23:26	INSERT
+trg_TicketDetails_PeriodLock	TicketDetails	False	2026-09-30 23:34	INSERT,UPDATE,DELETE
+trg_TicketMaster_PeriodLock	TicketMaster	False	2026-09-30 23:34	INSERT,UPDATE,DELETE
+trg_AddMenuAccess	Users	False	2026-04-27 14:17	INSERT
+uinsupd_EncryptPassword	Users	True	2026-06-09 13:52	INSERT,UPDATE
+log_deletes	Users	False	2016-07-25 09:10	DELETE

@@ -1,0 +1,132 @@
+--- enzo/sp_AddBranchOrderHRI.sql	2026-10-15 23:07:08.129031200 +0800
++++ prod/sp_AddBranchOrderHRI.sql	2026-10-15 23:07:12.689381800 +0800
+@@ -18,6 +17,7 @@
+ 	
+ 	BEGIN TRY
+ 		BEGIN TRAN;
++		EXEC dbo.sp_SOOrder_Lock @PONumber = @parmpono;   -- 2026-10-02c: the per-order lock every Sales Order writer shares
+ 		
+ 		DECLARE @productname varchar(100);
+ 		DECLARE @qtyrequested decimal(18,3) = @parmqty; 
+@@ -31,7 +31,7 @@
+ 
+ 		-- 1. Get Effectivity Date
+ 		SELECT @parmeffectivitydate = EffectivityDate 
+-		FROM TransferOrderSummary WITH(NOLOCK)
++		FROM TransferOrderSummary
+ 		WHERE PONumber = @parmpono;
+ 		
+ 		IF @parmeffectivitydate IS NULL
+@@ -41,49 +41,63 @@
+ 
+ 		-- 2. Get Product Info
+ 		SELECT @productname = Description, @isvatablenew = ISNULL(isVat,0)
+-		FROM Products WITH(NOLOCK)
++		FROM Products
+ 		WHERE ProductCode = @parmprodcode AND BranchCode = @parmorigin;
+ 
+-		-- ISNULL is critical here. If the item has never been in the warehouse, SUM returns NULL!
+-		SELECT @invqty = ISNULL(SUM(Available), 0)
+-		FROM Inventory WITH(NOLOCK)
++		SELECT @invqty = SUM(Available)
++		FROM Inventory
+ 		WHERE Branch = @parmorigin AND Available > 0 AND isStock = 1 AND Product = @parmprodcode AND IsWarehouse = 1;
+ 
+-		-- =========================================================================
+-		-- 🛑 THE TRAP: INSUFFICIENT INVENTORY CHECK
+-		-- =========================================================================
+-		IF @invqty < @parmqty
+-		BEGIN
+-			-- Formats a clean message: "Insufficient Stocks! Requested: 5.000, Available: 2.000."
+-			DECLARE @CustomError NVARCHAR(4000) = 'Insufficient Stocks for ' + ISNULL(@productname, @parmprodcode) + '! You requested ' + CAST(CAST(@parmqty AS INT) AS VARCHAR) + ', but only ' + CAST(CAST(@invqty AS INT) AS VARCHAR) + ' are available.';
+-			
+-			-- Severity 16 forces SQL to jump instantly to the BEGIN CATCH block below
+-			RAISERROR(@CustomError, 16, 1); 
+-		END
+-	 
+-		SELECT @specialpriceamount = ISNULL(SellingPrice,0)  FROM PurchaseOrderDetails 
+-		WHERE PONumber =@parmpono and ProductCode = @parmprodcode ;
+-		-- 4. FIFO Processing & Delivery Details 
++		-- 3. Pricing Logic
++		--IF @parmbranchcode = @parmorigin
++		--BEGIN
++		--	SELECT @custkey = Customer FROM PurchaseOrderSummary WHERE PONumber = @parmpono;
++
++		--	SELECT @specialpriceamount = SpecialPriceAmount FROM CustomerProductSetting
++		--	WHERE ProductCode = @parmprodcode AND CustomerKey = @custkey;
++
++		--	IF (@specialpriceamount = 0 OR @specialpriceamount IS NULL)
++		--	BEGIN
++		--		SELECT @specialpriceamount = SellingPrice FROM Products
++		--		WHERE ProductCode = @parmprodcode AND BranchCode = @parmorigin;
++		--	END
++		--END
++		SELECT @specialpriceamount = SellingPrice FROM Products
++		WHERE ProductCode = @parmprodcode AND BranchCode = @parmorigin;
++		-- 4. FIFO Processing & Delivery Details select * FROM InventorySettings
+ 		SELECT @parminvsettings = isFIFO FROM InventorySettings;  
+ 		
+-		
+-			SELECT @devseqno = ISNULL(MAX(SeqNo),0) FROM DeliveryDetails WITH(NOLOCK)
++		IF @parminvsettings = 1
++		BEGIN
++			SELECT @devseqno = ISNULL(MAX(SeqNo),0) + 1 FROM DeliveryDetails
+ 			WHERE DeliveryNo = @parmdevno AND PONumber = @parmpono;
+ 
+-			declare @devdetsqno int 
+-			set @devdetsqno=@devseqno+1;
+ 			-- Execute FIFO Mapping
+-			EXEC sp_FiFoMappingHRI @parmeffectivitydate, @parmorigin, @parmbranchcode, @parmprodcode, @parmqty, @parmdevno, @parmpono, @devdetsqno;
++			EXEC sp_FiFoMappingHRI @parmeffectivitydate, @parmorigin, @parmbranchcode, @parmprodcode, @parmqty, @parmdevno, @parmpono, @parmdevseqno=@devseqno;
+ 			
++			-- Check if FIFO actually generated records (Meaning there was inventory available to deduct)
++			IF EXISTS (SELECT TOP 1 DeliveryNo FROM InventoryDeliveryFIFO WHERE DeliveryNo = @parmdevno AND PONumber = @parmpono AND ProductNo = @parmprodcode)
++			BEGIN
++				--IF NOT EXISTS (SELECT TOP 1 DeliveryNo FROM DeliveryDetails WHERE DeliveryNo = @parmdevno AND PONumber = @parmpono AND ProductNo = @parmprodcode)
++				--BEGIN
+ 			INSERT INTO [dbo].[DeliveryDetails] (
+ 					[SeqNo], [DeliveryNo], [PONumber], [ReferenceNumber], [ProductNo], [BarcodeNo],
+ 					[ProductName], [QtyDelivered], [ActualQty], [Variance], [Cost], [SellingPrice],
+-					[Status], [isVat], [ProcessedBy], [isSettled], [isCreditMemo], [isReturned],isCancelled
++						[Status], [isVat], [ProcessedBy], [isSettled], [isCreditMemo], [isReturned], isCancelled, DateTimeAdded, DateTimeUpdated
+ 				)
+ 				SELECT
+-					@devseqno + 1, @parmdevno, @parmpono, @parmrefno, @parmprodcode, @parmbarcode,
++						@devseqno, @parmdevno, @parmpono, @parmrefno, @parmprodcode, @parmbarcode,
+ 					@productname, @parmqty, @parmqty, 0, 0, ISNULL(@specialpriceamount,0),
+-					'PENDING', @isvatablenew, @preparedby, 0, 0, 0,0;
++						'PENDING', @isvatablenew, @preparedby, 0, 0, 0,0,GETDATE(),'';
++				--END
++			END
++			ELSE
++			BEGIN
++				-- If you want it to insert into DeliveryDetails even if FIFO fails (e.g. out of stock),
++				-- you need to add logic here! Currently, if out of stock, it skips inserting the detail.
++				PRINT 'No Inventory Available for FIFO deduction. Detail skipped.';
++			END
++		END
+ 		
+ 		-- 5. Delivery Summary Logic (FIXED: Changed IF EXISTS to IF NOT EXISTS)
+ 		IF NOT EXISTS (SELECT TOP(1) PONumber FROM DeliverySummary WHERE PONumber = @parmpono AND DeliveryNo = @parmdevno)
+@@ -92,7 +106,7 @@
+ 				
+ 			SELECT @totalitem = ISNULL(COUNT(*),0), @totalqtydelivered = ISNULL(SUM(QtyDelivered),0) 
+ 			FROM DeliveryDetails 
+-			WHERE DeliveryNo = @parmdevno AND PONumber = @parmpono;
++			WHERE DeliveryNo = @parmdevno AND PONumber = @parmpono and isCancelled=0;
+ 				
+ 			INSERT INTO [dbo].[DeliverySummary] (
+ 				[DeliveryNo], [PONumber], [ReferenceNumber], [InvoiceNo], [BranchCode],
+@@ -108,11 +122,10 @@
+ 		COMMIT TRAN;
+ 	END TRY
+ 	BEGIN CATCH
+-		-- The RAISERROR drops us right here. We cancel the transaction cleanly!
+ 		IF @@TRANCOUNT > 0
+ 			ROLLBACK TRAN;
+ 			
+-		-- Force the error back to C#
++		-- Force the error to show up in SSMS or your App instead of failing silently
+ 		DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
+ 		RAISERROR (@ErrorMessage, 16, 1);
+ 	END CATCH

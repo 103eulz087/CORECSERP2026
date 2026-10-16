@@ -1,0 +1,75 @@
+--- enzo/sp_ReplicateSales.sql	2026-10-15 23:07:09.781125600 +0800
++++ prod/sp_ReplicateSales.sql	2026-10-15 23:07:14.738664200 +0800
+@@ -1,8 +1,7 @@
+ 
+ CREATE PROCEDURE [dbo].[sp_ReplicateSales]
+ 	@brcode char(3),
+-	@FromDate date,
+-	@ToDate date,
++	@petsa date,
+ 	@machinename varchar(20)
+ AS
+ BEGIN
+@@ -10,7 +9,7 @@
+ 	SET NOCOUNT ON;
+ 	DELETE FROM [dbo].[BatchSalesDetails2]
+ 	 WHERE BranchCode=@brcode
+-	and CAST(DateOrder as date) BETWEEN @FromDate AND @ToDate
++	and CAST(DateOrder as date)=@petsa
+ 	and MachineUsed=@machinename
+ 
+ 	INSERT INTO  [dbo].[BatchSalesDetails2]
+@@ -94,13 +93,13 @@
+            ,[MachineUsed]
+ 	FROM BatchSalesDetails with(nolock)
+ 	WHERE BranchCode=@brcode
+-	and CAST(DateOrder as date) BETWEEN @FromDate AND @ToDate
++	and CAST(DateOrder as date)=@petsa
+ 	and MachineUsed=@machinename
+ 
+ 	DELETE FROM
+ 	[dbo].[BatchSalesSummary2]
+ 	WHERE BranchCode=@brcode
+-	AND CAST(Transdate as date) BETWEEN @FromDate AND @ToDate
++	AND CAST(Transdate as date)=@petsa
+ 	AND MachineUsed=@machinename
+ 
+ 	INSERT INTO [dbo].[BatchSalesSummary2]
+@@ -212,12 +211,12 @@
+            ,[ZeroRatedSale]
+ 	FROM BatchSalesSummary with(nolock)
+ 	WHERE BranchCode=@brcode
+-	AND CAST(Transdate as date) BETWEEN @FromDate AND @ToDate
++	AND CAST(Transdate as date)=@petsa
+ 	AND MachineUsed=@machinename
+ 
+ 	DELETE FROM [dbo].[SalesTransactionSummary2]
+ 	WHERE BranchCode=@brcode
+-	AND DateOpen BETWEEN @FromDate AND @ToDate
++	AND DateOpen=@petsa
+ 	AND MachineUsed=@machinename
+ 
+ 
+@@ -338,12 +337,12 @@
+ 		   ,[TotalNetSales]
+ 	FROM [dbo].[SalesTransactionSummary] with(nolock)
+ 	WHERE BranchCode=@brcode
+-	AND DateOpen BETWEEN @FromDate AND @ToDate
++	AND DateOpen=@petsa
+ 	AND MachineUsed=@machinename
+ 
+ 	DELETE FROM [dbo].[POSZReadingTransactions2]
+ 	WHERE BranchCode=@brcode
+-	AND DateExecute BETWEEN @FromDate AND @ToDate
++	AND DateExecute=@petsa
+ 	AND MachineUsed=@machinename
+ INSERT INTO [dbo].[POSZReadingTransactions2]
+            ([BranchCode]
+@@ -428,6 +427,6 @@
+            ,[TotalNetSales]
+ 	FROM [dbo].[POSZReadingTransactions] with(nolock)
+ 	WHERE BranchCode=@brcode
+-	AND DateExecute BETWEEN @FromDate AND @ToDate
++	AND DateExecute=@petsa
+ 	AND MachineUsed=@machinename
+ END

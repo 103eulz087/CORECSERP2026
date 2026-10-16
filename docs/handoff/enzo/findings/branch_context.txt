@@ -1,0 +1,1140 @@
+######## ./AccountingDevEx/ViewLinkedPODetailsFrm.cs:83
+
+        private void LoadLines()
+        {
+            string funcName = GlobalCache.CompanyName == "JFC" ? "funcview_PODetails_JFC" : "funcview_PODetails";
+
+            using (var con = Database.getConnection())
+            using (var cmd = new SqlCommand($"SELECT * FROM {funcName}(@ShipmentNo, @SupplierID, @OrderType)", con))
+            {
+                string supplierId = Database.getSingleQuery("POSUMMARY", $"ShipmentNo='{_shipmentNo}'", "SupplierID");
+                cmd.Parameters.Add("@ShipmentNo", SqlDbType.VarChar, 50).Value = _shipmentNo;
+                cmd.Parameters.Add("@SupplierID", SqlDbType.VarChar, 50).Value = (object)supplierId ?? DBNull.Value;
+                cmd.Parameters.Add("@OrderType", SqlDbType.VarChar, 10).Value = _orderType;
+
+                var dt = new DataTable();
+                con.Open();
+                new SqlDataAdapter(cmd).Fill(dt);
+                gridControlLines.DataSource = dt;
+            }
+######## ./Branches/BranchInventory.cs:49
+                {
+                    //string query = $"SELECT * FROM func_view_BranchInventory('{Login.assignedBranch}') ";
+                    string query = "";
+                    if(GlobalCache.CompanyName =="JFC")
+                    {
+                        query = "SELECT * FROM view_BranchInventoryJFC WHERE Branch='" + Login.assignedBranch + "' ";
+                    }
+                    else
+                    {
+                        query = "SELECT * FROM view_BranchInventory WHERE Branch='" + Login.assignedBranch + "' ";
+                    }
+                        HelperFunction.ShowWaitAndDisplay(query, gridControl1, gridView1, "Please wait", "Populating data into the database...");
+
+                    GridView view = gridControl1.FocusedView as GridView;
+                    view.SortInfo.ClearAndAddRange(new GridColumnSortInfo[] {
+                new GridColumnSortInfo(view.Columns["Category"],DevExpress.Data.ColumnSortOrder.Ascending)
+                }, 1);
+                    gridView1.ExpandAllGroups();
+######## ./HOForms/AddPrimalCutInventory.cs:62
+                //radchanged();
+
+                Database.displayComboBoxItems("SELECT Description FROM ProductCategory with(nolock)", "Description", txtprodcat);
+                if(GlobalCache.CompanyName=="ENZO")
+                {
+                    Database.displaySearchlookupEdit($"Select ProductCode,Description,ProductCategoryCode FROM dbo.Products with(nolock) WHERE BranchCode='{Login.assignedBranch}' AND ProductCategoryCode IN (10,11,12) ", txtsrchprod, "Description", "Description");
+                }
+                else
+                {
+                    Database.displaySearchlookupEdit($"Select ProductCode,Description,ProductCategoryCode FROM dbo.Products with(nolock) WHERE BranchCode='{Login.assignedBranch}'  ", txtsrchprod, "Description", "Description");
+
+                }
+                getAvailablePort();
+
+                isprimalcuts.Checked = true;
+                //Classes.Product.displayProductCategoryComboBoxItems(txtprodcat);
+                //txtavailableqty.Text = getAvailableQty().ToString();
+                display();
+######## ./HOForms/ChangePassword.cs:39
+                return;
+            }
+
+            if (GlobalCache.CompanyName != "VROSS")
+            {
+                string validationMessage;
+                if (!Password=<redacted>), Login.isglobalUserID, out validationMessage))
+                {
+                    BigAlert.Show("WEAK PASSWORD=<redacted>, validationMessage, MessageBoxIcon.Warning);
+                    //XtraMessageBox.Show(validationMessage, "Weak Password=<redacted>, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+            }
+
+
+            update();
+            this.Dispose();
+######## ./HOForms/HOConversion.cs:786
+        private void txtsrchprodcat_EditValueChanged(object sender, EventArgs e)
+        {
+            objprod = SearchLookUpClass.getSingleValue(txtsrchprodcat, "ProductCategoryID");
+            if(GlobalCache.CompanyName == "JFC")
+            {
+                Database.display("SELECT ShipmentNo,ReferenceCode,Product,Description,SUM(Available) as Available " +
+              "FROM Inventory with(nolock)" +
+              "WHERE Branch='" + Login.assignedBranch + "' " +
+              "and Available > 0 " +
+              "GROUP BY ShipmentNo,ReferenceCode,Product,Description", gridControl1, gridView1);
+            }
+            else
+            {
+                Database.display("SELECT Product,Description,SUM(Available) as Available " +
+                "FROM Inventory with(nolock)" +
+                "WHERE Branch='" + Login.assignedBranch + "' " +
+                "and Available > 0 " +
+                "and Product in (Select ProductCode FROM Products with(nolock) WHERE BranchCode='" + Login.assignedBranch + "' AND ProductCategoryCode='" + objprod + "') " +
+######## ./HOForms/HOConversion.cs:1192
+        private DataTable BuildOneToManyLinesFromGrid()
+        {
+            var dt = new DataTable();
+            if(GlobalCache.CompanyName == "JFC")
+            {
+                dt.Columns.Add("ShipmentNo", typeof(string));
+                dt.Columns.Add("ReferenceCode", typeof(string));
+            }
+            dt.Columns.Add("ProductCode", typeof(string));
+            dt.Columns.Add("Description", typeof(string));
+            dt.Columns.Add("ActualQty", typeof(decimal));
+            dt.Columns.Add("Barcode", typeof(string));
+
+            for (int i = 0; i < gridView3.DataRowCount; i++)
+            {
+                int rh = gridView3.GetVisibleRowHandle(i);
+                if (!gridView3.IsDataRow(rh)) continue;
+
+######## ./HOForms/HOConversion.cs:1213
+
+                if (actualQty <= 0m) continue;
+                string shipno=""; string refcode="";
+                if (GlobalCache.CompanyName == "JFC")
+                {
+                    shipno = Convert.ToString(gridView3.GetRowCellValue(rh, "ShipmentNo"));
+                    refcode = Convert.ToString(gridView3.GetRowCellValue(rh, "ReferenceCode"));
+                }
+                string prod = Convert.ToString(gridView3.GetRowCellValue(rh, "ProductCode"));
+                string desc = Convert.ToString(gridView3.GetRowCellValue(rh, "Description"));
+
+                if (string.IsNullOrWhiteSpace(prod) || string.IsNullOrWhiteSpace(desc))
+                    continue;
+
+                var r = dt.NewRow();
+                if (GlobalCache.CompanyName == "JFC")
+                {
+                    r["ShipmentNo"] = shipno.Trim();
+######## ./HOForms/HOConversion.cs:1225
+                    continue;
+
+                var r = dt.NewRow();
+                if (GlobalCache.CompanyName == "JFC")
+                {
+                    r["ShipmentNo"] = shipno.Trim();
+                    r["ReferenceCode"] = refcode.Trim();
+                }
+                r["ProductCode"] = prod.Trim();
+                r["Description"] = desc.Trim();
+                r["ActualQty"] = actualQty;
+                r["Barcode"] = Convert.ToString(gridView3.GetRowCellValue(rh, "Barcode")) ?? "";
+                dt.Rows.Add(r);
+            }
+
+            return dt;
+        }
+        private DataTable BuildManyToOneLinesFromGrid()
+######## ./HOForms/HOConversion.cs:1336
+
+                if (isOneToMany)
+                {
+                    if(GlobalCache.CompanyName=="JFC")
+                    {
+                        srcShipmentNo = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "ShipmentNo")?.ToString();
+                        srcReferenceCode = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "ReferenceCode")?.ToString();
+                    }
+                    srcProdCode = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "Product")?.ToString();
+                    srcDesc = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "Description")?.ToString();
+
+                    if (string.IsNullOrWhiteSpace(srcProdCode))
+                    {
+                        BigAlert.Show("NO SOURCE PRODUCT", "Please select a source product in the source grid.", MessageBoxIcon.Warning);
+                        return;
+                    }
+
+                    if (string.IsNullOrWhiteSpace(txtsrcqty.Text) || Convert.ToDecimal(txtsrcqty.Text) <= 0)
+######## ./HOForms/HOConversion.cs:1376
+
+                // Call ONE stored procedure
+                string procname = "dbo.sp_SubmitConversionRaw";
+                if (GlobalCache.CompanyName == "JFC")
+                {
+                    procname = "dbo.sp_SubmitConversionRaw_JFC";
+                }
+                else
+                {
+                    procname = "dbo.sp_SubmitConversionRaw";
+                }
+                using (SqlConnection conn = Database.getConnection())
+                using (SqlCommand cmd = new SqlCommand(procname, conn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandTimeout = 180;
+
+                    cmd.Parameters.AddWithValue("@BranchCode", branch);
+######## ./HOForms/HOConversion.cs:1397
+                    cmd.Parameters.AddWithValue("@DateConverted", DateTime.Now);
+                    cmd.Parameters.AddWithValue("@IsErrorCorrect", false);
+                    cmd.Parameters.AddWithValue("@IsConfirm", false);
+                    if (GlobalCache.CompanyName == "JFC")
+                    {
+                        cmd.Parameters.AddWithValue("@CuttingFee", txtcharge.Text);
+                    }
+                    
+                    // OneToMany params
+                    cmd.Parameters.AddWithValue("@SourceProductCode", (object)srcProdCode ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@SourceDescription", (object)srcDesc ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@SourceSequenceNumber", DBNull.Value); // pass if you have it
+                    cmd.Parameters.AddWithValue("@SourceQty", isOneToMany ? (object)srcQty : DBNull.Value);
+
+                    // ManyToOne params
+                    cmd.Parameters.AddWithValue("@DestProductCode", (object)destProdCode ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@DestDescription", (object)destDesc ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@ActualQtyOut", !isOneToMany ? (object)actualQtyOut : DBNull.Value);
+######## ./HOForms/HOConversion.cs:1416
+                    // TVPs
+                    var p1 = cmd.Parameters.AddWithValue("@OneToManyLines", dtOneToMany);
+                    p1.SqlDbType = SqlDbType.Structured;
+                    if (GlobalCache.CompanyName == "JFC")
+                    {
+                        p1.TypeName = "dbo.TVP_Conversion_OneToManyLines_JFC";
+                    }
+                    else
+                    {
+                        p1.TypeName = "dbo.TVP_Conversion_OneToManyLines";
+                    }
+                
+
+                    var p2 = cmd.Parameters.AddWithValue("@ManyToOneLines", dtManyToOne);
+                    p2.SqlDbType = SqlDbType.Structured;
+                    p2.TypeName = "dbo.TVP_Conversion_ManyToOneLines";
+
+                    conn.Open();
+######## ./HOForms/ViewForDeliveryDetails.cs:194
+            Reporting.SalesInvoiceDexEx viewdet = new Reporting.SalesInvoiceDexEx();
+            viewdet.Show();
+
+            if(GlobalCache.CompanyName=="JFC")
+            {
+                analyze("spview_SalesInvoiceJFC", txtpono.Text, viewdet.gridControl4, viewdet.gridView4);
+            }
+            else
+            {
+                analyze("spview_SalesInvoice", txtpono.Text, viewdet.gridControl4, viewdet.gridView4);
+            }
+            if (GlobalCache.CompanyName == "JFC")
+            {
+                Classes.DevXGridViewSettings.ShowFooterCountTotal(viewdet.gridView4, "Cnt"); //NEW
+            }
+            viewdet.txtinvoiceno.Text = view.GetRowCellValue(view.FocusedRowHandle, "InvoiceNo").ToString();
+
+            if (GlobalCache.CompanyName == "JFC")
+######## ./HOForms/ViewForDeliveryDetails.cs:202
+            {
+                analyze("spview_SalesInvoice", txtpono.Text, viewdet.gridControl4, viewdet.gridView4);
+            }
+            if (GlobalCache.CompanyName == "JFC")
+            {
+                Classes.DevXGridViewSettings.ShowFooterCountTotal(viewdet.gridView4, "Cnt"); //NEW
+            }
+            viewdet.txtinvoiceno.Text = view.GetRowCellValue(view.FocusedRowHandle, "InvoiceNo").ToString();
+
+            if (GlobalCache.CompanyName == "JFC")
+            {
+                viewdet.txtinvoicedate.Text = view.GetRowCellValue(view.FocusedRowHandle, "InvoiceDate").ToString();
+            }
+            //viewdet.txtpono.Text = txtpono.Text;
+            viewdet.txtpono.Text = refno1;
+            viewdet.txtcusttin.Text = tinno;
+            double vatablesales = 0.0, vatexemptsale = 0.0, vatamount = 0.0, totalsales = 0.0, lessvat = 0.0, netofvat = 0.0, amountdue = 0.0, addvat = 0.0, vatsales = 0.0, totalamountdue = 0.0;
+            for (int i = 0; i <= viewdet.gridView4.RowCount - 1; i++)
+######## ./HOForms/ViewForDeliveryDetails.cs:208
+            }
+            viewdet.txtinvoiceno.Text = view.GetRowCellValue(view.FocusedRowHandle, "InvoiceNo").ToString();
+
+            if (GlobalCache.CompanyName == "JFC")
+            {
+                viewdet.txtinvoicedate.Text = view.GetRowCellValue(view.FocusedRowHandle, "InvoiceDate").ToString();
+            }
+            //viewdet.txtpono.Text = txtpono.Text;
+            viewdet.txtpono.Text = refno1;
+            viewdet.txtcusttin.Text = tinno;
+            double vatablesales = 0.0, vatexemptsale = 0.0, vatamount = 0.0, totalsales = 0.0, lessvat = 0.0, netofvat = 0.0, amountdue = 0.0, addvat = 0.0, vatsales = 0.0, totalamountdue = 0.0;
+            for (int i = 0; i <= viewdet.gridView4.RowCount - 1; i++)
+            {
+                if (Convert.ToBoolean(viewdet.gridView4.GetRowCellValue(i, "isVat").ToString()) == true)
+                {
+                    vatablesales += Convert.ToDouble(viewdet.gridView4.GetRowCellValue(i, "Amount").ToString());
+                }
+                if (Convert.ToBoolean(viewdet.gridView4.GetRowCellValue(i, "isVat").ToString()) == false)
+######## ./HOFormsDevEx/AddInventoryDevEx.cs:46
+            txtinvoicedate.Text = DateTime.Today.ToShortDateString();
+            txtduedate.Text = DateTime.Today.AddYears(1).ToShortDateString();
+            populateProductCategory();
+            if (GlobalCache.CompanyName == "VROSS") { chckboxbarcode.Checked = false; chckboxUseBarcode.Checked = false; }
+        }
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            bool functionReturnValue = false;
+            if (keyData == Keys.F10)
+            {
+                simpleButton2.PerformClick();
+            }
+            else if (keyData == Keys.F6)
+            {
+                btnclear.PerformClick();
+            }
+            else if (keyData == Keys.F1)
+            {
+######## ./HOFormsDevEx/AddInventoryDevEx.cs:81
+                return;
+            }
+           
+            if (GlobalCache.CompanyName == "ENZO" && string.IsNullOrWhiteSpace(txtpalletno.Text))
+            {
+                BigAlert.Show("NO PALLET NUMBER", "Please Input Pallet Number!", MessageBoxIcon.Warning);
+                return;
+            }
+            
+
+            if (string.IsNullOrWhiteSpace(txtbarcode.Text))
+            {
+                BigAlert.Show("TEXTFIELD EMPTY", "Textfield must not empty", MessageBoxIcon.Warning);
+                txtbarcode.Focus();
+                return;
+            }
+
+            if (!isproductexist)
+######## ./HOFormsDevEx/AddInventoryDevEx.cs:366
+                         "WHERE ShipmentNo='" + txtshipmentno.Text + "' AND isProcess=0 ";
+
+            // Decide sort direction
+            string sortDirection = (GlobalCache.CompanyName == "ENZO") ? "DESC" : "ASC";
+
+            // Append ORDER BY
+            sql += "ORDER BY SequenceNumber " + sortDirection;
+
+            // Execute once
+            Database.display(sql, gridControl1, gridView1);
+
+
+            if (GlobalCache.CompanyName == "ENZO")
+            {
+                GridView view = gridControl1.FocusedView as GridView;
+                view.SortInfo.ClearAndAddRange(new GridColumnSortInfo[] {
+                new GridColumnSortInfo(view.Columns["Description"],DevExpress.Data.ColumnSortOrder.Ascending)
+                }, 1);
+######## ./HOFormsDevEx/AddInventoryDevEx.cs:375
+            Database.display(sql, gridControl1, gridView1);
+
+
+            if (GlobalCache.CompanyName == "ENZO")
+            {
+                GridView view = gridControl1.FocusedView as GridView;
+                view.SortInfo.ClearAndAddRange(new GridColumnSortInfo[] {
+                new GridColumnSortInfo(view.Columns["Description"],DevExpress.Data.ColumnSortOrder.Ascending)
+                }, 1);
+                gridView1.ExpandAllGroups();
+
+                GridGroupSummaryItem itemCount = new GridGroupSummaryItem();
+                itemCount.FieldName = "PalletNo";
+                itemCount.SummaryType = DevExpress.Data.SummaryItemType.Count;
+                itemCount.ShowInGroupColumnFooter = gridView1.Columns["PalletNo"];
+                gridView1.GroupSummary.Add(itemCount);
+                gridView1.Focus();
+
+######## ./HOFormsDevEx/AddInventoryDevEx.cs:630
+        {
+            // Minimal changes here. Passing strings to XR labels is fine, 
+            // just ensure txtbarcode.Text is fully generated and trimmed.
+            if (GlobalCache.CompanyName == "JFC")
+            {
+                PrintQrJFC(txtbarcode.Text);
+            }
+            else
+            {
+                PrintQr(txtbarcode.Text);
+            }
+           
+           
+        }
+
+        private void checkBox3_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox3.Checked == true)
+######## ./HOFormsDevEx/AddPurchaseOrder.cs:62
+            // column itself is System.Int32 and truncates the edited value back to whole numbers
+            // the moment the cell commits. Cast it to decimal in the query itself so the actual
+            // bound column type supports fractional values; every other column is unchanged.
+            if (GlobalCache.CompanyName=="JFC")
+            {
+                //Database.display("SELECT ProductCode,Barcode,ProductName,Cost,CAST(Quantity AS DECIMAL(10,2)) AS Quantity,Units,ReferenceCode,AvailableQty FROM func_viewPurchaseOrderJFC('" + Login.assignedBranch + "','" + suppkey + "')", gridControl1, gridView1);
+                Database.display("SELECT ProductCode,Description as ProductName,CAST(0 AS DECIMAL(10,2)) as Cost,CAST(0 AS DECIMAL(10,2)) AS Quantity,'kg' as Units,' ' as ReferenceCode " +
+                    "FROM Products WHERE BranchCode='" + Login.assignedBranch + "' ", gridControl1, gridView1);
+            }
+            else
+            {
+                Database.display("SELECT ProductCode,Barcode,ProductName,Cost,CAST(Quantity AS DECIMAL(10,2)) AS Quantity,Units,AvailableQty FROM func_viewPurchaseOrder('" + Login.assignedBranch + "','" + suppkey + "')", gridControl1, gridView1);
+            }
+            applyQuantitySpinEditor();
+        }
+
+        // Quantity comes back from func_viewPurchaseOrder(JFC) as a whole-number SQL type, so
+        // DevExpress auto-generates an integer-only editor for the column by default -- the
+######## ./HOFormsDevEx/AddPurchaseOrder.cs:325
+                DataTable dtDetails = BuildPODetailsTable_ByQty();
+                string spname = "sp_BulkInsertPODetails";
+                string tvpname = "";
+                if (GlobalCache.CompanyName == "JFC")
+                {
+                    dtDetails = BuildPODetailsTable_ByQty_JFC();
+                    tvpname = "dbo.PODetailsType_JFC";
+                }
+                else
+                {
+                    dtDetails = BuildPODetailsTable_ByQty();
+                    tvpname = "dbo.PODetailsType";
+                }
+                   
+                 
+                if (dtDetails.Rows.Count == 0)
+                {
+                    XtraMessageBox.Show("No items to insert. Please enter Quantity > 0.");
+######## ./HOFormsDevEx/AddPurchaseOrder.cs:343
+                    return;
+                }
+
+                if(GlobalCache.CompanyName=="JFC")
+                {
+                    spname = "sp_BulkInsertPODetails_JFC";
+                    
+                }
+                else
+                {
+                    spname = "sp_BulkInsertPODetails";
+                }
+
+                    using (SqlConnection conn = Database.getConnection())
+                    using (SqlCommand cmd = new SqlCommand(spname, conn))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+
+######## ./HOFormsDevEx/ReceivedSTSBatchMode.cs:38
+        {
+            using (SqlConnection con = Database.getConnection())
+            using (SqlCommand com = new SqlCommand(
+                GlobalCache.CompanyName == "JFC" ? "sp_ConfirmBranchRecievedOrderJFC" : "sp_ConfirmBranchRecievedOrder", con))
+            {
+                com.CommandType = CommandType.StoredProcedure;
+                com.Parameters.AddWithValue("@parmdevno", "");
+                com.Parameters.AddWithValue("@parmpono", txtshipmentno.Text);
+                com.Parameters.AddWithValue("@parmbarcode", "");
+                com.Parameters.AddWithValue("@parmbranchcode", Login.assignedBranch);
+                com.Parameters.AddWithValue("@preparedby", Login.Fullname);
+
+                try
+                {
+                    con.Open();
+                    com.ExecuteNonQuery();
+                    return true;
+                }
+######## ./HOFormsDevEx/ReceivedSTSBatchModeFIFO.cs:147
+                // destination, and HO (888) is always the origin of this HO-outbound STS flow
+                // (the same convention sp_ConfirmBranchOrderSTS hardcodes for its GL ticket).
+                cmd.Parameters.Add("@Origin", SqlDbType.VarChar, 10).Value = "888";
+                cmd.Parameters.Add("@UseJFC", SqlDbType.Bit).Value = GlobalCache.CompanyName == "JFC";
+
+                try
+                {
+                    con.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        var skipped = new List<string>();
+                        while (reader.Read())
+                            skipped.Add($"{reader["Barcode"]}: {reader["Reason"]}");
+
+                        if (skipped.Count > 0)
+                        {
+                            BigAlert.Show("SOME LINES SKIPPED",
+                                "The following line(s) were not received (the rest of the transfer was posted):\n" + string.Join("\n", skipped),
+######## ./HOFormsDevEx/VIEWPO.cs:211
+            viewpod.txtbrcode.Text = view.GetRowCellValue(view.FocusedRowHandle, "BranchCode").ToString();
+            //Database.display("SELECT ItemCode, FROM view_PODETAILS WHERE ShipmentNo='" + gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "ShipmentNo").ToString() + "' AND SupplierID='" + gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "SupplierID").ToString() + "' and OrderType='" + gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "OrderType").ToString() + "'", viewpod.gridControl2, viewpod.gridView2);
+            
+            if(GlobalCache.CompanyName=="JFC")
+            {
+                
+                Database.display("SELECT * FROM funcview_PODetails_JFC('" + view.GetRowCellValue(view.FocusedRowHandle, "ShipmentNo").ToString() + "'" +
+                    ",'" + view.GetRowCellValue(view.FocusedRowHandle, "SupplierID").ToString() + "'" +
+                    ",'" + view.GetRowCellValue(view.FocusedRowHandle, "OrderType").ToString() + "')"
+                    , viewpod.gridControl2, viewpod.gridView2);
+            }
+            else
+            {
+                Database.display("SELECT * FROM funcview_PODetails('" + view.GetRowCellValue(view.FocusedRowHandle, "ShipmentNo").ToString() + "'" +
+                       ",'" + view.GetRowCellValue(view.FocusedRowHandle, "SupplierID").ToString() + "'" +
+                       ",'" + view.GetRowCellValue(view.FocusedRowHandle, "OrderType").ToString() + "')"
+                       , viewpod.gridControl2, viewpod.gridView2);
+            }
+######## ./HOFormsDevEx/VIEWPO.cs:232
+            viewpod.ShowDialog(this);
+            if (VIEWPODETAILS.isdone == true)
+            {
+                if (GlobalCache.CompanyName == "JFC")
+                {
+
+                    Database.display("SELECT * FROM funcview_PODetails_JFC('" + view.GetRowCellValue(view.FocusedRowHandle, "ShipmentNo").ToString() + "'" +
+                        ",'" + view.GetRowCellValue(view.FocusedRowHandle, "SupplierID").ToString() + "'" +
+                        ",'" + view.GetRowCellValue(view.FocusedRowHandle, "OrderType").ToString() + "')"
+                        , viewpod.gridControl2, viewpod.gridView2);
+                }
+                else
+                {
+                    Database.display("SELECT * FROM funcview_PODetails('" + view.GetRowCellValue(view.FocusedRowHandle, "ShipmentNo").ToString() + "'" +
+                           ",'" + view.GetRowCellValue(view.FocusedRowHandle, "SupplierID").ToString() + "'" +
+                           ",'" + view.GetRowCellValue(view.FocusedRowHandle, "OrderType").ToString() + "')"
+                           , viewpod.gridControl2, viewpod.gridView2);
+                }
+######## ./Orders/AddBranchOrder.cs:128
+            gridControl2.BeginUpdate();
+            //     Database.display("SELECT QtyDelivered,BarcodeNo,ProductNo,ProductName,FORMAT(Cost,'N','en-us')AS Cost,SequenceNo FROM DeliveryDetails WHERE DeliveryNo='" + txtdevno.Text + "'", gridControl2, gridView2);
+
+            if(GlobalCache.CompanyName=="JFC")
+            {
+
+                Database.display($"SELECT * FROM dbo.funcview_ProcessOrderItemsSales('{txtponum.Text}')  ORDER BY SeqNo ASC", gridControl2, gridView2);
+            }
+            else
+            {
+                Database.display("SELECT SeqNo" +
+               ",ProductNo" +
+               ",ProductName" +
+               ",BarcodeNo" +
+               ",QtyDelivered " +
+               "FROM DeliveryDetails " +
+               "WHERE PONumber='" + txtponum.Text + "' " +
+               "AND Status='PENDING' AND isnull(isCancelled,0)=0 and isnull(isReturned,0)=0 ORDER BY SeqNo ASC", gridControl2, gridView2);
+######## ./Orders/AddBranchOrder.cs:171
+            SqlConnection con = Database.getConnection();
+            con.Open();
+            string query = "sp_AddBranchOrderHRI";
+            if (GlobalCache.CompanyName == "JFC") { query = "sp_AddBranchOrderHRI_JFC"; }
+            try
+            {
+                SqlCommand com = new SqlCommand(query, con);
+                com.Parameters.AddWithValue("@parmdevno", txtdevno.Text);
+                com.Parameters.AddWithValue("@parmrefno", txtrefno.Text);
+                com.Parameters.AddWithValue("@parmpono", txtponum.Text);
+                com.Parameters.AddWithValue("@parmprodcatcode", productcategorycode);
+                com.Parameters.AddWithValue("@parmprodcode", primalproductcode);
+
+                if (GlobalCache.CompanyName == "JFC")
+                {
+                    com.Parameters.AddWithValue("@parmshipmentno", shipmentno?.ToString() ?? "");
+                }
+                
+######## ./Orders/AddBranchOrder.cs:181
+                com.Parameters.AddWithValue("@parmprodcatcode", productcategorycode);
+                com.Parameters.AddWithValue("@parmprodcode", primalproductcode);
+
+                if (GlobalCache.CompanyName == "JFC")
+                {
+                    com.Parameters.AddWithValue("@parmshipmentno", shipmentno?.ToString() ?? "");
+                }
+                
+                com.Parameters.AddWithValue("@parmqty", txtweight.Text);
+                com.Parameters.AddWithValue("@parmbarcode", txtsku.Text);
+
+                com.Parameters.AddWithValue("@parmbranchcode", txtbrcode.Text); //initiating branhc
+                com.Parameters.AddWithValue("@parmorigin", Login.assignedBranch);
+                com.Parameters.AddWithValue("@preparedby", Login.Fullname);
+                //com.Parameters.AddWithValue("@parmeffectivitydate", txteffectivedate.Text);
+                com.Parameters.AddWithValue("@parmsourceseqno", sourceseqnum);
+                com.Parameters.AddWithValue("@parmbarcodescanning", "");
+                com.CommandType = CommandType.StoredProcedure;
+######## ./Orders/AddBranchOrder.cs:275
+            SqlConnection con = Database.getConnection();
+            con.Open();
+            string query = "sp_CancelDelivery";
+            if (GlobalCache.CompanyName == "JFC")
+            {
+                query = "sp_CancelDeliveryFIFOJFC";
+            }
+            else
+            {
+                query = "sp_CancelDelivery";
+            }
+            try
+            {
+                string prodno = gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "ProductNo").ToString();
+                string qtydeliv = gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "QtyDelivered").ToString();
+                string seqno = gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "SeqNo").ToString();
+
+                SqlCommand com = new SqlCommand(query, con);
+######## ./Orders/AddBranchOrder.cs:577
+                    //    BigAlert.Show("INSUFFICENT STOCKS", "Insuficient Stocks for this Product.. Your Available Quantity is ", MessageBoxIcon.Warning);
+                    //}
+                    //kung imong gi encode na quantity is greater than sa total quantity sa imong Inventory sa commisary
+                    else if (GlobalCache.CompanyName != "JFC" && Convert.ToDouble(txtweight.Text) > Database.getTotalSummation2("Inventory", "Product = '" + primalproductcode + "' AND Branch='" + Login.assignedBranch + "' AND isWarehouse='1' and Available > 0 ", "Available")) //Database.getTotalSummation("Inventory", "Product", txtsku.Text.Substring(1, 6), "Quantity"))
+                    {
+                        string mark = Database.getTotalSummation2("Inventory", "Product = '" + primalproductcode + "' AND Branch='" + Login.assignedBranch + "' AND isWarehouse='1'  and Available > 0 ", "Available").ToString();
+                        XtraMessageBox.Show("Insuficient Stocks for this Product.. Your Available Quantity is " + mark);
+                    }
+                    else
+                    {
+                        add();
+                        displayForDelivery();
+                        //if(isFifo==false)
+                        //{
+                        //    searchLookUpEdit1.Text = "";
+                        //}
+                        txtweight.Text = "";
+                        // EditValue = null re-fires txtsearchlookupproduct_EditValueChanged, which
+######## ./Orders/AddBranchOrderSTS.cs:153
+            gridControl2.BeginUpdate();
+            //     Database.display("SELECT QtyDelivered,BarcodeNo,ProductNo,ProductName,FORMAT(Cost,'N','en-us')AS Cost,SequenceNo FROM DeliveryDetails WHERE DeliveryNo='" + txtdevno.Text + "'", gridControl2, gridView2);
+
+            if (GlobalCache.CompanyName == "JFC")
+            {
+
+                Database.display($"SELECT * FROM dbo.funcview_ProcessOrderItemsSales('{txtponum.Text}')", gridControl2, gridView2);
+            }
+            else
+            {
+                Database.display("SELECT SeqNo" +
+               ",ProductNo" +
+               ",ProductName" +
+               ",BarcodeNo" +
+               ",QtyDelivered " +
+               "FROM DeliveryDetails " +
+               "WHERE PONumber='" + txtponum.Text + "' AND DeliveryNo='" + txtdevno.Text + "' AND isCancelled=0 " +
+               "AND Status='PENDING'", gridControl2, gridView2);
+######## ./Orders/AddBranchOrderSTS.cs:243
+            SqlConnection con = Database.getConnection();
+            con.Open();
+            string query = "";
+            if(GlobalCache.CompanyName=="JFC")
+            {
+                query = "sp_AddBranchOrder_JFC";
+            }
+            else
+            {
+                query = "sp_AddBranchOrder";
+            }
+            try
+            {
+                SqlCommand com = new SqlCommand(query, con);
+
+                com.Parameters.AddWithValue("@parmdevno",
+                    string.IsNullOrWhiteSpace(txtdevno.Text) ? "" : txtdevno.Text);
+
+######## ./Orders/AddBranchOrderSTS.cs:266
+
+                com.Parameters.AddWithValue("@parmprodcatcode", catcode?.ToString() ?? "");
+                com.Parameters.AddWithValue("@parmprodcode", pcode?.ToString() ?? "");
+                if (GlobalCache.CompanyName == "JFC")
+                {
+                    com.Parameters.AddWithValue("@parmshipmentno", shipmentno?.ToString() ?? "");
+                }
+                com.Parameters.AddWithValue("@parmqty", txtweight.Text);
+                com.Parameters.AddWithValue("@parmbarcode", txtsku.Text);
+
+                com.Parameters.AddWithValue("@parmbranchcode", txtbrcode.Text); //initiating branhc
+                com.Parameters.AddWithValue("@parmorigin", Login.assignedBranch);
+                com.Parameters.AddWithValue("@preparedby", Login.Fullname);
+                //com.Parameters.AddWithValue("@parmeffectivitydate", txteffectivedate.Text);
+                com.Parameters.AddWithValue("@parmsourceseqno", sourceseqnum);
+                com.Parameters.AddWithValue("@parmbarcodescanning", "");
+                com.CommandType = CommandType.StoredProcedure;
+                com.CommandText = query;
+######## ./Orders/AddBranchOrderSTS.cs:952
+            if(barcodescanning.Checked == true)
+            {
+                
+                if(GlobalCache.CompanyName=="JFC")
+                {
+                    var barcodeObj = gridView2.GetRowCellValue(gridView2.FocusedRowHandle, "BarcodeNo");
+                    string barcode = barcodeObj?.ToString() ?? string.Empty; 
+                    if (barcode.StartsWith("A01") || barcode.StartsWith("B01"))
+                    {
+                        returnOrderByBarcode();
+                    }
+                    else
+                    {
+                        returnOrder();
+                    }
+                }
+                else
+                {
+######## ./Orders/AddBranchOrderSTSBatchMode.cs:44
+        static AddBranchOrderSTSBatchMode()
+        {
+            // Only enable these restricted categories for ENZO (ENZODEV).
+            if (string.Equals(GlobalCache.CompanyName, "ENZO", System.StringComparison.OrdinalIgnoreCase))
+            {
+                _restrictedCategoryCodes = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "10", "11", "12" };
+            }
+            else
+            {
+                _restrictedCategoryCodes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            }
+        }
+
+        public AddBranchOrderSTSBatchMode()
+        {
+            InitializeComponent();
+        }
+
+######## ./Orders/AddBranchOrderSTSV2.cs:140
+            // LoadData() runs before the form is shown, and the RadioGroup raises no
+            // SelectedIndexChanged until its window exists (2026-10-03: Manual looked selected
+            // but its dropdown was empty). So set the type quietly and load the list here.
+            string defaultType = GlobalCache.CompanyName == "JFC" ? FifoManual : FifoAuto;
+            _settingFifoType = true;
+            try { rdoFifoType.EditValue = defaultType; }
+            finally { _settingFifoType = false; }
+            LoadProductLookup();
+            displayForDelivery();
+        }
+
+        bool _settingFifoType = false;   // LoadData() sets the default type and loads the list itself
+        bool IsManualFifo => Equals(rdoFifoType.EditValue, FifoManual);
+
+        private void rdoFifoType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (_settingFifoType) return;
+            LoadProductLookup();
+######## ./Orders/AddBranchOrderV2.cs:142
+            // LoadData() runs before the form is shown, and the RadioGroup raises no
+            // SelectedIndexChanged until its window exists (2026-10-03: Manual looked selected
+            // but its dropdown was empty). So set the type quietly and load the list here.
+            string defaultType = GlobalCache.CompanyName == "JFC" ? FifoManual : FifoAuto;
+            _settingFifoType = true;
+            try { rdoFifoType.EditValue = defaultType; }
+            finally { _settingFifoType = false; }
+            LoadProductLookup();
+            displayForDelivery();
+        }
+
+        bool _settingFifoType = false;   // LoadData() sets the default type and loads the list itself
+        bool IsManualFifo => Equals(rdoFifoType.EditValue, FifoManual);
+
+        private void rdoFifoType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (_settingFifoType) return;
+            LoadProductLookup();
+######## ./Orders/AddItemsBranchOrderSTS.cs:117
+                    string remarks = Convert.ToString(gridView1.GetRowCellValue(rowHandle, "Remarks"))?.Trim();
+
+                    if (string.IsNullOrWhiteSpace(productCode)) continue;
+                    if (GlobalCache.CompanyName == "VROSS")
+                    {
+                        if (string.IsNullOrWhiteSpace(unit)) unit = "pcs";
+                    }
+                    else if (GlobalCache.CompanyName == "ENZO")
+                    {
+                        if (string.IsNullOrWhiteSpace(unit)) unit = "kgs";
+                    }
+
+                        //dt.Rows.Add(
+                        //    txtpono.Text.Trim(),
+                        //    productCode,
+                        //    desc,
+                        //    qty,
+                        //    "kgs",
+######## ./Orders/AddItemsBranchOrderSTS.cs:121
+                    {
+                        if (string.IsNullOrWhiteSpace(unit)) unit = "pcs";
+                    }
+                    else if (GlobalCache.CompanyName == "ENZO")
+                    {
+                        if (string.IsNullOrWhiteSpace(unit)) unit = "kgs";
+                    }
+
+                        //dt.Rows.Add(
+                        //    txtpono.Text.Trim(),
+                        //    productCode,
+                        //    desc,
+                        //    qty,
+                        //    "kgs",
+                        //    true,
+                        //    remarks ?? ""
+                        //);
+
+######## ./Orders/POForApproval.cs:601
+            viewdet.Show();
+            
+            //analyze("spview_SalesInvoice", refno1, viewdet.gridControl4, viewdet.gridView4);
+            if (GlobalCache.CompanyName == "JFC")
+            {
+                analyze("spview_SalesInvoiceJFC", refno1, viewdet.gridControl4, viewdet.gridView4);
+            }
+            else
+            {
+                analyze("spview_SalesInvoice", refno1, viewdet.gridControl4, viewdet.gridView4);
+            }
+
+           // string compname = Database.getSingleQuery("CompanyProfile", "CompanyName='JFC'", "CompanyName");
+            if (GlobalCache.CompanyName == "JFC")
+            {
+                Classes.DevXGridViewSettings.ShowFooterCountTotal(viewdet.gridView4, "Cnt"); //NEW
+            }
+            viewdet.txtinvoiceno.Text = view.GetRowCellValue(view.FocusedRowHandle, "InvoiceNo").ToString();
+######## ./Orders/POForApproval.cs:611
+            }
+
+           // string compname = Database.getSingleQuery("CompanyProfile", "CompanyName='JFC'", "CompanyName");
+            if (GlobalCache.CompanyName == "JFC")
+            {
+                Classes.DevXGridViewSettings.ShowFooterCountTotal(viewdet.gridView4, "Cnt"); //NEW
+            }
+            viewdet.txtinvoiceno.Text = view.GetRowCellValue(view.FocusedRowHandle, "InvoiceNo").ToString();
+
+            if(GlobalCache.CompanyName=="JFC")
+            {
+                viewdet.txtinvoicedate.Text = view.GetRowCellValue(view.FocusedRowHandle, "EffectivityDate").ToString();
+            }
+            viewdet.txtpono.Text = refno1;
+            viewdet.txtcusttin.Text = tinno;
+            double vatablesales = 0.0, vatexemptsale = 0.0, vatamount = 0.0, totalsales = 0.0, lessvat = 0.0, netofvat = 0.0, amountdue = 0.0, addvat = 0.0, vatsales = 0.0, totalamountdue = 0.0;
+            for (int i = 0; i <= viewdet.gridView4.RowCount - 1; i++)
+            {
+######## ./Orders/POForApproval.cs:617
+            }
+            viewdet.txtinvoiceno.Text = view.GetRowCellValue(view.FocusedRowHandle, "InvoiceNo").ToString();
+
+            if(GlobalCache.CompanyName=="JFC")
+            {
+                viewdet.txtinvoicedate.Text = view.GetRowCellValue(view.FocusedRowHandle, "EffectivityDate").ToString();
+            }
+            viewdet.txtpono.Text = refno1;
+            viewdet.txtcusttin.Text = tinno;
+            double vatablesales = 0.0, vatexemptsale = 0.0, vatamount = 0.0, totalsales = 0.0, lessvat = 0.0, netofvat = 0.0, amountdue = 0.0, addvat = 0.0, vatsales = 0.0, totalamountdue = 0.0;
+            for (int i = 0; i <= viewdet.gridView4.RowCount - 1; i++)
+            {
+                if (Convert.ToBoolean(viewdet.gridView4.GetRowCellValue(i, "isVat").ToString()) == true)
+                {
+                    vatablesales += Convert.ToDouble(viewdet.gridView4.GetRowCellValue(i, "Amount").ToString());
+                }
+                if (Convert.ToBoolean(viewdet.gridView4.GetRowCellValue(i, "isVat").ToString()) == false)
+                {
+######## ./Orders/POForApprovalSTS.cs:440
+            devrepfrm.gridView1.BestFitColumns();
+            devrepfrm.gridView1.Columns["SeqNo"].Visible = false;
+            devrepfrm.gridView1.Columns["ProductCode"].Visible = false;
+            if (GlobalCache.CompanyName != "VROSS")
+            {
+                devrepfrm.gridView1.Columns["BarcodeNo"].Visible = false;
+                devrepfrm.gridView1.Columns["TotalCost"].Visible = false;
+            }
+
+            GridView view = devrepfrm.gridControl1.FocusedView as GridView;
+            view.SortInfo.ClearAndAddRange(new GridColumnSortInfo[] {
+                new GridColumnSortInfo(view.Columns["Description"],DevExpress.Data.ColumnSortOrder.Ascending)
+                }, 1);
+            devrepfrm.gridView1.ExpandAllGroups();
+        }
+        private void printDeliveryReceiptToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            showSTSDetails(gridViewForDelivSts);
+######## ./Orders/ReceivedSTS.cs:166
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                if(GlobalCache.CompanyName=="JFC")
+                {
+                    contextMenuStripForReceiving.Show(gridControlForReceiving, e.Location);
+                    contextMenuStripForReceiving.Items[0].Visible = false;
+                }
+                else
+                {
+                    contextMenuStripForReceiving.Show(gridControlForReceiving, e.Location);
+                    contextMenuStripForReceiving.Items[0].Visible = true;
+                    contextMenuStripForReceiving.Items[1].Visible = false;
+                }
+            }
+               
+        }
+
+######## ./Orders/STSForApprovalDetails.cs:188
+            this.gridView1.Columns["Category"].Visible = false;
+            this.gridView1.Columns["ProductCode"].Visible = false;
+            //this.gridView1.Columns["ProductCategoryCode"].Visible = false;
+            if (GlobalCache.CompanyName == "ENZO" || GlobalCache.CompanyName == "JFC")
+            {
+                this.gridView1.Columns["Barcode"].Visible = false;
+            }
+           
+            this.gridView1.Columns["Status"].Visible = false;
+         
+
+            xct.Bands[BandKind.Detail].Controls.Add(HelperFunction.CopyGridControl(this.gridControl1));
+            xct.Bands[BandKind.Detail].Font = new System.Drawing.Font("Tahoma", 9);
+            // Ensure detail band doesn’t force page breaks
+
+            xct.Bands[BandKind.Detail].PageBreak = DevExpress.XtraReports.UI.PageBreak.None;
+            xct.Margins = new System.Drawing.Printing.Margins(50, 50, 50, 50);
+            xct.PaperKind = (DevExpress.Drawing.Printing.DXPaperKind)System.Drawing.Printing.PaperKind.A4;
+######## ./Orders/ViewBranchOrder.cs:173
+        private void gridView1_DoubleClick(object sender, EventArgs e)
+        {
+             
+            if (GlobalCache.CompanyName == "JFC")
+            {
+                openBranchOrderV2();
+            }
+            else
+            {
+                openBranchOrder();
+            }
+        }
+
+        void openBranchOrder()
+        {
+            string stat = "";
+            branchno = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "BranchCode").ToString();
+            ponumber = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "PONumber").ToString();
+######## ./Orders/ViewBranchOrder.cs:220
+                addbrorder.gridView1.Columns["PONumber"].Summary.Add(DevExpress.Data.SummaryItemType.Count, "PONumber", "{0:n2}");
+                addbrorder.gridView2.Columns["SeqNo"].Summary.Add(DevExpress.Data.SummaryItemType.Count, "SeqNo", "{0:n2}");
+
+                if(GlobalCache.CompanyName=="JFC")
+                {
+                    Database.displaySearchlookupEdit($"SELECT * FROM dbo.funcview_populateProductsJFC('{Login.assignedBranch}') " +
+                    $"WHERE ProductCode in (Select distinct ProductCode FROM PurchaseOrderDetails WHERE PONumber='{ponumber}')", addbrorder.txtsearchlookupproduct, "Description", "Description");
+                }
+                else
+                {
+                    Database.displaySearchlookupEdit($"SELECT * FROM dbo.funcview_populateProducts('{Login.assignedBranch}') " +
+                     $"WHERE ProductCode in (Select distinct ProductCode FROM PurchaseOrderDetails WHERE PONumber='{ponumber}')", addbrorder.txtsearchlookupproduct, "Description", "Description");
+                }
+            }
+            else
+            {
+                XtraMessageBox.Show("You Already Processed This Request!");
+            }
+######## ./Orders/ViewBranchOrder.cs:255
+
+        private void processThisOrderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if(GlobalCache.CompanyName=="JFC")
+            {
+                openBranchOrderV2();
+            }
+            else
+            {
+                openBranchOrder();
+            }
+
+
+        }
+
+        private void confirmOrderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            refno = gridView1.GetRowCellValue(gridView2.FocusedRowHandle, "PONumber").ToString();
+######## ./Orders/ViewBranchOrder.cs:381
+
+        private void btnGenerateDelivery_Click(object sender, EventArgs e)
+        {
+            if (company != "JFC")
+            {
+                Database.display("SELECT * FROM view_ForDelivery WHERE Status='FOR DELIVERY' and DateAdded >= '" + datefromfordev.Text + "' and DateAdded <= '" + datetofordev.Text + "'", gridControl2, gridView2);
+                gridView2.Focus();
+            }
+            else
+            {
+                if (Login.assignedBranch == "888")
+                {
+                    Database.display("SELECT * FROM view_ForDelivery WHERE BranchCode='" + Login.assignedBranch + "' AND Status='FOR DELIVERY' and DateAdded >= '" + datefromfordev.Text + "' and DateAdded <= '" + datetofordev.Text + "' ", gridControl2, gridView2);
+                    gridView2.Focus();
+                }
+                else
+                {
+                    Database.display("SELECT * FROM view_ForDelivery WHERE BranchCode='" + Login.assignedBranch + "' AND Status='FOR DELIVERY' and DateAdded >= '" + datefromfordev.Text + "' and DateAdded <= '" + datetofordev.Text + "'  ", gridControl2, gridView2);
+######## ./Orders/ViewBranchOrder.cs:403
+
+        private void btnGenerateRejected_Click(object sender, EventArgs e)
+        {
+            if (company != "JFC")
+            {
+                Database.display("SELECT * FROM view_ForDelivery WHERE Status='REJECTED' and DateAdded >= '" + datefromrej.Text + "' and DateAdded <= '" + datetorej.Text + "'", gridControl3, gridView3);
+                gridView3.Focus();
+            }
+            else
+            {
+                if (Login.assignedBranch == "888")
+                {
+                    Database.display("SELECT * FROM view_ForDelivery WHERE Status='REJECTED' and BranchCode='" + Login.assignedBranch + "' AND DateAdded >= '" + datefromrej.Text + "' and DateAdded <= '" + datetorej.Text + "' ", gridControl3, gridView3);
+                    gridView3.Focus();
+                }
+                else
+                {
+                    Database.display("SELECT * FROM view_ForDelivery WHERE Status='REJECTED' AND BranchCode='" + Login.assignedBranch + "' AND DateAdded >= '" + datefromrej.Text + "' and DateAdded <= '" + datetorej.Text + "'  ", gridControl3, gridView3);
+######## ./Orders/ViewBranchOrderSTS.cs:42
+
+        private void gridView1_DoubleClick(object sender, EventArgs e)
+        {
+            if (GlobalCache.CompanyName == "JFC")
+            {
+                openBranchOrderV2();
+            }
+            else
+            {
+                openBranchOrder("STS");
+            }
+               
+        }
+
+        private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            //tabfilter();
+        }
+######## ./Orders/ViewBranchOrderSTS.cs:154
+            devrepfrm.gridView1.BestFitColumns();
+            devrepfrm.gridView1.Columns["SeqNo"].Visible = false;
+            devrepfrm.gridView1.Columns["ProductCode"].Visible = false;
+            if(GlobalCache.CompanyName != "VROSS")
+            {
+                devrepfrm.gridView1.Columns["BarcodeNo"].Visible = false;
+                devrepfrm.gridView1.Columns["TotalCost"].Visible = false;
+            }
+
+            GridView view = devrepfrm.gridControl1.FocusedView as GridView;
+            view.SortInfo.ClearAndAddRange(new GridColumnSortInfo[] {
+                new GridColumnSortInfo(view.Columns["Description"],DevExpress.Data.ColumnSortOrder.Ascending)
+                }, 1);
+            devrepfrm.gridView1.ExpandAllGroups();
+        }
+        private void printDeliveryReceiptToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            showSTSDetails();
+######## ./Orders/ViewBranchOrderSTS.cs:353
+
+        private void singleModeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (GlobalCache.CompanyName == "JFC")
+            {
+                openBranchOrderV2();
+            }
+            else
+            {
+                openBranchOrder("STS");
+            }
+           
+            //openBranchOrder("STS");
+        }
+
+        //private void tabfilter()
+        //{
+        //    if (tabMain.SelectedTabPage.Equals(tabForApproval))
+######## ./Orders/ViewBranchOrderSTS.cs:494
+ 
+            //Database.displaySearchlookupEdit($"SELECT * FROM dbo.funcview_populateProducts('{Login.assignedBranch}') " +
+            //  $"WHERE CategoryCode NOT IN(10,11,12) AND ProductCode in (Select distinct ProductCode FROM PurchaseOrderDetails WHERE PONumber in (SELECT PONumber FROM PurchaseOrderSummary WHERE EffectivityDate='{addbrorder.txteffectivedate.Text}') )", addbrorder.txtsearchlookupproduct, "Description", "Description");
+            if(GlobalCache.CompanyName.Equals("JFC"))
+            {
+                Database.displaySearchlookupEdit($"SELECT * FROM dbo.funcview_populateProductsInPO_JFC('{Login.assignedBranch}','{addbrorder.txteffectivedate.Text}')", addbrorder.txtsearchlookupproduct, "Description", "Description");
+            }
+            else
+            {
+                Database.displaySearchlookupEdit($"SELECT * FROM dbo.funcview_populateProductsInPO('{Login.assignedBranch}','{addbrorder.txteffectivedate.Text}')", addbrorder.txtsearchlookupproduct, "Description", "Description");
+            }
+
+            if (Orders.AddBranchOrderSTS.isdone == true)
+            {
+                Orders.AddBranchOrderSTS.isdone = false;
+                addbrorder.Dispose();
+                display();
+            }
+######## ./Orders/ViewBranchOrderSTS.cs:542
+
+                  addbrorder.gridView2.Columns["ProductNo"].Summary.Add(DevExpress.Data.SummaryItemType.Count, "ProductNo", "{0:n2}");
+
+                if(GlobalCache.CompanyName=="JFC")
+                {
+                    Database.displaySearchlookupEdit($"SELECT * FROM dbo.funcview_populateProductsInPOJFC('{Login.assignedBranch}','{ponumber}','{addbrorder.txteffectivedate.Text}')", addbrorder.txtsearchlookupproduct, "Description", "Description");
+                }
+                else
+                {
+                    Database.displaySearchlookupEdit($"SELECT * FROM dbo.funcview_populateProductsInPO('{Login.assignedBranch}','{ponumber}','{addbrorder.txteffectivedate.Text}')", addbrorder.txtsearchlookupproduct, "Description", "Description");
+                }
+
+                if (Orders.AddBranchOrderSTS.isdone == true)
+                {
+                    Orders.AddBranchOrderSTS.isdone = false;
+                    addbrorder.Dispose();
+                    display();
+                }
+######## ./POS/POSConfirmPaymentResto.cs:719
+
+            Reporting.SalesInvoiceDexEx viewdet = new Reporting.SalesInvoiceDexEx();
+
+            if(GlobalCache.CompanyName=="JFC")
+            {
+                analyze("spview_SalesInvoiceJFC", lblorderno.Text, viewdet.gridControl4, viewdet.gridView4);
+            }
+            else
+            {
+                analyze("spview_SalesInvoice", lblorderno.Text, viewdet.gridControl4, viewdet.gridView4);
+            }
+            
+
+            viewdet.txtpono.Text = lblorderno.Text;
+            viewdet.txtcustkey.Text = custkey;
+            viewdet.txtcustname.Text = custname;
+            viewdet.txtcustaddress.Text = custaddress;
+            viewdet.txtterm.Text = custterm;
+######## ./Reporting/SalesInvoiceDexEx.cs:46
+            this.gridView4.Columns["isVat"].Visible = false;
+
+
+            if (GlobalCache.CompanyName == "JFC")
+            {
+                DevExReportTemplate.SalesInvoiceJFC xct = new DevExReportTemplate.SalesInvoiceJFC();
+
+                // Column widths measured directly off the physical Epson LQ310 sales invoice
+                // form: Quantity=3.5cm, Unit=1.6cm, Articles=7.7cm, UnitPrice=4.2cm, Amount=3.8cm,
+                // table inset 1.8cm from each paper edge (paper is 9.5in wide -- see
+                // DevExReportTemplate/SalesInvoiceJFC.Designer.cs Margins, set to match).
+                // HelperFunction.CopyGridControl() renders this GridControl into the report via a
+                // WinControlContainer that reuses grid.Size (WinForms pixels) as report units
+                // (hundredths of an inch) -- so 1 column-width unit here = 0.01in, and
+                // cm-to-unit is a straight cm/2.54*100 conversion:
+                //   Quantity  3.5cm -> 138
+                //   Unit      1.6cm ->  63
+                //   Articles  7.7cm -> 303
+######## ./Reporting/StocksOrder.cs:127
+            gridView1.OptionsSelection.MultiSelect = false;
+            gridView1.OptionsSelection.MultiSelectMode = DevExpress.XtraGrid.Views.Grid.GridMultiSelectMode.RowSelect;
+
+            if(GlobalCache.CompanyName=="VROSS")
+            {
+                gridView1.Columns["ProductCode"].OptionsColumn.Printable = DevExpress.Utils.DefaultBoolean.False;
+                gridView1.Columns["QtyReceived"].OptionsColumn.Printable = DevExpress.Utils.DefaultBoolean.False;
+            }
+
+            gridView1.Columns["SeqNo"].OptionsColumn.Printable = DevExpress.Utils.DefaultBoolean.False;
+            //gridView1.Columns["BarcodeNo"].OptionsColumn.Printable = DevExpress.Utils.DefaultBoolean.False;
+         
+            //gridView1.Columns["Variance"].OptionsColumn.Printable = DevExpress.Utils.DefaultBoolean.False;
+            gridView1.Columns["Cost"].OptionsColumn.Printable = DevExpress.Utils.DefaultBoolean.False;
+            //gridView1.Columns["TotalCost"].OptionsColumn.Printable = DevExpress.Utils.DefaultBoolean.False;
+
+            ReportPrintTool report = new ReportPrintTool(xct);
+            report.ShowRibbonPreviewDialog();

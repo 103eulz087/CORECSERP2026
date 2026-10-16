@@ -31,7 +31,9 @@ namespace SalesInventorySystem.HOFormsDevEx
         //}
         void displayvendor()
         {
-            Database.displaySearchlookupEdit("select SupplierID,SupplierName FROM Supplier", txtvendor, "SupplierName", "SupplierName");
+            // 2026-10-15 (H6): keyed on SupplierID, not the name; no free text
+            Database.displaySearchlookupEdit("select SupplierID,SupplierName FROM Supplier", txtvendor, "SupplierName", "SupplierID");
+            txtvendor.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;
         }
         void loadRepositoryItem()
         {
@@ -58,6 +60,7 @@ namespace SalesInventorySystem.HOFormsDevEx
 
         private void btnsummary_Click(object sender, EventArgs e)
         {
+            if (suppid == null) { MessageBox.Show("Pick the supplier first."); return; }   // 2026-10-15 (H6)
             bool confirm = HelperFunction.ConfirmDialog("Are you sure you want to update this Expense Summary", "Update Expense Summary");
             if (confirm)
             {

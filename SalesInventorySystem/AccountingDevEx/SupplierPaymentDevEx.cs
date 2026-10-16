@@ -49,6 +49,7 @@ namespace SalesInventorySystem.AccountingDevEx
             public decimal OverPay { get; set; }          // excess cash -> supplier advance credit (101030208)
             public decimal OverPayExpense { get; set; }   // excess cash -> written off (60339), not carried forward
             public decimal AdvanceApplied { get; set; }   // prior OverPay credit consumed instead of cash
+            public string Type { get; set; }              // [97] PURCHASE / EXPENSE (splist_Accounts' Type)
         }
 
         // Grid-only columns added client-side in populate() for PURCHASE mode
@@ -257,24 +258,26 @@ namespace SalesInventorySystem.AccountingDevEx
 
                 lines.Add(new PaymentLine
                 {
-                    SequenceNumber = Convert.ToInt64(gridViewMaster.GetRowCellValue(i, "SequenceNumber") ?? 0),
-                    BatchReferenceID = Convert.ToInt64(gridViewMaster.GetRowCellValue(i, "BatchReferenceID") ?? 0),
+                    // [97] DBNull-safe (a legacy expense row can carry a NULL BatchReferenceID)
+                    SequenceNumber = (long)SafeToDecimal(gridViewMaster.GetRowCellValue(i, "SequenceNumber")),
+                    BatchReferenceID = (long)SafeToDecimal(gridViewMaster.GetRowCellValue(i, "BatchReferenceID")),
                     BranchCode = "",//Convert.ToString(gridViewMaster.GetRowCellValue(i, "BranchCode") ?? ""),
                     InvoiceNo = Convert.ToString(gridViewMaster.GetRowCellValue(i, "InvoiceNo") ?? ""),
                     //SequenceReferenceNumber = Convert.ToString(gridViewMaster.GetRowCellValue(i, "SequenceReferenceNumber") ?? ""),
                     InvoiceDate = Convert.ToDateTime(gridViewMaster.GetRowCellValue(i, "InvoiceDate") ?? DateTime.MinValue),
-                    ActualCost = Convert.ToDecimal(gridViewMaster.GetRowCellValue(i, "ActualCost") ?? 0m), //NET
-                    AmountPaid = Convert.ToDecimal(gridViewMaster.GetRowCellValue(i, "AmountPaid") ?? 0m), //NET
+                    ActualCost = SafeToDecimal(gridViewMaster.GetRowCellValue(i, "ActualCost")), //NET
+                    AmountPaid = SafeToDecimal(gridViewMaster.GetRowCellValue(i, "AmountPaid")), //NET
                     Balance = SafeToDecimal(gridViewMaster.GetRowCellValue(i, "Balance")),
-                    DiscountAmount = Convert.ToDecimal(gridViewMaster.GetRowCellValue(i, "DiscountAmount") ?? 0m),
-                    EWTAmount = Convert.ToDecimal(gridViewMaster.GetRowCellValue(i, "EWTAmount") ?? 0m),
-                    ReturnAllowances = Convert.ToDecimal(gridViewMaster.GetRowCellValue(i, "ReturnAllowances") ?? 0m),
-                    Variance = Convert.ToDecimal(gridViewMaster.GetRowCellValue(i, "Variance") ?? 0m),   // NEW
+                    DiscountAmount = SafeToDecimal(gridViewMaster.GetRowCellValue(i, "DiscountAmount")),
+                    EWTAmount = SafeToDecimal(gridViewMaster.GetRowCellValue(i, "EWTAmount")),
+                    ReturnAllowances = SafeToDecimal(gridViewMaster.GetRowCellValue(i, "ReturnAllowances")),
+                    Variance = SafeToDecimal(gridViewMaster.GetRowCellValue(i, "Variance")),   // NEW
                     DiscountAccountCode = Convert.ToString(gridViewMaster.GetRowCellValue(i, "DiscountAccountCode") ?? ""),
                     Description = Convert.ToString(gridViewMaster.GetRowCellValue(i, "Description") ?? ""),
                     OverPay = ToDecimal(gridViewMaster.GetRowCellValue(i, ColOverPay)),
                     OverPayExpense = ToDecimal(gridViewMaster.GetRowCellValue(i, ColOverPayExpense)),
-                    AdvanceApplied = ToDecimal(gridViewMaster.GetRowCellValue(i, ColAdvanceApplied))
+                    AdvanceApplied = ToDecimal(gridViewMaster.GetRowCellValue(i, ColAdvanceApplied)),
+                    Type = RowType(i)   // [97]
                 });
             }
 
@@ -348,6 +351,57 @@ namespace SalesInventorySystem.AccountingDevEx
             WireEvents();
             repositoryItemCheckEditStat.EditValueChanged += RepositoryItemCheckEditStat_EditValueChanged;
             BuildCancelledChequeButton();
+
+            // [97] 2026-10-15 (user): purchases and expenses in one list, one voucher may pay both (cash / check).
+            // The Purchase / Expense radio buttons are hidden (kept in the designer); the list shows each row's Type.
+            radioButtonPurchase.Visible = false;
+            radioButtonExpense.Visible = false;
+        }
+
+        // [97] the kind of a grid row (splist_Accounts' Type column): "PURCHASE", "EXPENSE", or "" when unknown
+        // (a posting refuses unknown rows rather than guessing their kind)
+        private string RowType(int rowHandle)
+        {
+            if (rowHandle < 0 || gridViewMaster.Columns["Type"] == null) return "";
+            string t = Convert.ToString(gridViewMaster.GetRowCellValue(rowHandle, "Type"))?.Trim().ToUpperInvariant() ?? "";
+            return t == "PURCHASE" || t == "EXPENSE" ? t : "";
+        }
+
+        // [97] footer totals of the ticked rows only (see populate)
+        private static readonly string[] TickedSumColumns = { "AmountPaid", "DiscountAmount", "EWTAmount", "ReturnAllowances" };
+        private bool _tickedSummaryWired;
+        private decimal _tickedSum;
+
+        private void GridViewMaster_CustomSummaryCalculate(object sender, DevExpress.Data.CustomSummaryEventArgs e)
+        {
+            var item = e.Item as DevExpress.XtraGrid.GridSummaryItem;
+            if (item == null || Array.IndexOf(TickedSumColumns, item.FieldName) < 0) return;
+            switch (e.SummaryProcess)
+            {
+                case DevExpress.Data.CustomSummaryProcess.Start:
+                    _tickedSum = 0m;
+                    break;
+                case DevExpress.Data.CustomSummaryProcess.Calculate:
+                    if (ToBool(gridViewMaster.GetRowCellValue(e.RowHandle, "Pay")))
+                        _tickedSum += ToDecimal(e.FieldValue);
+                    break;
+                case DevExpress.Data.CustomSummaryProcess.Finalize:
+                    e.TotalValue = _tickedSum;
+                    break;
+            }
+        }
+
+        // [97] the kinds among the ticked rows: "PURCHASE", "EXPENSE", "PURCHASE / EXPENSE" or "" (none ticked)
+        private string TickedKinds()
+        {
+            bool p = false, e = false;
+            for (int i = 0; i < gridViewMaster.RowCount; i++)
+            {
+                if (!ToBool(gridViewMaster.GetRowCellValue(i, "Pay"))) continue;
+                string t = RowType(i);
+                if (t == "PURCHASE") p = true; else if (t == "EXPENSE") e = true;
+            }
+            return p && e ? "PURCHASE / EXPENSE" : p ? "PURCHASE" : e ? "EXPENSE" : "";
         }
 
         // ── 2026-10-12: RECORD A CANCELLED (SPOILED) CHEQUE ─────────────────────
@@ -676,6 +730,7 @@ namespace SalesInventorySystem.AccountingDevEx
         {
             gridViewMaster.PostEditor();        // commit immediately
             gridViewMaster.UpdateCurrentRow();  // trigger CellValueChanged
+            gridViewMaster.UpdateTotalSummary();   // [97] the footers add up the ticked rows only
         }
 
 
@@ -714,7 +769,9 @@ namespace SalesInventorySystem.AccountingDevEx
                 {
                     // 2026-10-12 (user): the "CANCELLED" supplier was only a workaround for recording spoiled cheques;
                     // that is now "Cancelled Cheque…" (sp_RecordCancelledCheque), so it is hidden here
-                    ["suppliers"] = "SELECT SupplierID,SupplierName FROM Supplier WHERE LTRIM(RTRIM(SupplierName)) <> 'CANCELLED'",
+                    // 2026-10-15 (user, SQL [93]): cash / check pays LOCAL suppliers, plus an import supplier marked
+                    // "Pay by Cash/Check and Telegraphic" (Supplier.isPayableBoth); imports go through Vouchering Telegraphic
+                    ["suppliers"] = "SELECT SupplierID,SupplierName FROM Supplier WHERE LTRIM(RTRIM(SupplierName)) <> 'CANCELLED' AND (ISNULL(isLocal, 1) = 1 OR isPayableBoth = 1)",
                     ["coaD"] = "SELECT AccountCode, Description FROM ChartOfAccounts WHERE AccountType='D' ORDER BY AccountCode",
                     ["coa508"] = "SELECT AccountCode, Description FROM ChartOfAccounts ORDER BY CASE WHEN AccountCode = '508' THEN 0 ELSE 1 END, AccountCode",
                     ["coaAll"] = "SELECT coa.AccountCode, coa.Description, coa.AccountCode + '-' + coa.Description AS DisplayText FROM ChartOfAccounts coa ORDER BY coa.AccountCode",
@@ -732,7 +789,8 @@ namespace SalesInventorySystem.AccountingDevEx
             searchLookUpSupplier.Properties.DataSource = null;
             searchLookUpSupplier.Properties.DataSource = t["suppliers"];
             searchLookUpSupplier.Properties.DisplayMember = "SupplierName";
-            searchLookUpSupplier.Properties.ValueMember = "SupplierName";
+            searchLookUpSupplier.Properties.ValueMember = "SupplierID";   // 2026-10-15 (H6): the key, not the name
+            searchLookUpSupplier.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;
 
             populateCOA(t["coaD"], t["coa508"]);
             radChanged();
@@ -922,6 +980,22 @@ namespace SalesInventorySystem.AccountingDevEx
             if (hasDebitLines && !ValidateDebitLines()) return;
             if (hasInvoices && !ValidateInvoiceLines()) return;
 
+            // [97] every ticked row must say what it is (checked before any voucher / reference number is drawn)
+            if (lines.Exists(l => l.Type != "PURCHASE" && l.Type != "EXPENSE"))
+            {
+                XtraMessageBox.Show("A ticked invoice has no Kind (purchase / expense). Reload the supplier's invoices and try again; nothing was posted.",
+                    "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // [97] purchases + expenses on one voucher: cash / check only (the SQL refuses it too, 60232)
+            if (radtelegraphic.Checked && TickedKinds() == "PURCHASE / EXPENSE")
+            {
+                XtraMessageBox.Show("A telegraphic voucher pays one kind at a time: tick only purchase invoices or only expense invoices,\n"
+                    + "or use a cash / check voucher to pay both together.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             PostCombinedVoucher(lines, hasInvoices, hasDebitLines);
         }
 
@@ -1079,16 +1153,24 @@ namespace SalesInventorySystem.AccountingDevEx
             else if (radCashVoucher.Checked) _voucherType = "CASH";
             else if (radtelegraphic.Checked) _voucherType = "TELEGRAPHIC";
 
-            _payMethod = radioButtonPurchase.Checked ? "PURCHASE" : "EXPENSE";
+            // [97] the kind comes from the ticked rows (the radio buttons are gone): one kind = today's call;
+            // both kinds = MIXED: purchases in @PurchaseLines, expenses in @InvoiceLines, one voucher / cheque.
+            var purchaseLines = lines.FindAll(l => l.Type == "PURCHASE");
+            var expenseLines = lines.FindAll(l => l.Type == "EXPENSE");
+            bool mixed = purchaseLines.Count > 0 && expenseLines.Count > 0;
+            _payMethod = mixed ? "MIXED" : (purchaseLines.Count > 0 ? "PURCHASE" : "EXPENSE");
+            var invoiceSide = mixed ? expenseLines : lines;          // @InvoiceLines
+            var purchaseSide = mixed ? purchaseLines : new List<PaymentLine>();   // @PurchaseLines (mixed only)
 
-            
             decimal invoiceLegAmount = 0;
             foreach (var ln in lines)
                 invoiceLegAmount += ln.AmountPaid;
 
-            var invoiceLinesTvp = BuildPaymentLinesTVP(hasInvoices ? lines : new List<PaymentLine>());
+            var invoiceLinesTvp = BuildPaymentLinesTVP(hasInvoices ? invoiceSide : new List<PaymentLine>());
             var manualLinesTvp = BuildManualDebitLinesTVP(); // empty-but-correctly-shaped if hasDebitLines is false
-            var lineExtrasTvp = BuildPaymentLineExtrasTVP(hasInvoices ? lines : new List<PaymentLine>());
+            var lineExtrasTvp = BuildPaymentLineExtrasTVP(hasInvoices ? invoiceSide : new List<PaymentLine>());
+            var purchaseLinesTvp = BuildPaymentLinesTVP(purchaseSide);
+            var purchaseExtrasTvp = BuildPaymentLineExtrasTVP(purchaseSide);
 
             using (var con = Database.getConnection())
             using (var cmd = new SqlCommand("sp_PostSupplierPaymentWithManualLines", con))
@@ -1131,6 +1213,17 @@ namespace SalesInventorySystem.AccountingDevEx
                 var extrasParam = cmd.Parameters.AddWithValue("@InvoiceLineExtras", lineExtrasTvp);
                 extrasParam.SqlDbType = SqlDbType.Structured;
                 extrasParam.TypeName = "dbo.AP_PaymentLineExtraTVP";
+
+                if (mixed)   // [97] sent only for a mixed voucher (the SQL side treats them as optional)
+                {
+                    var purParam = cmd.Parameters.AddWithValue("@PurchaseLines", purchaseLinesTvp);
+                    purParam.SqlDbType = SqlDbType.Structured;
+                    purParam.TypeName = "dbo.AP_PaymentLineTVP";
+
+                    var purExtrasParam = cmd.Parameters.AddWithValue("@PurchaseLineExtras", purchaseExtrasTvp);
+                    purExtrasParam.SqlDbType = SqlDbType.Structured;
+                    purExtrasParam.TypeName = "dbo.AP_PaymentLineExtraTVP";
+                }
 
                 try
                 {
@@ -1177,8 +1270,9 @@ namespace SalesInventorySystem.AccountingDevEx
                 //cmd.Parameters.Add("@parmdatefrom", SqlDbType.Date).Value = fromDate;
                 //cmd.Parameters.Add("@parmdateto", SqlDbType.Date).Value = toDate;
                 cmd.Parameters.Add("@parmsupplierid", SqlDbType.VarChar, 30).Value = txtsupplierid.Text.Trim();
-                cmd.Parameters.Add("@parmispurchase", SqlDbType.Bit).Value = radioButtonPurchase.Checked;
-                cmd.Parameters.Add("@parmisexpense", SqlDbType.Bit).Value = radioButtonExpense.Checked;
+                // [97] both kinds in one list (splist_Accounts both flags; Type tells the kind)
+                cmd.Parameters.Add("@parmispurchase", SqlDbType.Bit).Value = true;
+                cmd.Parameters.Add("@parmisexpense", SqlDbType.Bit).Value = true;
 
                 var table = new DataTable();
                 bool loadedOk = false;
@@ -1239,15 +1333,26 @@ namespace SalesInventorySystem.AccountingDevEx
             if (gridViewMaster.Columns["ReturnAllowances"] != null) gridViewMaster.Columns["ReturnAllowances"].Visible = false;
             Classes.DevXGridViewSettings.ShowFooterTotal(gridViewMaster, "ActualCost");
 
-            if (radioButtonPurchase.Checked == true)
+            // [97] one list for both kinds. These footers add up the TICKED rows only: an unticked expense row still
+            // carries what was already paid and the accrued EWT / discount / offset left (zeroed when it is ticked),
+            // so a plain column sum would mix "already paid" with "to pay" (GridViewMaster_CustomSummaryCalculate).
+            foreach (string col in TickedSumColumns)
             {
-                Classes.DevXGridViewSettings.ShowFooterTotal(gridViewMaster, "AmountPaid");
-                Classes.DevXGridViewSettings.ShowFooterTotal(gridViewMaster, "DiscountAmount");
-                Classes.DevXGridViewSettings.ShowFooterTotal(gridViewMaster, "EWTAmount");
-                Classes.DevXGridViewSettings.ShowFooterTotal(gridViewMaster, "ReturnAllowances");
+                var c = gridViewMaster.Columns[col];
+                if (c == null) continue;
+                c.Summary.Clear();
+                c.Summary.Add(DevExpress.Data.SummaryItemType.Custom, col, "{0:n2}");
             }
-            else
+            if (!_tickedSummaryWired)
             {
+                gridViewMaster.CustomSummaryCalculate += GridViewMaster_CustomSummaryCalculate;
+                _tickedSummaryWired = true;
+            }
+            if (gridViewMaster.Columns["Type"] != null)
+            {
+                gridViewMaster.Columns["Type"].Visible = true;
+                gridViewMaster.Columns["Type"].Caption = "Kind";
+                gridViewMaster.Columns["Type"].OptionsColumn.AllowEdit = false;
             }
 
             // Overpayment/advance columns - both modes since 2026-09-24c.
@@ -1678,8 +1783,9 @@ namespace SalesInventorySystem.AccountingDevEx
                 xct.PaperKind = (DevExpress.Drawing.Printing.DXPaperKind)System.Drawing.Printing.PaperKind.A4; 
                 double amounttopay = Convert.ToDouble(txtamounttopay.Text);
 
-                string paytype = "";
-                if (radioButtonPurchase.Checked == true) { paytype = "PURCHASE"; } else { paytype = "EXPENSE"; }
+                // [97] from the ticked rows: PURCHASE, EXPENSE or PURCHASE / EXPENSE (blank when nothing is ticked)
+                string paytype = TickedKinds();
+                bool mixedPrint = paytype == "PURCHASE / EXPENSE";
 
                 xct.xrcheckdate.Text = txtcheckdate.Text;
                 xct.xrpaytype.Text = paytype;
@@ -1692,17 +1798,20 @@ namespace SalesInventorySystem.AccountingDevEx
                 gridViewMaster.Columns["Balance"].Visible = false;
                 gridViewMaster.Columns["BranchCode"].Visible = false;
                
-                if (paytype == "EXPENSE")
+                if (paytype != "PURCHASE")   // [97] expense rows present (alone or with purchases)
                 {
                     gridViewMaster.Columns["BatchReferenceID"].Visible = false;
                     gridViewMaster.Columns["BatchReferenceID"].OptionsColumn.ShowInCustomizationForm = true;
                 }
 
-                gridViewMaster.Columns["Type"].Visible = false;
-            
+                if (gridViewMaster.Columns["Type"] != null)
+                {
+                    gridViewMaster.Columns["Type"].Visible = mixedPrint;   // [97] a mixed voucher prints each invoice's kind
+                    gridViewMaster.Columns["Type"].OptionsColumn.ShowInCustomizationForm = true;
+                }
+
                 gridViewMaster.Columns["Balance"].OptionsColumn.ShowInCustomizationForm = true;
                 gridViewMaster.Columns["BranchCode"].OptionsColumn.ShowInCustomizationForm = true;
-                gridViewMaster.Columns["Type"].OptionsColumn.ShowInCustomizationForm = true;
                 gridViewMaster.Columns["Pay"].Visible = false;
 
                 xct.xramountinwords.Text = str.ToString().ToUpper();
@@ -1809,7 +1918,7 @@ namespace SalesInventorySystem.AccountingDevEx
         {
             string refno = gridViewMaster.GetRowCellValue(gridViewMaster.FocusedRowHandle, "ReferenceNo").ToString();
             string invoiceno = gridViewMaster.GetRowCellValue(gridViewMaster.FocusedRowHandle, "InvoiceNo").ToString();
-            if (radioButtonExpense.Checked == true && gridViewMaster.RowCount > 0)
+            if (gridViewMaster.RowCount > 0 && RowType(gridViewMaster.FocusedRowHandle) == "EXPENSE")   // [97] the row's kind
             {
                 bool checkifNotYetProcessed = Database.checkifExist("SELECT TOP(1) InvoiceNo " +
                 "FROM dbo.ExpenseSummary " +
@@ -1887,7 +1996,7 @@ namespace SalesInventorySystem.AccountingDevEx
 
         private void showInvoiceDetailsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if(radioButtonExpense.Checked==true)
+            if (gridViewMaster.FocusedRowHandle >= 0 && RowType(gridViewMaster.FocusedRowHandle) == "EXPENSE")   // [97] the row's kind
             {
                 HOFormsDevEx.ViewExpenseDetailsDevEx viewdetdevex = new HOFormsDevEx.ViewExpenseDetailsDevEx();
                 viewdetdevex.groupControl1.Visible = false;
@@ -1895,6 +2004,11 @@ namespace SalesInventorySystem.AccountingDevEx
                  $"WHERE BatchReferenceID ='{Convert.ToInt64(gridViewMaster.GetRowCellValue(gridViewMaster.FocusedRowHandle, "BatchReferenceID") ?? 0)}' " +
                  $"AND InvoiceNo='{Convert.ToString(gridViewMaster.GetRowCellValue(gridViewMaster.FocusedRowHandle, "InvoiceNo") ?? "")}' ", viewdetdevex.gridControl2, viewdetdevex.gridView2);
                 viewdetdevex.ShowDialog(this);
+            }
+            else if (gridViewMaster.FocusedRowHandle >= 0)   // [97] purchases are in the same list now
+            {
+                XtraMessageBox.Show("Invoice details are shown for expense invoices only. This row is a purchase invoice (see the Kind column).",
+                    "Invoice Details", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
@@ -1922,7 +2036,8 @@ namespace SalesInventorySystem.AccountingDevEx
         private void searchLookUpSupplier_EditValueChanged(object sender, EventArgs e)
         {
             _suppid = SearchLookUpClass.getSingleValue(searchLookUpSupplier, "SupplierID");
-            txtsupplierid.Text = _suppid.ToString();
+            txtsupplierid.Text = _suppid?.ToString() ?? "";
+            if (_suppid == null) return;   // 2026-10-15 (H6): nothing picked / cleared: no supplier to load
             populate();
             RefreshAvailableCredit();
         }

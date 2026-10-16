@@ -66,6 +66,19 @@ END
     a `ROLLBACK` inside a proc run by `INSERT ... EXEC` raises 3915 over the real error, and the portal's dispatcher
     skips providers for the same reason. `spu_PostSTSReceiveFromFIFO` writes its skipped lines into `#STSRcvSkipped`
     when the caller (`spu_STS_ReceiveTransfer`) created it, and returns them as a result set otherwise.
+12. **Bank reconciliation items ([88], hardening H7).** Every outstanding-cheque (OC) / deposit-in-transit (DIT) item is
+    written through `sp_Payment_PostBankReconEntry`, ONE call per reference + bank account + side with the cash movement
+    already added up (Known Bug #9). The helper keeps one item per (ReferenceNo, AccountCode, ItemType): the same posting
+    again is a no-op, another amount or another document under that key is refused (93021), a LOCKED reconciliation
+    month is refused (93022). **A locked month at or after the item's month counts**: an open item carries forward
+    into every later month, so a July item changes a locked August (the range `sp_BankRecon_ResolveItem` already
+    uses); read the headers `WITH (HOLDLOCK)`. Every writer of `BankStatementRecon` checks that lock
+    (`sp_BankRecon_SaveItem` / `_DeleteItem` / `_UpdateItem` 93002, the AR reversal 93028, the cash-advance reversal
+    93027) and matches a document's items by `ReferenceNo + SourceModule + SourceRef`, never by `ReferenceNo` alone
+    (voucher ids and reference numbers are different counters; the reference counter is shared by every module). An edit that re-posts a voucher
+    reconciles its items (`sp_JV_PostBankReconForLines @Mode = 'SYNC'`): a cleared item stays as the bank cleared it
+    (else 93023), open items keep their ReconID. Items a document posted are never deleted by hand (60005): reverse
+    the document.
 
 ## Anchor-patch deploy scripts
 

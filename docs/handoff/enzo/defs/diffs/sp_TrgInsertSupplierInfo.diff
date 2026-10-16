@@ -1,0 +1,10 @@
+--- enzo/sp_TrgInsertSupplierInfo.sql	2026-10-15 23:07:10.242147500 +0800
++++ prod/sp_TrgInsertSupplierInfo.sql	2026-10-15 23:07:15.297816100 +0800
+@@ -1,6 +1,5 @@
+-
+ CREATE TRIGGER [dbo].[sp_TrgInsertSupplierInfo]
+-   ON  [dbo].[Supplier]
++   ON  dbo.Supplier
+    AFTER INSERT
+ AS 
+ declare @acctid varchar(50),@acctname varchar(100),@maxid int,@acctno varchar(13),@suppkey varchar(20)

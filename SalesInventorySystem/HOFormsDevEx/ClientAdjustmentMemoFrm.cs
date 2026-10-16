@@ -24,9 +24,11 @@ namespace SalesInventorySystem.HOFormsDevEx
 
             txtReferenceNo.Text = IDGenerator.getIDNumberSP("sp_GetReferenceNumber", "ReferenceNumber");
 
+            // 2026-10-15 (H6): keyed on CustomerID, not the name (988 customers share a name on PRODUCTION); no free text
             Database.displaySearchlookupEdit(
                 "SELECT CustomerID, CustomerName FROM Customers",
-                txtCustomer, "CustomerName", "CustomerName");
+                txtCustomer, "CustomerName", "CustomerID");
+            txtCustomer.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;
 
             Database.displaySearchlookupEdit(
                 "SELECT AccountCode, Description FROM ChartOfAccounts WHERE AccountType='D'",

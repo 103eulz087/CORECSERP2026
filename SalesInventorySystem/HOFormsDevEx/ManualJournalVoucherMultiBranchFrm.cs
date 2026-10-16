@@ -19,6 +19,108 @@ namespace SalesInventorySystem.HOFormsDevEx
             InitializeComponent();
             // Posted tab: draggable split, vouchers grid ~55% / details below.
             Classes.DevXGridViewSettings.KeepSplitterRatio(splitPosted, 0.55);
+            BuildReverseControls();
+        }
+
+        // [96] 2026-10-15: Reverse a saved voucher (spu_ReverseManualJournalVoucher). Built in code next to
+        // Edit Voucher; a reversed voucher stays on the list as CANCELLED (greyed) and can't be edited.
+        private SimpleButton btnReverseVoucher;
+        private System.Drawing.Font _cancelledFont;
+
+        private void BuildReverseControls()
+        {
+            btnReverseVoucher = new SimpleButton
+            {
+                Name = "btnReverseVoucher",
+                Text = "Reverse Voucher…",
+                Location = new System.Drawing.Point(462, 9),
+                Size = new System.Drawing.Size(150, 31),
+                Enabled = false,
+                TabIndex = 3
+            };
+            btnReverseVoucher.Appearance.BackColor = System.Drawing.Color.FromArgb(255, 226, 226);
+            btnReverseVoucher.Appearance.Options.UseBackColor = true;
+            btnReverseVoucher.Click += BtnReverseVoucher_Click;
+            pnlPostedButtons.Controls.Add(btnReverseVoucher);
+
+            gridViewPosted.RowStyle += GridViewPosted_RowStyle;
+            Disposed += (s, e) => { _cancelledFont?.Dispose(); _cancelledFont = null; };
+        }
+
+        private bool FocusedVoucherIsCancelled()
+        {
+            return gridViewPosted.FocusedRowHandle >= 0
+                && string.Equals(Convert.ToString(gridViewPosted.GetFocusedRowCellValue("Status")), "CANCELLED", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private void GridViewPosted_RowStyle(object sender, DevExpress.XtraGrid.Views.Grid.RowStyleEventArgs e)
+        {
+            if (e.RowHandle < 0) return;
+            if (string.Equals(Convert.ToString(gridViewPosted.GetRowCellValue(e.RowHandle, "Status")), "CANCELLED", StringComparison.OrdinalIgnoreCase))
+            {
+                if (_cancelledFont == null)
+                    _cancelledFont = new System.Drawing.Font(e.Appearance.Font, System.Drawing.FontStyle.Strikeout);
+                e.Appearance.ForeColor = System.Drawing.Color.Gray;
+                e.Appearance.Font = _cancelledFont;
+                e.HighPriority = true;
+            }
+        }
+
+        private void BtnReverseVoucher_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(_selectedPostedRefNo) || FocusedVoucherIsCancelled()) return;
+
+            string refNo = _selectedPostedRefNo;
+            object amt = gridViewPosted.GetFocusedRowCellValue("TotalAmount");
+            string amount = amt == null || amt == DBNull.Value ? "" : Convert.ToDecimal(amt).ToString("N2");
+            object vd = gridViewPosted.GetFocusedRowCellValue("VoucherDate");
+            string voucherDate = vd == null || vd == DBNull.Value ? "" : Convert.ToDateTime(vd).ToString("MM/dd/yyyy");
+
+            string reason = XtraInputBox.Show(
+                $"Reverse journal voucher {refNo}  ({voucherDate}, {amount})\n\n"
+                + "A reversal entry dated like the voucher is posted for every branch, its bank recon items are voided, "
+                + "and the voucher is marked CANCELLED (refused if a bank item was already cleared or its recon month is locked).\n\n"
+                + "Reason for the reversal:",
+                "Reverse Journal Voucher", "");
+            if (reason == null) return;
+            if (string.IsNullOrWhiteSpace(reason))
+            {
+                XtraMessageBox.Show("Enter the reason for the reversal.", "Reverse Journal Voucher", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            if (reason.Trim().Length > 300)
+            {
+                XtraMessageBox.Show($"The reason is {reason.Trim().Length} characters; keep it to 300.", "Reverse Journal Voucher", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            try
+            {
+                string message;
+                using (var con = Database.getConnection())
+                using (var cmd = new SqlCommand("spu_ReverseManualJournalVoucher", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandTimeout = 120;
+                    cmd.Parameters.Add("@ReferenceNo", SqlDbType.VarChar, 10).Value = refNo;
+                    cmd.Parameters.Add("@Reason", SqlDbType.VarChar, 300).Value = reason.Trim().Length > 300 ? reason.Trim().Substring(0, 300) : reason.Trim();
+                    cmd.Parameters.Add("@User", SqlDbType.VarChar, 50).Value = Login.Fullname ?? "";
+                    var dt = new DataTable();
+                    con.Open();
+                    new SqlDataAdapter(cmd).Fill(dt);
+                    message = dt.Rows.Count > 0 ? Convert.ToString(dt.Rows[0]["Message"]) : "Journal voucher reversed.";
+                }
+                XtraMessageBox.Show(message, "Reversed", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (SqlException ex)
+            {
+                XtraMessageBox.Show(ex.Message, "Not Reversed", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            LoadPostedVouchers();
+            int h = gridViewPosted.LocateByValue("ReferenceNo", refNo);
+            if (h >= 0) gridViewPosted.FocusedRowHandle = h;
         }
         private bool _dataLoaded = false;
         public void LoadData()
@@ -288,11 +390,20 @@ namespace SalesInventorySystem.HOFormsDevEx
 
                     con.Open();
 
+                    // [86] 2026-10-14: sp_EditManualJournalVoucher returns Status 0 when the
+                    // voucher was saved unchanged; nothing is re-posted then (same ticket,
+                    // same preparer, no Last Modified stamp).
                     string message = defaultMessage;
+                    bool noChange = false;
                     using (var rdr = cmd.ExecuteReader())
-                        if (rdr.Read()) message = rdr["Message"]?.ToString() ?? message;
+                        if (rdr.Read())
+                        {
+                            message = rdr["Message"]?.ToString() ?? message;
+                            object status = rdr["Status"];
+                            noChange = status != null && status != DBNull.Value && Convert.ToInt32(status) == 0;
+                        }
 
-                    XtraMessageBox.Show(message, "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    XtraMessageBox.Show(message, noChange ? "No Changes" : "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
 
                 ResetForNewEntry(clearRemarks: true);
@@ -443,6 +554,8 @@ namespace SalesInventorySystem.HOFormsDevEx
                     gridViewPosted.Columns["TotalAmount"].DisplayFormat.FormatString = "N2";
                     gridViewPosted.Columns["TotalAmount"].AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
                     gridViewPosted.Columns["TotalAmount"].AppearanceCell.Options.UseTextOptions = true;
+                    gridViewPosted.Columns["TotalAmount"].AppearanceHeader.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+                    gridViewPosted.Columns["TotalAmount"].AppearanceHeader.Options.UseTextOptions = true;
                 }
                 if (gridViewPosted.Columns["BranchCount"] != null)
                 {
@@ -458,6 +571,7 @@ namespace SalesInventorySystem.HOFormsDevEx
                     gridViewPosted.Columns["VoucherDate"].DisplayFormat.FormatType = DevExpress.Utils.FormatType.DateTime;
                     gridViewPosted.Columns["VoucherDate"].DisplayFormat.FormatString = "MM/dd/yyyy";
                 }
+                FormatAuditColumns(gridViewPosted);
 
                 gridViewPosted.BestFitColumns();
                 gridControlPostedDetails.DataSource = null;
@@ -478,6 +592,32 @@ namespace SalesInventorySystem.HOFormsDevEx
                     "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+        // [86] 2026-10-14: audit columns from sp_GetPostedManualJournalVouchers. PreparedBy /
+        // DatePrepared = who first posted the voucher (an edit keeps them);
+        // LastModifiedBy / LastModifiedDate = the last edit that changed something (blank if never edited,
+        // or edited before 2026-10-14 when edits overwrote PreparedBy instead).
+        internal static void FormatAuditColumns(DevExpress.XtraGrid.Views.Grid.GridView view)
+        {
+            var captions = new[] {
+                new[] { "PreparedBy", "Prepared By" },
+                new[] { "DatePrepared", "Date Prepared" },
+                new[] { "LastModifiedBy", "Last Modified By" },
+                new[] { "LastModifiedDate", "Last Modified Date" },
+                new[] { "ReversedBy", "Reversed By" },          // [96]
+                new[] { "ReversedDate", "Reversed Date" },
+                new[] { "ReverseReason", "Reverse Reason" } };
+            foreach (var c in captions)
+                if (view.Columns[c[0]] != null) view.Columns[c[0]].Caption = c[1];
+
+            foreach (string name in new[] { "DatePrepared", "LastModifiedDate", "ReversedDate" })
+            {
+                var col = view.Columns[name];
+                if (col == null) continue;
+                col.DisplayFormat.FormatType = DevExpress.Utils.FormatType.DateTime;
+                col.DisplayFormat.FormatString = "MM/dd/yyyy hh:mm tt";
+            }
+        }
+
         private void ChkAllowCrossBranch_CheckedChanged(object sender, EventArgs e)
         {
             UpdateTotals();   // re-evaluate the balance message under the new rule
@@ -485,6 +625,12 @@ namespace SalesInventorySystem.HOFormsDevEx
         private void BtnEditVoucher_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(_selectedPostedRefNo)) return;
+            if (FocusedVoucherIsCancelled())   // [96] the trigger refuses it too (59229)
+            {
+                XtraMessageBox.Show("This voucher was reversed (cancelled) and cannot be edited. Use Copy to New Entry to post a corrected voucher.",
+                    "Cannot Edit", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
 
             DataTable lines;
             string remarks;
@@ -569,7 +715,9 @@ namespace SalesInventorySystem.HOFormsDevEx
             bool has = gridViewPosted.FocusedRowHandle >= 0;
             btnViewDetails.Enabled = has;
             btnCopyToNew.Enabled = has;
-            btnEditVoucher.Enabled = has;
+            bool cancelled = FocusedVoucherIsCancelled();   // [96] a reversed voucher can't be edited or reversed again
+            btnEditVoucher.Enabled = has && !cancelled;
+            if (btnReverseVoucher != null) btnReverseVoucher.Enabled = has && !cancelled;
             _selectedPostedRefNo = has ? gridViewPosted.GetFocusedRowCellValue("ReferenceNo")?.ToString() : null;
         }
 

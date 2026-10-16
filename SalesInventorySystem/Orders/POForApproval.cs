@@ -109,16 +109,34 @@ namespace SalesInventorySystem
             }
         }
 
+        // SELECT ... FROM for the Delivered and Paid tabs.
+        // 2026-10-15 (user, PO 12415 showed 3 items / 1 sold for 2 live lines): the item and qty totals are
+        // counted from the delivery lines, cancelled lines left out. DeliverySummary's stored counters are
+        // written by several procs with different rules (Save counts cancelled lines, the cancel proc sets
+        // TotalItemSold and nothing updates it after a later scan), so ~2% of deliveries carry wrong ones.
+        // Column names and order are view_DeliverySummary's, so the grids and showItems() read them as before.
+        const string DeliverySummaryLiveTotalsFrom =
+            "SELECT v.BranchCode, v.DeliveryNo, v.PONumber, v.InvoiceNo, v.EffectivityDate, v.Customer, v.CustomerName, " +
+            "ISNULL(dl.TotalItem, 0) AS TotalItem, ISNULL(dl.TotalItemSold, 0) AS TotalItemSold, v.TotalItemReturned, " +
+            "ISNULL(dl.TotalQtyDelivered, 0) AS TotalQtyDelivered, v.TotalQtyReturned, ISNULL(dl.TotalActualQty, 0) AS TotalActualQty, " +
+            "v.RequestedBy, v.DateApproved, v.PreparedBy, v.OrderType, v.Status, " +
+            "CASE WHEN EXISTS (SELECT 1 FROM CreditMemo cm WHERE cm.PONumber = v.PONumber) THEN 1 ELSE 0 END AS HasCreditMemo, " +
+            "CASE WHEN EXISTS (SELECT 1 FROM ReturnedOrderDetails rod WHERE rod.PONumber = v.PONumber) THEN 1 ELSE 0 END AS HasReturnOrder " +
+            "FROM view_DeliverySummary v " +
+            "OUTER APPLY (SELECT COUNT(*) AS TotalItem, " +
+            "                    SUM(CASE WHEN d.isReturned = 0 THEN 1 ELSE 0 END) AS TotalItemSold, " +
+            "                    SUM(d.QtyDelivered) AS TotalQtyDelivered, " +
+            "                    SUM(CASE WHEN d.isReturned = 0 THEN d.ActualQty ELSE 0 END) AS TotalActualQty " +
+            "             FROM DeliveryDetails d " +
+            "             WHERE d.DeliveryNo = v.DeliveryNo AND d.PONumber = v.PONumber AND d.isCancelled = 0) dl ";
+
         // Shared by filtertab() (tab switch) and btnDeliveredSalesOrder_Click (manual refresh) --
         // both must populate gridView5 identically, since gridView5_RowStyle depends on the
         // HasCreditMemo/HasReturnOrder columns added here being present either way.
         void loadDeliveredSalesOrder()
         {
             Database.display(
-                "SELECT v.*, " +
-                "CASE WHEN EXISTS (SELECT 1 FROM CreditMemo cm WHERE cm.PONumber = v.PONumber) THEN 1 ELSE 0 END AS HasCreditMemo, " +
-                "CASE WHEN EXISTS (SELECT 1 FROM ReturnedOrderDetails rod WHERE rod.PONumber = v.PONumber) THEN 1 ELSE 0 END AS HasReturnOrder " +
-                "FROM view_DeliverySummary v " +
+                DeliverySummaryLiveTotalsFrom +
                 "WHERE v.BranchCode='"+Login.assignedBranch+"' and v.Status='DELIVERED' and v.DateApproved >= '" + dateFromDeliv.Text + "' and v.DateApproved < DATEADD(DAY,1,'" + dateToDeliv.Text + "')  AND v.BranchCode='" + Login.assignedBranch + "' " +
                 // Already fully paid (Balance=0) POs are excluded from this list. Only excludes
                 // when a TransactionChargeSales row exists AND shows Balance=0 -- a PO with no AR
@@ -134,11 +152,10 @@ namespace SalesInventorySystem
         void loadPaidSalesOrder()
         {
             Database.display(
-                "SELECT v.*, " +
-                "CASE WHEN EXISTS (SELECT 1 FROM CreditMemo cm WHERE cm.PONumber = v.PONumber) THEN 1 ELSE 0 END AS HasCreditMemo, " +
-                "CASE WHEN EXISTS (SELECT 1 FROM ReturnedOrderDetails rod WHERE rod.PONumber = v.PONumber) THEN 1 ELSE 0 END AS HasReturnOrder " +
-                "FROM view_DeliverySummary v " +
-                "WHERE v.Status='DELIVERED' and v.DateApproved >= '" + dateFromPaid.Text + "' and v.DateApproved < DATEADD(DAY,1,'" + dateToPaid.Text + "')  AND v.BranchCode='" + Login.assignedBranch + "' " +
+                DeliverySummaryLiveTotalsFrom +
+                // 2026-10-15 (user): RETURNED too -- a PO whose lines were all returned turns RETURNED
+                // (sp_ReturnSalesOrder) and would otherwise never show here; it is also on the Returned tab.
+                "WHERE v.Status IN ('DELIVERED','RETURNED') and v.DateApproved >= '" + dateFromPaid.Text + "' and v.DateApproved < DATEADD(DAY,1,'" + dateToPaid.Text + "')  AND v.BranchCode='" + Login.assignedBranch + "' " +
                 "AND EXISTS (SELECT 1 FROM TransactionChargeSales t WHERE t.ReferenceNo = v.PONumber AND t.Balance = 0) " +
                 "ORDER BY v.PONumber", gridControlPaid, gridViewPaid);
             gridViewPaid.Columns["HasCreditMemo"].Visible = false;
@@ -793,9 +810,22 @@ namespace SalesInventorySystem
         }
         void showItemsReturned(GridView view)
         {
+            int h = view.FocusedRowHandle;
+            showItemsReturned(
+                view.GetRowCellValue(h, "PONumber").ToString(),
+                view.GetRowCellValue(h, "EffectivityDate").ToString(),
+                view.GetRowCellValue(h, "PreparedBy").ToString(),
+                view.GetRowCellValue(h, "TotalItemReturned").ToString(),
+                view.GetRowCellValue(h, "TotalQtyReturned").ToString());
+        }
+
+        // Shared by the Returned tab (row values from view_ReturnedSummary in its grid) and the Paid
+        // tab's "Show Returned Items" (same values read from view_ReturnedSummary for the PO).
+        void showItemsReturned(string pono, string effectivityDate, string preparedBy, string totalItemReturned, string totalQtyReturned)
+        {
             try
             {
-                bool isInvoiceUpdated = Database.checkifExist("Select isInvoiceUpdate FROM DeliverySummary WHERE PONumber='" + view.GetRowCellValue(view.FocusedRowHandle, "PONumber").ToString() + "' and isInvoiceUpdate=1");
+                bool isInvoiceUpdated = Database.checkifExist("Select isInvoiceUpdate FROM DeliverySummary WHERE PONumber='" + pono + "' and isInvoiceUpdate=1");
                 if (isInvoiceUpdated == false)
                 {
                     XtraMessageBox.Show("Invoice Number must be updated first..please go to Print Delivery Receipt Option!...");
@@ -803,16 +833,16 @@ namespace SalesInventorySystem
                 }
 
                 HOFormsDevEx.ClientShowItemsDevEx confi = new HOFormsDevEx.ClientShowItemsDevEx();
-              
-                confi.txtpono.Text = view.GetRowCellValue(view.FocusedRowHandle, "PONumber").ToString();
-                confi.txteffectivitydate.Text = view.GetRowCellValue(view.FocusedRowHandle, "EffectivityDate").ToString();
+
+                confi.txtpono.Text = pono;
+                confi.txteffectivitydate.Text = effectivityDate;
                 string custkey = Database.getSingleQuery("PurchaseOrderSummary", "PONumber='" + confi.txtpono.Text + "'", "Customer");
                 confi.txtcustname.Text = Database.getSingleQuery("Customers", "CustomerKey='" + custkey + "'", "CustomerName");
-                confi.txtpreparedby.Text = view.GetRowCellValue(view.FocusedRowHandle, "PreparedBy").ToString();
+                confi.txtpreparedby.Text = preparedBy;
                 confi.txtrefkey.Text = Database.getSingleQuery("DeliverySummary", "PONumber='" + confi.txtpono.Text + "'", "InvoiceNo");
                 confi.txtstatus.Text = "RETURNED";
-                confi.txttotalitem.Text = view.GetRowCellValue(view.FocusedRowHandle, "TotalItemReturned").ToString();
-                confi.txttotalqty.Text = view.GetRowCellValue(view.FocusedRowHandle, "TotalQtyReturned").ToString();
+                confi.txttotalitem.Text = totalItemReturned;
+                confi.txttotalqty.Text = totalQtyReturned;
                 Database.display("Select * FROM funcview_ForDeliveryDetails('" + confi.txtpono.Text + "')", confi.gridControl2, confi.gridView2);
 
 
@@ -1142,6 +1172,67 @@ namespace SalesInventorySystem
         {
             stat = "RETURNED";
             showItemsReturned(gridViewReturned);
+        }
+
+        // Paid tab (loadPaidSalesOrder): view the PO's items, same dialog as Delivered's Show Items.
+        // stat = "DELIVERED" keeps the dialog read-only (its update price / discount menu is blocked).
+        private void gridControlPaid_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right && gridViewPaid.FocusedRowHandle >= 0)
+            {
+                // Only POs with a return (HasReturnOrder, hidden column from loadPaidSalesOrder).
+                object hasReturn = gridViewPaid.GetRowCellValue(gridViewPaid.FocusedRowHandle, "HasReturnOrder");
+                toolStripMenuItemPaidShowReturnedItems.Enabled = hasReturn != null && hasReturn != DBNull.Value && Convert.ToInt32(hasReturn) == 1;
+                contextMenuStripPaid.Show(gridControlPaid, e.Location);
+            }
+        }
+
+        // Paid tab: the PO's returned items, same dialog as the Returned tab's Show Items. The Paid grid
+        // has no returned totals, so they are read from view_ReturnedSummary for the PO.
+        private void toolStripMenuItemPaidShowReturnedItems_Click(object sender, EventArgs e)
+        {
+            if (gridViewPaid.FocusedRowHandle < 0) return;
+            string pono = gridViewPaid.GetRowCellValue(gridViewPaid.FocusedRowHandle, "PONumber").ToString();
+
+            DataTable ret = new DataTable();
+            try
+            {
+                using (SqlConnection con = Database.getConnection())
+                using (SqlCommand cmd = new SqlCommand(
+                    "SELECT MAX(EffectivityDate) AS EffectivityDate, MAX(PreparedBy) AS PreparedBy, " +
+                    "       SUM(TotalItemReturned) AS TotalItemReturned, SUM(TotalQtyReturned) AS TotalQtyReturned " +
+                    "FROM dbo.view_ReturnedSummary " +
+                    "WHERE PONumber = @PONumber " +
+                    "HAVING COUNT(*) > 0", con))
+                {
+                    cmd.Parameters.Add("@PONumber", SqlDbType.VarChar, 20).Value = pono;
+                    con.Open();
+                    using (SqlDataAdapter da = new SqlDataAdapter(cmd)) da.Fill(ret);
+                }
+            }
+            catch (SqlException ex)
+            {
+                XtraMessageBox.Show(ex.Message);
+                return;
+            }
+
+            if (ret.Rows.Count == 0)
+            {
+                XtraMessageBox.Show("No returned items found for PO " + pono + ".");
+                return;
+            }
+
+            DataRow r = ret.Rows[0];
+            stat = "RETURNED";
+            showItemsReturned(pono, r["EffectivityDate"].ToString(), r["PreparedBy"].ToString(),
+                r["TotalItemReturned"].ToString(), r["TotalQtyReturned"].ToString());
+        }
+
+        private void toolStripMenuItemPaidShowItems_Click(object sender, EventArgs e)
+        {
+            if (gridViewPaid.FocusedRowHandle < 0) return;
+            stat = "DELIVERED";
+            showItems(gridViewPaid);
         }
 
         private void gridControlApprovedServices_MouseUp(object sender, MouseEventArgs e)

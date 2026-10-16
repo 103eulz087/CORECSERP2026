@@ -1,0 +1,29 @@
+--- enzo/view_DeliveryReciept.sql	2026-10-15 23:07:10.086995000 +0800
++++ prod/view_DeliveryReciept.sql	2026-10-15 23:07:15.114458300 +0800
+@@ -2,7 +2,7 @@
+ 
+ 
+ 
+-CREATE   VIEW [dbo].[view_DeliveryReciept] 
++CREATE VIEW [dbo].[view_DeliveryReciept] --select * FROM [view_DeliveryReciept] where PONumber=691
+ AS
+ SELECT  
+ dbo.DeliveryDetails.DeliveryNo, 
+@@ -21,7 +21,7 @@
+ FROM dbo.DeliveryDetails
+ INNER JOIN DeliverySummary d
+ 	ON DeliveryDetails.PONumber=d.PONumber
+-	--AND DeliveryDetails.DeliveryNo=d.DeliveryNo 
++	AND DeliveryDetails.DeliveryNo=d.DeliveryNo 
+ INNER JOIN Products b
+ 	ON dbo.DeliveryDetails.ProductNo=b.ProductCode
+ 	AND b.BranchCode=d.BranchCode
+@@ -31,3 +31,8 @@
+ 
+ WHERE dbo.DeliveryDetails.isReturned=0 
+ AND dbo.DeliveryDetails.isCancelled=0
++--and d.PONUmber='40332'
++
++
++--select TOP(1) * FROM Products
++

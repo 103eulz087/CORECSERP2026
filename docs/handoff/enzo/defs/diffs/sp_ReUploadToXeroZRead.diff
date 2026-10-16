@@ -1,0 +1,20 @@
+--- enzo/sp_ReUploadToXeroZRead.sql	2026-10-15 23:07:09.933633900 +0800
++++ prod/sp_ReUploadToXeroZRead.sql	2026-10-15 23:07:14.929387600 +0800
+@@ -29,7 +29,7 @@
+         a.BranchCode, 
+         a.MachineUsed,
+         DATEADD(day, 1, a.DateOrder) -- Pre-calculate tomorrow's date for range joins
+-    FROM CORECSERP_001.dbo.POSSalesSummary a WITH(NOLOCK)
++    FROM CORECS2026.dbo.POSSalesSummary a WITH(NOLOCK)
+     WHERE a.DateOrder BETWEEN @StartDate AND @EndDate
+       AND a.BranchCode NOT IN ('888','000') --HRI NOT INCLUDED
+       AND NOT EXISTS (
+@@ -73,7 +73,7 @@
+             s.TotalSCDiscount, s.TotalPWDDiscount, s.TotalRegDiscount, s.TotalVatSales,
+             s.VatExemptSale, s.VatableSale, s.VatInput, s.ZeroRatedSale, s.VatAdjustment,
+             s.DateExecute, s.ExecuteBy, s.TotalNetSales, 0
+-        FROM CORECSERP_001.dbo.POSZReadingTransactions s WITH(NOLOCK)
++        FROM CORECS2026.dbo.POSZReadingTransactions s WITH(NOLOCK)
+         JOIN #BranchNotUploaded u
+           ON s.DateExecute >= u.DateOrder AND s.DateExecute < u.NextDay
+          AND s.BranchCode = u.BranchCode

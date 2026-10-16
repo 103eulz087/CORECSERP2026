@@ -38,7 +38,9 @@ namespace SalesInventorySystem.HOFormsDevEx
             new KeyValuePair<string, string>("navReports", "Reports"),
             new KeyValuePair<string, string>("navReportsV2", "Reports V2"),
             new KeyValuePair<string, string>("navGLTicketEntries", "GL Ticket Entries"),
-            // navLoanRevaluation is not listed: the board shows it to admins and accounting users only, whatever this list
+            // 2026-10-14: the board also shows GL Detail Transaction to anyone allowed a posting page; ticking it here
+            // grants it to a user who has none of those (e.g. a reviewer)
+            new KeyValuePair<string, string>("navGLDetailTransaction", "GL Detail Transaction"),            // navLoanRevaluation is not listed: the board shows it to admins and accounting users only, whatever this list
             // says (2026-10-14: every user already had a saved list, so a new key here would have hidden it from everyone)
         };
 

@@ -30,13 +30,16 @@ namespace SalesInventorySystem.HOFormsDevEx
             // as your other posting forms (Post Expense, etc.)
             txtReferenceNo.Text = IDGenerator.getIDNumberSP("sp_GetReferenceNumber", "ReferenceNumber");
 
+            // 2026-10-15 (H6): keyed on the record's key, not its name / description; no free text
             Database.displaySearchlookupEdit(
                 "SELECT SupplierID, SupplierName FROM Supplier",
-                txtSupplier, "SupplierName", "SupplierName");
+                txtSupplier, "SupplierName", "SupplierID");
+            txtSupplier.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;
 
             Database.displaySearchlookupEdit(
                 "SELECT AccountCode, Description FROM ChartOfAccounts WHERE AccountType='D'",
-                txtAPAccount, "Description", "Description");
+                txtAPAccount, "Description", "AccountCode");
+            txtAPAccount.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;
 
             Database.displayRepositorySearchlookupEdit(
                 "SELECT AccountCode, Description FROM ChartOfAccounts WHERE AccountType='D'",

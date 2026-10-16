@@ -49,6 +49,13 @@ namespace SalesInventorySystem
         public Login()
         {
             InitializeComponent();
+            // 2026-10-15: the startup "please wait" (Program.Main) ends when the Login is on screen; then the Login is
+            // pulled to the front (after a click elsewhere Windows would only flash it in the taskbar).
+            Shown += (s, e) =>
+            {
+                StartupSplash.Close();
+                StartupSplash.BringToFront(this);
+            };
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -84,7 +91,7 @@ namespace SalesInventorySystem
             if (GlobalConfig.Token== "MTQ2NzgwNjAz" || GlobalConfig.Token == "ODM1NTI0ODYz" 
                 || GlobalConfig.Token == "1234567890XX"
                 || GlobalConfig.Token == "ONEzNTE4NjEx"
-                || GlobalConfig.Token == "NjQwOTg4MzU1") 
+                || GlobalConfig.Token == "NjQwOTg4MzU1") //
             {
                 Database.RunLocalDatabaseMigrations();
           
@@ -93,16 +100,18 @@ namespace SalesInventorySystem
             //{
             //    Database.ExecuteQuery("UPDATE POSType set isAutoSystemDeduct=1");
             //}
+            StartupSplash.SetStatus("Checking for updates...");
             tryCheckUpdate(); //#tryCheckUpdateV1();
             //labelversion.Text= HelperFunction.readFileVersion();
 
-           
+
             try
             {
                 regkey = Registry.CurrentUser.CreateSubKey(@"AAITCRE\ConnSettingsMain");
-              
+
                 if (regkey.GetValue("dbconn") == null)
                 {
+                    StartupSplash.Close();   // the TopMost "please wait" would cover the dialog
                     Connection C = new Connection();
                     C.lblservername.Text = "Main Server";
                     C.txtconnsettingsname.Text = @"AAITCRE\ConnSettingsMain";
@@ -138,6 +147,7 @@ namespace SalesInventorySystem
             }
             catch (Exception ex)
             {
+                StartupSplash.Close();
                 DevExpress.XtraEditors.XtraMessageBox.Show(ex.Message);
             }
 
@@ -171,7 +181,10 @@ namespace SalesInventorySystem
                         file["DownloadUrl"] = file["DownloadUrlFormat"].Replace("file.zip", "file-v" + server_version + ".zip");
                         file.Update();
                     }
+                    StartupSplash.Close();   // the TopMost "please wait" would cover the message
                     MessageBox.Show("A New Updates Available\nGet the latest application update now.");
+                    // 2026-10-15: tells the next start (the new exe, launched by exeUpdater) to say "Finishing the update"
+                    try { System.IO.File.WriteAllText(StartupSplash.UpdateMarkerPath, DateTime.Now.ToString("o")); } catch { }
                     string batCmdLaunch = $"bat_{ DateTime.Now.ToString("yyyyMMdd.HHmmss") }.bat";
                     System.IO.File.WriteAllText(batCmdLaunch, @"
                         @echo off
@@ -187,6 +200,7 @@ namespace SalesInventorySystem
             }
             catch (Exception ex)
             {
+                StartupSplash.Close();
                 MessageBox.Show(ex.Message.ToString());
             }
         }

@@ -1,0 +1,27 @@
+--- enzo/sp_FiFoMappingSalesInvDeductForJobs.sql	2026-10-15 23:07:09.128865200 +0800
++++ prod/sp_FiFoMappingSalesInvDeductForJobs.sql	2026-10-15 23:07:13.920979900 +0800
+@@ -153,21 +153,13 @@
+         BEGIN
+             -- Update POSSalesSummary with averaged costs
+             UPDATE POS
+-            SET POS.isUpload = 1
+-               
++            SET POS.isUpload = 1,
++                POS.Cost = (S.TotalCost / S.TotalQty)
+             FROM POSSalesSummary POS
+             INNER JOIN (
+-                SELECT SeqNo 
++                SELECT SeqNo, SUM(TempCost) AS TotalCost, SUM(QtySold) AS TotalQty
+                 FROM #SalesSummary GROUP BY SeqNo
+             ) S ON POS.SalesID = S.SeqNo;
+-
+-               update a SET a.Cost=isnull(b.Cost,0),a.isUpload=1
+-            from dbo.POSSalesSummary a
+-            inner join dbo.InventoryLedgerDeduct b
+-	            on a.BranchCode=b.Branch
+-	            and a.SalesID=b.SalesID
+-            WHERE a.BranchCode=@parmbranchcode
+-            and a.DateOrder=@parmtransdate
+         END;
+ 
+         UPDATE ReInventoryMonitoring SET isDeducted = 1,DateTimeDeducted=GETDATE()  

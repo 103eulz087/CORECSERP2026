@@ -1,0 +1,42 @@
+--- enzo/sp_ConfirmBranchOrder.sql	2026-10-15 23:07:08.080027100 +0800
++++ prod/sp_ConfirmBranchOrder.sql	2026-10-15 23:07:12.623852700 +0800
+@@ -30,6 +30,10 @@
+ 
+ BEGIN
+ SET XACT_ABORT ON
++	BEGIN TRANSACTION;   -- 2026-10-02c: Save runs as one unit (XACT_ABORT rolls it back on any error)
++	EXEC dbo.sp_SOOrder_Lock @PONumber = @parmpono;   -- 2026-10-02c: the per-order lock every Sales Order writer shares
++	IF EXISTS (SELECT 1 FROM dbo.DeliverySummary WHERE PONumber = @parmpono AND (ISNULL(isInvoiceUpdate, 0) = 1 OR Status IN ('DELIVERED', 'RETURNED')))
++		THROW 59847, 'This sales order already has its invoice number (or is confirmed); it can''t be saved again.', 1;
+ 	SET NOCOUNT ON
+ 	 
+ 	
+@@ -57,13 +61,17 @@
+ 		--WHERE dd.PONumber = @parmpono AND dd.DeliveryNo = @parmdevno;
+ 
+ 		UPDATE dd
+-		SET dd.Cost =  isnull(i.Cost,0)
++		SET dd.Cost = ISNULL(i.Cost, 0)   -- 2026-10-01: weighted cost of every lot the line used
+ 		FROM DeliveryDetails dd
+-		INNER JOIN InventoryDeliveryFIFO i
+-			ON dd.PONumber=i.PONumber
++		INNER JOIN (SELECT DeliveryNo, PONumber, DevDetSeqNo, ProductNo,
++		                   SUM(TotalCost) / NULLIF(SUM(QtyDelivered), 0) AS Cost
++		            FROM InventoryDeliveryFIFO
++		            WHERE isErrorCorrect = 0
++		            GROUP BY DeliveryNo, PONumber, DevDetSeqNo, ProductNo) i
++			ON dd.DeliveryNo=i.DeliveryNo
++			and dd.PONumber=i.PONumber
+ 			and dd.SeqNo=i.DevDetSeqNo
+ 			and dd.ProductNo=i.ProductNo
+-			and i.isErrorCorrect=0
+ 		WHERE dd.PONumber = @parmpono 
+ 		AND dd.DeliveryNo = @parmdevno;
+ 
+@@ -449,5 +457,6 @@
+ 	WHERE PONumber=@parmpono
+ 	
+ 	insert into HistoryLogs values (@preparedby,GETDATE(),'Commissary Process Order with PONumber='+@parmpono,@parmbranchcode)
++	COMMIT TRANSACTION;   -- 2026-10-02c
+ END
+ 

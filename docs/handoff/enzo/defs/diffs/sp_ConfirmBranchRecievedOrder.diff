@@ -1,0 +1,172 @@
+--- enzo/sp_ConfirmBranchRecievedOrder.sql	2026-10-15 23:07:08.441294300 +0800
++++ prod/sp_ConfirmBranchRecievedOrder.sql	2026-10-15 23:07:13.085836800 +0800
+@@ -1,14 +1,15 @@
+ 
+ CREATE PROCEDURE [dbo].[sp_ConfirmBranchRecievedOrder] 
+-	@parmdevno varchar(20), 
+-	@parmpono varchar(10),
+-	@parmbarcode varchar(30),
+-	@parmbranchcode varchar(10), 
+-	@preparedby varchar(30) 
++(
++    @parmdevno      VARCHAR(20),
++    @parmpono       VARCHAR(10),
++    @parmbarcode    VARCHAR(30),
++    @parmbranchcode VARCHAR(10),
++    @preparedby     VARCHAR(30)
++)
+ AS
+ BEGIN
+ 	SET NOCOUNT ON;
+-	SET XACT_ABORT ON;
+ 	
+ 	-- =========================================================================
+ 	-- THE SAFEPOINT
+@@ -20,26 +21,27 @@
+ 		BEGIN TRANSACTION;
+ 
+ 	BEGIN TRY
+-		-- 1. Insert into Inventory from Received Order Details
+-
+-		IF NOT EXISTS (SELECT 1 FROM [Inventory] WITH(NOLOCK) WHERE Branch = @parmbranchcode and ReferenceCode='rcv-' + @parmpono and DateReceived=CAST(GETDATE() as date))
++        -- Idempotency guard - don't double-receive / double-post
++        IF EXISTS (SELECT 1 FROM DeliverySummary WHERE PONumber = @parmpono AND Status = 'DELIVERED')
+         BEGIN
+-			
+-				INSERT INTO [Inventory] (
+-					[Branch], [ShipmentNo], [PalletNo], [BatchCode], [DateReceived],
+-					[Product], [Description], [Barcode], [TipWeight], [Quantity],
+-					[Cost], [Available], [IsStock], [IsVat], [IsWarehouse],
+-					[ReferenceCode], [LastMovementDate], [isProcess], [isSource], [isConversion]
+-				) 
+-				SELECT 
+-					@parmbranchcode, ' ', ' ', ' ', GETDATE(),
+-					ProductCode, ProductName, Barcode, 0, Qty,
+-					Cost, Qty, 1, IsVat, 1,
+-					'rcv-' + PONumber, GETDATE(), 0, 1, 0
+-				FROM ReceivedOrderDetails WITH(NOLOCK) 
+-				WHERE PONumber = @parmpono;
++            RAISERROR('PONumber %s has already been confirmed as received.', 16, 1, @parmpono);
+         END
+         
++        ---- 1. Insert into Inventory from Received Order Details
++        --INSERT INTO [Inventory] (
++        --    [Branch], [ShipmentNo], [PalletNo], [BatchCode], [DateReceived],
++        --    [Product], [Description], [Barcode], [TipWeight], [Quantity],
++        --    [Cost], [Available], [IsStock], [IsVat], [IsWarehouse],
++        --    [ReferenceCode], [LastMovementDate], [isProcess], [isSource], [isConversion]
++        --)
++        --SELECT
++        --    @parmbranchcode, ' ', ' ', ' ', GETDATE(),
++        --    ProductCode, ProductName, Barcode, 0, Qty,
++        --    Cost, Qty, 1, IsVat, 1,
++        --    'rcv-' + PONumber, GETDATE(), 0, 1, 0
++        --FROM ReceivedOrderDetails WITH(NOLOCK)
++        --WHERE PONumber = @parmpono;
++ 
+ 		-- 2. Update Delivery Details Status
+ 		UPDATE dt 
+ 		SET dt.Status = 'DELIVERED',
+@@ -50,6 +52,7 @@
+ 			ON dt.PONumber = rt.PONumber
+ 			AND dt.BarcodeNo = rt.Barcode
+ 			AND dt.ProductNo = rt.ProductCode
++            AND dt.isCancelled = 0
+ 		WHERE dt.PONumber = @parmpono;  
+ 
+ 		-- 3. Calculate Totals instantly without Temp Tables!
+@@ -54,13 +57,13 @@
+ 
+ 		-- 3. Calculate Totals instantly without Temp Tables!
+ 		DECLARE @totalactualqty2 FLOAT = 0, @totalvariancevat FLOAT = 0, @totalvariancevatexempt FLOAT = 0;
+-
+ 		SELECT 
+ 			@totalactualqty2 = ISNULL(SUM(ActualQty), 0),
+ 			@totalvariancevat = ISNULL(SUM(CASE WHEN isVat = 1 THEN ABS(Variance) ELSE 0 END), 0),
+ 			@totalvariancevatexempt = ISNULL(SUM(CASE WHEN isVat = 0 THEN ABS(Variance) ELSE 0 END), 0)
+ 		FROM DeliveryDetails WITH(NOLOCK)
+-		WHERE PONumber = @parmpono;
++        WHERE PONumber = @parmpono
++        AND isCancelled=0;
+ 
+ 		-- 4. Update Summaries
+ 		UPDATE DeliverySummary 
+@@ -79,7 +82,68 @@
+ 			TotalKilo = (SELECT ISNULL(SUM(Qty), 0) FROM ReceivedOrderDetails WITH(NOLOCK) WHERE PONumber = @parmpono)
+ 		WHERE PONumber = @parmpono;
+ 
+-		-- 5. Write History Log (FIXED: Used @preparedby instead of the unassigned @username)
++        -- 4b. Post ticket entries for what actually landed in this branch's inventory
++        --     Debit Inventory (on hand) / Credit Inventory In Transit, split VAT vs VAT-exempt
++        DECLARE @overalltotalcostvat MONEY, @overalltotalcostvatex MONEY;
++        SELECT
++            @overalltotalcostvat   = ISNULL(SUM(CASE WHEN IsVat = 1 THEN Qty * Cost END), 0),
++            @overalltotalcostvatex = ISNULL(SUM(CASE WHEN IsVat = 0 THEN Qty * Cost END), 0)
++        FROM ReceivedOrderDetails WITH(NOLOCK)
++        WHERE PONumber = @parmpono;
++ 
++        DECLARE @outrefnum VARCHAR(10), @Particulars VARCHAR(400);
++        EXEC GetReferenceNumber @outrefnum OUTPUT;
++        SET @Particulars = 'Inventory Transfer In - PO#' + @parmpono + ' (' + @parmbranchcode + ') - VATable';
++        declare @datekaron date = GETDATE()
++        IF @overalltotalcostvat > 0
++        BEGIN
++            DECLARE @AmtsVAT dbo.tt_AmountBreakdown, @TokVAT dbo.tt_TokenResolution, @FlgVAT dbo.tt_ConditionFlags;
++            INSERT @AmtsVAT VALUES ('GROSS', @overalltotalcostvat);
++ 
++            EXEC [dbo].[sp_PostCompoundTicket]
++                @Mnemonic        = 'IT-BR-VAT',
++                @TicketDate      = @datekaron,
++                @BranchCode      = @parmbranchcode,
++                @ReferenceNumber = @outrefnum,
++                @ReferenceKey    = @parmpono,
++                @Particulars     = @Particulars ,
++                @Owner           = 'CS IN TRANSIT',
++                @PreparedBy      = @preparedby,
++                @Amounts         = @AmtsVAT,
++                @Tokens          = @TokVAT,
++                @Flags           = @FlgVAT,
++                @LedgerType      = NULL,
++                @LedgerEntityID  = NULL,
++                @LedgerInvoiceNo = NULL,
++                @LedgerBatchRef  = @parmpono,
++                @LedgerSeqRef    = 1;
++        END
++ 
++        IF @overalltotalcostvatex > 0
++        BEGIN
++            DECLARE @AmtsVE dbo.tt_AmountBreakdown, @TokVE dbo.tt_TokenResolution, @FlgVE dbo.tt_ConditionFlags;
++            INSERT @AmtsVE VALUES ('GROSS', @overalltotalcostvatex);
++            SET @Particulars = 'Inventory Transfer In - PO#' + @parmpono + ' (' + @parmbranchcode + ') - VAT Exempt';
++            EXEC [dbo].[sp_PostCompoundTicket]
++                @Mnemonic        = 'IT-BR-VATEX',
++                @TicketDate      = @datekaron,
++                @BranchCode      = @parmbranchcode,
++                @ReferenceNumber = @outrefnum,
++                @ReferenceKey    = @parmpono,
++                @Particulars     = @Particulars,
++                @Owner           = 'CS IN TRANSIT',
++                @PreparedBy      = @preparedby,
++                @Amounts         = @AmtsVE,
++                @Tokens          = @TokVE,
++                @Flags           = @FlgVE,
++                @LedgerType      = NULL,
++                @LedgerEntityID  = NULL,
++                @LedgerInvoiceNo = NULL,
++                @LedgerBatchRef  = @parmpono,
++                @LedgerSeqRef    = 2;
++        END
++ 
++        -- 5. Write History Log
+ 		INSERT INTO HistoryLogs (UserID, DateExecute, ActionLogs, BranchCode)
+ 		VALUES (@preparedby, GETDATE(), 'Received/Confirm Order with PONumber=' + @parmpono, @parmbranchcode);
+ 
+@@ -93,8 +156,6 @@
+ 		ELSE
+ 			IF XACT_STATE() <> -1
+ 				ROLLBACK TRANSACTION ConfirmRcvdSave;
+-
+-		-- Pass the error explicitly back to C# so you never get blind-sided again!
+ 		DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
+ 		RAISERROR (@ErrorMessage, 16, 1);
+ 	END CATCH

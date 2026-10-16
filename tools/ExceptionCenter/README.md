@@ -36,6 +36,10 @@ Run it:
 | S03 | HIGH | Order's AR in the GL (sale − credit memo − return) ≠ invoice |
 | S04 | HIGH | Sales ticket cost of sales ≠ invoice COGS rows |
 | S05 | MEDIUM | Order and delivery header disagree on DELIVERED (a delivery fully returned before confirm, never invoiced, is valid and not flagged) |
+| S06 | HIGH | Invoice no. with several rows: a row's paid amount differs from its own payment lines (script [80]) |
+| S07 | HIGH | A customer's account balance differs from the sum of its invoice balances (script [87]) |
+| S08 | HIGH | An invoice row's `Balance` doesn't follow its own columns, all rows and dates (script [87]) |
+| S09 | MEDIUM | A sales-order delivery's `DeliverySummary` counters (items / sold / returned / qty / actual qty) differ from its lines (script [89]; most rows before [89], 0 after) |
 | T01 | CRITICAL | Saved transfer: head-office In Transit ≠ cost of the stock actually shipped |
 | T02 | CRITICAL | Received transfer: In Transit did not clear to 0 |
 | T03 | CRITICAL | Transfer received more than once |
@@ -70,3 +74,6 @@ Bank Recon item (DIT / OC) and lists every recon period with its figures.
 Set 1 = per account, set 2 = exceptions (should be empty), set 3 = recon periods.
 Codes: GL ONLY (bank moved, nothing to tick), RECON ONLY (item without GL),
 AMOUNT DIFFERS (e.g. Known Bug #9), OTHER MONTH (item filed under another period).
+Set 6 (added by [88], hardening H7): items of a LOCKED month added, changed, cleared or uncleared
+after the lock (every recon writer refuses a locked month since [88]; a row here came from a hand
+edit or an older exe). Should be empty.

@@ -1,0 +1,27 @@
+--- enzo/sp_StageManualEntryForReInventoryIN.sql	2026-10-15 23:07:09.475262000 +0800
++++ prod/sp_StageManualEntryForReInventoryIN.sql	2026-10-15 23:07:14.367780100 +0800
+@@ -47,7 +48,7 @@
+         -- Insert Staging Record
+         ---------------------------------------------------------------------
+         ---------------------------------------------------------------------
+-        -- Create New Re-Inventory Snapshot select top 1 * FROM TempInventoryIN
++        -- Create New Re-Inventory Snapshot select * FROM TempInventoryIN
+         ---------------------------------------------------------------------
+         INSERT INTO dbo.TempInventoryIN
+         (
+@@ -62,6 +63,7 @@
+             Cost,
+             isWarehouse,
+             IsVat,
++            isDone,
+             DateEncode,
+             EncodeBy
+         )
+@@ -77,6 +79,7 @@
+             @parmcost,
+             @parmiswarehouse,
+             @isvat,
++            0,
+             GETDATE(),
+             @parmuser;
+ 

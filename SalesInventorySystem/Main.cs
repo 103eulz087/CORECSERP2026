@@ -74,6 +74,8 @@ namespace SalesInventorySystem
             validate_userAccess();
             SetupGLPeriodClosingMenu();
             SetupPosV2ReportsMenu();
+            SetupRegistersMenu();
+            SetupAccountOfficersMenu();
             // 2026-10-14 (user): Loan Revaluation moved to the Accounting Board (menu "Loan Revaluation"); no Accounting Settings entry
             //checkAccess();
             //  ribbonPage1.Visible = false;
@@ -1190,6 +1192,85 @@ namespace SalesInventorySystem
             };
             ribbonControl.Items.Add(btn);
             popupMenuAcctgSettings.ItemLinks.Add(btn);
+        }
+
+        // 2026-10-15 (user): Registers (Invoice No. / Collection Receipt / EWT payable, SQL [92]) on REPORTING › SALES, right after
+        // Client Sales (btnTransactions). Added in code like the POS V2 Reports menu (Main.Designer untouched). Shown to admins and
+        // accounting, to whoever sees Client Sales, and to a user whose Reporting menu list names "btnRegisters" (UserMenuAccess):
+        // a new button is in nobody's saved list yet, so the list alone would hide it from everyone.
+        private void SetupRegistersMenu()
+        {
+            bool isAdmin, isAcctg;
+            bool.TryParse(Login.isglobalAdmin, out isAdmin);
+            bool.TryParse(Login.isglobalAccounting, out isAcctg);
+            bool seesClientSales = btnTransactions.Visibility == BarItemVisibility.Always;
+            bool granted = !string.IsNullOrEmpty(strmenuReporting)
+                && Array.IndexOf(strmenuReporting.Replace("\r", "").Split('\n', '|'), "btnRegisters") >= 0;
+            if (!isAdmin && !isAcctg && !seesClientSales && !granted) return;
+
+            var btn = new BarButtonItem { Caption = "Registers (Invoice / CR / EWT)", Name = "btnRegisters" };
+            btn.ImageOptions.LargeImage = btnTransactions.ImageOptions.LargeImage;
+            btn.ItemClick += (s, args) => OpenRegisters();
+            ribbonControl.Items.Add(btn);
+
+            int at = 0;
+            for (int i = 0; i < ribbonPageGroup4.ItemLinks.Count; i++)
+                if (ribbonPageGroup4.ItemLinks[i].Item == btnTransactions) { at = i + 1; break; }
+            ribbonPageGroup4.ItemLinks.Insert(at, btn);
+            ribbonPageGroup4.Visible = true;
+            REPORTING.Visible = true;
+        }
+
+        // 2026-10-15 (user): Account Officers maintenance (SQL [95]) on ADMIN TOOLS › GENERAL ADMINISTRATION, right after Customers
+        // Info. Added in code (Main.Designer untouched). Shown to admins, to whoever sees Customers Info, and to a user whose
+        // Admin menu list (UserMenuAccess.isAdmin) names "btnAccountOfficers" (nobody's saved list has a new button yet).
+        private void SetupAccountOfficersMenu()
+        {
+            bool isAdmin;
+            bool.TryParse(Login.isglobalAdmin, out isAdmin);
+            bool seesCustomers = btnCustomersInfo.Visibility == BarItemVisibility.Always;
+            bool granted = !string.IsNullOrEmpty(strmenuAdmin)
+                && Array.IndexOf(strmenuAdmin.Replace("\r", "").Split('\n', '|'), "btnAccountOfficers") >= 0;
+            if (!isAdmin && !seesCustomers && !granted) return;
+
+            var btn = new BarButtonItem { Caption = "Account Officers", Name = "btnAccountOfficers" };
+            btn.ImageOptions.LargeImage = btnCustomersInfo.ImageOptions.LargeImage;
+            btn.ItemClick += (s, args) =>
+            {
+                foreach (Form f in Application.OpenForms)
+                    if (f is HOFormsDevEx.AccountOfficersDevEx) { f.Activate(); return; }
+                var frm = new HOFormsDevEx.AccountOfficersDevEx();
+                frm.Show();         // not inside a using block (2026-10-13 Loan Revaluation lesson)
+                frm.LoadData();     // the real entry (Known Bug Pattern #1)
+            };
+            ribbonControl.Items.Add(btn);
+
+            int at = ribbonPageGroup13.ItemLinks.Count;
+            for (int i = 0; i < ribbonPageGroup13.ItemLinks.Count; i++)
+                if (ribbonPageGroup13.ItemLinks[i].Item == btnCustomersInfo) { at = i + 1; break; }
+            ribbonPageGroup13.ItemLinks.Insert(at, btn);
+            ribbonPageGroup13.Visible = true;
+            AdminPage.Visible = true;
+        }
+
+        // the page is an XtraUserControl (it is reused as it was on the Accounting Board); one window at a time
+        private void OpenRegisters()
+        {
+            foreach (Form f in Application.OpenForms)
+                if (f.Tag as string == "RegistersHost") { f.Activate(); return; }
+
+            var page = new AccountingDevEx.AccountingRegistersFrm { Dock = DockStyle.Fill };
+            var host = new DevExpress.XtraEditors.XtraForm
+            {
+                Text = "Registers (Invoice / CR / EWT)",
+                Tag = "RegistersHost",
+                Width = 1360,
+                Height = 800,
+                StartPosition = FormStartPosition.CenterScreen
+            };
+            host.Controls.Add(page);
+            host.Show();        // not inside a using block: that disposed the Loan Revaluation window at once (2026-10-13)
+            page.LoadData();    // the real entry (Known Bug Pattern #1); Load only falls back to it
         }
 
         private void barButtonItem42_ItemClick(object sender, ItemClickEventArgs e)

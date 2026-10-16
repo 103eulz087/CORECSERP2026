@@ -1,0 +1,118 @@
+--- enzo/sp_ConversionProcess.sql	2026-10-15 23:07:08.970690300 +0800
++++ prod_jfc/sp_ConversionProcess_JFC.sql	2026-10-15 23:14:28.714201200 +0800
+@@ -1,7 +1,8 @@
+ 
+-CREATE PROCEDURE [dbo].[sp_ConversionProcess] --exec [sp_ConversionProcess] 274,'005'
++CREATE PROCEDURE [dbo].[sp_ConversionProcess_JFC] --exec [sp_ConversionProcess] 274,'005'
+     @parmconid      INT,
+-    @parmbranchcode VARCHAR(5)
++    @parmbranchcode VARCHAR(5),
++    @parmcuttingfee money
+ AS
+ BEGIN
+     SET NOCOUNT ON;
+@@ -38,11 +39,11 @@
+         (
+             [BranchCode],[ConID],[SourceSequenceNumber],[SourceQty],[SourceCost],
+             [SourceTotalAmount],[TotalItemsConverted],[TotalQtyConverted],[ActualQty],
+-            [ConversionType],[DateConverted],[ConvertedBy],[isErrorCorrect],[isConfirm]
++            [ConversionType],[DateConverted],[ConvertedBy],[isErrorCorrect],[isConfirm],[cuttingfee]
+         )
+         SELECT [BranchCode],[ConID],[SourceSequenceNumber],[SourceQty],[SourceCost],
+                [SourceTotalAmount],[TotalItemsConverted],[TotalQtyConverted],[ActualQty],
+-               [ConversionType],[DateConverted],[ConvertedBy],[isErrorCorrect],[isConfirm]
++               [ConversionType],[DateConverted],[ConvertedBy],[isErrorCorrect],[isConfirm],@parmcuttingfee
+         FROM dbo.TempConversionSummary
+         WHERE ConID = @parmconid;
+ 
+@@ -98,6 +99,22 @@
+             CLOSE ConversionDataOneToMany;
+             DEALLOCATE ConversionDataOneToMany;
+ 
++            declare @costchargealloc money,@ctralloc int
++            SELECT @ctralloc=COUNT(*) 
++            FROM dbo.ConversionDetails 
++            WHERE ConID = @parmconid
++            AND (
++						Description NOT LIKE '%dripl%'
++						OR Description NOT LIKE 'sawd%'
++				)
++            IF (ISNULL(@parmcuttingfee,0) > 0)
++            BEGIN
++                SET @costchargealloc = ISNULL(ISNULL(@parmcuttingfee,0)/@ctralloc,0)
++            END
++            ELSE
++            BEGIN
++                SET @costchargealloc = 0
++            END
+ /********************************************************************************/
+ 			DECLARE @exemptQty TABLE (
+ 				ConID varchar(10),
+@@ -126,7 +143,7 @@
+ 			),
+ 			LowestQuantity AS
+ 			(
+-				SELECT ConID, ISNULL(SUM(CAST(Quantity AS decimal(19,6))),0) AS MinQty
++				SELECT ConID, SUM(CAST(Quantity AS decimal(19,6))) AS MinQty
+ 				FROM dbo.ConversionDetails
+ 				WHERE ConID = @parmconid
+ 				  AND (
+@@ -140,12 +157,12 @@
+ 				d.SourceCost =
+ 					CASE
+ 						WHEN (f.TotQty - COALESCE(l.MinQty,0)) = 0 THEN 0
+-						ELSE f.TotCost / NULLIF((f.TotQty),0)--NULLIF((f.TotQty - COALESCE(l.MinQty,0)),0)
++						ELSE f.TotCost / NULLIF((f.TotQty - COALESCE(l.MinQty,0)),0)
+ 					END,
+ 				d.SourceTotalCost =
+ 					CASE
+ 						WHEN f.TotQty = 0 THEN 0
+-						ELSE (f.TotCost / NULLIF(f.TotQty,0)) * d.SourceQty--(f.TotCost / NULLIF(f.TotQty - COALESCE(l.MinQty,0),0)) * d.SourceQty
++						ELSE (f.TotCost / NULLIF(f.TotQty - COALESCE(l.MinQty,0),0)) * d.SourceQty
+ 					END
+ 			FROM dbo.ConversionDetails d
+ 			INNER JOIN F f
+@@ -165,7 +182,7 @@
+ 			)
+ 			,LowestQuantity AS
+ 			(
+-				SELECT ConID, ISNULL(SUM(CAST(Quantity AS decimal(19,6))),0) AS MinQty
++				SELECT ConID, SUM(CAST(Quantity AS decimal(19,6))) AS MinQty
+ 				FROM dbo.ConversionDetails
+ 				WHERE ConID = @parmconid
+ 				  AND (
+@@ -175,8 +192,8 @@
+ 				GROUP BY ConID
+ 			)
+ 			UPDATE cs
+-            SET cs.SourceCost        = f.TotCost/NULLIF((f.TotQty-COALESCE(l.MinQty,0)),0),
+-                cs.SourceTotalAmount = (f.TotCost /NULLIF((f.TotQty-COALESCE(l.MinQty,0)),0))*cs.SourceQty
++            SET cs.SourceCost        = f.TotCost/(f.TotQty-l.MinQty),
++                cs.SourceTotalAmount = (f.TotCost /(f.TotQty-l.MinQty))*cs.SourceQty
+             FROM dbo.ConversionSummary cs
+             INNER JOIN F f ON f.ConID = cs.ConID
+ 			LEFT JOIN LowestQuantity l          -- ✅ FIX
+@@ -194,7 +211,7 @@
+             ),
+ 			LowestQuantity AS
+ 			(
+-				SELECT ConID, ISNULL(SUM(CAST(Quantity AS decimal(19,6))),0) AS MinQty
++				SELECT ConID, SUM(CAST(Quantity AS decimal(19,6))) AS MinQty
+ 				FROM dbo.ConversionDetails
+ 				WHERE ConID = @parmconid
+ 				  AND (
+@@ -214,11 +231,11 @@
+             )
+             UPDATE d
+             SET d.PercentagePerPart   = ROUND(d.Quantity / NULLIF(a.DestTotQty, 0), 2),
+-                d.FinalRatio          = d.Quantity / NULLIF(s.SourceQty-COALESCE(@minqty,0), 0),
++                d.FinalRatio          = d.Quantity / NULLIF(s.SourceQty-@minqty, 0),
+                 -- Recompute SourceAmountPerPart using SourceAmount and FinalRatio (your intent) 
+-                d.SourceAmountPerPart = (d.Quantity / NULLIF(s.SourceQty-COALESCE(@minqty,0), 0)) * s.SourceTotalAmount,
++                d.SourceAmountPerPart = (d.Quantity / NULLIF(s.SourceQty-@minqty, 0)) * s.SourceTotalAmount,
+                 d.Cost                = case when (d.Description like 'sawd%' OR d.Description like '%drip%') then 0 
+-										else  s.SourceTotalAmount/(s.SourceQty-COALESCE(@minqty,0)) end--( (d.Quantity / NULLIF(s.SourceQty-isnull(@minqty,0), 0)) * s.SourceAmount ) / NULLIF(d.Quantity, 0) end
++										else s.SourceCost+@costchargealloc end-- s.SourceTotalAmount/(s.SourceQty-@minqty) end--( (d.Quantity / NULLIF(s.SourceQty-isnull(@minqty,0), 0)) * s.SourceAmount ) / NULLIF(d.Quantity, 0) end
+             FROM dbo.ConversionDetails d
+             INNER JOIN Agg a ON a.ConID = d.ConID
+             INNER JOIN Src s ON s.ConID = d.ConID

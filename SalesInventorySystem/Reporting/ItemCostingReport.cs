@@ -147,18 +147,40 @@ namespace SalesInventorySystem.Reporting
                 // none of those exist here, so it silently adds no footer sums at all. Add
                 // them ourselves for this ledger's actual numeric movement columns.
                 var detailView = gridItemCosting.LevelTree.Nodes["Movement Ledger"]?.LevelTemplate as GridView;
-                if (detailView != null)
+                var ledger = (gridItemCosting.DataSource as DataSet)?.Tables["Ledger"];
+                if (detailView != null && ledger != null)
                 {
+                    // The level template GridMasterDetail adds has no columns: each expanded row built its own,
+                    // so the captions / hiding / formats below never reached the detail. Create the template's
+                    // columns from the ledger schema first; the expanded views are cloned from it.
+                    if (detailView.Columns.Count == 0)
+                        foreach (DataColumn dc in ledger.Columns)
+                            detailView.Columns.AddVisible(dc.ColumnName);
+
                     SetCaption(detailView, "MovementDate", "Date");
                     SetCaption(detailView, "MovementType", "Type");
+                    SetCaption(detailView, "QtyIn", "Qty In");
+                    SetCaption(detailView, "QtyOut", "Qty Out");
+                    SetCaption(detailView, "AmountIn", "Amount In");
+                    SetCaption(detailView, "AmountOut", "Amount Out");
+                    SetCaption(detailView, "RunningQty", "Running Qty");
+                    SetCaption(detailView, "RunningValue", "Running Value");
                     // 2026-10-10 (user): Branch hidden; a sale's Reference now carries the invoice no. and the
                     // customer as "branch-name", a transfer's the PO no. (SQL/2026-10-10_ItemCostingReport_Detail_SoldReference.sql)
                     HideColumn(detailView, "BranchName");
+                    // 2026-10-15 (user): Sales Amount hidden in the detail.
+                    HideColumn(detailView, "SalesAmount");
+
+                    // Every figure numeric: quantities N3, amounts N2 (CLAUDE.md reporting convention).
+                    foreach (DataColumn dc in ledger.Columns)
+                        if (IsNumericType(dc.DataType))
+                            FormatNumericColumn(detailView, dc.ColumnName,
+                                dc.ColumnName.IndexOf("Qty", StringComparison.OrdinalIgnoreCase) >= 0 ? "N3" : "N2");
+
                     AddSumFooter(detailView, "QtyIn", "N3");
                     AddSumFooter(detailView, "QtyOut", "N3");
                     AddSumFooter(detailView, "AmountIn", "N2");
                     AddSumFooter(detailView, "AmountOut", "N2");
-                    AddSumFooter(detailView, "SalesAmount", "N2");
                     detailView.OptionsView.ShowFooter = true;
                     detailView.BestFitColumns();
                 }
@@ -185,6 +207,16 @@ namespace SalesInventorySystem.Reporting
             if (col == null) return;
             col.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
             col.DisplayFormat.FormatString = formatString;
+            col.AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+            col.AppearanceCell.Options.UseTextOptions = true;
+            col.AppearanceHeader.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+            col.AppearanceHeader.Options.UseTextOptions = true;
+        }
+
+        private static bool IsNumericType(Type t)
+        {
+            return t == typeof(decimal) || t == typeof(double) || t == typeof(float)
+                || t == typeof(int) || t == typeof(long) || t == typeof(short);
         }
 
         private void AddSumFooter(GridView view, string field, string formatString = "N2")

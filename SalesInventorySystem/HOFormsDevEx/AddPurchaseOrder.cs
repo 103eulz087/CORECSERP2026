@@ -517,7 +517,9 @@ namespace SalesInventorySystem.HOFormsDevEx
 
         void displaySupplier()
         {
-            Database.displaySearchlookupEdit("select SupplierKey,SupplierID,SupplierName FROM Supplier", searchLookUpEdit1, "SupplierName", "SupplierName");
+            // 2026-10-15 (H6): keyed on SupplierKey, not the name; no free text
+            Database.displaySearchlookupEdit("select SupplierKey,SupplierID,SupplierName FROM Supplier", searchLookUpEdit1, "SupplierName", "SupplierKey");
+            searchLookUpEdit1.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;
         }
         void displayBranch()
         {

@@ -1,0 +1,35 @@
+--- enzo/sp_TrgInsertClientInfo.sql	2026-10-15 23:07:10.184246500 +0800
++++ prod/sp_TrgInsertClientInfo.sql	2026-10-15 23:07:15.238122600 +0800
+@@ -1,12 +1,27 @@
+-CREATE TRIGGER [dbo].[sp_TrgInsertClientInfo]
++CREATE TRIGGER dbo.sp_TrgInsertClientInfo
+    ON  dbo.Customers
+    AFTER INSERT
+ AS 
+ BEGIN
+ 
+-	declare @acctkey char(8),@acctid varchar(50),@acctname varchar(150)
+-	select @acctkey=CustomerKey,@acctid=CustomerID,@acctname=CustomerName from inserted
+-	INSERT INTO ClientAccounts
+-	select @acctkey,@acctid,@acctname,'Active',0,0,GETDATE() from inserted
++    INSERT INTO dbo.ClientAccounts
++    (
++        AccountKey,
++        AccountID,
++        AccountName,
++        AccountStatus,
++        AccountBalance,
++        CashWalletBalance,
++        LastMovementDate
++    )
++    SELECT
++        CustomerKey,
++        CustomerID,
++        CustomerName,
++        'Active',
++        0,
++        0,
++        GETDATE()
++    FROM inserted;
+ 
+ END

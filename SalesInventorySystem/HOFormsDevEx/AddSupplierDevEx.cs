@@ -32,6 +32,7 @@ namespace SalesInventorySystem.HOFormsDevEx
             int id = IDGenerator.getIDNumber("Supplier", "SupplierKey", 1);
             txtsupplierkey.Text = HelperFunction.sequencePadding1(id.ToString(), 6); //pad 6 zeros
             txtsupplierid.Text = txtsupplierkey.Text;// "000" +IDGenerator.getSupplierNumber().ToString();
+            chckpayableboth.Checked = false;   // ClearAllText clears text boxes only; a new supplier starts as one-way
             simpleButton1.Enabled = false;
             addbtn.Enabled = true;
             updatebtn.Enabled = false;
@@ -42,6 +43,7 @@ namespace SalesInventorySystem.HOFormsDevEx
         {
             HelperFunction.ClearAllText(this);
             HelperFunction.DisableTextFields(this);
+            chckpayableboth.Checked = false;
             simpleButton1.Enabled = true;
             addbtn.Enabled = false;
             updatebtn.Enabled = false;
@@ -103,6 +105,8 @@ namespace SalesInventorySystem.HOFormsDevEx
             com.Parameters.AddWithValue("@parmisvat", isvat);
             com.Parameters.AddWithValue("@parmislocal", islocal);
             com.Parameters.AddWithValue("@exectype", buttonexec);
+            // 2026-10-15 (SQL [93]): shown in Supplier Payment (cash / check) AND Vouchering Telegraphic
+            com.Parameters.Add("@parmisboth", SqlDbType.Bit).Value = chckpayableboth.Checked;
             com.CommandType = CommandType.StoredProcedure;
             com.CommandText = query;
             com.ExecuteNonQuery();
@@ -137,6 +141,8 @@ namespace SalesInventorySystem.HOFormsDevEx
 
             chckisvat.Checked = Convert.ToBoolean(gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "isVat").ToString());
             chcklocalsupplier.Checked = Convert.ToBoolean(gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "isLocal").ToString());
+            object both = gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "isPayableBoth");
+            chckpayableboth.Checked = both != null && both != DBNull.Value && Convert.ToBoolean(both);
 
             simpleButton1.Enabled = false;
             addbtn.Enabled = false;
@@ -168,7 +174,39 @@ namespace SalesInventorySystem.HOFormsDevEx
                     Database.ExecuteQuery("UPDATE dbo.POSUMMARY SET SupplierID='" + txtsupplierid.Text + "' WHERE SupplierID='" + id + "'");
                     Database.ExecuteQuery("UPDATE dbo.PODETAILS SET SupplierID='" + txtsupplierid.Text + "' WHERE SupplierID='" + id + "'");
                 }
-                Database.ExecuteQuery("UPDATE dbo.Supplier SET SupplierID = '" + txtsupplierid.Text + "',SupplierName='" + txtsuppliername.Text + "',Address='" + txtsupplieraddress.Text + "',ContactNo='" + txtsuppliercontactno.Text + "',Officer='" + txtsupplierofficer.Text + "',TinNo='" + txttinno.Text + "',TradeName='" + txttradename.Text + "',LineOfBusiness='" + txtlineofbusiness.Text + "',isVat='" + isvat + "',isLocal='" + islocal + "' WHERE SupplierKey='" + key + "' ", "Successfully Updated!");
+                // 2026-10-15 (SQL [93]): parameterized (was string-built) and saves isPayableBoth too
+                try
+                {
+                using (SqlConnection con = Database.getConnection())
+                using (SqlCommand com = new SqlCommand(
+                    @"UPDATE dbo.Supplier
+                      SET SupplierID = @SupplierID, SupplierName = @SupplierName, Address = @Address, ContactNo = @ContactNo,
+                          Officer = @Officer, TinNo = @TinNo, TradeName = @TradeName, LineOfBusiness = @LineOfBusiness,
+                          isVat = @isVat, isLocal = @isLocal, isPayableBoth = @isPayableBoth
+                      WHERE SupplierKey = @SupplierKey", con))
+                {
+                    com.Parameters.Add("@SupplierID", SqlDbType.VarChar, 10).Value = txtsupplierid.Text;
+                    com.Parameters.Add("@SupplierName", SqlDbType.VarChar, 50).Value = txtsuppliername.Text;
+                    com.Parameters.Add("@Address", SqlDbType.VarChar, 100).Value = txtsupplieraddress.Text;
+                    com.Parameters.Add("@ContactNo", SqlDbType.VarChar, 20).Value = txtsuppliercontactno.Text;
+                    com.Parameters.Add("@Officer", SqlDbType.VarChar, 30).Value = txtsupplierofficer.Text;
+                    com.Parameters.Add("@TinNo", SqlDbType.VarChar, 30).Value = txttinno.Text;
+                    com.Parameters.Add("@TradeName", SqlDbType.VarChar, 50).Value = txttradename.Text;
+                    com.Parameters.Add("@LineOfBusiness", SqlDbType.VarChar, 50).Value = txtlineofbusiness.Text;
+                    com.Parameters.Add("@isVat", SqlDbType.Bit).Value = isvat;
+                    com.Parameters.Add("@isLocal", SqlDbType.Bit).Value = islocal;
+                    com.Parameters.Add("@isPayableBoth", SqlDbType.Bit).Value = chckpayableboth.Checked;
+                    com.Parameters.Add("@SupplierKey", SqlDbType.VarChar, 15).Value = key;
+                    con.Open();
+                    com.ExecuteNonQuery();
+                }
+                }
+                catch (SqlException ex)
+                {
+                    XtraMessageBox.Show("Update failed:\n" + ex.Message);
+                    return;   // keep what was typed
+                }
+                XtraMessageBox.Show("Successfully Updated!");
                 HelperFunction.ClearAllText(this);
                 HelperFunction.DisableTextFields(this);
                 display();

@@ -1,0 +1,20 @@
+--- enzo/sp_FiFoMappingSTS.sql	2026-10-15 23:07:08.236043200 +0800
++++ prod/sp_FiFoMappingSTS.sql	2026-10-15 23:07:12.828942900 +0800
+@@ -6,8 +6,7 @@
+ 	@parmprodcode char(5),
+ 	@parmqty decimal(18,3),
+ 	@parmdevno varchar(10),
+-	@parmpono varchar(10),
+-	@parmdevdetseqno int
++	@parmpono varchar(10)
+ AS
+ BEGIN
+ 	SET NOCOUNT ON; 
+@@ -86,7 +85,6 @@
+ 				@sprice, 
+ 				@parmdevno, 
+ 				@parmpono, 
+-				@parmdevdetseqno,
+ 				@TotalCost OUTPUT;
+ 				
+ 			-- Save the cost back to the temp table (if needed later)

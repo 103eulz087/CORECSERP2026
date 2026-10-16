@@ -1,0 +1,21 @@
+### RS 1
+job	enabled	step_id	step_name	subsystem	database_name	command	sched	sched_enabled	freq_type	freq_interval	freq_subday_type	freq_subday_interval	active_start_time
+Backup	1	1	Backup	TSQL	CORECSERP_001	exec sp_Backup 'CORECSERP_001','C:\DB\','FULL','system'	BackupSched	1	4	1	8	5	80000
+Backup	1	2	Backup002	TSQL	CORECSERP_002	exec sp_Backup 'CORECSERP_002','C:\DB\','FULL','system'	BackupSched	1	4	1	8	5	80000
+Backup	1	3	Backup003	TSQL	CORECSERP_003	exec sp_Backup 'CORECSERP_003','C:\DB\','FULL','system'	BackupSched	1	4	1	8	5	80000
+DeductInventoryAndUploadSales	1	1	Deduct Inventory	TSQL	CORECSERP_001	declare @petsakron date  set @petsakron = CAST(GETDATE() as date)  exec spjob_DeductBranchInventory @petsakron	DeductInventory	1	4	1	1	0	234500
+DeductInventoryAndUploadSales	1	2	Deduct Inventory Late Upload	TSQL	CORECSERP_001	exec spjob_DeductLateUploadCleaner	DeductInventory	1	4	1	1	0	234500
+DeductInventoryAndUploadSales	1	3	Upload Sales for XERO	TSQL	CORECSERP_001	declare @petsakron date  set @petsakron = CAST(GETDATE() as date)  exec spjob_UploadSalesToXero @petsakron	DeductInventory	1	4	1	1	0	234500
+DeductInventoryAndUploadSales	1	4	Reupload Sales to Xero (LateUpload)	TSQL	CORECSERP_001	exec sp_ReUploadToXero '',''	DeductInventory	1	4	1	1	0	234500
+DeductInventoryAndUploadSales	1	5	Reupload Zread Branches	TSQL	CORECSERP_001	exec sp_ReUploadToXeroZRead '',''	DeductInventory	1	4	1	1	0	234500
+InventorySnapshot	1	1	CaptureDailySnapshot	TSQL	CORECSERP_001	declare @datetoday date  set @datetoday = CAST(GETDATE() as date)  exec dbo.sp_CaptureDailyInventorySnapshot @datetoday	DailySnapshot	1	4	1	1	0	235500
+InventorySnapshot	1	2	BackupAfterSnapShot	TSQL	CORECSERP_001	exec sp_Backup 'CORECSERP_001','C:\DB\','FULL','system'	DailySnapshot	1	4	1	1	0	235500
+syspolicy_purge_history	1	1	Verify that automation is enabled.	TSQL	master	IF (msdb.dbo.fn_syspolicy_is_automation_enabled() != 1)          BEGIN              RAISERROR(34022, 16, 1)          END	syspolicy_purge_history_schedule	1	4	1	1	0	20000
+syspolicy_purge_history	1	2	Purge history.	TSQL	master	EXEC msdb.dbo.sp_syspolicy_purge_history	syspolicy_purge_history_schedule	1	4	1	1	0	20000
+syspolicy_purge_history	1	3	Erase Phantom System Health Records.	PowerShell	master	if ('$(ESCAPE_SQUOTE(INST))' -eq 'MSSQLSERVER') {$a = '\DEFAULT'} ELSE {$a = ''};  (Get-Item SQLSERVER:\SQLPolicy\$(ESCAPE_NONE(SRVR))$a).EraseSystemHealthPhantomRecords()	syspolicy_purge_history_schedule	1	4	1	1	0	20000
+### RS 2
+name	last_run_date	failed_steps_hist	hist_rows
+Backup	20261015	2	34
+DeductInventoryAndUploadSales	20261014	0	17
+InventorySnapshot	20261014	1	34
+syspolicy_purge_history	20261015	0	25

@@ -1,0 +1,102 @@
+--- enzo/sp_AddBranchOrder.sql	2026-10-15 23:07:08.182269400 +0800
++++ prod_jfc/sp_AddBranchOrder_JFC.sql	2026-10-15 23:14:28.561488200 +0800
+@@ -1,10 +1,11 @@
+ 
+-CREATE    PROCEDURE [dbo].[sp_AddBranchOrder] 
++CREATE PROCEDURE [dbo].[sp_AddBranchOrder_JFC] 
+ 	@parmdevno varchar(20),
+ 	@parmrefno varchar(10),
+ 	@parmpono varchar(10), 
+ 	@parmprodcatcode varchar(10),
+ 	@parmprodcode varchar(10),
++	@parmshipmentno varchar(10),
+ 	@parmqty decimal(18,3), -- Using Decimal instead of Float
+ 	@parmbarcode varchar(50),
+ 	@parmbranchcode varchar(10),
+@@ -47,7 +47,7 @@
+ 		-- ISNULL is critical here. If the item has never been in the warehouse, SUM returns NULL!
+ 		SELECT @invqty = ISNULL(SUM(Available), 0)
+ 		FROM Inventory WITH(NOLOCK)
+-		WHERE Branch = @parmorigin AND Available > 0 AND Product = @parmprodcode AND IsWarehouse = 1;
++		WHERE Branch = @parmorigin AND ShipmentNo=@parmshipmentno AND Available > 0 AND Product = @parmprodcode;
+ 
+ 		-- =========================================================================
+ 		-- 🛑 THE TRAP: INSUFFICIENT INVENTORY CHECK
+@@ -55,7 +55,7 @@
+ 		IF @invqty < @parmqty
+ 		BEGIN
+ 			-- Formats a clean message: "Insufficient Stocks! Requested: 5.000, Available: 2.000."
+-			DECLARE @CustomError NVARCHAR(4000) = 'Insufficient Stocks for ' + ISNULL(@productname, @parmprodcode) + '! You requested ' + CAST(CAST(@parmqty AS INT) AS VARCHAR) + ', but only ' + CAST(CAST(@invqty AS INT) AS VARCHAR) + ' are available.';
++			DECLARE @CustomError NVARCHAR(4000) = 'Insufficient Stocks for ' + ISNULL(@productname, @parmprodcode) + '! You requested ' + CAST(CAST(@parmqty AS INT) AS VARCHAR) + ', but only ' + CAST(CAST(@invqty AS INT) AS VARCHAR) + ' are availables.';
+ 			
+ 			-- Severity 16 forces SQL to jump instantly to the BEGIN CATCH block below
+ 			RAISERROR(@CustomError, 16, 1); 
+@@ -69,41 +69,45 @@
+ 		END
+ 		-- =========================================================================
+ 
+-		---- 3. Pricing Logic
+-		--IF @parmbranchcode = @parmorigin
+-		--BEGIN
+-		--	SELECT @custkey = Customer FROM PurchaseOrderSummary WITH(NOLOCK) WHERE PONumber = @parmpono;
+-			
+-		--	SELECT @specialpriceamount = SpecialPriceAmount FROM CustomerProductSetting WITH(NOLOCK)
+-		--	WHERE ProductCode = @parmprodcode AND CustomerKey = @custkey;
+-			
+-		--	IF (@specialpriceamount = 0 OR @specialpriceamount IS NULL)
+-		--	BEGIN
+-		--		SELECT @specialpriceamount = SellingPrice FROM Products WITH(NOLOCK)
+-		--		WHERE ProductCode = @parmprodcode AND BranchCode = @parmorigin;
+-		--	END
+-		--END
++		-- 3. Pricing Logic
++		IF @parmbranchcode = @parmorigin
++		BEGIN
++			SELECT @custkey = Customer FROM PurchaseOrderSummary WITH(NOLOCK) WHERE PONumber = @parmpono;
++			
++			SELECT @specialpriceamount = SpecialPriceAmount FROM CustomerProductSetting WITH(NOLOCK)
++			WHERE ProductCode = @parmprodcode AND CustomerKey = @custkey;
++			
++			IF (@specialpriceamount = 0 OR @specialpriceamount IS NULL)
++			BEGIN
++				SELECT @specialpriceamount = SellingPrice FROM Products WITH(NOLOCK)
++				WHERE ProductCode = @parmprodcode AND BranchCode = @parmorigin;
++			END
++		END
+ 
+ 		-- 4. FIFO Processing & Delivery Details  
+ 	 
+-			SELECT @devseqno = ISNULL(MAX(SeqNo),0) FROM DeliveryDetails WITH(NOLOCK)
+-			WHERE DeliveryNo = @parmdevno AND PONumber = @parmpono;
+ 
+-			declare @devdetsqno int 
+-			set @devdetsqno=@devseqno+1;
++			--SELECT @devseqno = ISNULL(MAX(SeqNo)+1,0) FROM DeliveryDetails WITH(NOLOCK)
++			--WHERE DeliveryNo = @parmdevno AND PONumber = @parmpono AND ProductNo = @parmprodcode;-- and BarcodeNo=@parmbarcode;
++
++			
++		 
++			SELECT @devseqno = ISNULL(MAX(DevDetSeqNo)+1,0) FROM InventoryDeliveryFIFO WITH(NOLOCK)
++			WHERE DeliveryNo = @parmdevno AND PONumber = @parmpono --AND ProductNo = @parmprodcode;-- and BarcodeNo=@parmbarcode;
++
++			 
+ 			-- Execute FIFO Mapping
+-			EXEC sp_FiFoMappingSTS @parmeffectivitydate, @parmorigin, @parmbranchcode, @parmprodcode, @parmqty, @parmdevno, @parmpono, @devdetsqno;
++			EXEC sp_FiFoMappingSTS_JFC @parmeffectivitydate, @parmorigin, @parmbranchcode, @parmprodcode,@parmshipmentno, @parmqty, @parmdevno, @parmpono, @devseqno; 
+ 			
+-			-- Check if FIFO actually generated records
+ 			INSERT INTO [dbo].[DeliveryDetails] (
+ 					[SeqNo], [DeliveryNo], [PONumber], [ReferenceNumber], [ProductNo], [BarcodeNo],
+ 					[ProductName], [QtyDelivered], [ActualQty], [Variance], [Cost], [SellingPrice],
+-					[Status], [isVat], [ProcessedBy], [isSettled], [isCreditMemo], [isReturned],isCancelled,DateTimeAdded
++				[Status], [isVat], [ProcessedBy], [isSettled], [isCreditMemo], [isReturned], isCancelled, DateTimeAdded, DateTimeUpdated
+ 				)
+ 			SELECT
+-					@devseqno + 1, @parmdevno, @parmpono, @parmrefno, @parmprodcode, @parmbarcode,
++				@devseqno, @parmdevno, @parmpono, @parmrefno, @parmprodcode, @parmbarcode,
+ 					@productname, @parmqty, @parmqty, 0, 0, ISNULL(@specialpriceamount,0),
+-					'PENDING', @isvatablenew, @preparedby, 0, 0, 0,0,GETDATE()
++				'PENDING', @isvatablenew, @preparedby, 0, 0, 0, 0, GETDATE(), '';
+ 	 
+ 		
+ 		-- 5. Delivery Summary Logic

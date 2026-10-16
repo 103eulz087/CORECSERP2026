@@ -1,0 +1,2 @@
+./HOFormsDevEx/TransferUpdateDevEx.cs:543:                    if (txtbarcodescanning.Text.Length == 19) //tens 11111 10015 10123 0001 --10.123 kilos
+./Orders/AddBranchOrderSTS.cs:956:                    if (barcode.StartsWith("A01") || barcode.StartsWith("B01"))

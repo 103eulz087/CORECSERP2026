@@ -1,0 +1,23 @@
+# erp.itcoreapps.com,4281 / CORECSERP_001
+compat level                         OK   -> 120
+STRING_SPLIT                         FAIL -> Invalid object name 'STRING_SPLIT'.
+STRING_SPLIT enable_ordinal          FAIL -> Invalid object name 'STRING_SPLIT'.
+OPENJSON                             FAIL -> Invalid object name 'OPENJSON'.
+JSON_VALUE                           OK   -> 1
+GENERATE_SERIES                      FAIL -> Invalid object name 'GENERATE_SERIES'.
+STRING_AGG                           OK   -> a,b
+STRING_AGG WITHIN GROUP              OK   -> b,a
+TRIM                                 OK   -> x
+TRIM chars                           OK   -> a
+CONCAT_WS                            OK   -> a-b
+TRANSLATE                            OK   -> xyc
+DATE_BUCKET                          OK   -> 10/15/2026 12:00:00 AM
+GREATEST                             OK   -> 2
+LEAST                                OK   -> 1
+IS DISTINCT FROM                     OK   -> y
+DATETRUNC                            OK   -> 10/1/2026 12:00:00 AM
+APPROX_PERCENTILE_CONT               OK   -> 1.5
+DROP TABLE IF EXISTS #x              OK   -> ok
+IIF / FORMAT / EOMONTH / TRY_CONVERT OK   -> y1,234.502026-10-31null
+THROW in batch                       OK   -> 50001
+CREATE OR ALTER (parse only)         OK   -> 1

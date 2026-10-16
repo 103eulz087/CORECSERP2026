@@ -253,7 +253,9 @@ namespace SalesInventorySystem.POS
 
             txtamounttender.Focus();
             //Database.displayComboBoxItems("SELECT distinct CustomerName FROM dbo.Customers", "CustomerName", txtcustname);
-            Database.displaySearchlookupEdit("SELECT CustomerID,CustomerName FROM dbo.Customers", txtcustnamelookup,"CustomerName", "CustomerName");
+            // 2026-10-15 (H6): keyed on CustomerID, not the name (988 customers share a name on PRODUCTION); no free text
+            Database.displaySearchlookupEdit("SELECT CustomerID,CustomerName FROM dbo.Customers", txtcustnamelookup,"CustomerName", "CustomerID");
+            txtcustnamelookup.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;
 
         }
         void sp_DataReceived(object sender, SerialDataReceivedEventArgs e)

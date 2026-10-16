@@ -1,0 +1,38 @@
+--- enzo/sp_AddTempInventory.sql	2026-10-15 23:07:08.698896400 +0800
++++ prod/sp_AddTempInventory.sql	2026-10-15 23:07:13.401447500 +0800
+@@ -21,6 +21,8 @@
+ AS
+ BEGIN
+ declare @barcode varchar(100)
++DECLARE @ISVAT BIT
++
+ IF @parmisusebarcode=1
+ BEGIN
+ 	set @barcode=@parmbarcode
+@@ -39,11 +41,16 @@
+ BEGIN
+ 	--SELECT @cost=ISNULL(CostKg,0) FROM InventoryCost WHERE ProductCode=@productcode and SupplierID=@supplierID
+ 	--select * FROM PODETAILS
+-	SELECT @cost=ISNULL(Cost,0)
++	SELECT @cost=ISNULL(Cost,0),@ISVAT=isVat
+ 	FROM PODETAILS 
+ 	WHERE OrderCode=@parmprodcode 
+ 	AND ShipmentNo=@parmshipmentno
+ END
++--select * FROM PODETAILS
++	SELECT @ISVAT=isVat
++	FROM PODETAILS 
++	WHERE OrderCode=@parmprodcode 
++	AND ShipmentNo=@parmshipmentno
+ 
+ INSERT INTO [dbo].[TempInventory]
+            ([Branch]
+@@ -73,7 +80,7 @@
+            ,@parmqty
+            ,@parmqty
+            ,1 --isstock
+-           ,0
++           ,@ISVAT
+            ,1,
+ 		   @parmexpirydate,
+ 		   0,

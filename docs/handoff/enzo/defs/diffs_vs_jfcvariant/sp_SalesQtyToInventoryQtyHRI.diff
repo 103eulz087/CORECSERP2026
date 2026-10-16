@@ -1,0 +1,93 @@
+--- enzo/sp_SalesQtyToInventoryQtyHRI.sql	2026-10-15 23:07:08.387202200 +0800
++++ prod_jfc/sp_SalesQtyToInventoryQtyHRI_JFC.sql	2026-10-15 23:14:28.206787700 +0800
+@@ -1,15 +1,16 @@
++CREATE PROCEDURE [dbo].[sp_SalesQtyToInventoryQtyHRI_JFC]
++	@parmSeqNo bigint
++	,@parmorigin char(3)
++	,@parmBranch char(3)
++	,@parmshipmentno varchar(10)
++	,@parmProduct char(5)
++	,@parmRunningQtySold float
++	,@parmsellingprice money
++	,@parmdevno varchar(10)
++	,@parmpono varchar(10)
++	,@TotalCost float output
++	,@parmDevDetSeqNo int = 0
+ 
+-CREATE PROCEDURE [dbo].[sp_SalesQtyToInventoryQtyHRI]  
+-	@parmSeqNo bigint OUTPUT, 
+-	@parmorigin char(3),
+-	@parmBranch char(3),
+-	@parmProduct char(5),
+-	@parmRunningQtySold decimal(18,3),
+-	@parmsellingprice decimal(18,2),   
+-	@parmdevno varchar(10),
+-	@parmpono varchar(10),
+-	@parmdevdetseqno int,
+-	@TotalCost decimal(18,3) OUTPUT    
+ AS
+ BEGIN
+ 	SET NOCOUNT ON;
+@@ -42,8 +43,9 @@
+ 				FROM Inventory WITH (UPDLOCK, ROWLOCK) 
+ 				WHERE ISNULL(Available, Quantity) > 0 
+ 				  AND Branch = @parmorigin 
++				  AND ShipmentNo = @parmshipmentno
+ 				  AND Product = @parmProduct 
+-				  AND IsWarehouse = 1
++				  --AND IsWarehouse = 1
+ 				ORDER BY SequenceNumber ASC 
+ 			)
+ 			UPDATE OldestInventoryBatch 
+@@ -52,7 +54,9 @@
+ 				@iAvailable = IIF(@RunningQtySold >= ISNULL(Available, Quantity), 0, ISNULL(Available, Quantity) - @RunningQtySold),
+ 				@iCost = ISNULL(Cost, 0),
+ 				@ProductDescription = Description,
+-				Available = IIF(@RunningQtySold >= ISNULL(Available, Quantity), 0, ISNULL(Available, Quantity) - @RunningQtySold);
++				Available = IIF(@RunningQtySold >= ISNULL(Available, Quantity), 0, ISNULL(Available, Quantity) - @RunningQtySold)
++				--ReferenceCode = 'stsfifo';
++
+ 			-- If the CTE couldn't find any more inventory, break the loop!
+ 			IF (@iSeqNo IS NULL) 
+ 			BEGIN
+@@ -112,4 +116,39 @@
+ 		DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
+ 		RAISERROR (@ErrorMessage, 16, 1);
+ 	END CATCH
++
++
++	--DECLARE @iSeqNo bigint, @iQty float, @iAvailable float, @iCost float;
++	--DECLARE @ProductDescription varchar(max), @Unit varchar(255);
++	--DECLARE @RunningQtySold float=@parmRunningQtySold;
++
++	--WHILE(0<@RunningQtySold)
++	--BEGIN
++	--	SET @iSeqNo = null; -- use to break a loop;
++	--	-- LINK SERVER
++	--	UPDATE TOP(1) Inventory
++	--	SET @iSeqNo=SequenceNumber,
++	--		@iQty=ISNULL(Available, Quantity),
++	--		@iAvailable=IIF(@RunningQtySold>=@iQty, 0, @iQty-@RunningQtySold),
++	--		@iCost=ISNULL(Cost, 0),
++	--		--
++	--		--@Unit=Unit,
++	--		@ProductDescription=Description,
++	--		-- update
++	--		Available=@iAvailable
++	--	WHERE ISNULL(Available, Quantity)>0 AND (ShipmentNo=@parmshipmentno and Branch=@parmBranch AND Product =@parmProduct) ;
++	--	IF(@iSeqNo IS NULL)BREAK; -- break loop
++	--	---- To Ledger
++	--	INSERT INTO InventoryDeliveryFIFO --select * FROM InventoryDeliveryFIFO where PONumber=176 alter table InventoryDeliveryFIFO add SellingPrice decimal(18,2)
++	--	VALUES(@parmdevno,@parmpono,@parmBranch,@parmProduct,@ProductDescription,(@iQty-@iAvailable),@iCost,((@iQty-@iAvailable)*@iCost),GETDATE(),@iSeqNo,@parmDevDetSeqNo,0,0,@parmsellingprice,((@iQty-@iAvailable)*@parmsellingprice))
++
++	--	INSERT INTO InventoryLedger
++	--	VALUES(@iSeqNo,@parmorigin,@parmBranch,GETDATE(),@parmProduct,@ProductDescription,@iQty,0,(@iQty-@iAvailable),@iAvailable,@iCost,'STS IN-TRANSIT PO#-'+@parmpono,'System')
++	--	-- LINK SERVER END --
++	--	SET @RunningQtySold=(@RunningQtySold-@iQty);
++	--	SET @TotalCost+=(@iCost*(@iQty-@iAvailable));
++	--END;
++
++	---- returns
++	----SELECT @TotalCost AS TotalCost;
+ END;
+\ No newline at end of file

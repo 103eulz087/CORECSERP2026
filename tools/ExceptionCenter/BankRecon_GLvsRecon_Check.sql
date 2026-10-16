@@ -82,3 +82,19 @@ SELECT b.AccountCode, b.ItemType, b.IsResolved, COUNT(*) n, SUM(b.Amount) amt FR
 SELECT COUNT(*) items_without_header FROM dbo.BankStatementRecon b WHERE b.HeaderID IS NULL OR NOT EXISTS (SELECT 1 FROM dbo.BankReconHeader h WHERE h.HeaderID = b.HeaderID);
 -- 5. GL lines dated after today
 SELECT td.AccountCode, CONVERT(VARCHAR(10),td.TicketDate,120) d, td.TicketNumber, td.ReferenceNumber, td.Debit, td.Credit FROM dbo.TicketDetails td WHERE td.AccountCode LIKE '101020%' AND td.TicketDate > GETDATE();
+
+-- 6. [88] 2026-10-15 (hardening H7): a LOCKED month whose items were added, changed, cleared or uncleared after the lock.
+--    Since [88] every recon writer refuses a locked month (93002 / 93022 / 93027 / 93028), so any row here was written
+--    outside the procs (a hand edit) or by an exe older than [88]'s procs. A clean database shows no rows.
+SELECT h.AccountCode, h.BranchCode, CONVERT(VARCHAR(10), h.PeriodEnd, 120) AS PeriodEnd, CONVERT(VARCHAR(16), h.LockedDate, 120) AS LockedDate, h.LockedBy,
+       b.ReconID, b.ItemType, b.ReferenceNo, b.SourceModule, b.SourceRef, b.Amount, b.IsResolved, b.ResolvedReason,
+       CONVERT(VARCHAR(16), b.DateTimeAdded, 120) AS Added, CONVERT(VARCHAR(16), b.DateTimeUpdated, 120) AS Updated, CONVERT(VARCHAR(16), b.ResolvedDate, 120) AS Resolved,
+       CASE WHEN b.DateTimeAdded > h.LockedDate THEN 'ADDED AFTER LOCK'
+            WHEN b.DateTimeUpdated > h.LockedDate THEN 'CHANGED AFTER LOCK'
+            ELSE 'CLEARED / UNCLEARED AFTER LOCK' END AS Finding
+FROM dbo.BankReconHeader AS h
+INNER JOIN dbo.BankStatementRecon AS b ON b.HeaderID = h.HeaderID
+WHERE h.Status = 'LOCKED' AND h.LockedDate IS NOT NULL
+  AND (b.DateTimeAdded > h.LockedDate OR b.DateTimeUpdated > h.LockedDate
+       OR (b.ResolvedDate > h.LockedDate AND ISNULL(b.ClearedPeriodEnd, h.PeriodEnd) <= h.PeriodEnd))
+ORDER BY h.AccountCode, h.PeriodEnd, b.ReconID;

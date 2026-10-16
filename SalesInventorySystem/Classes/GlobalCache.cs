@@ -38,6 +38,7 @@ public static class GlobalCache
         }
         catch (Exception ex)
         {
+            SalesInventorySystem.Classes.StartupSplash.Close();   // the TopMost "please wait" would cover this message
             MessageBox.Show("Failed to load company data: " + ex.Message);
             CompanyName = "DEFAULT_COMPANY";
         }

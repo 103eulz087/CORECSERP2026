@@ -1,4 +1,4 @@
-/* ================================================================
+﻿/* ================================================================
    [85] TEST SCRIPT - H2 (AR reversal scope) + H4 (atomic wrappers, STS receive in one call)
    ================================================================
    Run in SSMS on DEV or STAGING AFTER [85] is applied. Every test runs inside BEGIN TRAN ... ROLLBACK, so nothing is

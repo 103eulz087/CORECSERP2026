@@ -32,7 +32,9 @@ namespace SalesInventorySystem.HOFormsDevEx
             Database.displaySearchlookupEdit("SELECT BranchCode,BranchName FROM Branches", txtbranch, "BranchCode", "BranchCode");
             // Product list is independent of the In Transit / Link to Supplier
             // design (not used by this form) - load it directly.
-            Database.displaySearchlookupEdit("SELECT ProductCode,Description FROM Products WHERE BranchCode='888'", txtproduct, "Description", "Description");
+            // 2026-10-15 (H6): keyed on ProductCode, not the description (13180 / 13445 share one); no free text
+            Database.displaySearchlookupEdit("SELECT ProductCode,Description FROM Products WHERE BranchCode='888'", txtproduct, "Description", "ProductCode");
+            txtproduct.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;
         }
 
         private void txtbranch_EditValueChanged(object sender, EventArgs e)

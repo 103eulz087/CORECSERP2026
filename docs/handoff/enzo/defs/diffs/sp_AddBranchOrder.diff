@@ -1,0 +1,89 @@
+--- enzo/sp_AddBranchOrder.sql	2026-10-15 23:07:08.182269400 +0800
++++ prod/sp_AddBranchOrder.sql	2026-10-15 23:07:12.767688300 +0800
+@@ -40,14 +40,14 @@
+ 		END
+ 
+ 		-- 2. Get Product Info & Inventory
+-		SELECT @productname = Description, @isvatablenew = isVat
++		SELECT @productname = Description, @isvatablenew = ISNULL(isVat,0)
+ 		FROM Products WITH(NOLOCK)
+ 		WHERE ProductCode = @parmprodcode AND BranchCode = @parmorigin;
+ 
+ 		-- ISNULL is critical here. If the item has never been in the warehouse, SUM returns NULL!
+ 		SELECT @invqty = ISNULL(SUM(Available), 0)
+ 		FROM Inventory WITH(NOLOCK)
+-		WHERE Branch = @parmorigin AND Available > 0 AND Product = @parmprodcode AND IsWarehouse = 1;
++		WHERE Branch = @parmorigin AND Available > 0 AND isStock = 1 AND Product = @parmprodcode AND IsWarehouse = 1;
+ 
+ 		-- =========================================================================
+ 		-- 🛑 THE TRAP: INSUFFICIENT INVENTORY CHECK
+@@ -60,50 +60,44 @@
+ 			-- Severity 16 forces SQL to jump instantly to the BEGIN CATCH block below
+ 			RAISERROR(@CustomError, 16, 1); 
+ 		END
++		-- =========================================================================
+ 
+-		IF @isvatablenew is null
++		-- 3. Pricing Logic
++		IF @parmbranchcode = @parmorigin
+ 		BEGIN
+-			DECLARE @CustomError1 NVARCHAR(4000) = 'Product is no identification either VAT OR NON VAT' + ISNULL(@productname, @parmprodcode);
+-			-- Severity 16 forces SQL to jump instantly to the BEGIN CATCH block below
+-			RAISERROR(@CustomError1, 16, 1); 
+-		END
+-		-- =========================================================================
++			SELECT @custkey = Customer FROM PurchaseOrderSummary WITH(NOLOCK) WHERE PONumber = @parmpono;
+ 
+-		---- 3. Pricing Logic
+-		--IF @parmbranchcode = @parmorigin
+-		--BEGIN
+-		--	SELECT @custkey = Customer FROM PurchaseOrderSummary WITH(NOLOCK) WHERE PONumber = @parmpono;
+-			
+-		--	SELECT @specialpriceamount = SpecialPriceAmount FROM CustomerProductSetting WITH(NOLOCK)
+-		--	WHERE ProductCode = @parmprodcode AND CustomerKey = @custkey;
+-			
+-		--	IF (@specialpriceamount = 0 OR @specialpriceamount IS NULL)
+-		--	BEGIN
+-		--		SELECT @specialpriceamount = SellingPrice FROM Products WITH(NOLOCK)
+-		--		WHERE ProductCode = @parmprodcode AND BranchCode = @parmorigin;
+-		--	END
+-		--END
++			SELECT @specialpriceamount = SpecialPriceAmount FROM CustomerProductSetting WITH(NOLOCK)
++			WHERE ProductCode = @parmprodcode AND CustomerKey = @custkey;
++			
++			IF (@specialpriceamount = 0 OR @specialpriceamount IS NULL)
++			BEGIN
++				SELECT @specialpriceamount = SellingPrice FROM Products WITH(NOLOCK)
++				WHERE ProductCode = @parmprodcode AND BranchCode = @parmorigin;
++			END
++		END
+ 
+ 		-- 4. FIFO Processing & Delivery Details  
+ 	 
+ 			SELECT @devseqno = ISNULL(MAX(SeqNo),0) FROM DeliveryDetails WITH(NOLOCK)
+ 			WHERE DeliveryNo = @parmdevno AND PONumber = @parmpono;
+ 
+-			declare @devdetsqno int 
+-			set @devdetsqno=@devseqno+1;
+ 			-- Execute FIFO Mapping
+-			EXEC sp_FiFoMappingSTS @parmeffectivitydate, @parmorigin, @parmbranchcode, @parmprodcode, @parmqty, @parmdevno, @parmpono, @devdetsqno;
++			EXEC sp_FiFoMappingSTS @parmeffectivitydate, @parmorigin, @parmbranchcode, @parmprodcode, @parmqty, @parmdevno, @parmpono;
+ 			
+ 			-- Check if FIFO actually generated records
++			IF EXISTS (SELECT TOP 1 DeliveryNo FROM InventoryDeliveryFIFO WITH(NOLOCK) WHERE DeliveryNo = @parmdevno AND PONumber = @parmpono AND ProductNo = @parmprodcode)
++			BEGIN 
+ 			INSERT INTO [dbo].[DeliveryDetails] (
+ 					[SeqNo], [DeliveryNo], [PONumber], [ReferenceNumber], [ProductNo], [BarcodeNo],
+ 					[ProductName], [QtyDelivered], [ActualQty], [Variance], [Cost], [SellingPrice],
+-					[Status], [isVat], [ProcessedBy], [isSettled], [isCreditMemo], [isReturned],isCancelled,DateTimeAdded
++					[Status], [isVat], [ProcessedBy], [isSettled], [isCreditMemo], [isReturned], isCancelled, DateTimeAdded, DateTimeUpdated
+ 				)
+ 			SELECT
+ 					@devseqno + 1, @parmdevno, @parmpono, @parmrefno, @parmprodcode, @parmbarcode,
+ 					@productname, @parmqty, @parmqty, 0, 0, ISNULL(@specialpriceamount,0),
+-					'PENDING', @isvatablenew, @preparedby, 0, 0, 0,0,GETDATE()
++					'PENDING', @isvatablenew, @preparedby, 0, 0, 0, 0, GETDATE(), '';
++			END
+ 	 
+ 		
+ 		-- 5. Delivery Summary Logic

@@ -1,0 +1,17 @@
+--- enzo/sp_GetInventoryForStockOutDropdown.sql	2026-10-15 23:07:09.376713100 +0800
++++ prod/sp_GetInventoryForStockOutDropdown.sql	2026-10-15 23:07:14.244980500 +0800
+@@ -1,5 +1,4 @@
+-
+-CREATE PROCEDURE [dbo].[sp_GetInventoryForStockOutDropdown]
++CREATE PROCEDURE dbo.sp_GetInventoryForStockOutDropdown
+     @BranchCode VARCHAR(50)
+ AS
+ BEGIN
+@@ -14,7 +13,6 @@
+     WHERE i.Branch = @BranchCode
+       AND i.IsStock = 1
+       AND i.Available > 0
+-      AND i.IsWarehouse = 1
+     GROUP BY i.Product
+     ORDER BY MAX(i.Description);
+ END

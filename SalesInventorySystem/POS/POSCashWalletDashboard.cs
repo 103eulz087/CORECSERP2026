@@ -37,7 +37,9 @@ namespace SalesInventorySystem.POS
 
         void loadCustomers()
         {
-            Database.displaySearchlookupEdit("SELECT distinct CustomerKey,CustomerID,CustomerName FROM Customers", searchLookUpEdit1, "CustomerName", "CustomerName");
+            // 2026-10-15 (H6): keyed on CustomerKey, not the name (988 customers share a name on PRODUCTION); no free text
+            Database.displaySearchlookupEdit("SELECT distinct CustomerKey,CustomerID,CustomerName FROM Customers", searchLookUpEdit1, "CustomerName", "CustomerKey");
+            searchLookUpEdit1.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;
         }
 
         private void POSCashWalletDashboard_Load(object sender, EventArgs e)
@@ -52,6 +54,7 @@ namespace SalesInventorySystem.POS
         {
             //customername = searchLookUpEdit1.Text;
             object custky = SearchLookUpClass.getSingleValue(searchLookUpEdit1, "CustomerKey");
+            if (custky == null) return;   // 2026-10-15 (H6): nothing picked / cleared
             getCustDetails(custky.ToString());
         }
 

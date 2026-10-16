@@ -180,6 +180,9 @@
             this.toolStripMenuItem18 = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStripReturned = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStripMenuItem21 = new System.Windows.Forms.ToolStripMenuItem();
+            this.contextMenuStripPaid = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.toolStripMenuItemPaidShowItems = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItemPaidShowReturnedItems = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStripCancelServices = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1.SuspendLayout();
@@ -262,6 +265,7 @@
             this.panelControl4.SuspendLayout();
             this.contextMenuStripDelivered.SuspendLayout();
             this.contextMenuStripReturned.SuspendLayout();
+            this.contextMenuStripPaid.SuspendLayout();
             this.contextMenuStripCancelServices.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -1794,6 +1798,7 @@
             this.gridControlPaid.Name = "gridControlPaid";
             this.gridControlPaid.Size = new System.Drawing.Size(1352, 696);
             this.gridControlPaid.TabIndex = 4;
+            this.gridControlPaid.MouseUp += new System.Windows.Forms.MouseEventHandler(this.gridControlPaid_MouseUp);
             this.gridControlPaid.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewPaid});
             // 
@@ -1968,6 +1973,31 @@
             this.toolStripMenuItem21.Size = new System.Drawing.Size(154, 24);
             this.toolStripMenuItem21.Text = "Show Items";
             this.toolStripMenuItem21.Click += new System.EventHandler(this.toolStripMenuItem21_Click);
+            //
+            // contextMenuStripPaid
+            //
+            this.contextMenuStripPaid.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.contextMenuStripPaid.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripMenuItemPaidShowItems,
+            this.toolStripMenuItemPaidShowReturnedItems});
+            this.contextMenuStripPaid.Name = "contextMenuStripPaid";
+            this.contextMenuStripPaid.Size = new System.Drawing.Size(221, 56);
+            //
+            // toolStripMenuItemPaidShowItems
+            //
+            this.toolStripMenuItemPaidShowItems.Image = global::SalesInventorySystem.Properties.Resources.ShowProduct_16x16;
+            this.toolStripMenuItemPaidShowItems.Name = "toolStripMenuItemPaidShowItems";
+            this.toolStripMenuItemPaidShowItems.Size = new System.Drawing.Size(154, 26);
+            this.toolStripMenuItemPaidShowItems.Text = "Show Items";
+            this.toolStripMenuItemPaidShowItems.Click += new System.EventHandler(this.toolStripMenuItemPaidShowItems_Click);
+            //
+            // toolStripMenuItemPaidShowReturnedItems
+            //
+            this.toolStripMenuItemPaidShowReturnedItems.Image = global::SalesInventorySystem.Properties.Resources.Return_16x16;
+            this.toolStripMenuItemPaidShowReturnedItems.Name = "toolStripMenuItemPaidShowReturnedItems";
+            this.toolStripMenuItemPaidShowReturnedItems.Size = new System.Drawing.Size(220, 26);
+            this.toolStripMenuItemPaidShowReturnedItems.Text = "Show Returned Items";
+            this.toolStripMenuItemPaidShowReturnedItems.Click += new System.EventHandler(this.toolStripMenuItemPaidShowReturnedItems_Click);
             // 
             // contextMenuStripCancelServices
             // 
@@ -2085,6 +2115,7 @@
             this.panelControl4.PerformLayout();
             this.contextMenuStripDelivered.ResumeLayout(false);
             this.contextMenuStripReturned.ResumeLayout(false);
+            this.contextMenuStripPaid.ResumeLayout(false);
             this.contextMenuStripCancelServices.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -2200,6 +2231,9 @@
         private System.Windows.Forms.DateTimePicker dateFromReturned;
         private System.Windows.Forms.ContextMenuStrip contextMenuStripReturned;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem21;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStripPaid;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemPaidShowItems;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemPaidShowReturnedItems;
         private DevExpress.XtraTab.XtraTabPage tabPaid;
         private DevExpress.XtraTab.XtraTabControl xtraTabControl2;
         private DevExpress.XtraTab.XtraTabPage xtraTabPage2;

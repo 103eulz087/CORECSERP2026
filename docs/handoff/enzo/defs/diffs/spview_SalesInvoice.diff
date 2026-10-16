@@ -1,0 +1,28 @@
+--- enzo/spview_SalesInvoice.sql	2026-10-15 23:07:10.038544600 +0800
++++ prod/spview_SalesInvoice.sql	2026-10-15 23:07:15.055108000 +0800
+@@ -7,11 +7,12 @@
+ 	-- interfering with SELECT statements.
+ 	SET NOCOUNT OFF;
+ 	SELECT 
+-		SUM(a.QtyDelivered)AS Quantity
++		COUNT(a.BarcodeNo) as Cnt
++		,SUM(a.QtyDelivered)AS Quantity
+ 		,'Kg' as Unit
+ 		--,a.ProductName+'(Less Discount)'
+ 		,case when isnull(b.DiscountAmount,0) = 0 then a.ProductName when isnull(b.DiscountAmount,0) <> 0 then a.ProductName+' (Less Discount @'+CAST(b.Percentage as varchar(10))+'%)' else a.ProductName end as ProductName
+-		--,FORMAT(a.Cost, 'N', 'en-US')  AS Cost
++		,FORMAT(a.Cost, 'N', 'en-US')  AS Cost
+ 		,FORMAT(a.SellingPrice, 'N', 'en-US')  AS Price
+ 		--,FORMAT(b.DiscountAmount, 'N', 'en-US')  AS Discount
+ 		,FORMAT(SUM(isnull(a.QtyDelivered,0) * isnull(a.SellingPrice,0))-isnull(b.DiscountAmount,0), 'N', 'en-US') AS Amount
+@@ -20,8 +21,9 @@
+ 	LEFT OUTER JOIN SalesOrderDiscounts b
+ 	ON a.PONumber=b.PONumber
+ 	and a.ProductNo=b.ProductCode
++
+ 	--and a.SeqNo=b.SeqNo
+ 	WHERE a.PONumber = @parmpono  
+-	GROUP BY a.ProductName,a.SellingPrice,a.isVat,b.DiscountAmount,b.Percentage
++	GROUP BY a.ProductName,a.Cost,a.SellingPrice,a.isVat,b.DiscountAmount,b.Percentage
+ 
+ END

@@ -33,6 +33,124 @@ namespace SalesInventorySystem.AccountingDevEx
             InitializeComponent();
             // Posted tab: draggable split, expenses grid ~54% / details below.
             Classes.DevXGridViewSettings.KeepSplitterRatio(splitPosted, 0.54);
+            BuildReverseControls();
+        }
+
+        // [96] 2026-10-15: Reverse a saved expense (spu_ReverseSingleExpense). Built in code next to
+        // View PO Details; a reversed expense stays on the list as CANCELLED (greyed).
+        private SimpleButton btnReverse;
+        private ToolStripMenuItem miReverse;
+
+        private void BuildReverseControls()
+        {
+            btnReverse = new SimpleButton
+            {
+                Name = "btnReverse",
+                Text = "Reverse…",
+                Location = new System.Drawing.Point(582, 9),
+                Size = new System.Drawing.Size(110, 28),
+                Enabled = false,
+                TabIndex = 4
+            };
+            btnReverse.Appearance.BackColor = System.Drawing.Color.FromArgb(255, 226, 226);
+            btnReverse.Appearance.Options.UseBackColor = true;
+            btnReverse.Click += BtnReverse_Click;
+            pnlPostedButtons.Controls.Add(btnReverse);
+
+            miReverse = new ToolStripMenuItem("Reverse…");
+            miReverse.Click += BtnReverse_Click;
+            cmsPosted.Items.Add(miReverse);
+
+            gridViewPosted.RowStyle += GridViewPosted_RowStyle;
+            Disposed += (s, e) => { _cancelledFont?.Dispose(); _cancelledFont = null; };
+        }
+
+        private bool FocusedPostedIsCancelled()
+        {
+            return gridViewPosted.FocusedRowHandle >= 0
+                && string.Equals(Convert.ToString(gridViewPosted.GetFocusedRowCellValue("Status")), "CANCELLED", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private void GridViewPosted_RowStyle(object sender, RowStyleEventArgs e)
+        {
+            if (e.RowHandle < 0) return;
+            if (string.Equals(Convert.ToString(gridViewPosted.GetRowCellValue(e.RowHandle, "Status")), "CANCELLED", StringComparison.OrdinalIgnoreCase))
+            {
+                if (_cancelledFont == null)
+                    _cancelledFont = new System.Drawing.Font(e.Appearance.Font, System.Drawing.FontStyle.Strikeout);
+                e.Appearance.ForeColor = System.Drawing.Color.Gray;
+                e.Appearance.Font = _cancelledFont;
+                e.HighPriority = true;
+            }
+        }
+        private System.Drawing.Font _cancelledFont;
+
+        private void BtnReverse_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(_selectedPostedRefNo) || FocusedPostedIsCancelled()) return;
+
+            string refNo = _selectedPostedRefNo, invoiceNo = _selectedPostedInvoiceNo, supplierId = _selectedPostedSupplierId;
+            string supplierName = Convert.ToString(gridViewPosted.GetFocusedRowCellValue("SupplierName"));
+            object amt = gridViewPosted.GetFocusedRowCellValue("Amount");
+            string amount = amt == null || amt == DBNull.Value ? "" : Convert.ToDecimal(amt).ToString("N2");
+            string shipmentNo = Convert.ToString(gridViewPosted.GetFocusedRowCellValue("ShipmentNo"));
+
+            string reason = XtraInputBox.Show(
+                $"Reverse expense {refNo} / Invoice {invoiceNo}\n{supplierName}  {amount}\n\n"
+                + "A reversal entry dated like the expense is posted, the supplier ledger is reversed and the expense is marked CANCELLED."
+                + (string.IsNullOrWhiteSpace(shipmentNo) ? "" : $"\nIts cost is taken back out of shipment {shipmentNo} (refused if that stock was already sold or transferred).")
+                + "\n\nReason for the reversal:",
+                "Reverse Expense", "");
+            if (reason == null) return;
+            if (string.IsNullOrWhiteSpace(reason))
+            {
+                XtraMessageBox.Show("Enter the reason for the reversal.", "Reverse Expense", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            if (reason.Trim().Length > 300)
+            {
+                XtraMessageBox.Show($"The reason is {reason.Trim().Length} characters; keep it to 300.", "Reverse Expense", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            try
+            {
+                string message;
+                using (var con = Database.getConnection())
+                using (var cmd = new SqlCommand("spu_ReverseSingleExpense", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandTimeout = 120;
+                    cmd.Parameters.Add("@ReferenceNumber", SqlDbType.VarChar, 10).Value = refNo;
+                    cmd.Parameters.Add("@InvoiceNo", SqlDbType.VarChar, 150).Value = invoiceNo;
+                    cmd.Parameters.Add("@SupplierID", SqlDbType.VarChar, 20).Value = supplierId;
+                    cmd.Parameters.Add("@Reason", SqlDbType.VarChar, 300).Value = reason.Trim().Length > 300 ? reason.Trim().Substring(0, 300) : reason.Trim();
+                    cmd.Parameters.Add("@User", SqlDbType.VarChar, 100).Value = Login.Fullname ?? "";
+                    var dt = new DataTable();
+                    con.Open();
+                    new SqlDataAdapter(cmd).Fill(dt);
+                    message = dt.Rows.Count > 0 ? Convert.ToString(dt.Rows[0]["Message"]) : "Expense reversed.";
+                }
+                XtraMessageBox.Show(message, "Reversed", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (SqlException ex)
+            {
+                XtraMessageBox.Show(ex.Message, "Not Reversed", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            LoadPostedExpenses();
+            // refocus the same document: ReferenceNumber + InvoiceNo + SupplierID (a reference no. alone isn't unique)
+            for (int h = 0; h < gridViewPosted.RowCount; h++)
+            {
+                if (Convert.ToString(gridViewPosted.GetRowCellValue(h, "ReferenceNumber")) == refNo
+                    && Convert.ToString(gridViewPosted.GetRowCellValue(h, "InvoiceNo")) == invoiceNo
+                    && Convert.ToString(gridViewPosted.GetRowCellValue(h, "SupplierID")) == supplierId)
+                {
+                    gridViewPosted.FocusedRowHandle = h;
+                    break;
+                }
+            }
         }
 
         public async void LoadData()
@@ -315,8 +433,21 @@ namespace SalesInventorySystem.AccountingDevEx
 
             try
             {
-                bool invoiceExists = await Task.Run(() => Database.checkifExist(
-                    $"SELECT 1 FROM ExpenseSummary WHERE SupplierID='{_supplierKey}' AND InvoiceNo='{txtInvoiceNo.Text.Trim()}'"));
+                // [96] a reversed (CANCELLED) expense doesn't hold its invoice no.: it may be posted again correctly.
+                // Parameterized (was string-built SQL).
+                string supplierKey = Convert.ToString(_supplierKey), invoiceNo = txtInvoiceNo.Text.Trim();
+                bool invoiceExists = await Task.Run(() =>
+                {
+                    using (var con = Database.getConnection())
+                    using (var cmd = new SqlCommand(
+                        "SELECT COUNT(*) FROM dbo.ExpenseSummary WHERE SupplierID = @SupplierID AND InvoiceNo = @InvoiceNo AND ISNULL(Status, '') <> 'CANCELLED'", con))
+                    {
+                        cmd.Parameters.Add("@SupplierID", SqlDbType.VarChar, 20).Value = supplierKey;
+                        cmd.Parameters.Add("@InvoiceNo", SqlDbType.VarChar, 150).Value = invoiceNo;
+                        con.Open();
+                        return Convert.ToInt32(cmd.ExecuteScalar()) > 0;
+                    }
+                });
 
                 if (invoiceExists)
                 {
@@ -548,6 +679,25 @@ namespace SalesInventorySystem.AccountingDevEx
                     gridViewPosted.Columns["ExpenseDate"].DisplayFormat.FormatString = "MM/dd/yyyy";
                 }
 
+                // [96] reversal columns (blank unless the expense was reversed)
+                if (gridViewPosted.Columns["ReversedBy"] != null) gridViewPosted.Columns["ReversedBy"].Caption = "Reversed By";
+                if (gridViewPosted.Columns["ReverseReason"] != null) gridViewPosted.Columns["ReverseReason"].Caption = "Reverse Reason";
+                if (gridViewPosted.Columns["ReversedDate"] != null)
+                {
+                    gridViewPosted.Columns["ReversedDate"].Caption = "Reversed Date";
+                    gridViewPosted.Columns["ReversedDate"].DisplayFormat.FormatType = DevExpress.Utils.FormatType.DateTime;
+                    gridViewPosted.Columns["ReversedDate"].DisplayFormat.FormatString = "MM/dd/yyyy hh:mm tt";
+                }
+                foreach (string col in new[] { "Amount", "Balance", "AmountPaid" })
+                {
+                    var c = gridViewPosted.Columns[col];
+                    if (c == null) continue;
+                    c.AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+                    c.AppearanceCell.Options.UseTextOptions = true;
+                    c.AppearanceHeader.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+                    c.AppearanceHeader.Options.UseTextOptions = true;
+                }
+
                 gridControlPostedDetails.DataSource = null;
                 // NEW -- was previously hardcoded to false/null here, which
                 // silently undid whatever FocusedRowChanged had already set
@@ -585,7 +735,10 @@ namespace SalesInventorySystem.AccountingDevEx
                 // only on the DETAILS query — Edit's real eligibility check happens in
                 // BtnEdit_Click itself via sp_GetSingleExpenseDetails' BlockedReason.
                 // Enable optimistically here; the click handler is the actual gate.
-                btnEdit.Enabled = true;
+                // [96] a reversed (CANCELLED) expense can't be edited or reversed again; the procs refuse it too.
+                bool cancelled = FocusedPostedIsCancelled();
+                btnEdit.Enabled = !cancelled;
+                if (btnReverse != null) btnReverse.Enabled = !cancelled;
                 string shipmentNo = gridViewPosted.GetFocusedRowCellValue("ShipmentNo")?.ToString();
                 btnViewPODetails.Enabled = !string.IsNullOrWhiteSpace(shipmentNo);
             }
@@ -593,6 +746,7 @@ namespace SalesInventorySystem.AccountingDevEx
             {
                 _selectedPostedRefNo = _selectedPostedInvoiceNo = _selectedPostedSupplierId = null;
                 btnEdit.Enabled = false;
+                if (btnReverse != null) btnReverse.Enabled = false;
                 btnViewPODetails.Enabled = false;
             }
         }
@@ -618,6 +772,7 @@ namespace SalesInventorySystem.AccountingDevEx
         private void CmsPosted_Opening(object sender, System.ComponentModel.CancelEventArgs e)
         {
             miViewPODetails.Enabled = btnViewPODetails.Enabled;
+            if (miReverse != null) miReverse.Enabled = btnReverse.Enabled;
         }
 
         private void BtnViewPODetails_Click(object sender, EventArgs e)
@@ -757,6 +912,12 @@ namespace SalesInventorySystem.AccountingDevEx
         private void BtnEdit_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(_selectedPostedRefNo)) return;
+            if (FocusedPostedIsCancelled())   // [96] sp_EditSingleExpense refuses it too (56110)
+            {
+                XtraMessageBox.Show("This expense was reversed (cancelled) and cannot be edited. Use Copy to New Entry to post a corrected expense.",
+                    "Cannot Edit", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
 
             DataTable header, lines;
             try

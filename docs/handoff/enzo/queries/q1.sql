@@ -1,0 +1,2 @@
+SELECT DB_NAME() db, (SELECT compatibility_level FROM sys.databases WHERE name=DB_NAME()) compat,
+ (SELECT COUNT(*) FROM sys.procedures) procs, (SELECT COUNT(*) FROM sys.views) views, (SELECT COUNT(*) FROM sys.objects WHERE type IN ('FN','IF','TF')) funcs, (SELECT COUNT(*) FROM sys.tables) tabs, (SELECT COUNT(*) FROM sys.triggers WHERE parent_class=1) trg, (SELECT COUNT(*) FROM sys.table_types) tt

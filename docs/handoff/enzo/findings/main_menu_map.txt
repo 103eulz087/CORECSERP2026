@@ -1,0 +1,204 @@
+﻿Main.cs:386	barButtonItem1_ItemClick	[btnBigBlue 'BigBlue' grp=ribbonPageGroupViewInventory,ribbonPageGroup6]	forms=	
+Main.cs:500	barButtonItem2_ItemClick	[btnSetupBatchCode 'Setup BatchCode' grp=ribbonPageGroupInventoryProcess,ribbonPageGroup6]	forms=HOFormsDevEx.SetupBatchCodeDevEx	
+Main.cs:542	barButtonItem3_ItemClick	[btnCommissary 'Commisary' grp=ribbonPageGroupViewInventory,ribbonPageGroup6]	forms=ViewPrimalCutsInventory	
+Main.cs:548	barButtonItem4_ItemClick	[btnProductCosting 'Product Costing' grp=popupMenuCosting,ribbonPageGroup6]	forms=HOFormsDevEx.InventoryCost	
+Main.cs:553	barButtonItem5_ItemClick	[btnProducts 'Products' grp=ribbonPageGroup5,ribbonPageGroup6]	forms=HOFormsDevEx.ProductsDevEx	
+Main.cs:569	barButtonItem7_ItemClick	[btnRequestOrder 'Add Sales Order' grp=ribbonPageGroup1]	forms=AddOrder	
+Main.cs:609	barButtonItem8_ItemClick	[btnViewRequestOrder 'View Sales Order' grp=ribbonPageGroup1]	forms=POForApproval	
+Main.cs:626	barButtonItem9_ItemClick	[barButtonItem9 'P.O For Delivery' grp=]	forms=POForDelivery	
+Main.cs:632	barButtonItem10_ItemClick	[barButtonItem10 'Charge Invoice' grp=]	forms=	
+Main.cs:637	barButtonItem11_ItemClick	[barButtonItem11 'View Request' grp=]	forms=ViewRequest	
+Main.cs:652	barButtonItem12_ItemClick	[btnConsolidateInventory 'H.O Consolidate Inventory' grp=ribbonPageGroupViewInventory]	forms=HeadOfficeInventory	
+Main.cs:668	barButtonItem13_ItemClick	[barButtonItem13 'Inventory' grp=]	forms=BranchInventory	
+Main.cs:727	barButtonItem14_ItemClick	[barButtonItem14 'Point of Sale' grp=]	forms=AuthorizedConfirmationFrm,CashBeginningFrm,PointOfSale	L747: if (Database.checkifExist("SELECT UserID FROM SalesTransactionSummary WHERE UserID='" + Login.isglobalUserID + "' AND isOpen='1' And BranchCode='" + Login.assignedBranch + "'")) //if true OPEN POS | L772: Database.ExecuteQuery("INSERT INTO SalesTransactionSummary VALUES('" + id + "','" + Login.assignedBranch + "','" + Login.isglobalUserID + "','" + getcashbeg1 + "','','" + DateTime.Now.ToString() + "',0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,'','',0,0,0,'" + Login.isglobalUserID + "','','','1','" + DateTime.Now.ToString() + "','0')"); | L774: Database.ExecuteQuery("INSERT INTO CashiersBlotter VALUES('" + Login.assignedBranch + "','" + DateTime.Now.ToString() + "','" + id + "','CshBeg','" + getcashbeg1 + "','','" + Login.isglobalUserID + "','0')"); | L775: Database.ExecuteQuery("INSERT INTO TransactionCash VALUES('" + DateTime.Now.ToString() + "','" + id + "','" + Login.isglobalUserID + "','','" + Login.assignedBranch + "','CshBeg','" + getcashbeg1 + "','0','','0')", "Transaction Successfully Open"); | L797: Database.ExecuteQuery("INSERT INTO SalesTransactionSummary VALUES('" + id + "','" + Login.assignedBranch + "','" + Login.isglobalUserID + "','" + getcashbeg + "','','" + DateTime.Now.ToString() + "',0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,'','',0,0,0,'" + Login.isglobalUserID + "','','','1','" + DateTime.Now.ToString() + "','0')"); | L799: Database.ExecuteQuery("INSERT INTO CashiersBlotter VALUES('" + Login.assignedBranch + "','" + DateTime.Now.ToString() + "','" + referencenumber + "','CshBeg','" + getcashbeg + "','','" + Login.isglobalUserID + "','0')"); | L800: Database.ExecuteQuery("INSERT INTO TransactionCash VALUES('" + DateTime.Now.ToString() + "','" + referencenumber + "','" + Login.isglobalUserID + "','','" + Login.assignedBranch + "','CshBeg','" + getcashbeg + "','0','','0')", "Transaction Successfully Open");
+Main.cs:833	barButtonItem15_ItemClick	[barButtonItem15 'Cash Sales' grp=]	forms=CashSalesReport	
+Main.cs:850	barStaticItem1_ItemClick	[barStaticItem1 'IT CORE SOLUTIONS INC. CORE CS' grp=ribbonStatusBar]	forms=	
+Main.cs:855	barButtonItem19_ItemClick	[btnProcessToPrimalCuts 'Process to PrimalCuts' grp=ribbonPageGroupInventoryProcess]	forms=HOForms.SetBatchCodeFrm	
+Main.cs:884	barButtonItem20_ItemClick	[btnProcessSalesOrder 'Process Sales Order' grp=ribbonPageGroup1]	forms=ViewBranchOrder	
+Main.cs:900	barButtonItem22_ItemClick	[btnAddPurchaseOrder 'Add Purchase Order' grp=ribbonPageGroup10]	forms=HOFormsDevEx.AddPurchaseOrder	
+Main.cs:917	barButtonItem23_ItemClick	[btnGeneralInventory 'General Inventory' grp=ribbonPageGroupViewInventory]	forms=ViewGeneralInventory	
+Main.cs:933	barButtonItem24_ItemClick	[btnTransactions 'Client Sales' grp=ribbonPageGroup4]	forms=POS.POSSalesReportDevEx	
+Main.cs:947	barButtonItem25_ItemClick	[btnSuppliersInfo 'Suppliers info' grp=ribbonPageGroup13]	forms=HOFormsDevEx.AddSupplierDevEx	
+Main.cs:963	barButtonItem26_ItemClick	[btnViewPurchaseList 'View Purchase List' grp=ribbonPageGroup10]	forms=HOFormsDevEx.VIEWPO	
+Main.cs:968	barButtonItem27_ItemClick	[btnProductCategory 'Product Category' grp=ribbonPageGroup5]	forms=ProductCategory	
+Main.cs:984	barButtonItem28_ItemClick	[barButtonItem28 'Products' grp=]	forms=	
+Main.cs:998	barButtonItem29_ItemClick	[barButtonItem29 'InventoryCost' grp=]	forms=	
+Main.cs:1012	barButtonItem30_ItemClick	[btnUsersInfo 'Users Info' grp=ribbonPageGroup13]	forms=HOFormsDevEx.UsersDevEx	
+Main.cs:1040	barButtonItem34_ItemClick	[btnBranches 'Branches' grp=ribbonPageGroup13]	forms=HOFormsDevEx.BranchDevEx	
+Main.cs:1070	btnCustomersInfoV2_ItemClick	[btnCustomersInfoV2 'Customers Info (New)' grp=]	forms=HOFormsDevEx.CustomersInfoV2DevEx	
+Main.cs:1075	barButtonItem31_ItemClick	[btnCustomersInfo 'Customers Info' grp=ribbonPageGroup13]	forms=HOFormsDevEx.CustomersInfoV2DevEx	
+Main.cs:1093	barButtonItem32_ItemClick	[btnTransactionMapping 'Transaction Mapping' grp=popupMenuAcctgSettings]	forms=HOForms.TransactionDefinitionForm	
+Main.cs:1109	barButtonItem33_ItemClick	[btnCOA 'Chart of Accounts' grp=popupMenuAcctgSettings]	forms=AccountingDevEx.ChartOfAccountsDevEx	
+Main.cs:1130	barButtonItem35_ItemClick	[btnCreateTicket 'Create Ticket' grp=ribbonPageGroup15]	forms=	
+Main.cs:1276	barButtonItem42_ItemClick	[btnGLPosting 'GL Posting' grp=popupMenuAcctgSettings]	forms=Accounting.GLPostingDevEx	
+Main.cs:1284	barButtonItem41_ItemClick	[btnViewTicket 'View Ticket' grp=ribbonPageGroup15]	forms=Accounting.ViewTicketDevEx	
+Main.cs:1300	barButtonItem43_ItemClick	[barButtonItem43 'GLSummary' grp=]	forms=AccountingDevEx.GLSummary	
+Main.cs:1306	barButtonItem44_ItemClick	[btnConversion 'Conversion' grp=ribbonPageGroupInventoryProcess]	forms=HOConversion	
+Main.cs:1356	barButtonItem46_ItemClick	[btnReceiveInventory 'Receive Inventory' grp=ribbonPageGroupInventoryProcess]	forms=HOFormsDevEx.ReceivedInventoryDevEx	
+Main.cs:1369	barButtonItem47_ItemClick	[btnShipmentReport 'Shipment Reports' grp=ribbonPageGroup11]	forms=Reporting.BatchProcessMasterDevEx	
+Main.cs:1387	barButtonItem16_ItemClick	[barButtonItem16 'Charge Sales' grp=]	forms=	
+Main.cs:1392	barButtonItem20_ItemClick_1	[btnBatchProcess 'BatchProcess' grp=ribbonPageGroup11]	forms=Reporting.BatchProcessReports	
+Main.cs:1406	barButtonItem48_ItemClick	[btnTickets 'Tickets' grp=ribbonPageGroup24]	forms=Reporting.ViewTicketDevExRep	
+Main.cs:1430	barButtonItem52_ItemClick	[btnPOSReportReading 'POS Report Reading' grp=ribbonPageGroup4]	forms=POSDevEx.POSXReadReportDevEx	
+Main.cs:1448	barButtonItem53_ItemClick	[btnReturnInventory 'Return Inventory' grp=ribbonPageGroupInventoryProcess]	forms=HOForms.ReturnInventory	
+Main.cs:1462	barButtonItem54_ItemClick	[btnRequestTransfer 'Request Transfer' grp=ribbonPageGroupInventoryProcess]	forms=HOFormsDevEx.TransferUpdateDevEx	
+Main.cs:1489	barButtonItem18_ItemClick	[btnDeliveryReport 'Delivery Report' grp=ribbonPageGroup11]	forms=Reporting.DeliveryReportsFrm	
+Main.cs:1505	barButtonItem56_ItemClick	[barButtonItem56 'Batch Sales Upload' grp=]	forms=BatchUploading,CashBeginningFrm	L1521: if (Database.checkifExist("SELECT UserID FROM SalesTransactionSummary WHERE UserID='" + Login.isglobalUserID + "' AND isOpen='1' And BranchCode='" + Login.assignedBranch + "'")) | L1534: Database.ExecuteQuery("INSERT INTO SalesTransactionSummary VALUES('" + id + "','" + Login.assignedBranch + "','" + Login.isglobalUserID + "','" + getcashbeg + "','','" + DateTime.Now.ToString() + "',0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,'','',0,0,0,'" + Login.isglobalUserID + "','','','1','" + DateTime.Now.ToString() + "')"); | L1535: Database.ExecuteQuery("INSERT INTO CashiersBlotter VALUES('" + Login.assignedBranch + "','" + DateTime.Now.ToString() + "','" + referencenumber + "','CshBeg','" + getcashbeg + "','','" + Login.isglobalUserID + "')"); | L1536: Database.ExecuteQuery("INSERT INTO TransactionCash VALUES('" + DateTime.Now.ToString() + "','" + referencenumber + "','" + Login.isglobalUserID + "','','" + Login.assignedBranch + "','CshBeg','" + getcashbeg + "','0','')", "Transaction Successfully Open");
+Main.cs:1549	barButtonItem57_ItemClick	[btnInventoryIN 'Inventory IN' grp=ribbonPageGroupInventoryProcess]	forms=POS.POSInventoryIN,ReInventoryIn	L1562: if(GlobalCache.CompanyName=="ENZO" || GlobalCache.CompanyName == "JFC") | L1575: else if(GlobalCache.CompanyName == "VROSS")
+Main.cs:1607	barButtonItem55_ItemClick	[btnMetrics 'Metrics' grp=]	forms=POSDevEx.POSDataManagementAutomation	
+Main.cs:1625	barButtonItem58_ItemClick	[btnConversionLogs 'Conversion Logs' grp=ribbonPageGroup11]	forms=Reporting.ConversionReports	
+Main.cs:1641	barButtonItem59_ItemClick	[btnCarcassCosting 'Carcass Costing' grp=popupMenuCosting]	forms=HOFormsDevEx.PrimalCutCosting	
+Main.cs:1673	barButtonItem60_ItemClick	[btnARAccounts 'AR Accounts' grp=]	forms=HOFormsDevEx.ClientAccountsDevEx	
+Main.cs:1690	barButtonItem61_ItemClick	[btnStocksOrder 'Stocks/Order' grp=ribbonPageGroup11]	forms=Reporting.StocksOrder	
+Main.cs:1704	barButtonItem62_ItemClick	[btnPrinter 'Print Label' grp=ribbonPageGroup22]	forms=StickerLabeling	
+Main.cs:1742	barButtonItem64_ItemClick	[btnStockTransfer 'Stock Transfer' grp=ribbonPageGroupInventoryProcess]	forms=	
+Main.cs:1766	barButtonItem63_ItemClick	[btnSalesTicketing 'Sales Ticketing' grp=ribbonPageGroup16]	forms=HOForms.DataAnalysisAndTicketing	
+Main.cs:1780	barButtonItem49_ItemClick	[btnGLSummary 'GL Summary' grp=ribbonPageGroup24]	forms=AccountingDevEx.GLSummary	
+Main.cs:1794	barButtonItem50_ItemClick	[btnFinanceReport 'Financial Report' grp=ribbonPageGroup24]	forms=HOFormsDevEx.AccountingReportsFormV2	
+Main.cs:1813	barButtonItem51_ItemClick	[btnIncomeStatement 'Income Statement' grp=ribbonPageGroup24]	forms=Reporting.AccountingReportsForm	
+Main.cs:1840	barButtonItem65_ItemClick	[btnBackupDB 'Backup DB' grp=ribbonPageGroup22]	forms=HOForms.BackupDB	
+Main.cs:1854	barButtonItem66_ItemClick	[barButtonItem66 'Add Check Voucher' grp=]	forms=Accounting.AddCheckVoucher	
+Main.cs:1868	barButtonItem67_ItemClick	[btnCheckVoucher 'Check Voucher' grp=ribbonPageGroup25]	forms=AccountingDevEx.VoucheringManualFrm	
+Main.cs:1887	barButtonItem68_ItemClick	[barButtonItem68 'Purchase Journal' grp=]	forms=Accounting.ViewPurchaseJournal	
+Main.cs:1901	barButtonItem70_ItemClick	[btnInventoryTransfer 'Inventory Transfer' grp=ribbonPageGroupViewInventory]	forms=HOFormsDevEx.InventoryTransferDevEx	
+Main.cs:1917	barButtonItem71_ItemClick	[btnAPAccounts 'AP Accounts' grp=]	forms=HOFormsDevEx.SupplierAccountsDevEx	
+Main.cs:1934	barButtonItem72_ItemClick	[btnBankRecon 'Bank Recon' grp=ribbonPageGroup3]	forms=AccountingDevEx.BankReconFormV2	
+Main.cs:1952	barButtonItem73_ItemClick	[barButtonItem73 'Payables' grp=]	forms=POSDevEx.AccountPayablesDevEx	
+Main.cs:1968	barButtonItem69_ItemClick	[barButtonItem69 'Sales Journal' grp=]	forms=	
+Main.cs:1973	barButtonItem75_ItemClick	[btnAccountMasterlist 'Account Masterlist' grp=ribbonPageGroup25]	forms=	
+Main.cs:1989	barButtonItem76_ItemClick	[btnCustomerProductSettings 'Customer ProductSettings' grp=ribbonPageGroup5]	forms=HOFormsDevEx.CustomerProductSettingsDevEx	
+Main.cs:2005	barButtonItem77_ItemClick	[btnInventorySettlement 'Inventory Settlement' grp=ribbonPageGroupInventoryProcess]	forms=HOFormsDevEx.InventorySettlementDevEx	
+Main.cs:2021	barButtonItem78_ItemClick	[btnSalesChecker 'Sales Checker' grp=ribbonPageGroup4]	forms=POS.POSUploadChecker	
+Main.cs:2055	barButtonItem79_ItemClick	[btnDepositInTransit 'Deposit In Transit' grp=ribbonPageGroup3]	forms=HOFormsDevEx.CombinedSupplierVoucherFrm	
+Main.cs:2071	barButtonItem80_ItemClick	[btnCreateBankReconEntry 'Create Bank Recon Entry' grp=ribbonPageGroup3]	forms=AccountingDevEx.SupplierPaymentDevEx	
+Main.cs:2091	barButtonItem83_ItemClick	[btnViewPurchaseOrderNonTrade 'View Purchase Order Non-Trade' grp=ribbonPageGroup10]	forms=HOFormsDevEx.ViewNonTradeOrdersDevEx	
+Main.cs:2107	barButtonItem82_ItemClick	[btnAddPurchaseOrderNonTrade 'Add Purchase Order Non-Trade' grp=ribbonPageGroup10]	forms=HOFormsDevEx.AddNonTradeOrdersDevEx	
+Main.cs:2121	barButtonItem84_ItemClick	[btnInventoryCostAdjustment 'Inv Cost Adjustment' grp=ribbonPageGroupInventoryProcess]	forms=HOFormsDevEx.InventoryCostAdjustment	
+Main.cs:2145	barButtonItem85_ItemClick	[btnPostExpense 'Post Expense' grp=ribbonPageGroup15]	forms=	
+Main.cs:2160	barButtonItem81_ItemClick	[barButtonItem81 'Fixed Asset Management' grp=]	forms=HOFormsDevEx.ViewGeneralnventory	
+Main.cs:2175	barButtonItem86_ItemClick	[btnDepartments 'Departments' grp=ribbonPageGroup13]	forms=HOFormsDevEx.DepartmentsDevEx	
+Main.cs:2191	barButtonItem87_ItemClick	[btnLocations 'Locations' grp=ribbonPageGroup13]	forms=HOFormsDevEx.LocationDevEx	
+Main.cs:2207	barButtonItem88_ItemClick	[btnGenInventoryCategory 'Gen Inventory Category' grp=ribbonPageGroupAssetManagement]	forms=HOFormsDevEx.GenInventoryCategoryDevEx	
+Main.cs:2225	barButtonItem89_ItemClick	[btnGenInventoryList 'Gen Inventory List' grp=ribbonPageGroupAssetManagement]	forms=HOFormsDevEx.ViewGeneralnventory	
+Main.cs:2250	barButtonItem90_ItemClick	[btnGenInventoryItems 'Gen Inventory Items' grp=ribbonPageGroupAssetManagement]	forms=HOFormsDevEx.GenInventoryItems	
+Main.cs:2266	barButtonItem91_ItemClick	[btnDepreciation 'Depreciation' grp=ribbonPageGroup11]	forms=Reporting.DepreciationReports	
+Main.cs:2282	barButtonItem17_ItemClick	[btnPurchaseOrder 'Purchase Order' grp=ribbonPageGroup11]	forms=Reporting.PurchaseOrderRepDevEx	
+Main.cs:2298	barButtonItem92_ItemClick	[btnHotelDashboard 'DashBoard' grp=ribbonPageGroup7]	forms=HotelManagement.HotelFrmMainDashBoard	
+Main.cs:2314	barButtonItem93_ItemClick	[btnHotelRoomCategory 'Room Category' grp=ribbonPageGroup9]	forms=HotelManagement.HotelFrmRoomCategory	
+Main.cs:2330	btnCustodian_ItemClick	[btnCustodian 'Custodian' grp=ribbonPageGroup13]	forms=HOFormsDevEx.Custodian	
+Main.cs:2346	btnReportHeaderSettings_ItemClick	[btnReportHeaderSettings 'Report Header Settings' grp=ribbonPageGroup13]	forms=HOFormsDevEx.ReportHeaderSettings	
+Main.cs:2362	btnCollectionList_ItemClick	[btnCollectionList 'Collection List' grp=ribbonPageGroup4]	forms=Reporting.CollectionList	
+Main.cs:2378	btnHotelFoodMenu_ItemClick	[btnHotelFoodMenu 'Food Menu' grp=ribbonPageGroup12]	forms=HotelManagement.HotelFrmFoodMenu	
+Main.cs:2394	barButtonItem2_ItemClick_1	[barButtonItem2 'Change Password' grp=ribbonPageGroup2]	forms=HOForms.ChangePassword	
+Main.cs:2408	btnExpenseList_ItemClick	[btnExpenseList 'Expense List' grp=popupMenuAcctgSettings]	forms=HOFormsDevEx.ExpenseList	
+Main.cs:2424	btnExpenseMapping_ItemClick	[btnExpenseMapping 'Expense Mapping' grp=popupMenuAcctgSettings]	forms=HOFormsDevEx.ExpenseMapping	
+Main.cs:2440	barButtonItem5_ItemClick_1	[btnBatchmode 'Batch Mode Expense' grp=popupMenu1]	forms=AccountingDevEx.ExpenseManualMultiBranchFrm	
+Main.cs:2458	barButtonItem7_ItemClick_1	[btnSingleMode 'Single Mode Expense' grp=popupMenu1]	forms=AccountingDevEx.AddExpenseDevExFrm	
+Main.cs:2476	btnLiquidationList_ItemClick	[btnLiquidationList 'Liquidation List' grp=popupMenuAcctgSettings]	forms=HOFormsDevEx.LiquidationList	
+Main.cs:2492	btnLiquidationMapping_ItemClick	[btnLiquidationMapping 'Liquidation Mapping' grp=popupMenuAcctgSettings]	forms=HOFormsDevEx.LiquidationMapping	
+Main.cs:2508	btnInventoryQtyAdjustment_ItemClick	[btnInventoryQtyAdjustment 'Inventory Qty Adjustment' grp=ribbonPageGroupInventoryProcess]	forms=HOFormsDevEx.InventoryQtyAdjustmentDevEx	
+Main.cs:2522	barButtonItem96_ItemClick	[btnHotelTypeOfRates 'Type of Rates' grp=ribbonPageGroup9]	forms=HotelManagement.HotelFrmTypeOfRates	
+Main.cs:2538	btnHotelFoodCategory_ItemClick	[btnHotelFoodCategory 'Food Category' grp=ribbonPageGroup12]	forms=HotelManagement.HotelFrmFoodCategory	
+Main.cs:2554	btnHotelFoodMenuMaker_ItemClick	[btnHotelFoodMenuMaker 'Food MenuMaker' grp=ribbonPageGroup12]	forms=HotelManagement.HotelFrmMenuMaker	
+Main.cs:2570	btnHotelCharges_ItemClick	[btnHotelCharges 'Charges' grp=ribbonPageGroup26]	forms=HotelManagement.HotelFrmCharges	
+Main.cs:2586	btnHotelReports_ItemClick	[btnHotelReports 'Reports' grp=ribbonPageGroup26]	forms=HotelManagement.HotelFrmReports	
+Main.cs:2619	btnForwardingDashboard_ItemClick	[btnForwardingDashboard 'Dashboard' grp=ribbonPageGroup8]	forms=Forwarding.ForwardingDashboard	
+Main.cs:2635	btnfwrdingbilling_ItemClick	[btnfwrdingbilling 'Billing' grp=ribbonPageGroup8]	forms=Forwarding.Reporting.ForwardingDeliveryFrm	
+Main.cs:2651	btnCompany_ItemClick	[btnCompany 'Company' grp=ribbonPageGroup13]	forms=HOFormsDevEx.AddCompanyDevFrm	
+Main.cs:2667	barButtonItem7_ItemClick_2	[]	forms=HOFormsDevEx.ManualJournalVoucherFrm	
+Main.cs:2685	btnforwardngvhcleregistration_ItemClick	[btnforwardngvhcleregistration 'Vehicle Registration' grp=ribbonPageGroup8]	forms=Forwarding.ForwardingTruckDetails	
+Main.cs:2701	btnAccountingAging_ItemClick	[btnAccountingAging 'Aging' grp=ribbonPageGroup24]	forms=Accounting.AgingReports	
+Main.cs:2717	btnPassbookBalances_ItemClick	[btnPassbookBalances 'Passbook Balances' grp=popupMenuAcctgSettings]	forms=HOFormsDevEx.PassbookBalancesDevEx	
+Main.cs:2733	btnBanks_ItemClick	[]	forms=HOFormsDevEx.BanksDevEx	
+Main.cs:2749	btCounterReceipt_ItemClick	[btCounterReceipt 'Counter Receipt' grp=ribbonPageGroup4]	forms=Reporting.CounterReceiptDevEx	
+Main.cs:2763	btnCreditMemo_ItemClick	[btnCreditMemo 'Credit Memo' grp=ribbonPageGroup24]	forms=Reporting.CreditMemoRepDevEx	
+Main.cs:2779	btnSTSSummaryRep_ItemClick	[btnSTSSummaryRep 'STS Summary' grp=ribbonPageGroup11]	forms=Reporting.STSSummaryReport	
+Main.cs:2793	btnConnectionSettings_ItemClick	[btnConnectionSettings 'Connection' grp=ribbonPageGroup22]	forms=Connection	
+Main.cs:2807	btnServicesCost_ItemClick	[btnServicesCost 'Services Cost' grp=popupMenuCosting]	forms=HOFormsDevEx.ServicesCostDevEx	
+Main.cs:2823	btnServices_ItemClick	[btnServices 'Services' grp=ribbonPageGroup5]	forms=HOFormsDevEx.ServicesDevEx	
+Main.cs:2839	btnInventoryUnitActivity_ItemClick	[btnInventoryUnitActivity 'Inventory Unit Activity' grp=ribbonPageGroup11]	forms=Reporting.InventoryUnitActivity	
+Main.cs:2855	btnRequestStockTransfer_ItemClick	[btnRequestStockTransfer 'Request Stock Transfer' grp=ribbonPageGroup23]	forms=Orders.AddOrderSTSBatchMode	
+Main.cs:2863	btnProcessSTS_ItemClick	[btnProcessSTS 'Process Stock Transfer' grp=ribbonPageGroup23]	forms=Orders.ViewBranchOrderSTS	
+Main.cs:2879	btnAddSTSCharges_ItemClick	[btnAddSTSCharges 'Book Stock Transfer Charges' grp=ribbonPageGroup23]	forms=HOFormsDevEx.AddFreightChargeSTS	
+Main.cs:2895	btnViewJFCInventory_ItemClick	[btnViewJFCInventory 'Inventory' grp=ribbonPageGroupViewInventory]	forms=HOFormsDevEx.JFCInventory	
+Main.cs:2911	barButtonItem8_ItemClick_1	[]	forms=Forwarding.ForwardingAddSmallTrucks	
+Main.cs:2927	btnHotelHousekeeper_ItemClick	[btnHotelHousekeeper 'HouseKeepers' grp=ribbonPageGroup26]	forms=HotelManagement.HotelFrmAddHouseKeeper	
+Main.cs:2943	btnfwrdAddShipment_ItemClick	[btnfwrdAddShipment 'Add Shipment Entry' grp=ribbonPageGroup8]	forms=	
+Main.cs:2948	barButtonItem95_ItemClick	[btnHotelRoomRates 'Room Rates' grp=ribbonPageGroup9]	forms=HotelManagement.HotelFrmRoomRates	
+Main.cs:2964	barButtonItem97_ItemClick	[btnHotelTables 'Tables' grp=ribbonPageGroup12]	forms=HotelManagement.HotelFrmRestaurantTables	
+Main.cs:2980	barButtonItem94_ItemClick	[btnHotelRoomList 'Room List' grp=ribbonPageGroup9]	forms=HotelManagement.HotelFrmRooms	
+Main.cs:2996	barButtonItem109_ItemClick	[btnUserAccess 'User Access' grp=ribbonPageGroup13]	forms=HOFormsDevEx.UserAccessDevEx	
+Main.cs:3012	barButtonItem104_ItemClick	[btnHotelPOS 'Restaurant POS' grp=ribbonPageGroup18]	forms=	
+Main.cs:3055	barButtonItem105_ItemClick	[btnHotelAddClientInfo 'Add Client Info' grp=ribbonPageGroup21]	forms=HotelManagement.HotelFrmGuestDetails	
+Main.cs:3062	barButtonItem106_ItemClick	[btnHotelViewGuestDetails 'View Guest Details' grp=ribbonPageGroup21]	forms=HotelManagement.HotelFrmViewGuest	
+Main.cs:3078	barButtonItem107_ItemClick	[btnHotelSendEmail 'Send Email' grp=ribbonPageGroup26]	forms=HotelManagement.HotelFrmSendEmail	
+Main.cs:3084	barButtonItem108_ItemClick	[btnHotelKitchen 'Kitchen' grp=ribbonPageGroup12]	forms=HotelManagement.HotelFrmKitchenSection	
+Main.cs:3100	POSMachine_ItemClick	[btnPOSMachine 'POS Machine' grp=ribbonPageGroup13]	forms=RFID.RFIDDashboard	
+Main.cs:3141	btnPointOFSale_ItemClick	[btnPointOFSale 'POS' grp=ribbonPageGroup16]	forms=	
+Main.cs:3224	btnPOSSettings_ItemClick	[btnPOSSettings 'POS Settings' grp=ribbonPageGroup16]	forms=POSStandAloneSetup.POSStandAloneSettingsBoard	
+Main.cs:3230	barbtnDeductInventory_ItemClick	[barbtnDeductInventory 'Deduct Inventory' grp=ribbonPageGroupInventoryProcess]	forms=HOFormsDevEx.DeductInventoryDevEx	
+Main.cs:3245	btnBranchInventory_ItemClick	[btnBranchInventory 'Branch Inventory' grp=ribbonPageGroupViewInventory]	forms=BranchInventory	
+Main.cs:3261	btnTransferPerPallet_ItemClick	[btnTransferPerPallet 'Transfer Per Pallet' grp=popupMenuInvTransfer]	forms=HOFormsDevEx.TransferPerPalletDevExFixed	
+Main.cs:3269	btnTransferPerBarcode_ItemClick	[btnTransferPerBarcode 'Transfer Per Barcode' grp=popupMenuInvTransfer]	forms=HOFormsDevEx.TransferByBarcode	
+Main.cs:3277	btnConversionPerBarcode_ItemClick	[btnConversionPerBarcode 'Conversion' grp=ribbonPageGroupInventoryProcess]	forms=HOFormsDevEx.ConversionPerBarcode	
+Main.cs:3291	btnDispatchPerBarcode_ItemClick	[btnDispatchPerBarcode 'Dispatch Per Barcode' grp=ribbonPageGroupInventoryProcess]	forms=HOFormsDevEx.DispatchPerBarcode	
+Main.cs:3305	btnStockOutPerBarcode_ItemClick	[btnStockOutPerBarcode 'Stock-Out Per Barcode' grp=ribbonPageGroupInventoryProcess]	forms=HOFormsDevEx.StockOutPerBarcode	
+Main.cs:3319	barButtonItem24_ItemClick_1	[barButtonItem24 'barButtonItem24' grp=ribbonPageGroup19]	forms=	
+Main.cs:3326	btnPOSChecker_ItemClick	[btnPOSChecker 'Reuploading Tool' grp=ribbonPageGroup16]	forms=POSUploadChecker	
+Main.cs:3332	btnLockedUsers_ItemClick	[btnLockedUsers 'Locked Users' grp=ribbonPageGroup13]	forms=HOFormsDevEx.LockedUsers	
+Main.cs:3369	btnSalesManualEntry_ItemClick	[btnSalesManualEntry 'Sales Manual Entry' grp=ribbonPageGroup16]	forms=PointOfSaleManual	
+Main.cs:3376	btnInventoryMapping_ItemClick	[btnInventoryMapping 'Inventory Mapping' grp=ribbonPageGroupInventoryProcess]	forms=POS.POSInventoryMapping	
+Main.cs:3392	btnInventoryCostRep_ItemClick	[btnInventoryCostRep 'Inventory Costing' grp=ribbonPageGroup11]	forms=Reporting.InventoryCostingRep	
+Main.cs:3408	btnMerchants_ItemClick	[btnMerchants 'Merchants' grp=ribbonPageGroup13]	forms=HOFormsDevEx.MerchantsDevEx	
+Main.cs:3424	btnActivityLogs_ItemClick	[btnActivityLogs 'Activity Logs' grp=ribbonPageGroup22]	forms=HOFormsDevEx.ActivityLogsDevEx	
+Main.cs:3440	barButtonItem25_ItemClick_1	[barButtonItem25 'Comparative Report' grp=popupMenuBIRSalesReport]	forms=Reporting.BIR.ComparativeReport	
+Main.cs:3456	btnPOSManagement2_ItemClick	[btnPOSManagement2 'POS Report Mgmt' grp=ribbonPageGroup4]	forms=POSDevEx.POSManagementReport	
+Main.cs:3472	barButtonItem26_ItemClick_1	[barButtonItem26 'Sales Transaction Summary B' grp=popupMenuBIRSalesReport]	forms=Reporting.BIR.BIR2550M2	
+Main.cs:3488	barButtonItem27_ItemClick_1	[barbtncomparativeB 'Comparative Report B' grp=ribbonPageGroup11]	forms=	
+Main.cs:3493	barButtonItem30_ItemClick_1	[barButtonItem30 'Comparative Report B' grp=popupMenuBIRSalesReport]	forms=Reporting.BIR.ComparativeReport2	
+Main.cs:3509	barBtnStockOutItems_ItemClick	[barBtnStockOutItems 'StockOut Items' grp=ribbonPageGroupInventoryProcess]	forms=HOFormsDevEx.InventoryOut	
+Main.cs:3535	btnInventoryPerBranch_ItemClick	[btnInventoryPerBranch 'Inventory Per Branch' grp=ribbonPageGroupViewInventory]	forms=Branches.BranchGenInventory	
+Main.cs:3540	btnCashierSalesCollectionSummary_ItemClick	[btnCashierSalesCollectionSummary 'Sales Collection Summary' grp=ribbonPageGroup4]	forms=POSDevEx.POSSalesCollectionSummary	
+Main.cs:3556	barbtnInventoryMonitoring_ItemClick	[barbtnInventoryMonitoring 'Inventory Monitoring' grp=ribbonPageGroupViewInventory]	forms=HOFormsDevEx.ViewZeroInventory	
+Main.cs:3572	btnReturnOrders_ItemClick	[btnReturnOrders 'Return Orders' grp=ribbonPageGroup11]	forms=Reporting.BadOrderReport	
+Main.cs:3588	btnViewExpense_ItemClick	[btnViewExpense 'View Expense' grp=ribbonPageGroup15]	forms=HOFormsDevEx.ViewExpenseDevEx	
+Main.cs:3605	barButtonItem32_ItemClick_1	[barButtonItem32 'POS ESales Reports B' grp=popupMenuBIRSalesReport]	forms=Reporting.BIR.POSSalesReportSummary	
+Main.cs:3621	barButtonItem33_ItemClick_1	[barButtonItem33 'Sales Details Comparative' grp=popupMenuBIRSalesReport]	forms=Reporting.BIR.SalesDetailsComparative	
+Main.cs:3637	btnTransferInventoryHO_ItemClick	[btnTransferInventoryHO 'HO TransferInventory' grp=ribbonPageGroup11]	forms=Reporting.TransferInventoryHO	
+Main.cs:3653	barButtonItem27_ItemClick_2	[barButtonItem27 'Process Return Inventory' grp=ribbonPageGroup27]	forms=HOFormsDevEx.TransferBranchToBranchInvDevEx	
+Main.cs:3669	barButtonItemRcvdReturnInv_ItemClick	[barButtonItemRcvdReturnInv 'Receive Return Inventory' grp=ribbonPageGroup27]	forms=HOFormsDevEx.ReceivedTransferBranchInventory	
+Main.cs:3685	barButtonItemInvDailyActivity_ItemClick	[barButtonItemInvDailyActivity 'Inventory Daily Activity' grp=ribbonPageGroupViewInventory]	forms=Reporting.InventoryDailyActivityPivot	
+Main.cs:3691	btnLiveTrendsSts_ItemClick	[btnLiveTrendsSts 'STS Monitoring Tool' grp=ribbonPageGroup28]	forms=LiveTrends.STSMonitoring	
+Main.cs:3697	btnInventoryBranchSummary_ItemClick	[btnInventoryBranchSummary 'Inventory Branch Summary' grp=ribbonPageGroupViewInventory]	forms=Reporting.BranchInventoryProductSummary	
+Main.cs:3703	btnBranchInventoryIN_ItemClick	[btnBranchInventoryIN 'Branch Inventory IN' grp=ribbonPageGroupInventoryProcess]	forms=Branches.BranchInventoryIN	
+Main.cs:3717	btnInventoryINAdjustment_ItemClick	[btnInventoryINAdjustment 'Inventory IN Adjustment' grp=ribbonPageGroupInventoryProcess]	forms=InventoryIN	
+Main.cs:3723	btnPurchaseOrderReceivingConso_ItemClick	[btnPurchaseOrderReceivingConso 'Purchase Order Receiving' grp=popupMenuAcctgSettings,popupMenuInventoryConsoReport]	forms=BatchProcessMasterDevEx	
+Main.cs:3729	btnDelivReportRepConso_ItemClick	[btnDelivReportRepConso 'Delivery Reports - STS' grp=popupMenuInventoryConsoReport]	forms=DeliveryReportsFrm	
+Main.cs:3737	btnConversionRepConso_ItemClick	[btnConversionRepConso 'Conversion' grp=popupMenuInventoryConsoReport]	forms=ConversionReports	
+Main.cs:3744	btnInventoryReport_ItemClick	[btnInventoryReport 'Inventory Report' grp=ribbonPageGroup11]	forms=Reporting.InventoryReport	
+Main.cs:3750	btnConversionReportMasterDetail_ItemClick	[btnConversionReportMasterDetail 'Conversion Report (Master-Detail)' grp=ribbonPageGroup11]	forms=Reporting.ConversionReportMasterDetail	
+Main.cs:3756	btnInventoryUnitActivityReport_ItemClick	[btnInventoryUnitActivityReport 'Inventory Unit Activity Report' grp=ribbonPageGroup11]	forms=Reporting.InventoryUnitActivityReport	
+Main.cs:3762	btnItemCostingReport_ItemClick	[btnItemCostingReport 'Item Costing Report' grp=ribbonPageGroup11]	forms=Reporting.ItemCostingReport	
+Main.cs:3768	btnReturnTransferRepConso_ItemClick	[btnReturnTransferRepConso 'Return / Transfer' grp=popupMenuInventoryConsoReport]	forms=HOFormsDevEx.ReceivedTransferBranchInventory	
+Main.cs:3773	btnReturnToSupplierConso_ItemClick	[btnReturnToSupplierConso 'Return to Supplier' grp=popupMenuInventoryConsoReport]	forms=HOFormsDevEx.ReceivedTransferBranchInventory	
+Main.cs:3778	btnBOReportsConso_ItemClick	[btnBOReportsConso 'BO Reports' grp=popupMenuInventoryConsoReport]	forms=HOFormsDevEx.ReceivedTransferBranchInventory	
+Main.cs:3783	btnMonthEndCountConso_ItemClick	[btnMonthEndCountConso 'Inventory MonthEnd Count' grp=popupMenuInventoryConsoReport]	forms=InventoryMonthEndReInventory	
+Main.cs:3789	btnSummaryInventoryConso_ItemClick	[btnSummaryInventoryConso 'Summary Inventory' grp=popupMenuInventoryConsoReport]	forms=InventoryMonthlyActivityPivot	
+Main.cs:3795	btnSupplierDebitCreditMemo_ItemClick	[btnSupplierDebitCreditMemo 'Supplier Debit Credit Memo' grp=ribbonPageGroup14]	forms=HOFormsDevEx.SupplierAdjustmentMemoFrm	
+Main.cs:3801	btnVouchering_ItemClick	[btnAccountingBoard 'Accounting Board' grp=ribbonPageGroup25]	forms=AccountingDevEx.AccountingBoard	
+Main.cs:3811	btnSingleTicket_ItemClick	[btnSingleTicket 'Single Ticket' grp=popupMenuTickets,popupMenu2]	forms=HOFormsDevEx.ManualJournalVoucherFrm	
+Main.cs:3817	btnBatchTicket_ItemClick	[btnBatchTicket 'Batch Tickets' grp=popupMenuTickets,popupMenu2]	forms=	
+Main.cs:3823	barbtnPOSAutomation_ItemClick	[barbtnPOSAutomation 'POS Auto' grp=ribbonPageGroup13]	forms=POSDevEx.POSDataManagementAutomation	
+Main.cs:3829	btnBranchInterBranchTransfer_ItemClick	[btnBranchInterBranchTransfer 'Branch Inventory Transfer' grp=ribbonPageGroup11]	forms=	
+Main.cs:3834	btnCostingReconReport_ItemClick	[btnCostingReconReport 'Costing Recon Summary' grp=ribbonPageGroup11]	forms=Reporting.ItemCostingReconReport	
+Main.cs:3848	btnARCharges_ItemClick	[btnARCharges 'AR Charges' grp=popupMenuARReports]	forms=Reporting.ARFreight	
+Main.cs:3864	btnARPayments_ItemClick	[btnARPayments 'AR Payments' grp=popupMenuARReports]	forms=Reporting.ARPayments	
+Main.cs:4025	btnCloseSalesTransaction_ItemClick	[btnCloseSalesTransaction 'Close Sales Transaction' grp=ribbonPageGroup16]	forms=Main	
+Main.cs:4044	btnENDofDayTrans_ItemClick	[btnENDofDayTrans 'END OF DAY' grp=ribbonPageGroup16]	forms=AuthorizedConfirmationFrm,POS.POSEndOfDay	
+Main.cs:4093	btnReceivedSTS_ItemClick	[btnReceivedSTS 'Received Stock Transfer' grp=ribbonPageGroup23]	forms=Orders.ReceivedSTS	
+Main.cs:4109	btnViewSTSOrder_ItemClick	[btnViewSTSOrder 'View Stock Transfer Orders' grp=ribbonPageGroup23]	forms=Orders.POForApprovalSTS	
+Main.cs:4126	btnSalesSummary_ItemClick	[btnSalesSummary 'SalesSummary' grp=]	forms=Reporting.BIR.BIR2550M	
+Main.cs:4143	barButtonItem19_ItemClick_1	[barButtonItem19 'Sales Transaction Summary' grp=popupMenuBIRSalesReport]	forms=Reporting.BIR.BIR2550M	
+Main.cs:4159	barButtonItem20_ItemClick_2	[barButtonItem20 'POS ESales Reports' grp=popupMenuBIRSalesReport]	forms=Reporting.BIR.POSSalesReportSummary	
+Main.cs:4175	barButtonItem18_ItemClick_1	[barButtonItem18 'EWT Expanded Details' grp=popupMenuBIRSalesReport]	forms=Reporting.BIR.EWTReports	
+Main.cs:4191	barButtonItem23_ItemClick_1	[barButtonItem23 'VATInput Reports' grp=popupMenuBIRSalesReport]	forms=Reporting.BIR.VATInput	

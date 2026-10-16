@@ -1,0 +1,39 @@
+--- enzo/SP_ADDPOSUM.sql	2026-10-15 23:07:09.627268200 +0800
++++ prod/SP_ADDPOSUM.sql	2026-10-15 23:07:14.555763100 +0800
+@@ -38,16 +38,20 @@
+         TotalCost = Quantity * Cost,
+         isVat = NewIsVat;
+ 
+-	
++    declare @isApproved bit,@stat varchar(40)
++    SELECT TOP(1) @isApproved=ISNULL(isAuto,0) FROM ApprovalSettings WHERE Module='AddPurchaseOrder' and isAuto=1
++	IF(@isApproved=1)
++    BEGIN
++        set @stat = 'FOR APPROVAL'
++    END
++    ELSE
++    BEGIN
++        set @stat = 'APPROVED'
++    END
+     -- 2. INSERT OR UPDATE LOGIC
+ 	IF @parmaction <> 'EDITPO'
+ 	BEGIN
+-		INSERT INTO [dbo].[POSUMMARY]
+-           ([ShipmentNo],[BranchCode],[SupplierID],[TargetDate]
+-           ,[TotalItems],[TotalQty],[TotalCost],[TotalActualQty]
+-           ,[TotalActualCost],[Status],[OrderType],[DateOrder]
+-           ,[OrderedBy],[ApprovedDate],[ApprovedBy],[ReceivedDate]
+-           ,[ReceivedBy],[Remarks])
++		INSERT INTO POSUMMARY
+ 		SELECT 
+             @parmshipmentno,
+             @parmbranch,
+@@ -58,7 +62,7 @@
+             SUM(TotalCost),
+             0,
+             0,
+-            'FOR APPROVAL',
++            @stat,--'FOR APPROVAL',
+             OrderType,
+             GETDATE(),
+             @parmorderedby,

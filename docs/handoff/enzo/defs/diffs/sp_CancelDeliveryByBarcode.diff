@@ -1,0 +1,35 @@
+--- enzo/sp_CancelDeliveryByBarcode.sql	2026-10-15 23:07:08.919109000 +0800
++++ prod/sp_CancelDeliveryByBarcode.sql	2026-10-15 23:07:13.669187700 +0800
+@@ -10,11 +10,11 @@
+ 	@preparedby varchar(30)
+ AS
+ BEGIN
+-		declare @qty decimal(18,3),@qtyavailable decimal(18,3),@seqrefnum int,@prodno varchar(10),@prodname varchar(250),@cost money,@seqno int
++		declare @qty decimal(18,3),@qtyavailable decimal(18,3),@seqrefnum bigint,@prodno varchar(10),@prodname varchar(250),@cost money,@seqno int
+ 		set nocount on
+ 		
+-		SELECT TOP(1) 
+-		@prodno=Product
++		SELECT TOP(1) @seqrefnum=SequenceNumber 
++		,@prodno=Product
+ 		,@prodname=Description
+ 		,@qty=Quantity
+ 		,@qtyavailable=Available
+@@ -35,15 +35,15 @@
+ 					end
+             WHERE DeliveryNo = @parmdevno AND PONumber = @parmpono;
+ 
++		Update Inventory SET Available=Quantity WHERE Barcode=@parmbarcode AND SequenceNumber=@seqrefnum
+ 
+-		UPDATE InventoryDeliveryFIFO Set @seqrefnum=SequenceReferenceNumber, isErrorCorrect=1
++		UPDATE InventoryDeliveryFIFO Set isErrorCorrect=1
+ 			WHERE DeliveryNo=@parmdevno 
+ 				and PONumber=@parmpono
+ 				--and SequenceReferenceNumber=@seqrefnum
+ 				and DevDetSeqNo=@seqno
+ 				and isErrorCorrect=0
+ 		
+-		Update Inventory SET Available=Quantity WHERE Barcode=@parmbarcode AND SequenceNumber=@seqrefnum		
+ 
+ 			INSERT INTO [dbo].[InventoryLedger]
+            ([SequenceRefNum]

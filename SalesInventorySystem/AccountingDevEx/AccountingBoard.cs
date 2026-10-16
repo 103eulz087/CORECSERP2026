@@ -3,6 +3,7 @@ using DevExpress.XtraBars.Navigation;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace SalesInventorySystem.AccountingDevEx
@@ -38,7 +39,7 @@ namespace SalesInventorySystem.AccountingDevEx
         //private const string PageReportsV2 = "navReportsV2";
         private const string PageGLTicketEntries = "navGLTicketEntries";
         private const string PageLoanRevaluation = "navLoanRevaluation";   // 2026-10-14: moved here from Accounting Settings
-
+        private const string PageGLDetailTransaction = "navGLDetailTransaction";   // 2026-10-14: tracing right after posting
         // ---------------------------------------------------------------
         // Content loading — the ONE place to touch (besides the Designer)
         // when you add a new menu item: one dictionary entry, same key as
@@ -124,6 +125,23 @@ namespace SalesInventorySystem.AccountingDevEx
                 _loanRevaluation.LoadData();
                 return _loanRevaluation;
             },
+            // 2026-10-14 (user): GL Detail Transaction on the board, so staff can trace what they just posted
+            // without leaving it. The same screen as Accounting Reports › GL Detail Transaction (same proc,
+            // right-click ticket drill-down, exports), opened in its one-report mode and hosted as a child.
+            [PageGLDetailTransaction] = () =>
+            {
+                _glDetailTransaction = new HOFormsDevEx.AccountingReportsFormV2(HOFormsDevEx.AccountingReportsFormV2.GLDetailTransactionReport)
+                {
+                    TopLevel = false,
+                    FormBorderStyle = FormBorderStyle.None,
+                    Dock = DockStyle.Fill
+                };
+                _glDetailTransaction.Show();       // shown first: its Load runs LoadData with the controls already visible
+                _glDetailTransaction.LoadData();   // no-op if Load already did it (guarded)
+                return _glDetailTransaction;
+            },
+            // 2026-10-15: the Registers page (invoice / CR / EWT payable) was here for a few hours; moved to Main ›
+            // REPORTING › SALES next to Client Sales (user, same day; Main.SetupRegistersMenu)
         };
 
         // ---------------------------------------------------------------
@@ -164,6 +182,25 @@ namespace SalesInventorySystem.AccountingDevEx
             return _allowedKeys.Count == 0 || _allowedKeys.Contains(key);
         }
 
+        // Which board pages this user sees. Loan Revaluation: admins and accounting only, whatever the per-user list says.
+        // GL Detail Transaction (2026-10-14): anyone who may post on the board, or who was granted it explicitly. It is
+        // a read-only tracing report; every board user already has a saved list (all 22 on PRODUCTION) and none of them
+        // has this new key, so a plain IsKeyAllowed would have hidden it from everybody.
+        private static readonly string[] PostingPageKeys =
+        {
+            PageVoucherPosting, PageVoucherPostingManual, PageVoucherPaymentList, PagePostClientPayment,
+            PageExpenseSingle, PageExpenseBatch, PageManualTicket, PageBankRecon, PageGLTicketEntries
+        };
+
+        private bool IsPageAllowed(string key)
+        {
+            if (key == PageLoanRevaluation)
+                return IsAdminOrAccounting();
+            if (key == PageGLDetailTransaction)
+                return IsKeyAllowed(key) || PostingPageKeys.Any(IsKeyAllowed);
+            return IsKeyAllowed(key);
+        }
+
         // Loan Revaluation posts GL tickets: admins and accounting users only (same rule as its old Accounting Settings menu)
         private static bool IsAdminOrAccounting()
         {
@@ -189,7 +226,7 @@ namespace SalesInventorySystem.AccountingDevEx
                     continue;
 
                 // Loan Revaluation: role only (admins + accounting), not the per-user list, like its old menu
-                if (key == PageLoanRevaluation ? !IsAdminOrAccounting() : !IsKeyAllowed(key))
+                if (!IsPageAllowed(key))
                 {
                     element.Visible = false;
                     continue;
@@ -264,7 +301,7 @@ namespace SalesInventorySystem.AccountingDevEx
 
         private void SelectAndLoad(string key)
         {
-            if (key == PageLoanRevaluation ? !IsAdminOrAccounting() : !IsKeyAllowed(key))
+            if (!IsPageAllowed(key))
                 return;
 
             if (!_pagesByKey.TryGetValue(key, out var page))
@@ -325,7 +362,7 @@ namespace SalesInventorySystem.AccountingDevEx
         private AccountingDevEx.ExpenseManualMultiBranchFrm _addExpenseBatchMode;
         private BankReconFormV2 _bankRecon;
         private LoanRevaluationFrm _loanRevaluation;
-
+        private HOFormsDevEx.AccountingReportsFormV2 _glDetailTransaction;
         // ---------------------------------------------------------------
         // Form events
         // ---------------------------------------------------------------

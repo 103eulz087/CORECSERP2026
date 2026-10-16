@@ -210,6 +210,51 @@ LEFT JOIN pay p ON p.CustomerKey = c.CustomerKey AND p.InvoiceNo = c.InvoiceNo A
 WHERE ABS(ISNULL(c.AmountPaid, 0) - ISNULL(p.Paid, 0)) > @Tol
   AND (p.InvoiceNo IS NOT NULL OR ISNULL(c.TotalAmount, 0) = 0 OR ISNULL(c.AmountPaid, 0) < 0);   -- a row paid outside payment lines (cash sale) is not a finding
 
+-- S07 (2026-10-15, script [87], hardening H5) a customer whose account balance differs from the sum of its invoice balances
+--     (every TransactionChargeSales row, credits included). The payment proc settles invoices under lock and the ledger trigger
+--     recomputes the account, so the two must agree; a hand edit of a Balance, or a payment posted outside the proc, breaks it.
+--     All customers, all dates (the set is small: 0 on every tier on 2026-10-15).
+INSERT #X (CheckCode, PONumber, Ref, Expected, Actual, Detail)
+SELECT 'S07', NULL, c.AccountKey, ISNULL(i.SumBalance, 0), ISNULL(c.AccountBalance, 0),
+       'customer ' + c.AccountKey + ': account balance vs the sum of its ' + CONVERT(VARCHAR(10), ISNULL(i.RowCnt, 0)) + ' invoice rows (' + ISNULL(c.AccountName, '') + ')'
+FROM dbo.ClientAccounts c
+LEFT JOIN (SELECT CustomerKey, SUM(ISNULL(Balance, 0)) AS SumBalance, COUNT(*) AS RowCnt FROM dbo.TransactionChargeSales GROUP BY CustomerKey) i ON i.CustomerKey = c.AccountKey
+WHERE ABS(ISNULL(c.AccountBalance, 0) - ISNULL(i.SumBalance, 0)) > @Tol;
+
+-- S08 (2026-10-15, script [87], hardening H5) an invoice row whose Balance does not follow its own columns, ALL rows and dates
+--     (S02 covers the sales orders in scope only). Since [87] a payment on such a row is refused (92016) instead of silently
+--     resetting the balance, so a drifted row blocks that customer's collections until it is corrected.
+INSERT #X (CheckCode, PONumber, Ref, Expected, Actual, Detail)
+SELECT 'S08', c.ReferenceNo, c.InvoiceNo,
+       ISNULL(c.TotalAmount, 0) - ISNULL(c.AmountPaid, 0) - ISNULL(c.EWTAmount, 0) - ISNULL(c.DiscountAmount, 0) - ISNULL(c.OffsetAmount, 0),
+       c.Balance, 'customer ' + c.CustomerKey + ': Balance <> TotalAmount - AmountPaid - EWT - Discount - Offset (' + ISNULL(c.PayStatus, '') + ')'
+FROM dbo.TransactionChargeSales c
+WHERE ABS(ISNULL(c.Balance, 0) - (ISNULL(c.TotalAmount, 0) - ISNULL(c.AmountPaid, 0) - ISNULL(c.EWTAmount, 0)
+          - ISNULL(c.DiscountAmount, 0) - ISNULL(c.OffsetAmount, 0))) > @Tol;
+
+-- S09 (2026-10-15, script [89]) a sales-order delivery whose DeliverySummary counters differ from its lines. Rule (same as
+--     dbo.fn_SODelivery_LiveTotals, written out here so the check also runs where [89] is not installed): TotalItem = lines
+--     not cancelled, TotalItemSold = of those not returned, TotalItemReturned = of those returned, TotalQtyDelivered =
+--     their QtyDelivered, TotalActualQty = ActualQty of the lines not cancelled and not returned. Before [89] most rows show
+--     here (TotalItemSold / TotalItemReturned NULL, TotalActualQty 0); after it, 0 unless the triggers are disabled.
+INSERT #X (CheckCode, PONumber, Ref, Expected, Actual, Detail)
+SELECT 'S09', s.PONumber, 'delivery ' + s.DeliveryNo, a.Item, s.TotalItem,
+       'stored item/sold/returned/qty/actual ' + CONCAT(s.TotalItem, '/', s.TotalItemSold, '/', s.TotalItemReturned, '/', s.TotalQtyDelivered, '/', s.TotalActualQty)
+       + ' vs lines ' + CONCAT(a.Item, '/', a.Sold, '/', a.Ret, '/', a.Qty, '/', a.Act)
+FROM dbo.DeliverySummary s
+CROSS APPLY (SELECT COUNT(*) AS Item,
+                    ISNULL(SUM(CASE WHEN ISNULL(d.isReturned, 0) = 0 THEN 1 ELSE 0 END), 0) AS Sold,
+                    ISNULL(SUM(CASE WHEN ISNULL(d.isReturned, 0) = 1 THEN 1 ELSE 0 END), 0) AS Ret,
+                    CAST(ISNULL(SUM(d.QtyDelivered), 0) AS DECIMAL(18,3)) AS Qty,
+                    CAST(ISNULL(SUM(CASE WHEN ISNULL(d.isReturned, 0) = 0 THEN ISNULL(d.ActualQty, 0) ELSE 0 END), 0) AS DECIMAL(18,3)) AS Act
+             FROM dbo.DeliveryDetails d
+             WHERE d.DeliveryNo = s.DeliveryNo AND d.PONumber = s.PONumber AND ISNULL(d.isCancelled, 0) = 0) a
+WHERE s.PONumber IS NOT NULL
+  AND EXISTS (SELECT 1 FROM dbo.PurchaseOrderSummary p WHERE p.PONumber = s.PONumber)
+  AND NOT EXISTS (SELECT 1 FROM dbo.TransferOrderSummary t WHERE t.PONumber = s.PONumber)
+  AND (   ISNULL(s.TotalItem, -1) <> a.Item OR ISNULL(s.TotalItemSold, -1) <> a.Sold OR ISNULL(s.TotalItemReturned, -1) <> a.Ret
+       OR s.TotalQtyDelivered <> a.Qty OR ISNULL(s.TotalActualQty, -1) <> a.Act);
+
 ------------------------------------------------------------------
 -- T. STS (transfers)
 ------------------------------------------------------------------
@@ -359,6 +404,40 @@ INNER JOIN dbo.PaymentHeader ph ON ph.ReferenceNo = cl.ReferenceNumber AND ph.St
 WHERE cl.Remarks = 'REVERSAL ENTRY'
   AND (cl.AccountKey <> ph.CustomerKey OR cl.TransCode NOT LIKE 'OR-%');
 
+-- G05 (2026-10-15, script [96]) a reversed Single Expense or Manual JV that is not fully undone: its original + reversal
+--     tickets don't net to 0 per branch / account, the expense still owes something or isn't CANCELLED, or a reversed JV
+--     still has a live bank recon item. All dates. Skipped where [96] isn't installed (dynamic SQL: the log tables are new).
+IF OBJECT_ID('dbo.ExpenseSingleReversal', 'U') IS NOT NULL AND OBJECT_ID('dbo.ManualJournalVoucherReversal', 'U') IS NOT NULL
+    EXEC (N'
+INSERT #X (CheckCode, PONumber, Ref, Expected, Actual, Detail)
+SELECT ''G05'', r.ReferenceNumber, ''expense '' + r.InvoiceNo + '' / '' + td.BranchCode + '' '' + td.AccountCode, 0, SUM(td.Debit) - SUM(td.Credit),
+       ''reversed expense: original ticket '' + r.OriginalTicketNumber + '' + reversal '' + r.ReversalTicketNumber + '' do not net to 0 on this account''
+FROM dbo.ExpenseSingleReversal r
+INNER JOIN dbo.TicketDetails td ON td.TicketNumber IN (r.OriginalTicketNumber, r.ReversalTicketNumber)
+                               AND td.ReferenceNumber = r.ReferenceNumber AND td.ReferenceKey = r.InvoiceNo
+GROUP BY r.ReferenceNumber, r.InvoiceNo, r.OriginalTicketNumber, r.ReversalTicketNumber, td.BranchCode, td.AccountCode
+HAVING ABS(SUM(td.Debit) - SUM(td.Credit)) > 0.005
+UNION ALL
+SELECT ''G05'', r.ReferenceNumber, ''expense '' + r.InvoiceNo, 0, ISNULL(es.Balance, 0),
+       ''reversed expense still '' + ISNULL(es.Status, ''(missing)'') + '' with balance '' + FORMAT(ISNULL(es.Balance, 0), ''N2'')
+FROM dbo.ExpenseSingleReversal r
+LEFT JOIN dbo.ExpenseSummary es ON es.ReferenceNumber = r.ReferenceNumber AND es.InvoiceNo = r.InvoiceNo AND es.SupplierID = r.SupplierID
+WHERE es.ReferenceNumber IS NULL OR ISNULL(es.Status, '''') <> ''CANCELLED'' OR ABS(ISNULL(es.Balance, 0)) > 0.005
+UNION ALL
+SELECT ''G05'', r.ReferenceNo, ''JV '' + td.BranchCode + '' '' + td.AccountCode, 0, SUM(td.Debit) - SUM(td.Credit),
+       ''reversed journal voucher: original + reversal ticket '' + r.ReversalTicketNumber + '' do not net to 0 on this account''
+FROM dbo.ManualJournalVoucherReversal r
+INNER JOIN dbo.TicketDetails td ON td.ReferenceNumber = r.ReferenceNo
+       AND (td.TicketNumber = r.ReversalTicketNumber OR td.TicketNumber IN (SELECT v.TicketNumber FROM dbo.ManualJournalVoucher v WHERE v.ReferenceNo = r.ReferenceNo))
+GROUP BY r.ReferenceNo, r.ReversalTicketNumber, td.BranchCode, td.AccountCode
+HAVING ABS(SUM(td.Debit) - SUM(td.Credit)) > 0.005
+UNION ALL
+SELECT ''G05'', r.ReferenceNo, ''recon item '' + CAST(b.ReconID AS VARCHAR(20)), 0, b.Amount,
+       ''reversed journal voucher still has a live '' + b.ItemType + '' item on '' + b.AccountCode
+FROM dbo.ManualJournalVoucherReversal r
+INNER JOIN dbo.BankStatementRecon b ON b.ReferenceNo = r.ReferenceNo AND b.SourceModule = ''MANUAL-JV'' AND b.SourceRef = r.ReferenceNo
+WHERE ISNULL(b.ResolvedReason, '''') <> ''REVERSED'' AND ISNULL(b.ResolvedReason, '''') NOT LIKE ''VOIDED%'';');
+
 -- G02 VAT posting after the all-VAT-exempt rule
 INSERT #X (CheckCode, PONumber, Ref, Expected, Actual, Detail)
 SELECT 'G02', ISNULL(NULLIF(tm.ReferenceKey, ''), tm.ReferenceNumber), CAST(tm.TicketNumber AS VARCHAR(20)) + ' / ' + tm.BranchCode,
@@ -384,6 +463,9 @@ INSERT @Info VALUES
 ('S04', 'Sales',  'HIGH',     'Cost of sales on the sales ticket differs from the invoice COGS rows.', 'Check the line cost at Save and any later re-costing.'),
 ('S05', 'Sales',  'MEDIUM',   'Order and delivery header disagree on DELIVERED.', 'Check whether confirm or a manual edit stopped half-way.'),
 ('S06', 'Sales',  'HIGH',     'Invoice no. with several rows: a row''s paid amount differs from its own payment lines.', 'A payment / reversal moved another row of the same invoice no.; correct the row (see script [80]) and check the screen showed the real invoice.'),
+('S07', 'Sales',  'HIGH',     'A customer''s account balance differs from the sum of its invoice balances.', 'Find the invoice row edited by hand or the payment posted outside sp_AddPaymentClient ([87] refuses a hand-set balance, 92016); correct the row and let the ledger trigger recompute the account.'),
+('S08', 'Sales',  'HIGH',     'An invoice row''s Balance does not follow its own columns (all rows, all dates).', 'Correct the row (AmountPaid / EWT / Discount / Offset / Balance) from its payment lines; until then sp_AddPaymentClient refuses a payment on it (92016, since [87]).'),
+('S09', 'Sales',  'MEDIUM',   'A sales-order delivery''s counters (items / sold / returned / qty / actual qty) differ from its lines.', 'Since [89] the triggers keep them in step: check trg_DeliveryDetails_SOTotals / trg_DeliverySummary_SOTotals are enabled; a one-row UPDATE of any counter on the delivery puts it back.'),
 ('T01', 'STS',    'CRITICAL', 'Saved transfer: head-office In Transit differs from the cost of the stock actually shipped.', 'Run spu_STS_SyncInTransit for the PO after fixing the cause (duplicate Save, missed return).'),
 ('T02', 'STS',    'CRITICAL', 'Received transfer: In Transit did not clear to 0.', 'Look for a missing receipt, short/over ticket or a receipt on the wrong PO.'),
 ('T03', 'STS',    'CRITICAL', 'Transfer received more than once (two IT-BR tickets).', 'Reverse the duplicate receipt and its branch stock.'),
@@ -393,7 +475,8 @@ INSERT @Info VALUES
 ('G01', 'GL',     'CRITICAL', 'A Sales / STS ticket does not balance (DR <> CR).', 'Check the mnemonic''s mapping rows.'),
 ('G02', 'GL',     'HIGH',     'A VAT ticket was posted after the all-VAT-exempt rule.', 'Something is still on an old procedure version or a manual entry.'),
 ('G03', 'GL',     'CRITICAL', 'A GL ticket of any module does not balance (DR <> CR), all dates.', 'The compound writers refuse this since [83]; find the writer or the hand edit behind the ticket and correct it with a balancing entry.'),
-('G04', 'GL',     'CRITICAL', 'An AR payment reversal mirrored another document under the same reference (a second master on the reversal ticket, or a reversal ledger row on another customer).', 'Reverse the extra ticket lines / ledger row with a correcting entry; sp_ReversePaymentClient mirrors only the payment''s own ticket since [85].');
+('G04', 'GL',     'CRITICAL', 'An AR payment reversal mirrored another document under the same reference (a second master on the reversal ticket, or a reversal ledger row on another customer).', 'Reverse the extra ticket lines / ledger row with a correcting entry; sp_ReversePaymentClient mirrors only the payment''s own ticket since [85].'),
+('G05', 'GL',     'CRITICAL', 'A reversed Single Expense / Manual JV ([96]) is not fully undone: original + reversal don''t net to 0 on an account, the expense still owes or isn''t CANCELLED, or the JV keeps a live bank recon item.', 'Compare the two tickets line by line and the expense / recon rows with spu_ReverseSingleExpense / spu_ReverseManualJournalVoucher; correct with a balancing entry, never by deleting the reversal.');
 
 SELECT i.CheckCode, i.Area, i.Severity, COUNT(x.CheckCode) AS Found, i.Meaning, i.Action
 FROM @Info i

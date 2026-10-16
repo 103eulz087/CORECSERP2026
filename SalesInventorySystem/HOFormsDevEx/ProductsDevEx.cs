@@ -185,43 +185,59 @@ namespace SalesInventorySystem.HOFormsDevEx
                     }
                     else
                     {
-                        string mark = txtprodcatobject.ToString();
-                        //string mark = getProductCategoryCode();
-                        string prodcode = txtprodcode.Text;
-                        Database.ExecuteQuery("INSERT INTO dbo.Products VALUES('888'" +
-                            ",'" + txtprodcode.Text + "'" +
-                            ",'" + txtdesc.Text + "'" +
-                            ",'" + txtlongdesc.Text + "'" +
-                            ",'" + txtlandingcost.Text + "'" +
-                            ",'" + txtsellingprice.Text + "'" +
-                            //",'" + getProductCategoryCode() + "'" +
-                            ",'" + mark + "'" +
-                            //",'0'" +
-                            //",'0'" +
-                            ",'" + txtprice1.Text + "'" +
-                            ",'" + txtprice2.Text + "'" +
-                            ",'" + txtprice3.Text + "'" +
-                            ",'" + txtprice4.Text + "'" +
-                            //",'" + txtprice5.Text + "'" +
-                            ",'" + smainprice + "'" +
-                            ",'" + sprice1 + "'" +
-                            ",'" + sprice2 + "'" +
-                            ",'" + sprice3 + "'" +
-                            ",'" + sprice4 + "'" +
-                            ",'" + sdiscountitem + "'" +
-                            ",'" + ishavbarcode + "'" +
-                            ",'" + barcode + "'" +
-                            ",'" + txtreorderlevel.Text + "'" +
-                            ",'" + isvat + "'" +
-                            ",'3')");
+                        // 2026-10-15 (user, SQL [94]): the product goes to EVERY branch. It used to insert the 888 row only and
+                        // rely on the trigger trg_insProduct to copy it, which is disabled (so new products stayed in 888).
+                        // spu_AddProductAllBranches adds it to every branch and writes the HistoryLogs row in one transaction.
+                        if (txtprodcatobject == null || !int.TryParse(txtprodcatobject.ToString(), out int prodCategory))
+                        {
+                            XtraMessageBox.Show("Please pick the Product Category.");
+                            return;
+                        }
+                        decimal landing, selling, p1 = 0, p2 = 0, p3 = 0, p4 = 0;
+                        double reorder;
+                        if (!decimal.TryParse(txtlandingcost.Text, out landing) || !decimal.TryParse(txtsellingprice.Text, out selling)
+                            || !double.TryParse(txtreorderlevel.Text, out reorder)
+                            || (txtprice1.Text.Trim() != "" && !decimal.TryParse(txtprice1.Text, out p1))
+                            || (txtprice2.Text.Trim() != "" && !decimal.TryParse(txtprice2.Text, out p2))
+                            || (txtprice3.Text.Trim() != "" && !decimal.TryParse(txtprice3.Text, out p3))
+                            || (txtprice4.Text.Trim() != "" && !decimal.TryParse(txtprice4.Text, out p4)))
+                        {
+                            XtraMessageBox.Show("Landing Cost, Selling Price, Price 1-4 and Re-Order Level must be numbers.");
+                            return;
+                        }
 
-                        string caption = "Add New Product with Description name of "+txtdesc.Text+" and Product Code="+txtprodcode.Text+" ";
-                        Database.ExecuteQuery("INSERT INTO dbo.HistoryLogs VALUES('"+Login.isglobalUserID+"'" +
-                            ",'"+DateTime.Now.ToString()+"'" +
-                            ",'"+ caption + "' " +
-                            ",'888')");
+                        int branchesAdded;
+                        using (SqlConnection con = Database.getConnection())
+                        using (SqlCommand com = new SqlCommand("dbo.spu_AddProductAllBranches", con) { CommandType = CommandType.StoredProcedure })
+                        {
+                            com.Parameters.Add("@ProductCode", SqlDbType.VarChar, 50).Value = txtprodcode.Text.Trim();
+                            com.Parameters.Add("@Description", SqlDbType.VarChar, 100).Value = txtdesc.Text;
+                            com.Parameters.Add("@LongDescription", SqlDbType.VarChar, 300).Value = txtlongdesc.Text;
+                            com.Parameters.Add("@LandingCost", SqlDbType.Money).Value = landing;
+                            com.Parameters.Add("@SellingPrice", SqlDbType.Money).Value = selling;
+                            com.Parameters.Add("@ProductCategoryCode", SqlDbType.Int).Value = prodCategory;
+                            com.Parameters.Add("@Price1", SqlDbType.Money).Value = p1;
+                            com.Parameters.Add("@Price2", SqlDbType.Money).Value = p2;
+                            com.Parameters.Add("@Price3", SqlDbType.Money).Value = p3;
+                            com.Parameters.Add("@Price4", SqlDbType.Money).Value = p4;
+                            com.Parameters.Add("@isRegular", SqlDbType.Bit).Value = smainprice == "1";
+                            com.Parameters.Add("@isPrice1", SqlDbType.Bit).Value = sprice1 == "1";
+                            com.Parameters.Add("@isPrice2", SqlDbType.Bit).Value = sprice2 == "1";
+                            com.Parameters.Add("@isPrice3", SqlDbType.Bit).Value = sprice3 == "1";
+                            com.Parameters.Add("@isPrice4", SqlDbType.Bit).Value = sprice4 == "1";
+                            com.Parameters.Add("@isDiscount", SqlDbType.Bit).Value = sdiscountitem == "1";
+                            com.Parameters.Add("@haveBarcode", SqlDbType.Bit).Value = ishavbarcode == "1";
+                            com.Parameters.Add("@Barcode", SqlDbType.VarChar, 150).Value = barcode;
+                            com.Parameters.Add("@ReOrderLevel", SqlDbType.Float).Value = reorder;
+                            com.Parameters.Add("@isVat", SqlDbType.Bit).Value = isvat == "1";
+                            com.Parameters.Add("@ProdType", SqlDbType.TinyInt).Value = 3;   // what the screen always saved
+                            com.Parameters.Add("@UserID", SqlDbType.VarChar, 50).Value = (object)Login.isglobalUserID ?? DBNull.Value;
+                            con.Open();
+                            object r = com.ExecuteScalar();
+                            branchesAdded = r == null || r == DBNull.Value ? 0 : Convert.ToInt32(r);
+                        }
 
-                        XtraMessageBox.Show("Successfully Added!");
+                        XtraMessageBox.Show("Successfully Added to " + branchesAdded + " branches!");
                         display(comboBox2.Text);
                         HelperFunction.ClearAllText(this);
                         //HelperFunction.DisableTextFields(this);

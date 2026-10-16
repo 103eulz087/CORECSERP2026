@@ -1,0 +1,89 @@
+--- enzo/sp_ReUploadToXero.sql	2026-10-15 23:07:09.883598100 +0800
++++ prod/sp_ReUploadToXero.sql	2026-10-15 23:07:14.864058500 +0800
+@@ -28,7 +28,7 @@
+         a.BranchCode, 
+         a.MachineUsed,
+         DATEADD(day, 1, a.DateOrder) -- Pre-calculate tomorrow's date for range joins
+-    FROM CORECSERP_001.dbo.POSSalesSummary a WITH(NOLOCK)
++    FROM CORECS2026.dbo.POSSalesSummary a WITH(NOLOCK)
+     WHERE a.DateOrder BETWEEN @StartDate AND @EndDate
+       AND a.BranchCode NOT IN ('888','000')
+       AND NOT EXISTS (
+@@ -81,7 +81,7 @@
+             s.TotalSCDiscount, s.TotalPWDDiscount, s.TotalRegDiscount, s.TotalVatSales,
+             s.VatExemptSale, s.VatableSale, s.VatInput, s.ZeroRatedSale, s.VatAdjustment,
+             s.DateExecute, s.ExecuteBy, s.TotalNetSales, 0
+-        FROM CORECSERP_001.dbo.POSZReadingTransactions s WITH(NOLOCK)
++        FROM CORECS2026.dbo.POSZReadingTransactions s WITH(NOLOCK)
+         JOIN #BranchNotUploaded u
+           ON s.DateExecute >= u.DateOrder AND s.DateExecute < u.NextDay
+          AND s.BranchCode = u.BranchCode
+@@ -108,7 +108,7 @@
+             s.DiscountAmount, s.VatAdjustment, s.DiscName, s.DiscIDNo, s.DiscRemarks,
+             s.Cashier, s.MachineUsed, s.DateExecute, s.isErrorCorrect, s.VatExemptAdj,
+             s.DiscountPercentage, s.VatableSalesDiscAmount, s.VatDiscAmount, s.VatExDiscAmount
+-        FROM CORECSERP_001.dbo.SalesDiscount s WITH(NOLOCK)
++        FROM CORECS2026.dbo.SalesDiscount s WITH(NOLOCK)
+         JOIN #BranchNotUploaded u
+           ON s.DateExecute >= u.DateOrder AND s.DateExecute < u.NextDay
+          AND s.BranchCode = u.BranchCode
+@@ -117,50 +117,6 @@
+         ------------------------------------------------------------
+         -- 3. SYNC POSSalesSummary
+         ------------------------------------------------------------
+-       -- CHECK IF UPDATE IS NEEDED BEFORE EXECUTING
+-		IF EXISTS (
+-			SELECT 1
+-			FROM [dbo].POSSalesSummary aa
+-			INNER JOIN (
+-				SELECT a.ProductCode,
+-					   a.Description,
+-					   b.Description AS Category,
+-					   a.isVat
+-				FROM [dbo].Products a
+-				INNER JOIN [dbo].ProductCategory b
+-					ON a.ProductCategoryCode = b.ProductCategoryID
+-				WHERE a.BranchCode = '888' 
+-				
+-			) bb
+-			ON aa.ProductCode = bb.ProductCode COLLATE SQL_Latin1_General_CP1_CI_AS
+-			WHERE  aa.DateOrder BETWEEN @StartDate AND @EndDate
+-				AND ISNULL(aa.Category, '') COLLATE SQL_Latin1_General_CP1_CI_AS
+-				<> ISNULL(bb.Category, '') COLLATE SQL_Latin1_General_CP1_CI_AS
+-		)
+-		BEGIN
+-			-- Records exist - proceed with update
+-			WITH proddesccat AS (
+-						SELECT a.ProductCode,
+-							   a.Description,
+-							   b.Description AS Category,
+-							   a.isVat
+-						FROM [dbo].Products a
+-						INNER JOIN [dbo].ProductCategory b
+-							ON a.ProductCategoryCode = b.ProductCategoryID
+-						WHERE a.BranchCode = '888'
+-			)
+-			UPDATE aa
+-				SET aa.Category = bb.Category,aa.isVat=bb.isVat
+-				FROM [dbo].POSSalesSummary aa
+-					INNER JOIN proddesccat bb
+-					ON aa.ProductCode = bb.ProductCode COLLATE SQL_Latin1_General_CP1_CI_AS
+-				WHERE aa.DateOrder BETWEEN @StartDate AND @EndDate
+-					AND ISNULL(aa.Category, '') COLLATE SQL_Latin1_General_CP1_CI_AS
+-					<> ISNULL(bb.Category, '') COLLATE SQL_Latin1_General_CP1_CI_AS;
+-		END
+-
+-
+-
+         DELETE t
+         FROM ITCOREPOSENZO.dbo.POSSalesSummary t
+         JOIN #BranchNotUploaded u
+@@ -177,7 +133,7 @@
+             s.BranchCode, s.ProductCode, s.Description, s.Category, s.ProcessedBy,
+             s.QtySold, s.Subtotal, s.TotalAmount, s.Status, s.isVat, s.DateOrder,
+             0, s.MachineUsed, s.Cost
+-        FROM CORECSERP_001.dbo.POSSalesSummary s WITH(NOLOCK)
++        FROM CORECS2026.dbo.POSSalesSummary s WITH(NOLOCK)
+         JOIN #BranchNotUploaded u
+           ON s.DateOrder = u.DateOrder
+          AND s.BranchCode = u.BranchCode

@@ -1,0 +1,50 @@
+--- enzo/sp_SalesQtyToInventoryQtySTS.sql	2026-10-15 23:07:08.288032200 +0800
++++ prod_jfc/sp_SalesQtyToInventoryQtySTS_JFC.sql	2026-10-15 23:14:28.337668100 +0800
+@@ -1,8 +1,9 @@
+ 
+-CREATE PROCEDURE [dbo].[sp_SalesQtyToInventoryQtySTS]  
++CREATE PROCEDURE [dbo].[sp_SalesQtyToInventoryQtySTS_JFC]  
+ 	@parmSeqNo bigint OUTPUT, 
+ 	@parmorigin char(3),
+ 	@parmBranch char(3),
++	@parmshipmentno varchar(10),
+ 	@parmProduct char(5),
+ 	@parmRunningQtySold decimal(18,3),
+ 	@parmsellingprice decimal(18,2),   
+@@ -42,8 +43,9 @@
+ 				FROM Inventory WITH (UPDLOCK, ROWLOCK) 
+ 				WHERE ISNULL(Available, Quantity) > 0 
+ 				  AND Branch = @parmorigin 
++				  AND ShipmentNo = @parmshipmentno
+ 				  AND Product = @parmProduct 
+-				  AND IsWarehouse = 1
++				  --AND IsWarehouse = 1
+ 				ORDER BY SequenceNumber ASC 
+ 			)
+ 			UPDATE OldestInventoryBatch 
+@@ -52,8 +54,8 @@
+ 				@iAvailable = IIF(@RunningQtySold >= ISNULL(Available, Quantity), 0, ISNULL(Available, Quantity) - @RunningQtySold),
+ 				@iCost = ISNULL(Cost, 0),
+ 				@ProductDescription = Description,
+-				Available = IIF(@RunningQtySold >= ISNULL(Available, Quantity), 0, ISNULL(Available, Quantity) - @RunningQtySold),
+-				ReferenceCode = 'stsfifo';
++				Available = IIF(@RunningQtySold >= ISNULL(Available, Quantity), 0, ISNULL(Available, Quantity) - @RunningQtySold)
++				--ReferenceCode = 'stsfifo';
+ 
+ 			-- If the CTE couldn't find any more inventory, break the loop!
+ 			IF (@iSeqNo IS NULL) 
+@@ -69,12 +71,12 @@
+ 			INSERT INTO InventoryDeliveryFIFO (
+ 				DeliveryNo, PONumber, BranchCode, ProductNo, Description, 
+ 				QtyDelivered, Cost, TotalCost, DateProcessed, DevDetSeqNo, 
+-				SequenceReferenceNumber, isVat, isErrorCorrect 
++					SequenceReferenceNumber, isVat, isErrorCorrect, SellingPrice, TotalAmount
+ 			)
+ 			VALUES (
+ 				@parmdevno, @parmpono, @parmBranch, @parmProduct, @ProductDescription, 
+ 				@QtyDeducted, @iCost, (@QtyDeducted * @iCost), GETDATE(),@parmdevdetseqno,
+-				@iSeqNo, 0, 0
++					@iSeqNo, ISNULL((SELECT TOP 1 CAST(p.isVat AS INT) FROM dbo.Products p WHERE p.ProductCode = @parmProduct AND p.BranchCode = @parmorigin), 0) /* 2026-10-01: was 0 */, 0, ISNULL(@parmsellingprice,0), (@QtyDeducted*ISNULL(@parmsellingprice,0))
+ 			);
+ 
+ 			INSERT INTO InventoryLedger (

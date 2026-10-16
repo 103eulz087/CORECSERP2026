@@ -1,0 +1,46 @@
+--- enzo/sp_AddBranchOrderBatch.sql	2026-10-15 23:07:09.574057500 +0800
++++ prod/sp_AddBranchOrderBatch.sql	2026-10-15 23:07:14.488836100 +0800
+@@ -9,29 +9,6 @@
+ AS
+ BEGIN
+     SET NOCOUNT ON;
+-
+-    DECLARE @SkippedItems TABLE (
+-        ProductCode VARCHAR(10),
+-        ProductName VARCHAR(100),
+-        SeqNo       DECIMAL(3,0),
+-        Reason      VARCHAR(400)
+-    );
+-
+-    -- ── NEW: refuse the whole batch (reported per-row, not a hard THROW --
+-    --    matches this proc's own per-row skip/report design) if the request
+-    --    was never approved. ──
+-    DECLARE @transferStatus VARCHAR(30);
+-    SELECT @transferStatus = Status FROM TransferOrderSummary WHERE PONumber = @PONumber;
+-    IF @transferStatus IS NULL OR @transferStatus <> 'APPROVED'
+-    BEGIN
+-        INSERT INTO @SkippedItems (ProductCode, ProductName, SeqNo, Reason)
+-        SELECT ProductCode, ProductName, SeqNo, 'Transfer Order request is not APPROVED.'
+-        FROM @TransferItems;
+-
+-        SELECT ProductCode, ProductName, SeqNo, Reason FROM @SkippedItems;
+-        RETURN;
+-    END
+-
+     DECLARE @OriginCode VARCHAR(10);
+ 
+     SELECT @OriginCode = BranchCode FROM TransferOrderSummary WHERE PONumber = @PONumber;
+@@ -49,6 +26,13 @@
+     SELECT ProductCategoryCode, ProductCode, ProductName, Qty, SeqNo
+     FROM @TransferItems;
+ 
++    DECLARE @SkippedItems TABLE (
++        ProductCode VARCHAR(10),
++        ProductName VARCHAR(100),
++        SeqNo       DECIMAL(3,0),
++        Reason      VARCHAR(400)
++    );
++
+     DECLARE @i INT = 1, @max INT = (SELECT COUNT(*) FROM @Item);
+     WHILE @i <= @max
+     BEGIN

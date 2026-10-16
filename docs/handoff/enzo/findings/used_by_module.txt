@@ -1,0 +1,28 @@
+== POS / EOD sales deduction (23:45 job + HO)  [SAME 10, DIFFERENT TEXT 5, ENZO-ONLY 1]
+~sp_SalesQtyToInventoryQtyEODSalesInvDeduct(197050); =sp_SalesQtyToInventoryQtyEODSalesInvDeductPerMachine(22329); =func_B2getTotalVatExemptSales(10833); =sp_Analyze(7810); =func_B2getTotalSales(2839); =func_B2getTotalVatableSales(2829); Espman_apply_and_calculate(2530); ~sp_FiFoMappingSalesInvDeduct(690); ~sp_ReplicateSales(555); =sp_AnalyzePerMachine(264); =sp_resetSales(222); =spjob_DeductBranchInventory(143); =spjob_DeductLateUploadCleaner(143); ~sp_FiFoMappingSalesInvDeductForJobs(79); ~sp_FiFoMappingSalesInvDeductPerMachine(67); =view_SalesUploadButNotDeducted2()
+== Sales order (HRI) / confirm / credit memo / return  [DIFFERENT TEXT 11, ENZO-ONLY 1, SAME 2]
+~func_checkLapseInvoice(3726); EInsertClientLedger(2111); ~sp_ConfirmOrder(2102); ~sp_SalesQtyToInventoryQtyHRI(1645 -> sp_SalesQtyToInventoryQtyHRI_JFC); ~sp_FiFoMappingHRI(1645 -> sp_FiFoMappingHRI_JFC); ~sp_AddBranchOrderHRI(952 -> sp_AddBranchOrderHRI_JFC); ~spview_SalesInvoice(747 -> spview_SalesInvoiceJFC); =sp_AddSalesOrderRequest(621); ~sp_ConfirmBranchOrder(587); =spitcr_addCust(70 -> spitcr_addCustV2); ~sp_ReturnSalesOrder(36); ~sp_TrgInsertClientInfo(14); ~sp_CreditMemo(1); ~view_DeliveryReciept()
+== Other / shared (triggers, users, products)  [SAME 9, DIFFERENT TEXT 1]
+=func_getUsername(4325); =func_getMachineName(2639); =func_ConvertDateTimeToChar(243); =sp_UpdateProducts(141); =trg_insProduct(35); =trg_AddMenuAccess(5); ~trg_AutoAddProducts(0); =InsertInventoryLedger(0); =InsertCashWalletLedger(0); =log_deletes(0)
+== Numbering  [SAME 18]
+=func_GenerateBarcodeConversion(240851); =func_GenerateBarcode(43513 -> func_GenerateBarcodeSTSJFC); =sp_GetConversionNumber(25994); =sp_GetReferenceNumber(15372); =func_GeneratePrimalCutBarcode(11440); =func_GenerateBarcodeSTS(11018 -> func_GenerateBarcodeSTSJFC); =sp_GetDeliveryNumber(9993); =sp_GetPurchaseOrderNumber(6853); =func_GenerateBarcodeReturnTransfer(5746); =GetReferenceNumber(3194); =sp_GetTransNumber(2293); =sp_GetInventoryINNumber(1582); =sp_GetShipmentNo(1081); =func_GenerateBarcodeReInventoryIN(842); =sp_GetTransferInventoryNumber(819); =sp_GetInventoryBatchCode(194); =GetTicketNumber(45); =sp_GetStockOutBarcodeNumber(40)
+== PO (supplier) & receiving inventory  [SAME 7, ENZO-ONLY 1, DIFFERENT TEXT 7]
+~sp_AddTempInventory(35386); =sp_InsertTempInventoryPrimal(11367); =func_getTotalAmountOfPendingPO(1068); ~SP_ADDPOSUM(1005); =sp_BulkInsertPODetails(1001 -> sp_BulkInsertPODetails_JFC); =spu_InventoryCostUpdate(953); ~SP_POSTINVENTORY(565); =sp_BatchPrimalCutProcess(162); ~spu_UpdatePrimalCutCosting(47); ~sp_InvCostAdjustment(21); =sp_GetBatchCodesForShipment(4); ~sp_addSupplier(3); ~sp_TrgInsertSupplierInfo(1); =spout_APAccounts(1); EInsertSupplierLedger(0)
+== STS receive (branch)  [DIFFERENT TEXT 2]
+~sp_AddBranchInventoryBatch(1056); ~sp_ConfirmBranchRecievedOrder(640 -> sp_ConfirmBranchRecievedOrderJFC)
+== STS (request / approve / process / save / reverse)  [DIFFERENT TEXT 7, SAME 7]
+=sp_StageBarcodeForTransfer(27624); ~sp_FiFoMappingSTS(12897 -> sp_FiFoMappingSTS_JFC); ~sp_SalesQtyToInventoryQtySTS(12897 -> sp_SalesQtyToInventoryQtySTS_JFC); =sp_AddBranchOrderByBarcode(8897); ~sp_AddBranchOrder(6725 -> sp_AddBranchOrderHRI_JFC,sp_AddBranchOrder_JFC); =sp_StagePalletForTransfer(2423); =sp_ApproveTransferOrder(1131); ~sp_ConfirmBranchOrderSTS(1057); =sp_CommitTransferBatch(939); =sp_CommitTransferPallet(826); ~sp_AddBranchOrderBatch(386); ~sp_ReverseSTSInventoryTransfer(93); ~sp_CancelDeliveryByBarcode(67); =sp_CancelDelivery(53 -> sp_CancelDeliveryFIFOJFC)
+== Branch transfer inventory  [SAME 5, DIFFERENT TEXT 2, ENZO-ONLY 1]
+=sp_SalesQtyToInventoryQtyTransferInventory(5076); =sp_FiFoMappingTransferInventory(5076); =sp_AddBranchTransferInventory(5076); =sp_ConfirmBranchTransferInventory(556); ~sp_AddBranchTransferInventoryBatch(320); ~sp_ConfirmBranchReceivedTransferInventory(305); =sp_CancelTranferInventoryItems(233); Esp_ConfirmBranchReceivedTransferInventoryTest(1)
+== Backup  [SAME 1]
+=sp_Backup(715)
+== Inventory in / re-inventory  [ENZO-ONLY 1, DIFFERENT TEXT 3, SAME 1]
+~sp_StageBarcodeForReInventoryIN(2969); ~sp_StageManualEntryForReInventoryIN(814); =sp_CommitReInventoryINManualEntry(106); ~sp_CommitReInventoryIN(36); Esp_BranchInventoryINProcess(31)
+== Reports & monitors  [SAME 10, ENZO-ONLY 1, DIFFERENT TEXT 4]
+=sp_GetTopPendingDeliveries(155503); =splive_GetDailySTSMonitor(155497); =sp_GetDailyDeliveryMonitor(155494); ~spr_POSReports(30065); =spr_STS(14226); ~spr_POSReports2(14193); ~spr_STSSummary(955); =sp_GenerateInventoryDailyReport(871); =sp_CaptureDailyInventorySnapshot(143); ~spr_SalesDetailsComparativeAB(22); =spr_POSSalesReportSummary2(13); =spr_comparativeNetReport2(12); =spr_SalesReportSummary2(5); =sp_GenerateInventoryMonthlyRangeReport(4); Esp_GenerateInventoryMonthlyReport(2)
+== Conversion  [SAME 4, DIFFERENT TEXT 1]
+=sp_ConversionFIFO(52298); =sp_SubmitConversionRaw(22793 -> sp_SubmitConversionRaw_JFC); =sp_ConfirmConversion(22203); ~sp_ConversionProcess(14707 -> sp_ConversionProcess_JFC); =sp_ReturnConvertedItems(671)
+== Stock out  [SAME 1, DIFFERENT TEXT 4]
+~sp_GetInventoryForStockOutDropdown(39); ~sp_GetStockOutFIFOBreakdown(34); ~spu_PostStockOutBarcode(20); =sp_GetInventoryByBarcodeForStockOut(8); ~sp_GetStockOutFIFOBreakdownByShipment(1)
+== Xero upload (23:45 job)  [DIFFERENT TEXT 3]
+~sp_ReUploadToXeroZRead(140); ~spjob_UploadSalesToXero(92); ~sp_ReUploadToXero(92)

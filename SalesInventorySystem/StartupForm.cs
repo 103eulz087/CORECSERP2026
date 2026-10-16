@@ -27,9 +27,9 @@ namespace SalesInventorySystem
 
             try
             {
-                SplashScreenManager.ShowForm(typeof(WaitForm1));
-                SplashScreenManager.Default.SetWaitFormCaption("Starting...");
-                SplashScreenManager.Default.SetWaitFormDescription("Loading config...");
+                // 2026-10-15: the "please wait" window shown since Program.Main (Classes.StartupSplash) carries the
+                // status now; it was the DevExpress WaitForm1 here, which only appeared after the slow part.
+                Classes.StartupSplash.SetStatus("Loading config...");
 
                 await Task.Run(() =>
                 {
@@ -37,21 +37,19 @@ namespace SalesInventorySystem
                     GlobalConfig.Load(filepath);
                 });
 
-                SplashScreenManager.Default.SetWaitFormDescription("Opening login...");
+                Classes.StartupSplash.SetStatus("Opening login...");
 
                 var login = new Login();
 
                 // switch main form safely via wrapper method
                 _app.SwitchMainForm(login);
 
-                SplashScreenManager.CloseForm();
-
                 login.Show();
                 Close();
             }
             catch (Exception ex)
             {
-                try { SplashScreenManager.CloseForm(); } catch { }
+                Classes.StartupSplash.Close();
                 XtraMessageBox.Show(ex.ToString(), "Startup error");
                 Application.Exit();
             }

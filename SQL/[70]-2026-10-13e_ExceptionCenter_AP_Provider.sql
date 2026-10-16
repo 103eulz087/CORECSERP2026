@@ -270,7 +270,7 @@ SELECT 'AP-STATUS-VS-BALANCE', 'EXPENSE ' + LTRIM(RTRIM(es.ReferenceNumber)), NU
             WHEN es.InvoiceNo LIKE '%REVERSAL%' THEN 'A hand-made "-REVERSAL" invoice with nothing to pay: reverse the original expense in the system instead.'
             ELSE 'Balance 0 but not FULLYPAID.' END
 FROM dbo.ExpenseSummary es
-WHERE es.Balance IS NOT NULL
+WHERE es.Balance IS NOT NULL AND (ISNULL(es.Status, '') <> 'CANCELLED' OR ABS(es.Balance) >= 0.005)   -- [96] a reversed expense owes 0 by design
   AND ((es.Status = 'FULLYPAID' AND ABS(es.Balance) >= 0.005) OR es.Balance < -0.005
        -- balance 0 but not FULLYPAID: only when there was a payable (a ledger credit); an expense that liquidates an
        -- advance (e.g. a broker's) never creates one and stays POSTED at 0 by design

@@ -176,6 +176,18 @@ namespace SalesInventorySystem.HOFormsDevEx
         {
             InitializeComponent();
         }
+
+        // 2026-10-14: one-report mode. The Accounting Board hosts this form with only GL Detail Transaction
+        // (staff trace what they just posted without leaving the board). The report list holds that one
+        // report and can't be changed; everything else (parameters, Generate, ticket drill-down, exports)
+        // is the same code as the full Accounting Reports screen.
+        public const string GLDetailTransactionReport = "GL Detail Transaction";
+        private readonly string _onlyReport;
+
+        public AccountingReportsFormV2(string onlyReport) : this()
+        {
+            _onlyReport = onlyReport;
+        }
         private bool _dataLoaded = false;
         private ContextMenuStrip _reportContextMenu;
         // True while gridControlReport is showing an All-Branches pivot result --
@@ -199,8 +211,11 @@ namespace SalesInventorySystem.HOFormsDevEx
 
             cboReportType.Properties.Items.Clear();
             foreach (var key in _reportConfigs.Keys)
-                cboReportType.Properties.Items.Add(key);
+                if (string.IsNullOrEmpty(_onlyReport) || key == _onlyReport)
+                    cboReportType.Properties.Items.Add(key);
             cboReportType.SelectedIndex = 0;
+            if (!string.IsNullOrEmpty(_onlyReport))
+                cboReportType.Properties.ReadOnly = true;   // one-report mode: nothing else to pick
             ApplyParamModeForSelection();
             SetupReportContextMenu();
 
@@ -320,9 +335,22 @@ namespace SalesInventorySystem.HOFormsDevEx
 
                 gridControl.DataSource = lines;
 
-                gridView.PopulateColumns();
-                FormatGridColumns(gridView);
-                gridView.BestFitColumns();
+                // 2026-10-14 (user): Debit / Credit showed unformatted. The grid creates no columns while the popup
+                // isn't shown yet (PopulateColumns / FormatGridColumns found nothing to format here), so the columns
+                // are built and formatted once the popup is on screen: N2, right-aligned, footer totals.
+                popup.Shown += (s, e) =>
+                {
+                    gridView.PopulateColumns();
+                    FormatGridColumns(gridView);
+                    foreach (string name in new[] { "Debit", "Credit" })
+                    {
+                        var col = gridView.Columns[name];
+                        if (col == null) continue;
+                        col.Summary.Clear();
+                        col.Summary.Add(DevExpress.Data.SummaryItemType.Sum, name, "{0:N2}");
+                    }
+                    gridView.BestFitColumns();
+                };
 
                 var btnClose = new SimpleButton
                 {
@@ -375,13 +403,18 @@ namespace SalesInventorySystem.HOFormsDevEx
             lblAccountCode.Visible = showAccount;
             txtAccountCode.Visible = showAccount;
 
-            lblAsOfDate.Visible = showAsOf || (showConsolidated && rgConsolidatedMode.EditValue?.ToString() == "TB");
-            dteAsOfDate.Visible = lblAsOfDate.Visible;
+            // 2026-10-14: from local flags, not by reading lblAsOfDate.Visible / lblDateFrom.Visible back. The
+            // Visible getter is false while the form isn't shown yet (the Accounting Board loads this screen
+            // before showing it), which hid the date boxes there.
+            bool asOfVisible = showAsOf || (showConsolidated && rgConsolidatedMode.EditValue?.ToString() == "TB");
+            lblAsOfDate.Visible = asOfVisible;
+            dteAsOfDate.Visible = asOfVisible;
 
-            lblDateFrom.Visible = showDateRange || (showConsolidated && rgConsolidatedMode.EditValue?.ToString() == "IS");
-            dteDateFrom.Visible = lblDateFrom.Visible;
-            lblDateTo.Visible = lblDateFrom.Visible;
-            dteDateTo.Visible = lblDateFrom.Visible;
+            bool dateRangeVisible = showDateRange || (showConsolidated && rgConsolidatedMode.EditValue?.ToString() == "IS");
+            lblDateFrom.Visible = dateRangeVisible;
+            dteDateFrom.Visible = dateRangeVisible;
+            lblDateTo.Visible = dateRangeVisible;
+            dteDateTo.Visible = dateRangeVisible;
 
             chkAllBranches.Visible = showAllBranch;
             if (!showAllBranch) chkAllBranches.Checked = false;
@@ -776,6 +809,8 @@ namespace SalesInventorySystem.HOFormsDevEx
                     col.DisplayFormat.FormatString = "N2";
                     col.AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
                     col.AppearanceCell.Options.UseTextOptions = true;
+                    col.AppearanceHeader.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;   // CLAUDE.md: figures and their headers right-aligned
+                    col.AppearanceHeader.Options.UseTextOptions = true;
 
                     if (fn.Contains("debit"))
                     {

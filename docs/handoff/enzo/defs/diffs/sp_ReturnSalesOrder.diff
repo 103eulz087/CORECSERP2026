@@ -1,0 +1,668 @@
+--- enzo/sp_ReturnSalesOrder.sql	2026-10-15 23:07:08.804035500 +0800
++++ prod/sp_ReturnSalesOrder.sql	2026-10-15 23:07:13.526874700 +0800
+@@ -1,27 +1,5 @@
+ 
+--- =============================================
+--- Author:      Eulz Avancena (original); rewritten 2026-08-10
+--- Description: Handles item-level Sales Order returns from the "For Delivery"
+---              tab's Return Order screen (Orders/ReturnSalesOrder.cs). Supports
+---              staged/partial returns -- a user can return some items now and
+---              the rest later in a separate call (return-all-or-by-item via
+---              checkboxes, per the screen's design).
+---
+--- CHANGELOG FROM sp_ReturnSalesOrder (legacy, now sp_ReturnSalesOrder_OLD_08102026):
+---   [BUG] Step 4 (inventory refund) recomputed which DeliveryDetails lines to
+---   refund from "ALL rows where isReturned=1 for this PONumber" -- a set that
+---   only grows across calls. On a SECOND (or later) staged return for the same
+---   PO, that re-included every PREVIOUSLY returned line too, so their FIFO
+---   layers got flagged/refunded AGAIN and Inventory.Available was inflated by
+---   an extra copy of each earlier return's quantity, every time. A single
+---   full return didn't show it, since there was nothing already returned to
+---   double up on the first time around, but any staged return sequence
+---   corrupted stock counts silently.
+---   FIX: Step 4 now scopes strictly to #NewReturns (this call's lines only),
+---   matching the same "isErrorCorrect=0" double-refund guard already used by
+---   sp_CancelDelivery for the equivalent STS scenario.
+--- =============================================
+-CREATE PROCEDURE [dbo].[sp_ReturnSalesOrder]
++CREATE PROCEDURE dbo.sp_ReturnSalesOrder
+     @parmbranchcode   char(3),
+     @parmpono         varchar(10),
+     @parmdevno        varchar(10),
+@@ -29,385 +7,282 @@
+     @parmreturnstatus varchar(30),
+     @parmreason       varchar(930),
+     @parmmachinename  varchar(50),
+-    @Lines            dbo.tt_ReturnSalesOrderLines READONLY
++    @Lines            dbo.tt_ReturnSalesOrderLines READONLY,
++    @ReturnQty        dbo.tt_ReturnSalesOrderQty READONLY     -- 2026-10-04: optional; omitted = whole lines
+ AS
++/*
++    Returns delivery lines. Only SeqNo / ProductNo (and, from @Lines, the
++    ActualQty the screen saw) are taken from the caller; every other quantity
++    and price is re-read from DeliveryDetails.
++      Partial (2026-10-04): a @ReturnQty row below the line's ActualQty splits the
++        line first (spu_SO_SplitDeliveryLine) and returns the split-off twin.
++        FIFO lines only; barcode-scanned lines are refused (59114).
++      Stock: ActualQty (the billed qty) goes back to the lots the line used,
++        newest consumed lot first, one InventoryLedger row per lot.
++      Before confirm: no GL (nothing was billed); confirm skips returned lines.
++      After confirm: sales lines cancelled 1:1, sales header recomputed, AR
++        invoice lines tagged, then spu_SO_PostInvoiceReduction 'RET' for
++        THIS return only (sales / AR, cost back to inventory, excess to
++        customer credit). Return cost: whole line = ROUND(ActualQty * line Cost, 2)
++        as before; partial = the cost of the lots put back.
++      SalesReturnLog: one row per returned line.
++    Caller: Orders/ReturnSalesOrder.cs.
++*/
+ BEGIN
+-    SET XACT_ABORT OFF;
+-    -- XACT_ABORT OFF (not ON) -- sp_PostCompoundTicketSales is called inside
+-    -- this transaction for the DELIVERED path; rollback is managed explicitly
+-    -- in CATCH (same rationale documented in sp_ConfirmOrder / sp_CreditMemo
+-    -- for nested-SP calls).
+     SET NOCOUNT ON;
+-
++    SET XACT_ABORT ON;
+     BEGIN TRY
+         BEGIN TRANSACTION;
++        EXEC dbo.sp_SOOrder_Lock @PONumber = @parmpono;   -- 2026-10-02c: the per-order lock every Sales Order writer shares
+ 
+         IF NOT EXISTS (SELECT 1 FROM @Lines)
+             THROW 59101, 'No lines submitted for this Sales Return.', 1;
+ 
+-        ---------------------------------------------------------------------------
+-        -- 1. GET INVOICE / CUSTOMER INFO
+-        ---------------------------------------------------------------------------
+-        DECLARE @invoiceno VARCHAR(20), @effectivitydate DATE, @custkey CHAR(8), @custname VARCHAR(100);
+-
+-        SELECT @invoiceno = InvoiceNo,
+-               @effectivitydate = EffectivityDate
+-        FROM DeliverySummary WITH(NOLOCK)
+-        WHERE PONumber = @parmpono;
+-
+-        SELECT @custkey = Customer FROM PurchaseOrderSummary WITH(NOLOCK) WHERE PONumber = @parmpono;
+-        SELECT @custname = CustomerName FROM Customers WITH(NOLOCK) WHERE CustomerKey = @custkey;
+-
+-        ---------------------------------------------------------------------------
+-        -- 1b. INSERT NEW RETURN LINES (TVP-driven, idempotent -- see CHANGELOG [1])
+-        ---------------------------------------------------------------------------
+-        -- Only DeliveryDetails rows not already returned are accepted -- a
+-        -- resubmitted/duplicate row is silently skipped rather than
+-        -- double-inserted (this is what makes a re-run of this SP safe).
+-        SELECT l.SeqNo, @parmpono AS PONumber, l.ProductNo, l.ProductName, l.BarcodeNo,
+-               l.QtyDelivered, l.Cost, l.SellingPrice, l.ActualQty, l.Variance, l.isVat,
+-               @parmuser AS ProcessedBy, CAST(GETDATE() AS date) AS DateProcessed
++        DECLARE @invoiceno VARCHAR(50), @effectivitydate DATE, @custkey CHAR(8), @custname VARCHAR(150), @branch VARCHAR(5);
++        SELECT @invoiceno = InvoiceNo, @effectivitydate = EffectivityDate FROM dbo.DeliverySummary WHERE PONumber = @parmpono AND DeliveryNo = @parmdevno;
++        SELECT @custkey = Customer, @branch = BranchCode FROM dbo.PurchaseOrderSummary WHERE PONumber = @parmpono;
++        SELECT @custname = CustomerName FROM dbo.Customers WHERE CustomerKey = @custkey;
++
++        DECLARE @confirmed BIT = CASE WHEN EXISTS (SELECT 1 FROM dbo.TransactionChargeSales
++                                                   WHERE CustomerKey = @custkey AND ReferenceNo = @parmpono AND InvoiceNo = @invoiceno)
++                                      THEN 1 ELSE 0 END;
++        IF (@confirmed = 1 AND ISNULL(@parmreturnstatus, '') <> 'DELIVERED') OR (@confirmed = 0 AND ISNULL(@parmreturnstatus, '') = 'DELIVERED')
++            THROW 59103, 'The screen status does not match the order: refresh the list and open the return from the right tab.', 1;
++
++        -- ---- 2026-10-04: quantities from the screen (new exe only) ----
++        CREATE TABLE #Req (SeqNo DECIMAL(10,0) NOT NULL PRIMARY KEY, ProductNo VARCHAR(20) NOT NULL, ReturnQty DECIMAL(10,3) NOT NULL,
++                           ExpectedQty DECIMAL(10,3) NOT NULL, LineQty DECIMAL(10,3) NULL, IsPartial BIT NOT NULL DEFAULT 0,
++                           ReturnSeqNo DECIMAL(10,0) NULL, RetGross DECIMAL(18,2) NULL, RetCost DECIMAL(18,2) NULL);
++
++        IF EXISTS (SELECT 1 FROM @ReturnQty q WHERE NOT EXISTS (SELECT 1 FROM @Lines l WHERE l.SeqNo = q.SeqNo AND l.ProductNo = q.ProductNo))
++            THROW 59104, 'A return quantity was sent for a line that is not ticked. Nothing was returned.', 1;
++
++        INSERT INTO #Req (SeqNo, ProductNo, ReturnQty, ExpectedQty, LineQty)
++        SELECT q.SeqNo, q.ProductNo, q.ReturnQty, l.ActualQty, ISNULL(dd.ActualQty, dd.QtyDelivered)
++        FROM @ReturnQty AS q
++        INNER JOIN @Lines AS l ON l.SeqNo = q.SeqNo AND l.ProductNo = q.ProductNo
++        LEFT JOIN dbo.DeliveryDetails AS dd WITH (UPDLOCK)
++               ON dd.PONumber = @parmpono AND dd.DeliveryNo = @parmdevno AND dd.SeqNo = q.SeqNo AND dd.ProductNo = q.ProductNo
++              AND ISNULL(dd.isReturned, 0) = 0 AND ISNULL(dd.isCancelled, 0) = 0;
++
++        IF EXISTS (SELECT 1 FROM #Req WHERE LineQty IS NULL)
++            THROW 59108, 'A ticked line is no longer open (already returned or cancelled). Close the screen and open the return again.', 1;
++
++        IF EXISTS (SELECT 1 FROM #Req WHERE ReturnQty <= 0)
++            THROW 59105, 'Return quantity must be more than 0. Untick a line you are not returning.', 1;
++
++        IF EXISTS (SELECT 1 FROM #Req WHERE LineQty IS NOT NULL AND LineQty <> ExpectedQty)
++            THROW 59107, 'A line changed since the screen was opened (credit memo or another return). Close the screen and open the return again.', 1;
++
++        IF EXISTS (SELECT 1 FROM #Req WHERE LineQty IS NOT NULL AND ReturnQty > LineQty)
++            THROW 59106, 'Return quantity can''t be more than the line''s billed quantity (Actual Qty).', 1;
++
++        UPDATE #Req SET IsPartial = 1 WHERE LineQty IS NOT NULL AND ReturnQty < LineQty;
++
++        DECLARE @sSeq DECIMAL(10,0), @sQty DECIMAL(10,3), @sExp DECIMAL(10,3), @sNew DECIMAL(10,0), @sGross DECIMAL(18,2), @sCost DECIMAL(18,2);
++        SELECT @sSeq = MIN(SeqNo) FROM #Req WHERE IsPartial = 1;
++        WHILE @sSeq IS NOT NULL
++        BEGIN
++            SELECT @sQty = ReturnQty, @sExp = ExpectedQty FROM #Req WHERE SeqNo = @sSeq;
++            SELECT @sNew = NULL, @sGross = NULL, @sCost = NULL;
++            EXEC dbo.spu_SO_SplitDeliveryLine
++                @PONumber = @parmpono, @DeliveryNo = @parmdevno, @SeqNo = @sSeq, @SplitQty = @sQty, @ExpectedQty = @sExp,
++                @AfterConfirm = @confirmed, @InvoiceNo = @invoiceno, @SalesBranch = @branch, @User = @parmuser,
++                @NewSeqNo = @sNew OUTPUT, @RetGross = @sGross OUTPUT, @RetCost = @sCost OUTPUT;
++            UPDATE #Req SET ReturnSeqNo = @sNew, RetGross = @sGross, RetCost = @sCost WHERE SeqNo = @sSeq;
++            SELECT @sSeq = MIN(SeqNo) FROM #Req WHERE IsPartial = 1 AND SeqNo > @sSeq;
++        END;
++
++        -- the lines returned whole: ticked lines that were not split + every split-off twin
++        SELECT dd.DeliveryNo, dd.SeqNo, dd.PONumber, dd.ProductNo, dd.ProductName, dd.BarcodeNo,
++               dd.QtyDelivered, ISNULL(dd.Cost, 0) AS Cost, ISNULL(dd.SellingPrice, 0) AS SellingPrice,
++               ISNULL(dd.ActualQty, dd.QtyDelivered) AS ActualQty, dd.Variance, ISNULL(dd.isVat, 0) AS isVat,
++               CAST(CASE WHEN p.SeqNo IS NOT NULL THEN 1 ELSE 0 END AS BIT) AS IsPartial,
++               ISNULL(p.SeqNo, dd.SeqNo) AS SourceSeqNo,
++               ISNULL(p.LineQty, ISNULL(dd.ActualQty, dd.QtyDelivered)) AS QtyBefore
+         INTO #NewReturns
+-        FROM @Lines l
+-        JOIN DeliveryDetails dd
+-          ON dd.PONumber = @parmpono
+-         AND dd.SeqNo = l.SeqNo
+-         AND dd.ProductNo = l.ProductNo
+-         AND ISNULL(dd.BarcodeNo,'') = ISNULL(l.BarcodeNo,'')
+-        WHERE ISNULL(dd.isReturned,0) = 0
+-             AND ISNULL(dd.isCancelled,0) = 0;;
++        FROM dbo.DeliveryDetails dd WITH (UPDLOCK)
++        LEFT JOIN #Req AS p ON p.IsPartial = 1 AND p.ReturnSeqNo = dd.SeqNo
++        WHERE dd.PONumber = @parmpono AND dd.DeliveryNo = @parmdevno
++          AND ISNULL(dd.isReturned, 0) = 0 AND ISNULL(dd.isCancelled, 0) = 0
++          AND (p.SeqNo IS NOT NULL
++               OR (EXISTS (SELECT 1 FROM @Lines l WHERE l.SeqNo = dd.SeqNo AND l.ProductNo = dd.ProductNo)
++                   AND NOT EXISTS (SELECT 1 FROM #Req s WHERE s.IsPartial = 1 AND s.SeqNo = dd.SeqNo)));
+ 
+         IF NOT EXISTS (SELECT 1 FROM #NewReturns)
+-            THROW 59102, 'No new lines to return for this PO (already returned).', 1;
++            THROW 59102, 'No new lines to return for this PO (already returned or cancelled).', 1;
+ 
+-        INSERT INTO ReturnedOrderDetails
++        INSERT INTO dbo.ReturnedOrderDetails
+             (SeqNo, PONumber, ProductNo, ProductName, BarcodeNo, QtyDelivered,
+              Cost, SellingPrice, ActualQty, Variance, isVat, ProcessedBy, DateProcessed)
+         SELECT SeqNo, PONumber, ProductNo, ProductName, BarcodeNo, QtyDelivered,
+-               Cost, SellingPrice, ActualQty, Variance, isVat, ProcessedBy, DateProcessed
++               Cost, SellingPrice, ActualQty, Variance, isVat, @parmuser, CAST(GETDATE() AS DATE)
+         FROM #NewReturns;
+ 
+-        ---------------------------------------------------------------------------
+-        -- 2. UPSERT RETURNED ORDER SUMMARY (Optimized single-pass scan)
+-        ---------------------------------------------------------------------------
+-        DECLARE @Ret_TotalItem INT = 0,
+-                @Ret_TotalQty DECIMAL(18,2) = 0,
+-                @Ret_TotalAmt DECIMAL(18,2) = 0;
+-
+-        SELECT @Ret_TotalItem = COUNT(*),
+-               @Ret_TotalQty = ISNULL(SUM(QtyDelivered), 0),
+-               @Ret_TotalAmt = ISNULL(SUM(QtyDelivered * SellingPrice), 0)
+-        FROM ReturnedOrderDetails WITH(NOLOCK)
+-        WHERE PONumber = @parmpono;
+-     
+-        IF NOT EXISTS (SELECT 1 FROM ReturnedOrderSummary WITH(UPDLOCK) WHERE PONumber = @parmpono)
+-        BEGIN
+-            INSERT INTO ReturnedOrderSummary (PONumber, InvoiceNo, BranchCode, TotalItem, TotalQtyDelivered, TotalAmount, EffectivityDate, DateAdded, PreparedBy, ReturnType, Reason)
+-            VALUES (@parmpono, @invoiceno, @parmbranchcode, @Ret_TotalItem, @Ret_TotalQty, @Ret_TotalAmt, @effectivitydate, GETDATE(), @parmuser, ' ', @parmreason);
+-        END
++        DECLARE @RetItems INT, @RetQty DECIMAL(18,3), @RetAmt DECIMAL(18,2);
++        SELECT @RetItems = COUNT(*), @RetQty = ISNULL(SUM(ActualQty), 0), @RetAmt = ISNULL(SUM(ROUND(ActualQty * SellingPrice, 2)), 0)
++        FROM dbo.ReturnedOrderDetails WHERE PONumber = @parmpono;
++        IF NOT EXISTS (SELECT 1 FROM dbo.ReturnedOrderSummary WITH (UPDLOCK) WHERE PONumber = @parmpono)
++            INSERT INTO dbo.ReturnedOrderSummary (PONumber, InvoiceNo, BranchCode, TotalItem, TotalQtyDelivered, TotalAmount, EffectivityDate, DateAdded, PreparedBy, ReturnType, Reason)
++            VALUES (@parmpono, @invoiceno, @parmbranchcode, @RetItems, @RetQty, @RetAmt, @effectivitydate, GETDATE(), @parmuser, ' ', @parmreason);
+         ELSE
+-        BEGIN
+-            UPDATE ReturnedOrderSummary
+-            SET TotalItem = @Ret_TotalItem,
+-                TotalQtyDelivered = @Ret_TotalQty,
+-                TotalAmount = @Ret_TotalAmt
+-            WHERE PONumber = @parmpono;
+-        END
++            UPDATE dbo.ReturnedOrderSummary SET TotalItem = @RetItems, TotalQtyDelivered = @RetQty, TotalAmount = @RetAmt WHERE PONumber = @parmpono;
+ 
+-        ---------------------------------------------------------------------------
+-        -- 3. UPDATE DELIVERY DETAILS & SUMMARY
+-        ---------------------------------------------------------------------------
+-        UPDATE a
+-        SET a.isReturned = 1
+-        FROM DeliveryDetails a
+-        INNER JOIN ReturnedOrderDetails b
+-            ON a.PONumber = b.PONumber
+-            AND a.ProductNo = b.ProductNo
+-            AND a.BarcodeNo = b.BarcodeNo
+-            AND a.SeqNo = b.SeqNo
+-        WHERE a.PONumber = @parmpono;
+-
+-        -- Optimized single-pass scan for Delivery Summary
+-        DECLARE @Del_TotalItem INT = 0,
+-                @Del_TotalQty DECIMAL(18,2) = 0,
+-                @Del_TotalActual DECIMAL(18,2) = 0;
+-
+-        SELECT @Del_TotalItem = ISNULL(COUNT(*), 0),
+-               @Del_TotalQty = ISNULL(SUM(QtyDelivered), 0),
+-               @Del_TotalActual = ISNULL(SUM(ActualQty), 0)
+-        FROM DeliveryDetails WITH(NOLOCK)
+-        WHERE PONumber = @parmpono AND isReturned = 0 and isCancelled=0;
+-
+-
+-         UPDATE DeliverySummary
+-            SET TotalItem = (SELECT ISNULL(COUNT(*),0) FROM DeliveryDetails WHERE PONumber=@parmpono),
+-                TotalQtyDelivered = (SELECT ISNULL(SUM(QtyDelivered),0) FROM DeliveryDetails WHERE PONumber=@parmpono and isCancelled=0),
+-                TotalActualQty = (SELECT ISNULL(SUM(ActualQty),0) FROM DeliveryDetails WHERE PONumber=@parmpono and isCancelled=0 and isReturned=0),
+-                TotalItemSold = (SELECT ISNULL(COUNT(*),0) FROM DeliveryDetails WHERE PONumber=@parmpono and isCancelled=0 and isReturned=0),
+-                TotalItemReturned = (SELECT ISNULL(COUNT(*),0) FROM DeliveryDetails WHERE PONumber=@parmpono and isReturned=1),
+-                Status = CASE WHEN @Del_TotalItem = 0
+-                        THEN 'RETURNED'
+-                     ELSE Status
+-                     END
++        UPDATE dd SET dd.isReturned = 1, dd.DateTimeUpdated = GETDATE()
++        FROM dbo.DeliveryDetails dd
++        INNER JOIN #NewReturns r ON r.DeliveryNo = dd.DeliveryNo AND r.PONumber = dd.PONumber AND r.SeqNo = dd.SeqNo;
++
++        DECLARE @Live INT = (SELECT COUNT(*) FROM dbo.DeliveryDetails WHERE PONumber = @parmpono AND isReturned = 0 AND isCancelled = 0);
++        UPDATE dbo.DeliverySummary
++        SET TotalItem = (SELECT ISNULL(COUNT(*),0) FROM dbo.DeliveryDetails WHERE PONumber = @parmpono),
++            TotalQtyDelivered = (SELECT ISNULL(SUM(QtyDelivered),0) FROM dbo.DeliveryDetails WHERE PONumber = @parmpono AND isCancelled = 0),
++            TotalActualQty = (SELECT ISNULL(SUM(ActualQty),0) FROM dbo.DeliveryDetails WHERE PONumber = @parmpono AND isCancelled = 0 AND isReturned = 0),
++            TotalItemSold = (SELECT ISNULL(COUNT(*),0) FROM dbo.DeliveryDetails WHERE PONumber = @parmpono AND isCancelled = 0 AND isReturned = 0),
++            TotalItemReturned = (SELECT ISNULL(COUNT(*),0) FROM dbo.DeliveryDetails WHERE PONumber = @parmpono AND isReturned = 1),
++            Status = CASE WHEN @Live = 0 THEN 'RETURNED' ELSE Status END
+             WHERE DeliveryNo = @parmdevno AND PONumber = @parmpono;
+ 
+-        --UPDATE DeliverySummary
+-        --SET TotalItemSold = @Del_TotalItem,
+-        --    TotalItemReturned = @Ret_TotalItem,
+-        --    TotalQtyDelivered = @Del_TotalQty,
+-        --    TotalActualQty = @Del_TotalActual,
+-        --    Status = CASE WHEN @Del_TotalItem = 0
+-        --                THEN 'RETURNED'
+-        --             ELSE Status
+-        --             END
+-        --WHERE PONumber = @parmpono;
+-
+-        ---------------------------------------------------------------------------
+-        -- 4. UPDATE INVENTORY FIFO & MASTER INVENTORY
+-        --
+-        -- Scoped strictly to #NewReturns (THIS call's lines) -- not "every
+-        -- DeliveryDetails row that's isReturned=1 for this PO", which would
+-        -- re-include lines already refunded by an earlier staged return call
+-        -- and double-refund them. isErrorCorrect=0 guard mirrors the same
+-        -- fix already applied to sp_CancelDelivery for STS returns.
+-        ---------------------------------------------------------------------------
+-        UPDATE fifo
+-        SET fifo.isErrorCorrect = 1
+-        FROM InventoryDeliveryFIFO fifo
+-        INNER JOIN #NewReturns nr
+-            ON fifo.PONumber = nr.PONumber
+-           AND fifo.DevDetSeqNo = nr.SeqNo
+-        WHERE fifo.isErrorCorrect = 0;
+-
+-        UPDATE inv
+-        SET inv.IsStock = 1,
+-            inv.Available = inv.Available + refund.QtyRefund
+-        FROM Inventory inv
+-        INNER JOIN (
+-            SELECT fifo.SequenceReferenceNumber, SUM(fifo.QtyDelivered) AS QtyRefund
+-            FROM InventoryDeliveryFIFO fifo
+-            INNER JOIN #NewReturns nr
+-                ON fifo.PONumber = nr.PONumber
+-               AND fifo.DevDetSeqNo = nr.SeqNo
+-            GROUP BY fifo.SequenceReferenceNumber
+-        ) refund ON inv.SequenceNumber = refund.SequenceReferenceNumber;
+-
+-        ---------------------------------------------------------------------------
+-        -- 5. UPDATE BATCH SALES DETAILS
+-        ---------------------------------------------------------------------------
+-        UPDATE BatchSalesDetails
+-        SET isCancelled = 1
+-        WHERE ReferenceNo = @parmpono
+-          AND BranchCode = @parmbranchcode
+-          AND Barcode IN (SELECT BarcodeNo FROM ReturnedOrderDetails WHERE PONumber = @parmpono);
+-
+-        ---------------------------------------------------------------------------
+-        -- 6. UPDATE BATCH SALES SUMMARY (The 12-Subquery Fix)
+-        ---------------------------------------------------------------------------
+-        DECLARE @userid VARCHAR(20), @cashiertransno INT, @cashiertransdate CHAR(8);
+-        SELECT @userid = UserID FROM Users WITH(NOLOCK) WHERE FullName = @parmuser;
+-        SET @cashiertransdate = dbo.func_ConvertDateTimeToChar('DATE', GETDATE());
+-
+-        SELECT @cashiertransno = CashierTransNo
+-        FROM SalesTransactionSummary WITH(NOLOCK)
+-        WHERE BranchCode = @parmbranchcode
+-          AND MachineUsed = @parmmachinename
+-          AND UserID = @userid
+-          AND TransactionDate = @cashiertransdate;
+-
+-        -- Pre-calculate all 12 metrics in ONE highly efficient table scan
+-        DECLARE @B_ItemRet INT = 0, @B_Item INT = 0, @B_ItemSold INT = 0, @B_VatItems INT = 0;
+-        DECLARE @B_RetAmt DECIMAL(18,2)=0, @B_Tax DECIMAL(18,2)=0, @B_Kilos DECIMAL(18,2)=0;
+-        DECLARE @B_SubTotal DECIMAL(18,2)=0, @B_Amt DECIMAL(18,2)=0, @B_VatSale DECIMAL(18,2)=0;
+-        DECLARE @B_VatExempt DECIMAL(18,2)=0, @B_Vatable DECIMAL(18,2)=0;
+-
+-        SELECT
+-            @B_ItemRet = SUM(CASE WHEN isCancelled=1 AND isVoid=0 THEN 1 ELSE 0 END),
+-            @B_Item = SUM(CASE WHEN isCancelled=0 AND isVoid=0 THEN 1 ELSE 0 END),
+-            @B_ItemSold = SUM(CASE WHEN isCancelled=0 AND isVoid=0 THEN 1 ELSE 0 END),
+-            @B_VatItems = SUM(CASE WHEN isVat=1 AND isCancelled=0 AND isVoid=0 THEN 1 ELSE 0 END),
+-            @B_RetAmt = SUM(CASE WHEN isCancelled=1 AND isVoid=0 THEN TotalAmount ELSE 0 END),
+-            @B_Tax = SUM(CASE WHEN isCancelled=0 AND isVoid=0 THEN TaxTotal ELSE 0 END),
+-            @B_Kilos = SUM(CASE WHEN isCancelled=0 AND isVoid=0 THEN QtySold ELSE 0 END),
+-            @B_SubTotal = SUM(CASE WHEN isCancelled=0 AND isVoid=0 THEN SubTotal ELSE 0 END),
+-            @B_Amt = SUM(CASE WHEN isCancelled=0 AND isVoid=0 THEN TotalAmount ELSE 0 END),
+-            @B_VatSale = SUM(CASE WHEN isCancelled=0 AND isVoid=0 THEN TaxTotal ELSE 0 END),
+-            @B_VatExempt = SUM(CASE WHEN isVat=0 AND isCancelled=0 AND isVoid=0 THEN TotalAmount ELSE 0 END),
+-            @B_Vatable = SUM(CASE WHEN isVat=1 AND isCancelled=0 AND isVoid=0 THEN SubTotal ELSE 0 END)
+-        FROM BatchSalesDetails WITH(NOLOCK)
+-        WHERE ReferenceNo = @parmpono AND BranchCode = @parmbranchcode;
+-
+-        -- Now apply all 12 variables instantly!
+-        UPDATE BatchSalesSummary
+-        SET TotalItemReturned = ISNULL(@B_ItemRet,0),
+-            TotalItem = ISNULL(@B_Item,0),
+-            TotalItemSold = ISNULL(@B_ItemSold,0),
+-            TotalVatableItems = ISNULL(@B_VatItems,0),
+-            TotalReturnedAmount = ISNULL(@B_RetAmt,0),
+-            TotalTax = ISNULL(@B_Tax,0),
+-            TotalKilos = ISNULL(@B_Kilos,0),
+-            SubTotal = ISNULL(@B_SubTotal,0),
+-            TotalAmount = ISNULL(@B_Amt,0),
+-            TotalVATSale = ISNULL(@B_VatSale,0),
+-            TotalVATExemptSale = ISNULL(@B_VatExempt,0),
+-            TotalVatableSale = ISNULL(@B_Vatable,0)
+-        WHERE ReferenceNo = @parmpono AND BranchCode = @parmbranchcode AND CashierTransNo = @cashiertransno;
+-
+-        ---------------------------------------------------------------------------
+-        -- 7. UPDATE TRANSACTION CHARGE SALES + POST REVERSAL TICKETS (If Delivered)
+-        ---------------------------------------------------------------------------
+-        --IF @parmreturnstatus = 'DELIVERED'
+-        --BEGIN
+-        --    UPDATE TransactionChargeSalesDetails
+-        --    SET ErrorTag = 1
+-        --    WHERE ReferenceNo = @parmpono AND BranchCode = @parmbranchcode
+-        --      AND SKU IN (SELECT BarcodeNo FROM ReturnedOrderDetails WHERE PONumber = @parmpono);
+-
+-        --    -- Single-pass calculation
+-        --    DECLARE @Charge_Total DECIMAL(18,2) = 0;
+-        --    SELECT @Charge_Total = ISNULL(TotalAmount,0)
+-        --    FROM ReturnedOrderSummary WITH(NOLOCK)
+-        --    WHERE PONumber = @parmpono AND BranchCode = @parmbranchcode;
+-
+-        --    UPDATE TransactionChargeSales
+-        --    SET TotalAmount = TotalAmount-@Charge_Total,
+-        --        Balance = TotalAmount-@Charge_Total,
+-        --        PayStatus = 'UNPAID'
+-        --    WHERE ReferenceNo = @parmpono AND BranchCode = @parmbranchcode;
+-
+-        --    -- ── Reversal GL tickets (this run's #NewReturns only -- see CHANGELOG [2]/[3]) ─
+-        --    DECLARE
+-        --        @totalgrossvat    MONEY, @totalgrossvatex MONEY,
+-        --        @totalnetvat      MONEY, @totalvatoutput   MONEY,
+-        --        @totalcostvat     MONEY, @totalcostvatex   MONEY,
+-        --        @Particulars      VARCHAR(6999),
+-        --        @ticketnumvat     VARCHAR(10) = ' ',
+-        --        @ticketnumvatex   VARCHAR(10) = ' ';
+-
+-        --    SELECT
+-        --        @totalgrossvat   = SUM(CASE WHEN isVat=1 THEN ISNULL(QtyDelivered*SellingPrice,0) ELSE 0 END),
+-        --        @totalgrossvatex = SUM(CASE WHEN isVat=0 THEN ISNULL(QtyDelivered*SellingPrice,0) ELSE 0 END),
+-        --        @totalcostvat    = SUM(CASE WHEN isVat=1 THEN ISNULL(QtyDelivered*Cost,0) ELSE 0 END),
+-        --        @totalcostvatex  = SUM(CASE WHEN isVat=0 THEN ISNULL(QtyDelivered*Cost,0) ELSE 0 END)
+-        --    FROM #NewReturns;
+-
+-        --    SET @totalnetvat    = ISNULL(@totalgrossvat,0) / 1.12;
+-        --    SET @totalvatoutput = @totalnetvat * 0.12;
+-
+-        --    SET @Particulars =
+-        --        'SALES RETURN | Customer: ' + ISNULL(@custname,'')
+-        --        + ' | PO: ' + @parmpono
+-        --        + ' | Invoice: ' + ISNULL(@invoiceno,'');
+-
+-        --    IF ISNULL(@totalgrossvat,0) <> 0
+-        --    BEGIN
+-        --        DECLARE @AmtRetVat dbo.tt_AmountBreakdown;
+-        --        DECLARE @TokRetVat dbo.tt_TokenResolution;
+-        --        DECLARE @FlgRetVat dbo.tt_ConditionFlags;
+-
+-        --        INSERT @AmtRetVat VALUES
+-        --            ('GROSS', ROUND(@totalgrossvat,2)),
+-        --            ('NET',   ROUND(@totalnetvat,2)),
+-        --            ('VAT',   ROUND(@totalvatoutput,2)),
+-        --            ('VATEX', 0),
+-        --            ('COST',  ROUND(ISNULL(@totalcostvat,0),2));
+-
+-        --        INSERT @FlgRetVat VALUES ('HasVAT', 1), ('HasVATEX', 0);
+-
+-        --        EXEC [dbo].[sp_PostCompoundTicketSales]
+-        --            @Mnemonic        = 'CM-CLIENT-VAT',
+-        --            @TicketDate      = @effectivitydate,
+-        --            @BranchCode      = @parmbranchcode,
+-        --            @ReferenceNumber = @parmpono,
+-        --            @ReferenceKey    = @invoiceno,
+-        --            @Particulars     = @Particulars,
+-        --            @Owner           = @custname,
+-        --            @PreparedBy      = @parmuser,
+-        --            @Status          = 'POSTED',
+-        --            @Amounts         = @AmtRetVat,
+-        --            @Tokens          = @TokRetVat,
+-        --            @Flags           = @FlgRetVat,
+-        --            @LedgerType      = NULL;   -- ClientLedger written below (Credit side)
+-
+-        --        SELECT TOP 1 @ticketnumvat = TicketNumber
+-        --        FROM TicketMaster
+-        --        WHERE ReferenceNumber = @parmpono AND Mnemonic = 'CM-CLIENT-VAT'
+-        --        ORDER BY TRY_CAST(TicketNumber AS INT) DESC;
+-
+-        --        DECLARE @TRNRetVat DECIMAL(7,0);
+-        --        SELECT @TRNRetVat = ISNULL(MAX(TRN_SEQ_NO),0)+1 FROM ClientLedger WHERE AccountID = @custkey;
+-
+-        --        INSERT INTO ClientLedger
+-        --            (TRN_SEQ_NO, AccountKey, AccountID, PostingDate, InitiatingBranch,
+-        --             Description, TransCode, TransactionDate, ReferenceNumber, ReferenceKey,
+-        --             InvoiceNo, BeginningBalance, Debit, Credit, EndingBalance, ORNumber,
+-        --             TransactedBy, ApprovedBy, Remarks, TotalAmount, ErrorCorrectTag, TicketReference)
+-        --        VALUES
+-        --            (@TRNRetVat, @custkey, @custkey, @effectivitydate, @parmbranchcode,
+-        --             @Particulars, 'CM-CLIENT-VAT', @effectivitydate, @parmpono, @invoiceno,
+-        --             @invoiceno, 0, 0, ROUND(@totalgrossvat,2), 0, @invoiceno,
+-        --             @parmuser, '*', 'Sales Return', ROUND(@totalgrossvat,2), 0, @ticketnumvat);
+-
+-        --        UPDATE ReturnedOrderSummary SET TicketRefNoVAT = @ticketnumvat WHERE PONumber = @parmpono;
+-        --    END;
+-        --    IF ISNULL(@totalgrossvatex,0) <> 0
+-        --    BEGIN
+-        --        DECLARE @AmtRetVatEx dbo.tt_AmountBreakdown;
+-        --        DECLARE @TokRetVatEx dbo.tt_TokenResolution;
+-        --        DECLARE @FlgRetVatEx dbo.tt_ConditionFlags;
+-
+-        --        INSERT @AmtRetVatEx VALUES
+-        --            ('GROSS', ROUND(@totalgrossvatex,2)),
+-        --            ('COST',  ROUND(ISNULL(@totalcostvatex,0),2));
+-
+-        --        EXEC [dbo].[sp_PostCompoundTicketSales]
+-        --            @Mnemonic        = 'CM-CLIENT-VATEX',
+-        --            @TicketDate      = @effectivitydate,
+-        --            @BranchCode      = @parmbranchcode,
+-        --            @ReferenceNumber = @parmpono,
+-        --            @ReferenceKey    = @invoiceno,
+-        --            @Particulars     = @Particulars,
+-        --            @Owner           = @custname,
+-        --            @PreparedBy      = @parmuser,
+-        --            @Status          = 'POSTED',
+-        --            @Amounts         = @AmtRetVatEx,
+-        --            @Tokens          = @TokRetVatEx,
+-        --            @Flags           = @FlgRetVatEx,
+-        --            @LedgerType      = NULL;
+-
+-        --        SELECT TOP 1 @ticketnumvatex = TicketNumber
+-        --        FROM TicketMaster
+-        --        WHERE ReferenceNumber = @parmpono AND Mnemonic = 'CM-CLIENT-VATEX'
+-        --        ORDER BY TRY_CAST(TicketNumber AS INT) DESC;
+-
+-        --        DECLARE @TRNRetVatEx DECIMAL(7,0);
+-        --        SELECT @TRNRetVatEx = ISNULL(MAX(TRN_SEQ_NO),0)+1 FROM ClientLedger WHERE AccountID = @custkey;
+-
+-        --        INSERT INTO ClientLedger
+-        --            (TRN_SEQ_NO, AccountKey, AccountID, PostingDate, InitiatingBranch,
+-        --             Description, TransCode, TransactionDate, ReferenceNumber, ReferenceKey,
+-        --             InvoiceNo, BeginningBalance, Debit, Credit, EndingBalance, ORNumber,
+-        --             TransactedBy, ApprovedBy, Remarks, TotalAmount, ErrorCorrectTag, TicketReference)
+-        --        VALUES
+-        --            (@TRNRetVatEx, @custkey, @custkey, @effectivitydate, @parmbranchcode,
+-        --             @Particulars, 'CM-CLIENT-VATEX', @effectivitydate, @parmpono, @invoiceno,
+-        --             @invoiceno, 0, 0, ROUND(@totalgrossvatex,2), 0, @invoiceno,
+-        --             @parmuser, '*', 'Sales Return', ROUND(@totalgrossvatex,2), 0, @ticketnumvatex);
+-
+-        --        UPDATE ReturnedOrderSummary SET TicketRefNoVATEX = @ticketnumvatex WHERE PONumber = @parmpono;
+-        --    END;
+-        --END
++        -- stock: put ActualQty back, newest consumed lot first
++        ;WITH F AS (
++            SELECT f.SequenceNumber AS FifoSeq, f.SequenceReferenceNumber AS Lot, ISNULL(f.QtyDelivered, 0) AS Qty, ISNULL(f.Cost, 0) AS Cost,
++                   f.Description, r.ActualQty, r.ProductNo, r.SeqNo,
++                   SUM(ISNULL(f.QtyDelivered, 0)) OVER (PARTITION BY r.SeqNo ORDER BY f.SequenceNumber DESC ROWS UNBOUNDED PRECEDING) AS RunQty
++            FROM dbo.InventoryDeliveryFIFO f WITH (UPDLOCK, ROWLOCK)
++            INNER JOIN #NewReturns r ON r.DeliveryNo = f.DeliveryNo AND r.PONumber = f.PONumber AND r.SeqNo = f.DevDetSeqNo
++            WHERE f.isErrorCorrect = 0)
++        SELECT FifoSeq, Lot, Cost, Description, ProductNo, SeqNo,
++               CASE WHEN RunQty <= ActualQty THEN Qty
++                    WHEN RunQty - Qty < ActualQty THEN ActualQty - (RunQty - Qty)
++                    ELSE 0 END AS RestoreQty
++        INTO #Restore
++        FROM F;
++
++        INSERT INTO dbo.InventoryLedger
++            (SequenceRefNum, OriginBranch, DestinationBranch, DateProcessed, Product,
++             Description, BegQty, QtyIn, QtyOut, EndQty, Cost, Remarks, ProcessedBy)
++        SELECT x.Lot, @parmbranchcode, ISNULL(i.Branch, '888'), GETDATE(), x.ProductNo,
++               x.Description, ISNULL(i.Available, 0), x.RestoreQty, 0, ISNULL(i.Available, 0) + x.RestoreQty, x.Cost,
++               'SO RETURN PO#' + @parmpono, @parmuser
++        FROM (SELECT Lot, ProductNo, MAX(Cost) AS Cost, MAX(Description) AS Description, SUM(RestoreQty) AS RestoreQty
++              FROM #Restore GROUP BY Lot, ProductNo HAVING SUM(RestoreQty) > 0) x
++        LEFT JOIN dbo.Inventory i WITH (UPDLOCK, ROWLOCK) ON i.SequenceNumber = x.Lot;
++
++        UPDATE i SET i.Available = ISNULL(i.Available, 0) + x.RestoreQty, i.IsStock = 1
++        FROM dbo.Inventory i
++        INNER JOIN (SELECT Lot, SUM(RestoreQty) AS RestoreQty FROM #Restore GROUP BY Lot HAVING SUM(RestoreQty) > 0) x ON x.Lot = i.SequenceNumber;
++
++        UPDATE f SET f.isErrorCorrect = 1
++        FROM dbo.InventoryDeliveryFIFO f INNER JOIN #Restore x ON x.FifoSeq = f.SequenceNumber;
++
++        -- amount and cost per returned line: whole line as before; partial = what the split moved
++        -- (sales: the split-off sales row; cost: the lots put back)
++        SELECT n.SeqNo,
++               CAST(CASE WHEN n.IsPartial = 1 THEN ISNULL(p.RetGross, 0) ELSE ROUND(n.ActualQty * n.SellingPrice, 2) END AS DECIMAL(18,2)) AS RetGross,
++               CAST(CASE WHEN n.IsPartial = 1 THEN ISNULL(p.RetCost, 0)  ELSE ROUND(n.ActualQty * n.Cost, 2) END AS DECIMAL(18,2)) AS RetCost
++        INTO #RetCost
++        FROM #NewReturns AS n
++        LEFT JOIN #Req AS p ON p.IsPartial = 1 AND p.ReturnSeqNo = n.SeqNo;
+ 
+-        DROP TABLE IF EXISTS #NewReturns;
++        DECLARE @tkVat VARCHAR(20), @tkVatEx VARCHAR(20), @excess DECIMAL(18,2);
++
++        IF @confirmed = 1
++        BEGIN
++            -- sales lines of WHOLE-line returns: pair each returned delivery line with one live sales line of the same product + barcode
++            -- (BatchSalesDetails has no usable row key: SequenceNumber is not filled by sp_ConfirmOrder,
++            --  so the rows are numbered and updated through the CTE itself). Split twins already have their cancelled row.
++            CREATE TABLE #CanBSD (ProductCode CHAR(5), Barcode VARCHAR(50), QtySold DECIMAL(9,3));
++            ;WITH BS AS (SELECT b.isCancelled, b.ProductCode, ISNULL(b.Barcode, '') AS Barcode, b.QtySold,
++                               ROW_NUMBER() OVER (PARTITION BY b.ProductCode, ISNULL(b.Barcode, '') ORDER BY b.QtySold DESC, b.TotalAmount DESC) AS rn
++                        FROM dbo.BatchSalesDetails b
++                        WHERE b.ReferenceNo = @parmpono AND b.BranchCode = @branch AND ISNULL(b.isCancelled, 0) = 0),
++                  RS AS (SELECT r.ProductNo, ISNULL(r.BarcodeNo, '') AS Barcode,
++                               ROW_NUMBER() OVER (PARTITION BY r.ProductNo, ISNULL(r.BarcodeNo, '') ORDER BY r.SeqNo) AS rn
++                        FROM #NewReturns r
++                        WHERE r.IsPartial = 0)
++            UPDATE BS SET isCancelled = 1
++            OUTPUT inserted.ProductCode, inserted.Barcode, inserted.QtySold INTO #CanBSD (ProductCode, Barcode, QtySold)
++            FROM BS
++            INNER JOIN RS ON RS.ProductNo = BS.ProductCode AND RS.Barcode = BS.Barcode AND RS.rn = BS.rn;
++
++            UPDATE s SET
++                TotalItemReturned   = x.ItemRet,  TotalItem = x.Item,  TotalItemSold = x.Item,
++                TotalVatableItems   = x.VatItems, TotalReturnedAmount = x.RetAmt,
++                TotalTax = x.Tax, TotalKilos = x.Kilos, SubTotal = x.SubTotal, TotalAmount = x.Amt,
++                TotalVATSale = x.Tax, TotalVATExemptSale = x.VatExempt, TotalVatableSale = x.Vatable
++            FROM dbo.BatchSalesSummary s
++            CROSS APPLY (SELECT
++                SUM(CASE WHEN isCancelled = 1 AND isVoid = 0 THEN 1 ELSE 0 END) AS ItemRet,
++                SUM(CASE WHEN isCancelled = 0 AND isVoid = 0 THEN 1 ELSE 0 END) AS Item,
++                SUM(CASE WHEN isVat = 1 AND isCancelled = 0 AND isVoid = 0 THEN 1 ELSE 0 END) AS VatItems,
++                ISNULL(SUM(CASE WHEN isCancelled = 1 AND isVoid = 0 THEN TotalAmount END), 0) AS RetAmt,
++                ISNULL(SUM(CASE WHEN isCancelled = 0 AND isVoid = 0 THEN TaxTotal END), 0) AS Tax,
++                ISNULL(SUM(CASE WHEN isCancelled = 0 AND isVoid = 0 THEN QtySold END), 0) AS Kilos,
++                ISNULL(SUM(CASE WHEN isCancelled = 0 AND isVoid = 0 THEN SubTotal END), 0) AS SubTotal,
++                ISNULL(SUM(CASE WHEN isCancelled = 0 AND isVoid = 0 THEN TotalAmount END), 0) AS Amt,
++                ISNULL(SUM(CASE WHEN isVat = 0 AND isCancelled = 0 AND isVoid = 0 THEN TotalAmount END), 0) AS VatExempt,
++                ISNULL(SUM(CASE WHEN isVat = 1 AND isCancelled = 0 AND isVoid = 0 THEN SubTotal END), 0) AS Vatable
++                FROM dbo.BatchSalesDetails b WHERE b.ReferenceNo = s.ReferenceNo AND b.BranchCode = s.BranchCode) x
++            WHERE s.ReferenceNo = @parmpono AND s.BranchCode = @branch;
++
++            -- invoice detail rows of whole-line returns: one set (per TransCode) per cancelled sales row,
++            -- matched on product + barcode + qty (2026-10-04: was product + barcode only, which tagged a split twin's kept rows too).
++            -- A cancelled sales row with no invoice row of its qty (older / hand-edited data) keeps the old product + barcode match.
++            UPDATE d SET d.ErrorTag = 1
++            FROM dbo.TransactionChargeSalesDetails d
++            WHERE d.ReferenceNo = @parmpono AND d.InvoiceNo = @invoiceno AND ISNULL(d.ErrorTag, 0) = 0
++              AND EXISTS (SELECT 1 FROM #CanBSD c
++                          WHERE c.ProductCode = d.Product AND c.Barcode = ISNULL(d.SKU, '')
++                            AND NOT EXISTS (SELECT 1 FROM dbo.TransactionChargeSalesDetails q
++                                            WHERE q.ReferenceNo = @parmpono AND q.InvoiceNo = @invoiceno AND ISNULL(q.ErrorTag, 0) = 0
++                                              AND q.Product = c.ProductCode AND ISNULL(q.SKU, '') = c.Barcode AND q.Quantity = c.QtySold));
++
++            ;WITH C AS (SELECT ProductCode, Barcode, QtySold, COUNT(*) AS n FROM #CanBSD GROUP BY ProductCode, Barcode, QtySold),
++                  T AS (SELECT d.ErrorTag, d.Product, ISNULL(d.SKU, '') AS SKU, d.Quantity,
++                               ROW_NUMBER() OVER (PARTITION BY d.Product, ISNULL(d.SKU, ''), d.Quantity, d.TransCode ORDER BY d.SeqNo) AS rn
++                        FROM dbo.TransactionChargeSalesDetails d
++                        WHERE d.ReferenceNo = @parmpono AND d.InvoiceNo = @invoiceno AND ISNULL(d.ErrorTag, 0) = 0)
++            UPDATE T SET ErrorTag = 1
++            FROM T
++            INNER JOIN C ON C.ProductCode = T.Product AND C.Barcode = T.SKU AND C.QtySold = T.Quantity AND T.rn <= C.n;
++
++            -- 2026-10-01: the GL is all VAT-exempt (client rule): every line goes to the VATEX legs
++            DECLARE @nVat DECIMAL(18,2), @tVat DECIMAL(18,2), @gVatEx DECIMAL(18,2), @cVat DECIMAL(18,2), @cVatEx DECIMAL(18,2);
++            SELECT @nVat   = 0,
++                   @tVat   = 0,
++                   @gVatEx = ISNULL(SUM(c.RetGross), 0),
++                   @cVat   = 0,
++                   @cVatEx = ISNULL(SUM(c.RetCost), 0)
++            FROM #RetCost AS c;
++
++            DECLARE @Particulars VARCHAR(6999) = 'SALES RETURN | Customer: ' + ISNULL(@custname, '') + ' | PO: ' + @parmpono + ' | Invoice: ' + ISNULL(@invoiceno, '');
++            EXEC dbo.spu_SO_PostInvoiceReduction
++                @Kind = 'RET', @PONumber = @parmpono, @InvoiceNo = @invoiceno, @CustomerKey = @custkey,
++                @BranchCode = @branch, @User = @parmuser,
++                @NetVat = @nVat, @TaxVat = @tVat, @CostVat = @cVat, @GrossVatEx = @gVatEx, @CostVatEx = @cVatEx,
++                @Particulars = @Particulars,
++                @TicketVat = @tkVat OUTPUT, @TicketVatEx = @tkVatEx OUTPUT, @Excess = @excess OUTPUT;
++
++            UPDATE dbo.ReturnedOrderSummary
++            SET TicketRefNoVAT   = CASE WHEN @tkVat   <> ' ' THEN @tkVat   ELSE TicketRefNoVAT END,
++                TicketRefNoVATEX = CASE WHEN @tkVatEx <> ' ' THEN @tkVatEx ELSE TicketRefNoVATEX END
++            WHERE PONumber = @parmpono;
++        END
++
++        -- one log row per returned line (the audit trail of which line was split from which)
++        DECLARE @Batch UNIQUEIDENTIFIER = NEWID();
++        INSERT INTO dbo.SalesReturnLog
++            (ReturnBatch, PONumber, DeliveryNo, SourceSeqNo, ReturnSeqNo, ProductNo, IsPartial, QtyBefore, ReturnQty,
++             SellingPrice, ReturnAmount, ReturnCost, AfterConfirm, TicketNumber, Reason, CreatedBy)
++        SELECT @Batch, n.PONumber, n.DeliveryNo, n.SourceSeqNo, n.SeqNo, n.ProductNo, n.IsPartial, n.QtyBefore, n.ActualQty,
++               n.SellingPrice, c.RetGross, c.RetCost, @confirmed,
++               CASE WHEN @confirmed = 1 THEN NULLIF(LTRIM(RTRIM(ISNULL(@tkVatEx, ''))), '') END, @parmreason, @parmuser
++        FROM #NewReturns AS n
++        INNER JOIN #RetCost AS c ON c.SeqNo = n.SeqNo;
+ 
+         COMMIT TRANSACTION;
+     END TRY
+     BEGIN CATCH
+-        IF @@TRANCOUNT > 0
+-            ROLLBACK TRANSACTION;
+-        DROP TABLE IF EXISTS #NewReturns;
+-
+-        DECLARE @ErrMsg NVARCHAR(4000) = ERROR_MESSAGE(), @ErrSeverity INT = ERROR_SEVERITY();
+-        RAISERROR(@ErrMsg, @ErrSeverity, 1);
++        IF XACT_STATE() <> 0 ROLLBACK TRANSACTION;
++        THROW;
+     END CATCH
+ END
+\ No newline at end of file

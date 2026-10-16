@@ -1,0 +1,11 @@
+--- enzo/sp_SalesQtyToInventoryQtyEODSalesInvDeduct.sql	2026-10-15 23:07:09.024284300 +0800
++++ prod/sp_SalesQtyToInventoryQtyEODSalesInvDeduct.sql	2026-10-15 23:07:13.794377300 +0800
+@@ -88,7 +88,7 @@
+ 
+             -- Prepare for next loop iteration
+             SET @RunningQtySold = @RunningQtySold - @QtyToDeduct;
+-            SET @TotalCost = @iCost--@TotalCost + (@iCost * @QtyToDeduct);
++            SET @TotalCost = @TotalCost + (@iCost * @QtyToDeduct);
+         END;
+ 
+         -- ====================================================================

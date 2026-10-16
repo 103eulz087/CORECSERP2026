@@ -120,7 +120,7 @@ namespace SalesInventorySystem.AccountingDevEx
                     e.HighPriority = true;
                 }
             }
-        }
+        }//test
         private void gridView1_RowStyle(object sender, DevExpress.XtraGrid.Views.Grid.RowStyleEventArgs e)
         {
             rowstyle(sender, e);
@@ -130,6 +130,11 @@ namespace SalesInventorySystem.AccountingDevEx
         {
             if (e.Button == System.Windows.Forms.MouseButtons.Right)
                 contextMenuStrip1.Show(gridControl1, e.Location);
+        }
+
+        private void BalanceSheetDevEx_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }

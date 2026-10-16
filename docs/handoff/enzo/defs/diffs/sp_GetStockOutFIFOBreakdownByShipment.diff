@@ -1,0 +1,17 @@
+--- enzo/sp_GetStockOutFIFOBreakdownByShipment.sql	2026-10-15 23:07:09.329190100 +0800
++++ prod/sp_GetStockOutFIFOBreakdownByShipment.sql	2026-10-15 23:07:14.183858300 +0800
+@@ -1,5 +1,4 @@
+-
+-CREATE PROCEDURE [dbo].[sp_GetStockOutFIFOBreakdownByShipment]
++CREATE PROCEDURE dbo.sp_GetStockOutFIFOBreakdownByShipment
+     @ProductCode   VARCHAR(50),
+     @BranchCode    VARCHAR(50),
+     @ShipmentNo    VARCHAR(10),
+@@ -41,7 +40,6 @@
+           AND ISNULL(i.ReferenceCode, '') = ISNULL(@ReferenceCode, '')
+           AND i.IsStock = 1
+           AND (i.Available - ISNULL(s.StagedQty, 0)) > 0
+-          AND i.IsWarehouse=1
+         ORDER BY i.SequenceNumber ASC;
+ 
+         DECLARE @Result TABLE (

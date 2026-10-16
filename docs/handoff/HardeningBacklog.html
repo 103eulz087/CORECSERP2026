@@ -131,9 +131,9 @@ footer { color: var(--muted); font-size: var(--step--1); border-top: 1px solid v
     <h1>Hardening backlog</h1>
     <p class="lede">The bug classes still open after the September–October fixes, in the order to harden them. Fable takes one item at a time; the ERP session keeps operating and verifies each one.</p>
     <div class="meta">
-      <span>As of <strong>2026-10-14</strong></span>
+      <span>As of <strong>2026-10-15</strong></span>
       <span>Evidence read on <strong>PRODUCTION</strong> (read-only)</span>
-      <span>Next script number <strong class="mono">[86]</strong></span>
+      <span>Next script number <strong class="mono">[89]</strong></span>
       <span>Source <code>docs/handoff/2026-10-14_Hardening_Handoff_to_Fable.md</code></span>
     </div>
   </header>
@@ -142,7 +142,7 @@ footer { color: var(--muted); font-size: var(--step--1); border-top: 1px solid v
     <div class="count a"><b>6</b><span>Tier A · money or a ledger can go wrong silently</span></div>
     <div class="count b"><b>5</b><span>Tier B · needs a specific sequence or action</span></div>
     <div class="count c"><b>2</b><span>Tier C · needs a decision first</span></div>
-    <div class="count"><b id="cOpen">9</b><span>Open · 4 in progress · 0 done</span></div>
+    <div class="count"><b id="cOpen">6</b><span>Open · 0 in progress · 7 done (H1–H7; H6 ships with the next exe, H7 on DEV, STAGING and PRODUCTION)</span></div>
   </div>
 
   <section class="block" aria-labelledby="regTitle">
@@ -158,7 +158,7 @@ footer { color: var(--muted); font-size: var(--step--1); border-top: 1px solid v
     <div class="register" id="register">
 
       <details class="item" data-tier="A">
-        <summary><span class="id">H1</span><span class="name">GL ticket writer can post an unbalanced ticket and hides its errors</span><span class="tags"><span class="chip tier-A">Tier A</span><span class="chip st-prog">In progress · Fable, DEV + STAGING done, PRODUCTION pending</span><span class="chev" aria-hidden="true">›</span></span></summary>
+        <summary><span class="id">H1</span><span class="name">GL ticket writer can post an unbalanced ticket and hides its errors</span><span class="tags"><span class="chip tier-A">Tier A</span><span class="chip st-done">Done · Fable, on PRODUCTION</span><span class="chev" aria-hidden="true">›</span></span></summary>
         <div class="body">
           <section><h4>Problem</h4><ul>
             <li><code>sp_PostCompoundTicket</code> (PV-AP payment legs, inventory posting, upload finalize) has no debit = credit check.</li>
@@ -179,7 +179,7 @@ footer { color: var(--muted); font-size: var(--step--1); border-top: 1px solid v
       </details>
 
       <details class="item" data-tier="A">
-        <summary><span class="id">H2</span><span class="name">Reversing an AR payment can reverse another customer's sales ticket</span><span class="tags"><span class="chip tier-A">Tier A</span><span class="chip st-prog">In progress · Fable, DEV + STAGING done, PRODUCTION pending</span><span class="chev" aria-hidden="true">›</span></span></summary>
+        <summary><span class="id">H2</span><span class="name">Reversing an AR payment can reverse another customer's sales ticket</span><span class="tags"><span class="chip tier-A">Tier A</span><span class="chip st-done">Done · Fable, on PRODUCTION</span><span class="chev" aria-hidden="true">›</span></span></summary>
         <div class="body">
           <section><h4>Problem</h4><ul>
             <li><code>sp_ReversePaymentClient</code> mirrors every ticket and client-ledger row <code>WHERE ReferenceNumber = @refno</code>.</li>
@@ -197,7 +197,7 @@ footer { color: var(--muted); font-size: var(--step--1); border-top: 1px solid v
       </details>
 
       <details class="item" data-tier="A">
-        <summary><span class="id">H3</span><span class="name">Rollbacks and re-throws hide the real error, including the month lock</span><span class="tags"><span class="chip tier-A">Tier A</span><span class="chip st-prog">In progress · Fable, DEV + STAGING done, PRODUCTION pending</span><span class="chev" aria-hidden="true">›</span></span></summary>
+        <summary><span class="id">H3</span><span class="name">Rollbacks and re-throws hide the real error, including the month lock</span><span class="tags"><span class="chip tier-A">Tier A</span><span class="chip st-done">Done · Fable, on PRODUCTION</span><span class="chev" aria-hidden="true">›</span></span></summary>
         <div class="body">
           <section><h4>Problem</h4><ul>
             <li>Named rollbacks (<code>ROLLBACK TRANSACTION PaySupplierV2</code>) raise 6401 when nested and hide the cause.</li>
@@ -213,7 +213,7 @@ footer { color: var(--muted); font-size: var(--step--1); border-top: 1px solid v
       </details>
 
       <details class="item" data-tier="A">
-        <summary><span class="id">H4</span><span class="name">Multi-step postings can stop halfway</span><span class="tags"><span class="chip tier-A">Tier A</span><span class="chip st-prog">In progress · Fable, DEV + STAGING done, PRODUCTION pending</span><span class="chev" aria-hidden="true">›</span></span></summary>
+        <summary><span class="id">H4</span><span class="name">Multi-step postings can stop halfway</span><span class="tags"><span class="chip tier-A">Tier A</span><span class="chip st-done">Done · Fable, on PRODUCTION</span><span class="chev" aria-hidden="true">›</span></span></summary>
         <div class="body">
           <section><h4>Problem</h4><ul>
             <li><code>sp_PostSupplierPaymentWithManualLines</code>: the invoice payment commits, then the manual lines run on their own; a failure leaves cheque ≠ GL ("already posted, do not re-run", 60299).</li>
@@ -231,7 +231,7 @@ footer { color: var(--muted); font-size: var(--step--1); border-top: 1px solid v
       </details>
 
       <details class="item" data-tier="A">
-        <summary><span class="id">H5</span><span class="name">Payments settle against the amount on screen, not the current balance</span><span class="tags"><span class="chip tier-A">Tier A</span><span class="chip st-open">Open</span><span class="chev" aria-hidden="true">›</span></span></summary>
+        <summary><span class="id">H5</span><span class="name">Payments settle against the amount on screen, not the current balance</span><span class="tags"><span class="chip tier-A">Tier A</span><span class="chip st-done">Done · Fable, on PRODUCTION ([87])</span><span class="chev" aria-hidden="true">›</span></span></summary>
         <div class="body">
           <section><h4>Problem</h4><ul>
             <li>Known Bug #10 is fixed only in the telegraphic voucher. Supplier payments (expense and purchase) settle with the screen's amount.</li>
@@ -245,11 +245,12 @@ footer { color: var(--muted); font-size: var(--step--1); border-top: 1px solid v
             <li>A two-session test (grid loaded, invoice paid elsewhere, then submit) is refused; the normal path is identical; invoice = ledger checks stay 0 for AP and AR.</li>
           </ul></section>
           <p class="evidence"><strong>PRODUCTION 10-14:</strong> the AR balance formula is still a recompute.</p>
+          <p class="evidence"><strong>Result 10-15 (Fable, script [87], DEV):</strong> <code>sp_AddPaymentClient</code> reads every invoice of the payment under lock (new index on customer + invoice + PO) and refuses 92015 (not the customer's invoice), 92016 (balance set by hand), 92017 (more settled than owed now); the multi-branch supplier payment takes the invoice amount from the stored expense and refuses a stale screen (60525). Supplier payments already locked and refused over-settlement; credit memo, return and cash advance needed nothing. Tests 14 PASS + 4 BUG SHOWN; old = new on every normal shape. Exception Center S07 (account = sum of invoice balances) and S08 (balance follows its columns, all rows) = 0 on all tiers. <strong>STAGING 10-15 08:01:</strong> run by the user; the test there gave the same 14 PASS + 4 BUG SHOWN, 0 rows left; procs hash-identical to DEV, Exception Center all 23 checks 0. <strong>PRODUCTION 10-15 08:12:</strong> run by the user; test there 14 PASS + 4 BUG SHOWN, 0 rows left; verified read-only: procs = STAGING's, backups and index present, S07 / S08 = 0.</p>
         </div>
       </details>
 
       <details class="item" data-tier="A">
-        <summary><span class="id">H6</span><span class="name">Lookups can hand back a different record than the one picked</span><span class="tags"><span class="chip tier-A">Tier A</span><span class="chip st-open">Open</span><span class="chev" aria-hidden="true">›</span></span></summary>
+        <summary><span class="id">H6</span><span class="name">Lookups can hand back a different record than the one picked</span><span class="tags"><span class="chip tier-A">Tier A</span><span class="chip st-done">Done · Fable, C# (next exe)</span><span class="chev" aria-hidden="true">›</span></span></summary>
         <div class="body">
           <section><h4>Problem</h4><ul>
             <li><code>SearchLookUpClass.getSingleValue</code> reads the popup's focused row, not the picked one; the first pick after load can return another row.</li>
@@ -262,11 +263,12 @@ footer { color: var(--muted); font-size: var(--step--1); border-top: 1px solid v
             <li>Per converted screen, the first pick after load returns the picked row and a duplicate-name pair resolves to the right key; the user gets the list for a UI pass.</li>
           </ul></section>
           <p class="evidence"><strong>Code 10-14:</strong> 131 calls in 55 files.</p>
+          <p class="evidence"><strong>Result 10-15 (Fable, C# only):</strong> the helper now returns the row behind <code>EditValue</code> (harness vs the v26.1 control: the old one returned NULL for a value set in code, or the previously picked row after a pick). Nine posting screens keyed on the record's key with free text disabled: POS charge to client, POS confirm payment, POS cash wallet, inventory qty adjustment, supplier payment, edit expense, client and supplier adjustment memos, purchase order. Ships with the next exe; UI pass: first pick after open and a duplicate-name customer (DAQUIZ, ARNOLD 009 / 001).</p>
         </div>
       </details>
 
       <details class="item" data-tier="B">
-        <summary><span class="id">H7</span><span class="name">Bank recon loopholes</span><span class="tags"><span class="chip tier-B">Tier B</span><span class="chip st-open">Open</span><span class="chev" aria-hidden="true">›</span></span></summary>
+        <summary><span class="id">H7</span><span class="name">Bank recon loopholes</span><span class="tags"><span class="chip tier-B">Tier B</span><span class="chip st-done">Done · Fable ([88]); DEV, STAGING, PRODUCTION (2026-10-15)</span><span class="chev" aria-hidden="true">›</span></span></summary>
         <div class="body">
           <section><h4>Problem</h4><ul>
             <li><code>sp_Payment_PostBankReconEntry</code> silently does nothing on a second call for the same reference, account and side (Known Bug #9).</li>
@@ -277,6 +279,8 @@ footer { color: var(--muted); font-size: var(--step--1); border-top: 1px solid v
           <section><h4>Harden</h4><ul>
             <li>Refuse or report a second call that would change an amount; keep cleared items cleared across edits; lock checks on every recon writer; drop or disable Auto-Match (user's decision).</li>
           </ul></section>
+          <p class="evidence"><strong>Measured 10-15 (PRODUCTION, read-only):</strong> one reference counter (no overlap between AP, AR, JV, cash advance and expense references), no reference equals a voucher id, GL-vs-recon clean on every account, no period locked yet. The silent cases were latent; the rules now make them loud.</p>
+          <p class="evidence"><strong>Result 10-15 (Fable, script [88], DEV):</strong> the helper keeps one item per reference + account + side: the same posting again is a no-op, another amount or another document under the key is refused (93021), a locked month is refused (93022). JV and multi-branch expense edits reconcile their items instead of deleting them: a cleared item stays as the bank cleared it (93023 if the edit would change it), open items keep their ReconID; a multi-branch expense with a bank line now gets its item. Delete refuses items posted by a document (60005) and locked months (93002); Add and the old Update check the lock too; the cash-advance reversal voids only its own items and refuses a locked month (93027), the AR reversal likewise (93028), an AR deposit into a locked month is refused (93022); a cash advance with two lines on one bank account gets one deposit of their sum; the combined voucher updates its own item or creates it. Auto-Match is hard-disabled (93020). The lock rule counts a locked month at or after the item's month (open items carry forward), and the legacy supplier-payment proc (auto-debit postings) goes through the helper too. Review: no blocker; its points taken. Test: 32 PASS + 7 BUG SHOWN. Exception Center: new section 6 of the bank-recon check (locked month changed after the lock) = 0. No exe change. STAGING on the user's go, then PRODUCTION by the user; the user decides whether Auto-Match is dropped for good.</p>
         </div>
       </details>
 

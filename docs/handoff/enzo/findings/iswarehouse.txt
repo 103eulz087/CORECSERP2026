@@ -1,0 +1,93 @@
+./Classes/PosDataDownloader.cs:55:            "isAdmin", "isGlobalOfficer", "isBranchOfficer", "isWarehouseOfficer", "isCashier",
+./Classes/PosDataDownloader.cs:103:                "isAdmin", "isGlobalOfficer", "isBranchOfficer", "isWarehouseOfficer", "isCashier",
+./HOForms/AddCarcassInventory.cs:182:            Database.ExecuteQuery("UPDATE Inventory SET IsWarehouse='1',BatchCode=' ' WHERE SequenceNumber = '" + gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "SequenceNumber").ToString() + "' ");//temporary query execution because existing barcode is only 13 digit character
+./HOForms/HOConversion.cs:374:                if (Convert.ToDouble(txttotalactualweight.Text) > Database.getTotalSummation2("Inventory", "Product = '" + labeleulz.Text + "' AND Branch='" + Login.assignedBranch + "' AND Available > 0 and isWarehouse=1 ", "Available")) //Database.getTotalSummation("Inventory", "Product", txtsku.Text.Substring(1, 6), "Quantity"))
+./HOForms/HOConversion.cs:376:                    string mark = Database.getTotalSummation2("Inventory", "Product = '" + labeleulz.Text + "' AND Branch='" + Login.assignedBranch + "' AND isWarehouse=1 AND Available > 0", "Available").ToString();
+./HOForms/HRIConversion.cs:369:                if (Convert.ToDouble(txttotalactualweight.Text) > Database.getTotalSummation2("Inventory", "Product = '" + labeleulz.Text + "' AND Branch='" + Login.assignedBranch + "' AND Available > 0 and isWarehouse=1 ", "Available")) //Database.getTotalSummation("Inventory", "Product", txtsku.Text.Substring(1, 6), "Quantity"))
+./HOForms/HRIConversion.cs:371:                    string mark = Database.getTotalSummation2("Inventory", "Product = '" + labeleulz.Text + "' AND Branch='" + Login.assignedBranch + "' AND isWarehouse=1 AND Available > 0", "Available").ToString();
+./HOForms/TransferInventory.cs:54:            Database.display("SELECT * FROM view_TransferInventory WHERE IsWarehouse='" + isBigblue + "' And Branch='"+Login.assignedBranch+"'", gridControl1, gridView1);
+./HOForms/TransferInventory.cs:380:                    Database.ExecuteQuery("UPDATE Inventory SET IsWarehouse='0',QtyBigBlue=Available,Available=0 WHERE SequenceNumber='" + gridView2.GetRowCellValue(i, "#").ToString() + "'");
+./HOForms/TransferInventory.cs:399:                    Database.ExecuteQuery("UPDATE Inventory SET IsWarehouse='1' WHERE SequenceNumber='" + gridView2.GetRowCellValue(i, "SequenceNumber") + "'");
+./HOForms/TransferInventory.cs:423:                Database.display("SELECT * FROM view_TransferInventory WHERE IsWarehouse='" + isBigblue + "' and SUBSTRING(Product,1,2) = '" + Classes.Product.getProductCategoryCode(txtsort.Text) + "' And Branch='888'", gridControl1, gridView1);
+./HOForms/TransferInventoryUpdate.cs:77:            table.Columns.Add("IsWarehouse");
+./HOForms/TransferInventoryUpdate.cs:164:                        newRow["IsWarehouse"] = "1";
+./HOForms/TransferInventoryUpdate.cs:508:            gridView1.Columns["isWarehouse"].Visible = false;
+./HOForms/Users.cs:53:            if (iswarehouseofficer.Checked== true)
+./HOForms/Users.cs:193:                iswarehouseofficer.Checked = true;
+./HOForms/Users.cs:197:                iswarehouseofficer.Checked = false;
+./HOForms/Users.cs:290:                if (iswarehouseofficer.Checked == true)
+./HOForms/Users.cs:353:                    Database.ExecuteQuery("UPDATE Users SET Fullname='" + txtfullname.Text + "',Designation='" + txtdesignation.Text + "',EmailAddress='" + txtemailadd.Text + "',Password='" + txtpassword.Text + "',AssignedBranch='" + branchcode + "',isAdmin='" + sadmin + "',isGlobalOfficer='" + sglobalofficer + "',isBranchOfficer='" + sbranchofficer + "',isWarehouseOfficer='" + swarehouseofficer + "',isCashier='" + scashier + "',isMaker='" + smaker + "',isChecker='" + schecker + "',isApprover='" + sapprover + "',isAccounting='" + saccounting + "',LastUpdated='" + DateTime.Now.ToString() + "',CashEndLimit='" + txtcashendlimit.Text + "',CashInLimit='" + txtcashinlimit.Text + "',ReceivableLimit='" + txtreceivablelimit.Text + "',GLAccount='" + txtglaccount.Text + "' WHERE UserID='" + txtuserid.Text + "' ", "Successfully Updated!");
+./HOForms/ViewInventory.cs:216:            Database.ExecuteQuery("UPDATE Inventory SET IsWarehouse='1' WHERE SequenceNumber='" + gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "SequenceNumber").ToString() + "'", "Items Successfully Transferred To Commissary!");   
+./HOForms/ViewPrimalCutsInventory.cs:77:            bool check = Convert.ToBoolean(view.GetRowCellValue(e.RowHandle, "IsWarehouse"));
+./HOForms/ViewPrimalCutsInventory.cs:127:            Database.ExecuteQuery("UPDATE Inventory SET IsWarehouse='0' WHERE SequenceNumber='" + gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "SequenceNumber").ToString() + "'", "Items Successfully Transferred To BigBlue!");
+./HOFormsDevEx/AddInventoryDevExBatchMode.cs:50:            dt.Columns.Add("IsWarehouse", typeof(bool));
+./HOFormsDevEx/AddInventoryDevExBatchMode.cs:73:                dr["IsWarehouse"] = true;
+./HOFormsDevEx/AddPrimalCutInventoryDevEx.cs:243:                    ",0" + //iswarehouse
+./HOFormsDevEx/ConversionDevEx.cs:65:            Database.display("SELECT SequenceNumber as #,Product,Description,Available,Cost,Barcode FROM Inventory WHERE Branch='" + Login.assignedBranch + "' and isWarehouse=1 and Available > 0 and IsStock=1 and SUBSTRING(Product,1,2)='" + Classes.Product.getProductCategoryCode(txtprodcat.Text) + "' ", gridControlDisplay, gridViewDisplay);
+./HOFormsDevEx/InventoryQtyAdjustmentDevEx.cs:100:                double totalavailable = Database.getTotalSummation2("Inventory", "Product='" + productcode + "' and isStock=1 and Available > 0 and isWarehouse=1 and Branch='" + txtbranch.Text + "'", "Available");
+./HOFormsDevEx/InventoryTransferDevEx.cs:133:            gridView1.Columns["isWarehouse"].Visible = false;
+./HOFormsDevEx/SetupBatchCodeDevEx.cs:37:            Database.display("SELECT PalletNo,Product,Description,Barcode,Quantity,Available FROM Inventory with(nolock) WHERE BatchCode='" + txtbatchcodeno.Text + "' and Available > 0 and isWarehouse=1", gridControl1, gridView1);
+./HOFormsDevEx/SetupBatchCodeDevEx.cs:56:            Database.displayDevComboBoxItems("Select distinct Description FROM Inventory with(nolock) WHERE Available > 0 and ShipmentNo='" + txtshipmentno.Text+ "'  and isWarehouse=1", "Description", txtproduct);
+./HOFormsDevEx/SetupBatchCodeDevEx.cs:61:            Database.displayDevComboBoxItems("Select distinct PalletNo FROM Inventory with(nolock) WHERE Available > 0 and ShipmentNo='" + txtshipmentno.Text + "' and Description='"+txtproduct.Text+"' and BatchCode=0 and isWarehouse=1", "PalletNo", txtpalletno);
+./HOFormsDevEx/SetupBatchCodeDevEx.cs:78:            Database.displayDevComboBoxItems("Select distinct ShipmentNo FROM Inventory with(nolock) WHERE isWarehouse=1 and Available > 0 and (BatchCode < 1 OR BatchCode is null) order by ShipmentNo", "ShipmentNo", txtshipmentno);
+./HOFormsDevEx/TransferBranchToBranchInvDevEx.cs:229:            if (Convert.ToDouble(txtweight.Text) > Database.getTotalSummation2("Inventory", "Product = '" + objprodcode.ToString() + "' AND Branch='" + Login.assignedBranch + "' AND isWarehouse=1 and Available > 0 ", "Available")) //Database.getTotalSummation("Inventory", "Product", txtsku.Text.Substring(1, 6), "Quantity"))
+./HOFormsDevEx/TransferBranchToBranchInvDevEx.cs:231:                string mark = Database.getTotalSummation2("Inventory", "Product = '" + objprodcode.ToString() + "' AND Branch='" + Login.assignedBranch + "' AND isWarehouse=1  and Available > 0 ", "Available").ToString();
+./HOFormsDevEx/TransferPerPalletDevEx.cs:185:                    "WHERE Available > 0 and isWarehouse=1 order by ShipmentNo ASC", txtshipmentno, "ShipmentNo", "ShipmentNo");
+./HOFormsDevEx/TransferPerPalletDevEx.cs:191:                    "WHERE Available > 0 and isWarehouse=0 order by ShipmentNo ASC", txtshipmentno, "ShipmentNo", "ShipmentNo");
+./HOFormsDevEx/TransferPerPalletDevEx.cs:216:                    "AND isWarehouse = 1 " +
+./HOFormsDevEx/TransferPerPalletDevEx.cs:226:                         "AND isWarehouse=0 " +
+./HOFormsDevEx/TransferPerPalletDevEx.cs:318:                    "WHERE ShipmentNo='" + txtshipmentno.Text + "' and isWarehouse=1 and Available > 0 " +
+./HOFormsDevEx/TransferPerPalletDevEx.cs:324:                   "WHERE ShipmentNo='" + txtshipmentno.Text + "' and isWarehouse=0 and Available > 0 " +
+./HOFormsDevEx/TransferPerPalletDevExFixed.cs:36:                    "WHERE Available > 0 and isWarehouse=1 order by ShipmentNo ASC", txtshipmentno, "ShipmentNo", "ShipmentNo");
+./HOFormsDevEx/TransferPerPalletDevExFixed.cs:42:                    "WHERE Available > 0 and isWarehouse=0 order by ShipmentNo ASC", txtshipmentno, "ShipmentNo", "ShipmentNo");
+./HOFormsDevEx/TransferPerPalletDevExFixed.cs:67:                    "AND isWarehouse = 1 " +
+./HOFormsDevEx/TransferPerPalletDevExFixed.cs:77:                         "AND isWarehouse=0 " +
+./HOFormsDevEx/TransferPerPalletDevExFixed.cs:102:                    "WHERE ShipmentNo='" + txtshipmentno.Text + "' and isWarehouse=1 and Available > 0 " +
+./HOFormsDevEx/TransferPerPalletDevExFixed.cs:108:                   "WHERE ShipmentNo='" + txtshipmentno.Text + "' and isWarehouse=0 and Available > 0 " +
+./HOFormsDevEx/UsersDevEx.cs:68:            if (iswarehouseofficer.Checked == true)
+./HOFormsDevEx/UsersDevEx.cs:132:                    "AssignedBranch, isAdmin, isGlobalOfficer, isBranchOfficer, isWarehouseOfficer, isCashier, " +
+./HOFormsDevEx/UsersDevEx.cs:184:                if (iswarehouseofficer.Checked == true)
+./HOFormsDevEx/UsersDevEx.cs:247:                    Database.ExecuteQuery("UPDATE Users SET Fullname='" + txtfullname.Text + "',Designation='" + txtdesignation.Text + "',EmailAddress='" + txtemailadd.Text + "',AssignedBranch='" + txtbranch.Text + "',isAdmin='" + sadmin + "',isGlobalOfficer='" + sglobalofficer + "',isBranchOfficer='" + sbranchofficer + "',isWarehouseOfficer='" + swarehouseofficer + "',isCashier='" + scashier + "',isMaker='" + smaker + "',isChecker='" + schecker + "',isApprover='" + sapprover + "',isAccounting='" + saccounting + "',LastUpdated='" + DateTime.Now.ToString() + "',CashEndLimit='" + txtcashendlimit.Text + "',CashInLimit='" + txtcashinlimit.Text + "',ReceivableLimit='" + txtreceivablelimit.Text + "',GLAccount='" + txtglaccount.Text + "',MustChangePassword=1 WHERE UserID='" + txtuserid.Text + "' ", "Successfully Updated!");
+./HOFormsDevEx/UsersDevEx.cs:319:            if (Convert.ToBoolean(gridView1.GetRowCellValue(gridView1.FocusedRowHandle, "isWarehouseOfficer").ToString()) == true)
+./HOFormsDevEx/UsersDevEx.cs:321:                iswarehouseofficer.Checked = true;
+./HOFormsDevEx/UsersDevEx.cs:325:                iswarehouseofficer.Checked = false;
+./InventoryIN.cs:119:                Database.ExecuteQuery("INSERT INTO InventoryIN(ID,Branch,ShipmentNo,PalletNo,BatchCode,DateReceived,Product,Description,Barcode,TipWeight,Quantity,Cost,Available,QtyBigBlue,IsStock,IsVat,IsWarehouse,ReferenceCode,LastMovementDate,isProcess,isSource,isConversion,EncodeBy) VALUES('" + txtid.Text + "','" + Login.assignedBranch + "','00000','0','0','" + txtdatereceived.Text + "','" + prodcde + "','" + txtproduct.Text + "','" + txtbarcode.Text + "','" + txtweight.Text + "','" + txtweight.Text + "','" + txtcosting.Text + "',0,'" + txtweight.Text + "','1','" + isvat + "','" + destination + "','','" + DateTime.Now.ToShortDateString() + "','0','1','0','" + Login.isglobalUserID + "')");
+./InventoryIN.cs:125:                Database.ExecuteQuery("INSERT INTO InventoryIN(ID,Branch,ShipmentNo,PalletNo,BatchCode,DateReceived,Product,Description,Barcode,TipWeight,Quantity,Cost,Available,QtyBigBlue,IsStock,IsVat,IsWarehouse,ReferenceCode,LastMovementDate,isProcess,isSource,isConversion,EncodeBy) VALUES('" + txtid.Text + "','" + Login.assignedBranch + "','00000','0','0','" + txtdatereceived.Text + "','" + prodcde + "','" + txtproduct.Text + "','" + txtbarcode.Text + "','" + txtweight.Text + "','" + txtweight.Text + "','" + txtcosting.Text + "','" + txtweight.Text + "',0,'1','" + isvat + "','" + destination + "','','" + DateTime.Now.ToShortDateString() + "','0','1','0','" + Login.isglobalUserID + "')");
+./InventoryIN.cs:352:                        Database.ExecuteQuery("INSERT INTO InventoryIN(ID,Branch,ShipmentNo,PalletNo,BatchCode,DateReceived,Product,Description,Barcode,TipWeight,Quantity,Cost,Available,IsStock,IsVat,IsWarehouse,ReferenceCode,LastMovementDate,isProcess,isSource,isConversion,EncodeBy) SELECT TOP 1 '" + txtid.Text + "',Branch,ShipmentNo,PalletNo,BatchCode,DateReceived,Product,Description,Barcode,TipWeight,Quantity,Cost,Available,IsStock,IsVat,"+ destination + ",ReferenceCode,LastMovementDate,isProcess,isSource,isConversion,'" + Login.isglobalUserID + "' FROM InventoryALL WHERE Barcode='" + txtbarcode.Text + "' ORDER BY SequenceNumber DESC");
+./Login.cs:370:                        UserID, FullName, isAdmin, isGlobalOfficer, isBranchOfficer, isWarehouseOfficer,
+./Login.cs:394:                            isglobalWarehouseOfficer = reader["isWarehouseOfficer"].ToString();
+./LoginOrig.cs:233:                        isglobalWarehouseOfficer = reader["isWarehouseOfficer"].ToString();
+./Orders/AddBranchOrder.cs:340:                        productcode = globalproductcode;//Database.getSingleQuery("Inventory", "Barcode='" + globaltxtbarcodescanning + "' and isWarehouse=1 and Available > 0 and Branch='888' and IsStock=1", "Product");
+./Orders/AddBranchOrder.cs:494:                    var rows = Database.getMultipleQuery($"SELECT TOP(1) Product,Available FROM dbo.Inventory WHERE Branch='{Login.assignedBranch}' AND Barcode='{txtbarcodescanning.Text}' AND Available > 0 AND isWarehouse=1 ", "Product,Available");
+./Orders/AddBranchOrder.cs:553:                    bool inventoryExist = Database.checkifExist("SELECT 1 FROM dbo.Inventory WHERE Product='" + primalproductcode + "' AND Branch='" + Login.assignedBranch + "' AND Available > 0 and isWarehouse=1 ");
+./Orders/AddBranchOrder.cs:577:                    else if (GlobalCache.CompanyName != "JFC" && Convert.ToDouble(txtweight.Text) > Database.getTotalSummation2("Inventory", "Product = '" + primalproductcode + "' AND Branch='" + Login.assignedBranch + "' AND isWarehouse='1' and Available > 0 ", "Available")) //Database.getTotalSummation("Inventory", "Product", txtsku.Text.Substring(1, 6), "Quantity"))
+./Orders/AddBranchOrder.cs:579:                        string mark = Database.getTotalSummation2("Inventory", "Product = '" + primalproductcode + "' AND Branch='" + Login.assignedBranch + "' AND isWarehouse='1'  and Available > 0 ", "Available").ToString();
+./Orders/AddBranchOrderSTS.cs:668:                    var rows = Database.getMultipleQuery($"SELECT TOP(1) Product,Available FROM dbo.Inventory WHERE Branch='{Login.assignedBranch}' AND Barcode='{txtbarcodescanning.Text}' AND Available > 0 AND isWarehouse=1 ", "Product,Available");
+./Orders/AddBranchOrderSTS.cs:777:                        productcode = globalproductcode;//Database.getSingleQuery("Inventory", "Barcode='" + globaltxtbarcodescanning + "' and isWarehouse=1 and Available > 0 and Branch='888' and IsStock=1", "Product");
+./Orders/AddBranchOrderSTSV2.cs:851:                        productcode = globalproductcode;//Database.getSingleQuery("Inventory", "Barcode='" + globaltxtbarcodescanning + "' and isWarehouse=1 and Available > 0 and Branch='888' and IsStock=1", "Product");
+./Orders/AddBranchOrderV2.cs:867:                        productcode = globalproductcode;//Database.getSingleQuery("Inventory", "Barcode='" + globaltxtbarcodescanning + "' and isWarehouse=1 and Available > 0 and Branch='888' and IsStock=1", "Product");
+./POS/AuthorizedConfirmationFrm.cs:84:                                    isWarehouseOfficer,
+./POS/AuthorizedConfirmationFrm.cs:170:                            isglobalWarehouseOfficer = reader["isWarehouseOfficer"].ToString();
+./POS/AuthorizedConfirmationFrm.cs:314:                        isglobalWarehouseOfficer = reader["isWarehouseOfficer"].ToString();
+./POS/POSCloseTransactionAuthentication.cs:149:                                isWarehouseOfficer,
+./POS/POSCloseTransactionAuthentication.cs:231:                            isglobalWarehouseOfficer = reader["isWarehouseOfficer"].ToString();
+./ReInventoryAnalyzer.cs:55:            com.Parameters.AddWithValue("@parmiswarehouse", ReInventoryIn.iswarehouse);
+./ReInventoryIn.cs:28:        public static bool iswarehouse = false;
+./ReInventoryIn.cs:563:            bool isWarehouse = false;
+./ReInventoryIn.cs:566:                isWarehouse = false;
+./ReInventoryIn.cs:569:                isWarehouse = true;
+./ReInventoryIn.cs:587:                com.Parameters.AddWithValue("@parmiswarehouse", isWarehouse);
+./ReInventoryIn.cs:768:                iswarehouse = true;
+./ReInventoryIn.cs:770:                iswarehouse = false;
+./ReInventoryIn.cs:776:                iswarehouse = false;
+./ReInventoryIn.cs:778:                iswarehouse = true;
+./Reporting/InventoryReport.cs:88:                object isWarehouseParam = DBNull.Value;
+./Reporting/InventoryReport.cs:91:                    if (cmbLocation.Text == "Warehouse") isWarehouseParam = true;
+./Reporting/InventoryReport.cs:92:                    else if (cmbLocation.Text == "Third-Party Storage") isWarehouseParam = false;
+./Reporting/InventoryReport.cs:102:                LoadSummary(branchParam, isWarehouseParam, isConversionParam, dateFromParam, dateToParam);
+./Reporting/InventoryReport.cs:103:                LoadDetail(branchParam, isWarehouseParam, isConversionParam, dateFromParam, dateToParam);
+./Reporting/InventoryReport.cs:111:        private void LoadSummary(object branch, object isWarehouse, object isConversion, object dateFrom, object dateTo)
+./Reporting/InventoryReport.cs:118:                cmd.Parameters.Add("@IsWarehouse", SqlDbType.Bit).Value = isWarehouse;
+./Reporting/InventoryReport.cs:143:        private void LoadDetail(object branch, object isWarehouse, object isConversion, object dateFrom, object dateTo)
+./Reporting/InventoryReport.cs:150:                cmd.Parameters.Add("@IsWarehouse", SqlDbType.Bit).Value = isWarehouse;
+./Reporting/InventoryReport.cs:202:            HideColumn(viewDetail, "IsWarehouse");

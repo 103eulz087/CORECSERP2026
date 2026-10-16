@@ -812,6 +812,10 @@ namespace SalesInventorySystem.POS
                 gridView1.Columns.Clear();
                 LoadCustomerSalesJournal();
 
+                // 2026-10-15 (user, script [91]): the inventory lot's ReferenceCode, one row per lot taken
+                if (gridView1.Columns["ReferenceCode"] != null)
+                    gridView1.Columns["ReferenceCode"].Caption = "Reference Code";
+
                 gridView1.BestFitColumns();
             }
             catch (Exception ex)

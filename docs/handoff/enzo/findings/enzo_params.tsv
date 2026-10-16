@@ -1,0 +1,417 @@
+### RS 1
+proc_	params
+AccountL0	
+AccountL1	@paccount varchar
+AccountL2	@paccount varchar
+AccountL3	@paccount varchar
+AccountL4	@paccount varchar
+AccountL5	@paccount varchar
+AccountL6	@paccount varchar
+AccountL7	@paccount varchar
+AccountL8	@paccount varchar
+CommitPrimalCutConversion	@parmbatchcode varchar
+GetBatchReferenceID	@OutTicketNumber varchar OUT
+GetInventoryBatchNumber	@OutTicketNumber varchar OUT
+GetReferenceNumber	@OutTicketNumber varchar OUT
+GetTicketNumber	@OutTicketNumber varchar OUT
+GetVoucherNumber	@OutTicketNumber varchar OUT
+GLPosting	@Branch varchar, @PPostDate varchar, @PSupplementary varchar
+GLPosting02242018	@Branch varchar, @PPostDate varchar, @PSupplementary varchar
+GLPostingOLD	@Branch varchar, @PPostDate varchar, @PSupplementary varchar
+GLPostInit	@Branch varchar, @PPostDate varchar, @PSupplementary varchar
+ReturnInventory	@parmbarcode varchar, @parmbatchcode int, @parmshipnum varchar, @parmseqnum int
+sp_AddAPaccountsNEW	@parmbranchcode char, @parmshipment varchar, @parmsuppliername varchar, @parmsupplierid varchar, @parminvoicedate date, @parminvoiceno varchar, @parmvatexempt float, @parmvatamnt money, @parmparticulars varchar, @parmuser varchar
+sp_AddBranchInventory	@parmponumber varchar, @parmproductcode varchar, @parmqty float, @parmbarcode varchar, @parmbranchcode varchar, @parmreceivedby varchar, @parmsellingprice money, @parmisscan bit
+sp_AddBranchInventory05082025	@parmponumber varchar, @parmproductcode varchar, @parmqty float, @parmbarcode varchar, @parmbranchcode varchar, @parmreceivedby varchar, @parmsellingprice money, @parmisscan bit
+sp_AddBranchInventoryBatch	@PONumber varchar, @BranchCode varchar, @ReceivedBy varchar, @Items InventoryItemType
+sp_AddBranchInventoryBatch_04202026	@PONumber varchar, @BranchCode varchar, @ReceivedBy varchar, @Items InventoryItemType
+sp_AddBranchInventoryBatch03012026	@PONumber varchar, @BranchCode varchar, @ReceivedBy varchar, @Items InventoryItemType
+sp_AddBranchInventoryORIG	@parmdeliveryno varchar, @parmrefno varchar, @parmponumber varchar, @parmproductcode varchar, @parmqty float, @parmbarcode varchar, @parmbranchcode varchar, @parmreceivedby varchar, @parmyesno varchar, @parmsellingprice money, @parmisscan bit
+sp_AddBranchOrder	@parmdevno varchar, @parmrefno varchar, @parmpono varchar, @parmprodcatcode varchar, @parmprodcode varchar, @parmqty decimal, @parmbarcode varchar, @parmbranchcode varchar, @parmorigin varchar, @preparedby varchar, @parmsourceseqno varchar, @parmbarcodescanning bit
+sp_AddBranchOrder_04092026	@parmdevno varchar, @parmrefno varchar, @parmpono varchar, @parmprodcatcode varchar, @parmprodcode varchar, @parmqty decimal, @parmbarcode varchar, @parmbranchcode varchar, @parmorigin varchar, @preparedby varchar, @parmsourceseqno varchar, @parmbarcodescanning bit
+sp_AddBranchOrder02102026	@parmdevno varchar, @parmrefno varchar, @parmpono varchar, @parmprodcatcode varchar, @parmprodcode varchar, @parmqty decimal, @parmbarcode varchar, @parmbranchcode varchar, @parmorigin varchar, @preparedby varchar, @parmsourceseqno varchar, @parmbarcodescanning bit
+sp_AddBranchOrder03032026	@parmdevno varchar, @parmrefno varchar, @parmpono varchar, @parmprodcatcode varchar, @parmprodcode varchar, @parmqty decimal, @parmbarcode varchar, @parmbranchcode varchar, @parmorigin varchar, @preparedby varchar, @parmsourceseqno varchar, @parmbarcodescanning bit
+sp_AddBranchOrder05082025	@parmdevno varchar, @parmrefno varchar, @parmpono varchar, @parmprodcatcode varchar, @parmprodcode varchar, @parmqty decimal, @parmbarcode varchar, @parmbranchcode varchar, @parmorigin varchar, @preparedby varchar, @parmsourceseqno varchar, @parmbarcodescanning bit
+sp_AddBranchOrderBatch	@TransferItems TransferItemType, @PONumber varchar, @DeliveryNo varchar, @ReferenceNo varchar, @BranchCode varchar, @PreparedBy varchar
+sp_AddBranchOrderByBarcode	@parmdevno varchar, @parmrefno varchar, @parmpono varchar, @parmbarcode varchar, @parmbranchcode varchar, @parmorigin varchar, @preparedby varchar
+sp_AddBranchOrderHRI	@parmdevno varchar, @parmrefno varchar, @parmpono varchar, @parmprodcatcode varchar, @parmprodcode varchar, @parmqty decimal, @parmbarcode varchar, @parmbranchcode varchar, @parmorigin varchar, @preparedby varchar, @parmsourceseqno varchar, @parmbarcodescanning bit
+sp_AddBranchOrderHRI_05042026	@parmdevno varchar, @parmrefno varchar, @parmpono varchar, @parmprodcatcode varchar, @parmprodcode varchar, @parmqty decimal, @parmbarcode varchar, @parmbranchcode varchar, @parmorigin varchar, @preparedby varchar, @parmsourceseqno varchar, @parmbarcodescanning bit
+sp_AddBranchOrderHRI_08032026	@parmdevno varchar, @parmrefno varchar, @parmpono varchar, @parmprodcatcode varchar, @parmprodcode varchar, @parmqty decimal, @parmbarcode varchar, @parmbranchcode varchar, @parmorigin varchar, @preparedby varchar, @parmsourceseqno varchar, @parmbarcodescanning bit
+sp_AddBranchOrderNewEulz	@parmdevno varchar, @parmrefno varchar, @parmpono varchar, @parmprodcatcode varchar, @parmprodcode varchar, @parmqty float, @parmbarcode varchar, @parmsourcebranchcode varchar, @parmbranchcode varchar, @parmorigin varchar, @preparedby varchar, @parmeffectivitydate date, @parmsourceseqno varchar, @parmbarcodescanning bit
+sp_AddBranchOrderNewEulz_08212018	@parmdevno varchar, @parmrefno varchar, @parmpono varchar, @parmprodcatcode varchar, @parmprodcode varchar, @parmqty float, @parmbarcode varchar, @parmsourcebranchcode varchar, @parmbranchcode varchar, @parmorigin varchar, @preparedby varchar, @parmeffectivitydate date, @parmsourceseqno varchar, @parmbarcodescanning bit
+sp_AddBranchOrderNewEulz_08242018	@parmdevno varchar, @parmrefno varchar, @parmpono varchar, @parmprodcatcode varchar, @parmprodcode varchar, @parmqty decimal, @parmbarcode varchar, @parmsourcebranchcode varchar, @parmbranchcode varchar, @parmorigin varchar, @preparedby varchar, @parmeffectivitydate date, @parmsourceseqno varchar, @parmbarcodescanning bit
+sp_AddBranchOrderNewEulz-BACKUP12052017	@parmdevno varchar, @parmrefno varchar, @parmpono varchar, @parmprodcatcode varchar, @parmprodcode varchar, @parmqty float, @parmbarcode varchar, @parmsourcebranchcode varchar, @parmbranchcode varchar, @parmorigin varchar, @preparedby varchar, @parmeffectivitydate date, @parmsourceseqno varchar
+sp_AddBranchOrderORIG	@parmdevno varchar, @parmrefno varchar, @parmpono varchar, @parmprodcatcode varchar, @parmprodcode varchar, @parmqty float, @parmbarcode varchar, @parmbranchcode varchar, @parmorigin varchar, @preparedby varchar, @parmeffectivitydate date
+sp_AddBranchTransferInventory	@parmtransno varchar, @parmprodcode varchar, @parmqty decimal, @parmbarcode varchar, @parmsourcebranchcode varchar, @parmdestbranchcode varchar, @parmaddedby varchar
+sp_AddBranchTransferInventoryBatch	@TransferNo varchar, @BranchCodeRcvr varchar, @ReceivedBy varchar, @Items TransferInventoryItemType
+sp_AddCarcassInventory	@parmbatcode varchar, @parmbarcode varchar
+sp_addextendedproc	@functname nvarchar, @dllname varchar
+sp_AddHRIOrderByBarcode	@parmdevno varchar, @parmrefno varchar, @parmpono varchar, @parmbarcode varchar, @parmbranchcode varchar, @parmorigin varchar, @preparedby varchar
+sp_addNonTradeOrder	@parmshipmentno varchar, @parmbranch varchar, @parmsupplier varchar, @parmproduct varchar, @parmtargetdate date, @parmqty float, @parmunits varchar, @parmcost money, @parmremarks varchar, @parmorderedby varchar, @parminvoiceno varchar
+sp_AddPaymentClient	@parmrefno varchar, @parmtransseqno varchar, @parmcustkey char, @parmcontrolno varchar, @parmcrno varchar, @parmamounttopay decimal, @parmdate date, @parmremarks varchar, @parmpreparedby varchar, @parmdebitglcode varchar, @parmcreditglcode varchar, @parmpaymenttype varchar, @parmcheckremarks varchar
+sp_AddPaymentClient_06242018	@parmrefno varchar, @parmvoucherid varchar, @parmcustid varchar, @parmsuppliername varchar, @parmamounttopay money, @parmdate date, @parmremarks varchar, @parmpreparedby varchar, @parmglcode varchar, @parmcreditglcode varchar, @parmpaymenttype varchar
+sp_AddPaymentClient_08122018	@parmrefno varchar, @parmvoucherid varchar, @parmcustid varchar, @parmsuppliername varchar, @parmamounttopay money, @parmdate date, @parmremarks varchar, @parmpreparedby varchar, @parmglcode varchar, @parmcreditglcode varchar, @parmpaymenttype varchar
+sp_AddPaymentClient05142018	@parmrefno varchar, @parmvoucherid varchar, @parmcustid varchar, @parmsuppliername varchar, @parmamounttopay money, @parmdate date, @parmremarks varchar, @parmpreparedby varchar, @parmglcode varchar, @parmpaymenttype varchar
+sp_AddPaymentSupplier	@parmrefno varchar, @parmvoucherid varchar, @parmsupplierid varchar, @parmsuppliername varchar, @parmcheckamount decimal, @parmcheckno varchar, @parmcheckdate date, @parmcheckremarks varchar, @parmpreparedby varchar, @parmglcode varchar, @parmpaymethod varchar, @parmforliquidation bit, @parmvouchertype varchar
+sp_AddPaymentSupplier_10062018	@parmrefno varchar, @parmvoucherid varchar, @parmsupplierid varchar, @parmsuppliername varchar, @parmcheckamount money, @parmcheckno varchar, @parmcheckdate date, @parmcheckremarks varchar, @parmpreparedby varchar, @parmglcode varchar, @parmpaymethod varchar
+sp_AddPaymentSupplierNewEulz	@parmrefno varchar, @parmvoucherid varchar, @parmsupplierid varchar, @parmsuppliername varchar, @parmcheckamount money, @parmcheckno varchar, @parmcheckdate date, @parmcheckremarks varchar, @parmpreparedby varchar, @parmglcode varchar, @parmpaymethod varchar
+sp_AddPaymentSupplierNewEulz05072018	@parmrefno varchar, @parmvoucherid varchar, @parmsupplierid varchar, @parmsuppliername varchar, @parmcheckamount money, @parmcheckno varchar, @parmcheckdate date, @parmcheckremarks varchar, @parmpreparedby varchar, @parmglcode varchar, @parmpaymethod varchar
+sp_AddPaymentSupplierNewEulz05142018	@parmrefno varchar, @parmvoucherid varchar, @parmsupplierid varchar, @parmsuppliername varchar, @parmcheckamount money, @parmcheckno varchar, @parmcheckdate date, @parmcheckremarks varchar, @parmpreparedby varchar, @parmglcode varchar, @parmpaymethod varchar
+SP_ADDPOSUM	@parmshipmentno varchar, @parmbranch char, @parmtargetdate date, @parmremarks varchar, @parmorderedby varchar, @parmaction varchar, @parmsuppid varchar, @parmordertype varchar
+SP_ADDPOSUM02282026	@parmshipmentno varchar, @parmbranch char, @parmtargetdate date, @parmremarks varchar, @parmorderedby varchar, @parmaction varchar, @parmsuppid varchar, @parmordertype varchar
+sp_AddSalesInvoice	@parmorderno varchar, @parmcustid varchar, @parmbranchcode char, @parmtranscode varchar, @parmbarcode varchar, @parmprodcode varchar, @parmqty varchar, @parmuser varchar, @parmdiscountamount money, @parmissellingprice bit, @parmisusedform bit, @parmvatsale money, @parmvatexemptsale money, @parmvat money, @parmispriceused varchar, @parmtableno varchar, @parmoption varchar, @parmroomnum varchar, @parmbookingno varchar, @parmdesc1 varchar OUT, @parmqty2 varchar OUT, @parmsel1 varchar OUT, @parmtotal1 varchar OUT, @parmmachinename varchar
+sp_AddSalesInvoiceNew	@parmorderno varchar, @parmcustid varchar, @parmbranchcode varchar, @parmtranscode varchar, @parmbarcode varchar, @parmuser varchar, @parmdiscountamount money, @parmissellingprice bit
+sp_AddSalesInvoiceOffline	@parmorderno varchar, @parmcustid varchar, @parmbranchcode varchar, @parmtranscode varchar, @parmbarcode varchar, @parmprodcode varchar, @parmqty varchar, @parmuser varchar, @parmdiscountamount money, @parmissellingprice bit, @parmisusedform bit, @parmvatsale money, @parmvatexemptsale money, @parmvat money, @parmispriceused varchar
+sp_AddSalesInvoiceOnline	@parmorderno varchar, @parmcustid varchar, @parmbranchcode varchar, @parmtranscode varchar, @parmbarcode varchar, @parmprodcode varchar, @parmqty varchar, @parmuser varchar, @parmdiscountamount money, @parmissellingprice bit, @parmisusedform bit, @parmvatsale money, @parmvatexemptsale money, @parmvat money
+sp_AddSalesOrderRequest	@parmpono varchar, @parmcustomerkey varchar, @parmbranchcode varchar, @parmeffectivitydate date, @parmrequestedby varchar, @parmnotes varchar, @parmordertype varchar, @parmpaymenttype varchar, @Lines tt_PurchaseOrderLines
+sp_addShipmentOrder	@parmshipmentno varchar, @parmbranch varchar, @parmsupplier varchar, @parmproduct varchar, @parmtargetdate date, @parmqty float, @parmunits varchar, @parmcost money, @parmbutcherycost money, @parmfreightcost money, @parmremarks varchar, @parmorderedby varchar, @parmbutcheryvendor varchar, @parmfreightvendor varchar, @parmbutcheryvendorinvoiceno varchar, @parmfreightvendorinvoiceno varchar
+sp_addSupplier	@parmsuppkey varchar, @parmid varchar, @parmsuppliername varchar, @parmaddress varchar, @parmcontact varchar, @parmofficer varchar, @parmtinno varchar, @parmtradename varchar, @parmlineofbusiness varchar, @parmisvat bit, @parmislocal bit, @exectype varchar
+sp_AddTempInventory	@parmbranchcode varchar, @parmshipmentno varchar, @parmpalletno varchar, @parmprodcode varchar, @parmprodname varchar, @parmbarcode varchar, @parmtipweight float, @parmqty float, @parmcost varchar, @parmisoverride bit, @parmisusebarcode bit, @parmexpirydate date
+sp_AddTempInventoryNewEulz	@parmbranchcode varchar, @parmshipmentno varchar, @parmpalletno varchar, @parmcategory varchar, @parmprodtype varchar, @parmbarcode varchar, @parmtipweight float, @parmqty float, @parmcost money, @parmisoverride bit, @parmdestination varchar
+sp_Aging	@parmdatefrom date, @parmdateto date, @parmtype varchar
+sp_Aging2	@parmtype varchar
+sp_AgingAll	@parmtype varchar
+sp_alterdiagram	@diagramname sysname, @owner_id int, @version int, @definition varbinary
+sp_Analyze	@parmbranchcode varchar, @parmtransdate date
+sp_Analyze_08062025	@parmbranchcode varchar, @parmtransdate varchar, @parmispercashier bit, @parmprocessby varchar
+sp_Analyze02222026	@parmbranchcode varchar, @parmtransdate varchar
+sp_Analyze03192026	@parmbranchcode varchar, @parmtransdate date
+sp_AnalyzePerMachine	@parmbranchcode varchar, @parmmachineused varchar, @parmtransdate date
+sp_ApproveTransferOrder	@parmpono varchar, @parmuser varchar, @parmremarks varchar, @parmaction varchar, @Lines tt_TransferApprovalLines
+sp_Backup	@DBName sysname, @BaseLocation nvarchar, @BackupType varchar, @LoginName nvarchar
+sp_Backup03212026	@parmLogin varchar, @BaseLocation varchar, @BackupType varchar
+sp_BalanceSheet	@parmdate date
+sp_BankReconDisplay	@parmdatefrom date, @parmdateto date, @parmacctcode varchar, @parmbal money OUT, @parmdepintran money OUT, @parmoutstandingcheck money OUT, @parmunclearedcheck money OUT, @parmglbalance money OUT
+sp_BatchPrimalCutProcess	@parmbatchcode varchar, @parmshipmentno varchar, @parmprocessby varchar
+sp_BatchPrimalCutProcessNewEulz	@parmbatchcode varchar, @parmprocessby varchar
+sp_BatchPrimalCutProcessNewEulz_09132018	@parmbatchcode varchar, @parmprocessby varchar
+sp_BatchShortageOverage	@parmbatchcode varchar
+sp_BatchUpload	@parmshipno varchar
+sp_BranchInventoryINProcess	@Items InventoryINType, @EncodeBy varchar, @Result bit OUT, @ResultMessage nvarchar OUT
+sp_BranchInventoryINProcess_05202026	@Items InventoryINType, @EncodeBy varchar, @Result bit OUT, @ResultMessage nvarchar OUT
+sp_BranchInventoryINProcess_05202026_VarianceInsertion	@Items InventoryINType, @EncodeBy varchar, @Result bit OUT, @ResultMessage nvarchar OUT
+sp_BulkInsertPODetails	@Items PODetailsType
+sp_BulkInsertTempInventory	@TransferItems TempInventoryType
+sp_CancelDelivery	@parmdevno varchar, @parmrefno varchar, @parmpono varchar, @parmprodno varchar, @parmqty decimal, @parmbranchcode varchar, @parmorigin varchar, @preparedby varchar, @parmdevseqno int
+sp_CancelDelivery_04092026	@parmdevno varchar, @parmrefno varchar, @parmpono varchar, @parmprodno varchar, @parmqty decimal, @parmbranchcode varchar, @parmorigin varchar, @preparedby varchar, @parmdevseqno int
+sp_CancelDelivery_08212018	@parmdevno varchar, @parmrefno varchar, @parmpono varchar, @parmprodno varchar, @parmqty float, @parmbranchcode varchar, @parmorigin varchar, @preparedby varchar, @parmdevseqno int
+sp_CancelDelivery_08242018	@parmdevno varchar, @parmrefno varchar, @parmpono varchar, @parmprodno varchar, @parmqty decimal, @parmbranchcode varchar, @parmorigin varchar, @preparedby varchar, @parmdevseqno int
+sp_CancelDelivery_09132018	@parmdevno varchar, @parmrefno varchar, @parmpono varchar, @parmprodno varchar, @parmqty decimal, @parmbranchcode varchar, @parmorigin varchar, @preparedby varchar, @parmdevseqno int
+sp_CancelDelivery05082025	@parmdevno varchar, @parmrefno varchar, @parmpono varchar, @parmprodno varchar, @parmqty decimal, @parmbranchcode varchar, @parmorigin varchar, @preparedby varchar, @parmdevseqno int
+sp_CancelDeliveryByBarcode	@parmbranchcode char, @parmorigin char, @parmdevno varchar, @parmrefno varchar, @parmpono varchar, @parmbarcode varchar, @preparedby varchar
+sp_CancelledCashVoucher	@parmsupplierid varchar, @parmcheckno varchar, @parmreferenceno varchar, @parmvoucherid varchar, @parmvouchertype varchar, @parmuser varchar
+sp_CancelledCheques	@parmsupplierid varchar, @parmcheckno varchar, @parmreferenceno varchar, @parmvoucherid varchar, @parmvouchertype varchar, @parmuser varchar
+sp_CancelPOSTransaction	@parmorderno varchar, @parmtransno varchar, @parmbranchcode char, @parmseqnum decimal, @parmqty float, @parmamount decimal, @parmuser varchar, @parmmachinename varchar
+sp_CancelReceivedDelivery	@parmpono varchar, @parmseqno varchar
+sp_CancelTranferInventoryItems	@parmtransno varchar, @parmprodno varchar, @parmqty decimal, @parmsourcebranchcode varchar, @parmdestbranchcode varchar, @preparedby varchar, @parmseqno int
+sp_CaptureDailyInventorySnapshot	@parmdate date
+sp_CaptureDailyInventorySnapshotPerBranch	@parmbranchcode varchar, @parmdate date
+sp_CashBegin	@parmcashierid decimal, @parmbranchcode char, @parmcashbeginamount money, @parmtransno varchar, @parmuser varchar, @parmmachinename varchar
+sp_CeoDashboard	@parmbrcd varchar, @parmrng varchar
+sp_CeoDashboardOption	
+sp_CheckAccess	@parmuserid varchar, @isadmin bit OUT, @issales bit OUT, @isinv bit OUT, @isacct bit OUT, @ishotel bit OUT, @ispayroll bit OUT, @isreporting bit OUT, @isforwarding bit OUT
+sp_CheckBatchUploadedItems	@parmshipmentno varchar, @parmiserror bit OUT
+sp_CheckInventoryTransfer	@parmiserror bit OUT
+sp_CheckInventoryTransferNewEulz	@parmsource varchar, @parmiserror bit OUT
+sp_CommitPrimalCutConversion	@parmbatchcode varchar
+sp_CommitReInventoryIN	@parmid int
+sp_CommitReInventoryINManualEntry	@parmid int
+sp_CommitTransferBatch	@BatchNo int, @Source varchar, @Destination varchar, @DispatchNo varchar, @UserName varchar
+sp_CommitTransferPallet	@BatchNo int, @ShipmentNo varchar, @Product varchar, @PalletNo varchar, @Source varchar, @Destination varchar, @DispatchNo varchar, @UserName varchar, @Branch varchar
+sp_CommitTransferPallet02282026	@BatchNo int, @ShipmentNo varchar, @Product varchar, @PalletNo varchar, @Source varchar, @Destination varchar, @DispatchNo varchar, @UserName varchar, @Branch varchar
+sp_ComputeSalesCostingFIFO	@parmbranchcode char, @parmproductcode varchar, @parmqty float, @parmsalesdate date
+sp_ConfirmBranchOrder	@parmdevno varchar, @parmrefno varchar, @parmeffectivitydate date, @parmpono varchar, @parmbarcode varchar, @parmbranchcode varchar, @parmorigin varchar, @preparedby varchar
+sp_ConfirmBranchOrder_08212018	@parmdevno varchar, @parmrefno varchar, @parmpono varchar, @parmbarcode varchar, @parmbranchcode varchar, @parmorigin varchar, @preparedby varchar
+sp_ConfirmBranchOrder_09132018	@parmdevno varchar, @parmrefno varchar, @parmpono varchar, @parmbarcode varchar, @parmbranchcode varchar, @parmorigin varchar, @preparedby varchar
+sp_ConfirmBranchOrderSTS	@parmdevno varchar, @parmrefno varchar, @parmeffectivitydate date, @parmpono varchar, @parmbarcode varchar, @parmbranchcode varchar, @parmorigin varchar, @preparedby varchar
+sp_ConfirmBranchReceivedTransferInventory	@parmtransno varchar, @parmbranchcode varchar, @preparedby varchar, @category varchar, @remarks varchar, @suppliername varchar
+sp_ConfirmBranchReceivedTransferInventoryTest	@parmtransno varchar, @parmbranchcode varchar, @preparedby varchar, @category varchar, @remarks varchar, @suppliername varchar
+sp_ConfirmBranchRecievedOrder	@parmdevno varchar, @parmpono varchar, @parmbarcode varchar, @parmbranchcode varchar, @preparedby varchar
+sp_ConfirmBranchRecievedOrder_04202026	@parmdevno varchar, @parmpono varchar, @parmbarcode varchar, @parmbranchcode varchar, @preparedby varchar
+sp_ConfirmBranchRecievedOrder_10282017	@parmdevno varchar, @parmrefno varchar, @parmpono varchar, @parmbarcode varchar, @parmbranchcode varchar, @parmorigin varchar, @preparedby varchar, @parmpaymenttype varchar
+sp_ConfirmBranchRecievedOrder_11202017	@parmdevno varchar, @parmrefno varchar, @parmpono varchar, @parmbarcode varchar, @parmbranchcode varchar, @parmorigin varchar, @preparedby varchar, @parmpaymenttype varchar
+sp_ConfirmBranchTransferInventory	@parmtransno varchar, @parmbarcode varchar, @parmsourcebranchcode varchar, @parmdestbranchcode varchar, @preparedby varchar
+sp_ConfirmConversion	@parmbranchcode varchar, @parmconid varchar
+sp_ConfirmConversion_04152026	@parmbranchcode varchar, @parmconid varchar
+sp_ConfirmConversion02102026	@parmbranchcode varchar, @parmconid varchar
+sp_ConfirmConversion03092026	@parmbranchcode varchar, @parmconid varchar
+sp_ConfirmConversion05082025	@parmbranchcode varchar, @parmconid varchar
+sp_ConfirmOrder	@parmdevno varchar, @parmpono varchar, @preparedby varchar, @parmzerorated bit, @parmmachinename varchar
+sp_ConfirmOrder_10062018	@parmdevno varchar, @parmpono varchar, @preparedby varchar
+sp_ConfirmOrder03182026	@parmdevno varchar, @parmpono varchar, @preparedby varchar, @parmmachinename varchar
+SP_CONFIRMPO	@parmshipmentno varchar, @parmsupplierid varchar, @parmbranch char, @parmordertype char, @parminvoicedate date, @parminvoiceno varchar, @parmamountpayable money, @parmorderedby varchar
+sp_ConfirmShipmentOrder	@parmshipmentNo varchar, @parmrefno int, @parmuser varchar
+sp_Conversion	@parmbranchcode varchar, @refcode int, @parmconvertto varchar, @parmconvertprodcode varchar
+sp_ConversionFIFO	@parmbranchcode char, @parmproductcode varchar, @parmqty float, @parmdateconverted date, @parmconid varchar
+sp_ConversionFIFO02102026	@parmbranchcode char, @parmproductcode varchar, @parmqty float, @parmdateconverted date, @parmconid varchar
+sp_ConversionFIFO05082025	@parmbranchcode char, @parmproductcode varchar, @parmqty float, @parmdateconverted date, @parmconid varchar
+sp_ConversionProcess	@parmconid int, @parmbranchcode varchar
+sp_ConversionProcess_04152026	@parmconid int, @parmbranchcode varchar
+sp_ConversionProcess_04232026	@parmconid int, @parmbranchcode varchar
+sp_ConversionProcess_04282026	@parmconid int, @parmbranchcode varchar
+sp_ConversionProcess02102026	@parmconid int, @parmbranchcode varchar
+sp_ConversionProcess05082025	@parmconid int, @parmbranchcode varchar
+sp_ConversionProcessNewEulz	@parmconid int, @parmbranchcode varchar
+sp_ConversionProcessNewEulz_01272018	@parmconid int, @parmbranchcode varchar
+sp_ConversionProcessNewEulz_06072018	@parmconid int, @parmbranchcode varchar
+sp_ConversionProcessNewEulz_09132018	@parmconid int, @parmbranchcode varchar
+sp_ConversionProcessNewEulz2	@parmconid int, @parmbranchcode varchar
+sp_ConversionProcessNewEulzHO	@parmconid int, @parmbranchcode varchar, @parmconversiontype varchar, @parmuser varchar
+sp_createCosting	@parmshipmentno varchar
+sp_creatediagram	@diagramname sysname, @owner_id int, @version int, @definition varbinary
+sp_CreditMemo	@parmpono varchar, @parmuser varchar, @parmstat varchar, @Lines tt_CreditMemoLines
+sp_CreditMemo_09132018	@parmpono varchar, @parmuser varchar
+sp_DepreciationSchedule	@parmbranchcode varchar, @parmtagno varchar, @parmcost money, @parmterm money, @parmdatepurchased date
+sp_doFifo	@parmbranchcode varchar, @parmprodcode varchar, @parmdesc varchar, @parmqtyadj float, @parmuser varchar
+sp_dropdiagram	@diagramname sysname, @owner_id int
+sp_EditLine	@parmbranchcode varchar, @parmorderno varchar, @parmtransid varchar, @parmsequencenumber int, @parmprodname varchar, @parmunitprice money, @parmqty decimal, @parmtotalamount money, @parmisspecialprice bit, @parmspecialpriceamount money, @parmmachinename varchar
+sp_EditLine_bak	@parmbranchcode varchar, @parmorderno varchar, @parmtransid varchar, @parmsequencenumber int, @parmprodname varchar, @parmunitprice money, @parmqty float, @parmtotalamount money, @parmisspecialprice bit, @parmspecialpriceamount money
+sp_EditLineOffline	@parmbranchcode varchar, @parmorderno varchar, @parmtransid varchar, @parmsequencenumber int, @parmprodname varchar, @parmunitprice money, @parmqty float, @parmtotalamount money, @parmisspecialprice bit, @parmspecialpriceamount money
+sp_ErrorCorrect	@parmbranchcode varchar, @parmrefcode varchar, @parmremarks varchar, @parmuser varchar
+sp_ErrorCorrect_bak	@parmbranchcode varchar, @parmrefcode varchar, @parmremarks varchar, @parmuser varchar
+sp_ExcelInvMonthEndCount	@param1 varchar, @param2 varchar
+sp_ExcelInvMonthEndCount2	@param1 varchar, @param2 varchar
+sp_ExpenseReversal	@parmvoucherid varchar, @parmuser varchar, @parmseq int
+sp_FiFoMapping	@parmtransdate date, @parmbranchcode char, @parmprodcode char, @parmqty float, @parmoption char
+sp_FiFoMapping02232026	@parmtransdate date, @parmbranchcode char, @parmprodcode char, @parmqty float, @parmoption char
+sp_FiFoMappingHRI	@parmtransdate date, @parmorigin char, @parmbranchcode char, @parmprodcode char, @parmqty decimal, @parmdevno varchar, @parmpono varchar, @parmdevdetseqno int
+sp_FiFoMappingHRI_08032026	@parmtransdate date, @parmorigin char, @parmbranchcode char, @parmprodcode char, @parmqty float, @parmdevno varchar, @parmpono varchar
+sp_FiFoMappingSalesInvDeduct	@parmtransdate date, @parmbranchcode char, @parmprodcode char, @parmqty float, @parmoption char
+sp_FiFoMappingSalesInvDeduct_03242026	@parmtransdate date, @parmbranchcode char, @parmprodcode char, @parmqty float, @parmoption char
+sp_FiFoMappingSalesInvDeductForJobs	@parmtransdate date, @parmbranchcode char, @parmprodcode char, @parmqty float, @parmoption char
+sp_FiFoMappingSalesInvDeductPerMachine	@parmtransdate date, @parmbranchcode char, @parmmachineused varchar
+sp_FiFoMappingStockOut	@parmorderno varchar, @parmtransdate date, @parmbranchcode char, @parmprodcode char, @parmqty float, @parmoption char, @parmsellingprice decimal, @parmcost decimal OUT
+sp_FiFoMappingSTS	@parmtransdate date, @parmorigin char, @parmbranchcode char, @parmprodcode char, @parmqty decimal, @parmdevno varchar, @parmpono varchar, @parmdevdetseqno int
+sp_FiFoMappingSTS_03242026	@parmtransdate date, @parmorigin char, @parmbranchcode char, @parmprodcode char, @parmqty float, @parmdevno varchar, @parmpono varchar
+sp_FiFoMappingSTS_04092026	@parmtransdate date, @parmorigin char, @parmbranchcode char, @parmprodcode char, @parmqty decimal, @parmdevno varchar, @parmpono varchar
+sp_FiFoMappingTransferInventory	@parmtransferno bigint, @parmbranchcode char, @parmbranchcodedest char, @parmprodcode char, @parmqty float
+sp_FiFoWithOptions	@parmorderno varchar, @parmtransdate date, @parmbranchcode char, @parmprodcode char, @parmqty float, @parmoption char, @parmsellingprice decimal, @parmcost decimal OUT
+sp_FiFoWithOptionsInventory	@parmorderno varchar, @parmtransdate date, @parmbranchcode char, @parmprodcode char, @parmqty float, @parmoption char, @parmsellingprice decimal, @parmcost decimal OUT
+sp_GenerateInventoryDailyReport	@parmbrcode char, @datefrom date, @dateto date
+sp_GenerateInventoryDailyReport03232026	@parmbrcode char, @datefrom date, @dateto date
+sp_GenerateInventoryMonthlyRangeReport	@parmbrcode char, @datefrom date, @dateto date
+sp_GenerateInventoryMonthlyRangeReport_03292026	@parmbrcode char, @datefrom date, @dateto date
+sp_GenerateInventoryMonthlyReport	@parmbrcode char, @datefrom date, @dateto date
+sp_GetBadOrderNumber	
+sp_GetBatchCode	
+sp_GetBatchCodesForShipment	@ShipmentNo varchar
+sp_GetBatchReferenceID	
+sp_GetConversionNumber	
+sp_GetDailyDeliveryMonitor	
+sp_GetDeliveryNumber	
+sp_GetDispatchFIFOBreakdown	@ProductCode varchar, @BranchCode varchar, @RequestedQty decimal, @AlreadyStaged tt_STSDispatchStagedLots
+sp_GetExpenseNumber	
+sp_GetInventoryBatchCode	
+sp_GetInventoryByBarcodeForStockOut	@Barcode varchar, @BranchCode varchar
+sp_GetInventoryDrillDown	@BranchName varchar, @ProductCode char
+sp_GetInventoryForStockOutDropdown	@BranchCode varchar
+sp_GetInventoryForStockOutManualDropdown	@BranchCode varchar
+sp_GetInventoryINNumber	
+sp_GetLiquidationNumber	
+sp_GetPurchaseOrderNumber	
+sp_GetReferenceNumber	
+sp_GetSalesDateForDataProcessing	@BranchCode char, @FromDate date, @ToDate date, @MachineUsed varchar
+sp_GetShipmentNo	
+sp_getSKUItem	@parmcode varchar
+sp_GetStockOutBarcodeNumber	
+sp_GetStockOutFIFOBreakdown	@ProductCode varchar, @BranchCode varchar, @RequestedQty decimal, @AlreadyStaged tt_StockOutStagedLots
+sp_GetStockOutFIFOBreakdownByShipment	@ProductCode varchar, @BranchCode varchar, @ShipmentNo varchar, @ReferenceCode varchar, @RequestedQty decimal, @AlreadyStaged tt_StockOutStagedLots
+sp_GetTicketNumber	
+sp_GetTopPendingDeliveries	
+sp_GetTransferInventoryNumber	
+sp_GetTransNumber	
+sp_GetVoucherNumber	
+sp_GLDrillDown	@Branch varchar, @PeriodIn varchar, @AccountCode varchar
+sp_GLPosting	@Branch varchar, @PPostDate varchar, @SkipEmptyDays bit
+sp_GLSummary	@parmbranchcode varchar, @parmcutoffdate date, @parmdate date, @parmisasofdate bit, @parmisperbranch bit, @parmreporttype varchar
+sp_GLSummary_11222018	@parmbranchcode varchar, @parmcutoffdate date, @parmdate date, @parmisasofdate bit, @parmisperbranch bit, @parmreporttype varchar
+sp_helpdiagramdefinition	@diagramname sysname, @owner_id int
+sp_helpdiagrams	@diagramname sysname, @owner_id int
+sp_HoldSalesInvoice	@parmorderno varchar, @parmprodname varchar, @parmunitprice money, @parmqty float, @parmamount money, @parmdiscount money
+sp_ImportCarcassInventory	@parmbranchcode varchar, @parmfreightcost money, @barcode varchar, @parmproductcode varchar, @parmproddesc varchar, @parmshipmentno varchar, @parmpalletno varchar, @parmtipweight float, @parmactualweight float, @parmreferenceCode varchar, @parmreceivedby varchar, @parmrefno int, @parmdestination varchar, @ctr int, @parmcost money
+sp_ImportCarcassInventoryNewEulz	@parmbranchcode varchar, @parmshipmentno varchar, @parmreceivedby varchar, @parmdestination varchar
+sp_IncomeStatement	@parmbranchcode varchar, @parmdate date, @parmcutoffdate date, @parmisasofdate bit
+sp_InsertStockOutSummary	@parmbatchid varchar, @parmbrcode char, @parmcategory varchar, @parmremarks varchar
+sp_InsertTempInventoryPrimal	@Branch varchar, @ShipmentNo varchar, @BatchCode varchar, @ProductCode varchar, @ProductName varchar, @SkuNo varchar, @Quantity varchar, @Cost varchar, @UserID varchar, @PalletNo varchar
+sp_InvAdjustment	@parmbranchcode varchar, @parmprodcode varchar, @parmdesc varchar, @parmqty float, @parmcost money, @parmqtyadj float, @parmnewqty float, @parmseqrefnum int, @parmstat varchar, @parmamountadjusted money, @parmisvat bit, @parmuser varchar, @parmtype varchar, @parmsupplierid varchar
+sp_InvAdjustmentEulzOrig	@parmbranchcode varchar, @parmprodcode varchar, @parmdesc varchar, @parmqty float, @parmcost money, @parmqtyadj float, @parmnewqty float, @parmseqrefnum int, @parmstat varchar, @parmamountadjusted money, @parmisvat bit, @parmuser varchar, @parmtype varchar, @parmsupplierid varchar
+sp_InvAdjustmentORIG	@parmbranchcode varchar, @parmprodcode varchar, @parmdesc varchar, @parmqty float, @parmcost money, @parmqtyadj float, @parmnewqty float, @parmseqrefnum int, @parmstat varchar, @parmamountadjusted money, @parmisvat bit, @parmuser varchar, @parmtype varchar, @parmsupplierid varchar
+sp_InvBranchQtyAdj	@parmbranchcode char, @parmprodcode varchar, @parmdesc varchar, @parmqty float, @parmoption varchar, @parmaddedby varchar
+sp_InvCostAdjustment	@parmbranchcode varchar, @parmshipmentno varchar, @parmprodcode varchar, @parmoldqty float, @parmoldcostkg float, @parmnewcostvalue decimal, @parmuser varchar, @parmsupplierid varchar
+sp_InvCostAdjustment_ORIG	@parmbranchcode varchar, @parmprodcode varchar, @parmdesc varchar, @parmqty float, @parmcost money, @parmcostadj money, @parmoldcostvalue money, @parmnewcostvalue money, @parmseqrefnum int, @parmstat varchar, @parmisvat bit, @parmuser varchar, @parmsupplierid varchar
+sp_InvCostAdjustmentNewEulz	@parmbranchcode varchar, @parmshipmentno varchar, @parmprodcode varchar, @parmoldqty float, @parmoldcostkg float, @parmnewcostvalue money, @parmuser varchar, @parmsupplierid varchar
+sp_InventoryAnalyzerAdjustment	@parmbranchcode char, @parmiswarehouse bit
+sp_InventoryAnalyzerAdjustmentTest	@parmiswarehouse bit
+sp_InventoryFIFO	@parmdevno varchar, @parmpono varchar, @parmbranchcode char, @parmproductcode varchar, @parmqty float
+sp_InventorySettlement	@parmbranchcode varchar, @parmdelivno varchar, @parmpono varchar, @parmvatgain money, @parmvatloss money, @parmvatexemptgain money, @parmvatexemptloss money, @parmuser varchar
+sp_InventoryTransferFIFO	@parmbranchcode varchar, @parmdate date, @parmuser varchar, @parmbatchnumber varchar, @parmsource varchar, @parmdispatchno varchar
+sp_InventoryTransferFIFO_OLD	@parmbranchcode varchar, @parmdate date, @parmuser varchar, @parmbatchnumber varchar
+sp_InventoryTransferFIFONewEulz	@parmbranchcode varchar, @parmdate date, @parmuser varchar, @parmbatchnumber varchar, @parmsource varchar
+sp_InventoryTransferFIFONewEulz_08212018	@parmbranchcode varchar, @parmdate date, @parmuser varchar, @parmbatchnumber varchar, @parmsource varchar
+sp_InventoryTransferFIFONewEulz_08242015	@parmbranchcode varchar, @parmdate date, @parmuser varchar, @parmbatchnumber varchar, @parmsource varchar
+sp_InventoryTransferFIFONewEulz_09132018	@parmbranchcode varchar, @parmdate date, @parmuser varchar, @parmbatchnumber varchar, @parmsource varchar
+sp_InvQtyAdjustment	@parmbranchcode varchar, @parmprodcode varchar, @parmdesc varchar, @parmsupplierid varchar, @parmshipmentno varchar, @parmqty float, @parmcost money, @parmqtyadj float, @parmnewqty float, @parmadjustmenttype varchar, @parmadjustmentmethod varchar, @parmamountadjusted money, @parmuser varchar
+sp_IS	@parmdatefrom date, @parmdateto date
+sp_IS2	@parmdatefrom date, @parmdateto date
+sp_IS3	@parmdatefrom date, @parmdateto date
+sp_IS5	
+sp_LiquidateVoucher	@parmliquidationid varchar, @parmuser varchar, @parmticketdate date
+sp_OnHoldSalesInvoice	@parmbranchcode varchar, @parmorderno varchar, @parmtranscode varchar, @parmprodname varchar, @parmunitprice money, @parmqty float, @parmamount money, @parmdiscount money, @parmcustname varchar, @parmcustcode varchar, @parmadvancepayment money, @parmcashier varchar, @parmmachinename varchar
+sp_PayShipmentOrder	@parmshipmentno varchar, @parmrefno varchar, @parmbranchcode varchar, @parmpaidby varchar, @paymentcost money
+sp_pivotReport	@parmdate date
+sp_POSCloseTransaction	@parmbranhcode varchar, @parmtranscode varchar, @parmcashiertranscode varchar, @parmnextbegincash money, @parmbeginningsinumber varchar, @parmendingsinumber varchar, @parmendingtransno varchar, @parmbeginrettransno varchar, @parmendrettransno varchar, @parmnoofsolditem int, @parmnoofcancelleditem int, @parmnoofvoiditem int, @parmnoofdiscount int, @parmnoofvatitems int, @parmnoofreturneditem int, @parmnoofscdiscitems int, @parmnoofpwddiscitems int, @parmnoofregdiscitems int, @parmtotalofcancelleditem money, @parmtotalofvoiditem money, @parmtotalofdiscountitem money, @parmtotalofvatitems money, @parmtotalofreturneditems money, @parmtotalofscdiscitems money, @parmtotalofpwddiscitems money, @parmtotalofregdiscitems money, @parmvatablesale money, @parmvatexemptsale money, @parmvatamount money, @parmtotalcashsales money, @parmtotalcreditsales money, @parmtotalgrosssales money, @parmtotalnetsales money, @parmtotalzeroratedsales money, @parmactualcashonhand money, @parmcashremitted money, @parmoverrage money, @parmshortage money, @parmclosedby varchar, @parm1k int, @parm5h int, @parm2h int, @parm1h int, @parm50p int, @parm20p int, @parm10p int, @parm5p int, @parm1p int, @parm25c int, @parmmachinename varchar
+sp_POSCloseTransaction_bak	@parmbranhcode varchar, @parmrefno varchar, @transby varchar, @parmtranscode int, @parmnextbegincash money, @parmtotalsolditem money, @parmtotalcancelleditem money, @parmtotalvoiditem money, @parmtotalholditem money, @parmtotaldiscount money, @parmtotalcharge money, @parmtotaltax money, @parmtotalsales money, @parmtotalcashsales money, @parmtotalactualcash money, @parmcashvariance money, @parmtotalbills money, @parmtotalcoins money, @parmcashremitted money, @parmoverrage money, @parmshortage money, @parmclosedby varchar
+SP_POSTINVENTORY	@parmshipmentno varchar, @parmrefno varchar, @parmuser varchar, @parmbranch char, @parminvoiceno varchar, @parminvoicedate date, @parmduedate date
+SP_POSTINVENTORY_02102026	@parmshipmentno varchar, @parmrefno varchar, @parmuser varchar, @parmbranch char, @parminvoiceno varchar, @parminvoicedate date, @parmduedate date
+SP_POSTINVENTORY_03252026	@parmshipmentno varchar, @parmrefno varchar, @parmuser varchar, @parmbranch char, @parminvoiceno varchar, @parminvoicedate date, @parmduedate date
+SP_POSTINVENTORY_07152026	@parmshipmentno varchar, @parmrefno varchar, @parmuser varchar, @parmbranch char, @parminvoiceno varchar, @parminvoicedate date, @parmduedate date
+SP_POSTINVENTORY05082025	@parmshipmentno varchar, @parmrefno varchar, @parmuser varchar, @parmbranch char, @parminvoiceno varchar, @parminvoicedate date, @parmduedate date
+sp_RefundKunuhay	@parmbranchcode varchar, @parmdate date
+sp_ReInventoryAnalyzer	@parmbatchid int, @parmbranchcode varchar
+sp_renamediagram	@diagramname sysname, @owner_id int, @new_diagramname sysname
+sp_ReplicateSales	@brcode char, @FromDate date, @ToDate date, @machinename varchar
+sp_ReplicateSalesBatch	@brcode char, @FromDate date, @ToDate date, @machinename varchar
+sp_resetSales	@brcode char, @petsa date, @machinename varchar
+sp_ReturnConvertedItems	@parmbranchcode varchar, @parmconid varchar
+sp_ReturnDeliveredOrder	@parmdevno varchar, @parmrefno varchar, @parmpono varchar, @parmprodno varchar, @parmbranchcode varchar, @parmreturnedqty float, @parmcost float, @parmisvat bit, @parmtype varchar, @parmreturntype varchar, @parmuser varchar
+sp_ReturnDeliveredOrder_091302018	@parmdevno varchar, @parmrefno varchar, @parmpono varchar, @parmprodno varchar, @parmbranchcode varchar, @parmreturnedqty float, @parmcost float, @parmisvat bit, @parmtype varchar, @parmreturntype varchar, @parmuser varchar
+sp_ReturnDelivery	@parmdevno varchar, @parmrefno varchar, @parmpono varchar, @parmprodno varchar, @parmbranchcode varchar, @parmreturnedqty float, @parmcost float, @parmisvat bit, @parmtype varchar, @parmreturntype varchar, @parmuser varchar
+sp_ReturnSalesOrder	@parmbranchcode char, @parmpono varchar, @parmdevno varchar, @parmuser varchar, @parmreturnstatus varchar, @parmreason varchar, @parmmachinename varchar, @Lines tt_ReturnSalesOrderLines
+sp_ReturnSalesOrder_04092026	@parmbranchcode char, @parmpono varchar, @parmdevno varchar, @parmuser varchar, @parmreturnstatus varchar, @parmmachinename varchar
+sp_ReUploadToXero	@StartDate date, @EndDate date
+sp_ReUploadToXeroZRead	@StartDate date, @EndDate date
+sp_ReverseSTSInventoryTransfer	@parmdevno varchar, @parmrefno varchar, @parmpono varchar, @parmprodno varchar, @parmqty decimal, @parmbranchcode varchar, @parmorigin varchar, @preparedby varchar, @parmdevseqno int, @parmbarcode varchar
+sp_RunSingkitsRun	@parmbranchcode char, @parmdate date, @parmmachineused varchar, @parmpercent float
+SP_Sales	@branch_code varchar, @datefrom varchar, @dateto varchar, @filter varchar
+sp_SalesChecker	@parmdate date
+sp_SalesQtyToInventoryQty	@parmSeqNo bigint, @parmBranch char, @parmProduct char, @parmRunningQtySold float, @parmsellingprice money, @TotalCost float OUT
+sp_SalesQtyToInventoryQty02232026	@parmSeqNo bigint, @parmBranch char, @parmProduct char, @parmRunningQtySold float, @parmsellingprice money, @TotalCost float OUT
+sp_SalesQtyToInventoryQty05082025	@parmSeqNo bigint, @parmBranch char, @parmProduct char, @parmRunningQtySold float, @parmsellingprice money, @TotalCost float OUT
+sp_SalesQtyToInventoryQtyEODSalesInvDeduct	@parmSeqNo bigint, @parmBranch char, @parmProduct char, @parmRunningQtySold decimal, @parmsellingprice decimal, @TotalCost decimal OUT
+sp_SalesQtyToInventoryQtyEODSalesInvDeduct_03242026	@parmSeqNo bigint, @parmBranch char, @parmProduct char, @parmRunningQtySold float, @parmsellingprice money, @TotalCost float OUT
+sp_SalesQtyToInventoryQtyEODSalesInvDeduct_03292026	@parmSeqNo bigint, @parmBranch char, @parmProduct char, @parmRunningQtySold decimal, @parmsellingprice decimal, @TotalCost decimal OUT
+sp_SalesQtyToInventoryQtyEODSalesInvDeduct_04092026	@parmSeqNo bigint, @parmBranch char, @parmProduct char, @parmRunningQtySold decimal, @parmsellingprice decimal, @TotalCost decimal OUT
+sp_SalesQtyToInventoryQtyEODSalesInvDeductPerMachine	@parmSeqNo bigint, @parmBranch char, @parmProduct char, @parmRunningQtySold decimal, @parmsellingprice decimal, @TotalCost decimal OUT
+sp_SalesQtyToInventoryQtyHRI	@parmSeqNo bigint OUT, @parmorigin char, @parmBranch char, @parmProduct char, @parmRunningQtySold decimal, @parmsellingprice decimal, @parmdevno varchar, @parmpono varchar, @parmdevdetseqno int, @TotalCost decimal OUT
+sp_SalesQtyToInventoryQtyHRI_08032026	@parmSeqNo bigint, @parmorigin char, @parmBranch char, @parmProduct char, @parmRunningQtySold float, @parmsellingprice money, @parmdevno varchar, @parmpono varchar, @TotalCost float OUT
+sp_SalesQtyToInventoryQtySTS	@parmSeqNo bigint OUT, @parmorigin char, @parmBranch char, @parmProduct char, @parmRunningQtySold decimal, @parmsellingprice decimal, @parmdevno varchar, @parmpono varchar, @parmdevdetseqno int, @TotalCost decimal OUT
+sp_SalesQtyToInventoryQtySTS_0324206	@parmSeqNo bigint, @parmorigin char, @parmBranch char, @parmProduct char, @parmRunningQtySold float, @parmsellingprice money, @parmdevno varchar, @parmpono varchar, @TotalCost float OUT
+sp_SalesQtyToInventoryQtySTS_04092026	@parmSeqNo bigint OUT, @parmorigin char, @parmBranch char, @parmProduct char, @parmRunningQtySold decimal, @parmsellingprice decimal, @parmdevno varchar, @parmpono varchar, @TotalCost decimal OUT
+sp_SalesQtyToInventoryQtyTransferInventory	@parmSeqNo bigint, @parmtransferno bigint, @parmBranch char, @parmBranchDest char, @parmProduct char, @parmRunningQtySold float, @parmsellingprice money, @TotalCost float OUT
+sp_SalesTemp	@parmbranchcode char, @parminvoicedate date, @parmaddedby char
+sp_SaveSalesBatchAnalysis	@BranchCode char, @DateExecute date, @MachineUsed varchar, @TargetAmount decimal, @HasMatch bit, @BestIndex int, @ClosestAccumulatedAmount decimal, @DifferenceFromTarget decimal, @RowCount int
+sp_saveTransaction	@parmbranhcode varchar, @parmrefno varchar, @parmcashiertransno varchar, @parmreferenceno varchar, @parmtransno varchar, @parmamountpayable money, @parmamounttender money, @parmamountchange money, @parminvoice varchar, @parmpaymenttype varchar, @parmcustid varchar, @transby varchar, @parmvatsale money, @parmvatexemptsale money, @parmvat money, @parmdiscount money, @parmonetimediscount bit, @parmdiscounttype varchar, @parmdiscidno varchar, @parmdiscname varchar, @parmdiscamount money, @parmiszeroratedsale bit, @parmmachinename varchar
+sp_saveTransaction_bak	@parmbranhcode varchar, @parmrefno varchar, @parmreferenceno varchar, @parmtransno varchar, @parmamountpayable money, @parmamounttender money, @parmamountchange money, @parminvoice varchar, @parmpaymenttype varchar, @parmcustid varchar, @transby varchar, @parmvatsale money, @parmvatexemptsale money, @parmvat money
+sp_StageBarcodeForReInventoryIN	@parmid int, @parmbranch varchar, @parmbarcode varchar, @parmuser varchar
+sp_StageBarcodeForTransfer	@BatchNo int, @Barcode varchar, @Source varchar, @Destination varchar, @Branch varchar, @UserName varchar
+sp_StageManualEntryForReInventoryIN	@parmid int, @parmbranch varchar, @parmdatereceived date, @parmexpirydate date, @parmproductcode varchar, @parmbarcode varchar, @parmqty decimal, @parmcost decimal, @parmiswarehouse bit, @parmuser varchar
+sp_StagePalletForTransfer	@BatchNo int, @ShipmentNo varchar, @Product varchar, @PalletNo varchar, @Source varchar, @Destination varchar, @Branch varchar, @UserName varchar
+sp_SubmitConversionRaw	@BranchCode varchar, @ConID int, @ConversionType varchar, @ConvertedBy varchar, @DateConverted datetime, @IsErrorCorrect bit, @IsConfirm bit, @SourceProductCode varchar, @SourceDescription varchar, @SourceSequenceNumber int, @SourceQty decimal, @DestProductCode varchar, @DestDescription varchar, @ActualQtyOut decimal, @OneToManyLines TVP_Conversion_OneToManyLines, @ManyToOneLines TVP_Conversion_ManyToOneLines
+sp_SyncPrice	
+sp_TicketsChecker	@BranchCode varchar, @BeginDate varchar, @EndingDate varchar, @Options varchar
+sp_TransferByPallet	@parmshipmentno varchar, @parmprodcode varchar, @parmpalletno int, @parmbatchnumber varchar, @parmdispatchno varchar, @parmsource varchar, @parmdestination varchar, @parmuser varchar, @parmoption varchar
+sp_TransferDirectly	@parmbatchcode int
+sp_TransferPerBarcode	@parmbatchno int, @parmsource varchar
+sp_TrialBalance	@Branch varchar, @PeriodIn varchar
+sp_trialbalanceconso	@parmcutoffdate date, @parmdate date
+sp_UpdateBranchInventory	@devno varchar, @prodcode varchar, @barcode varchar, @prodname varchar, @unitprice money, @qty float, @totalamount money
+sp_UpdateExpense	@parmrefno char, @parmbatchrefno bigint, @parmsupplierid varchar, @parminvoiceno varchar, @parmexpensedate date, @parmremarks varchar, @parmuser varchar
+sp_UpdateExpenseApproved	@parmrefno varchar, @parmsupplierid varchar, @parminvoiceno varchar, @parmuser varchar
+sp_UpdatePalletNo	
+sp_UpdateProducts	@parmbranchcode varchar, @parmprodcatcode int, @parmprodcode varchar, @parmdesc varchar, @parmlongdesc varchar, @parmlandcost money, @parmsellingprice money, @parmprice1 money, @parmprice2 money, @parmprice3 money, @parmprice4 money, @parmisregular bit, @parmisprice1 bit, @parmisprice2 bit, @parmisprice3 bit, @parmisprice4 bit, @parmisdiscountitem bit, @parmhavebarcode bit, @parmbarcode varchar, @parmoption varchar, @parmexectype varchar, @parmreorderlevel float, @parmuser varchar, @parmisvat bit, @parmprodtype tinyint
+sp_upgraddiagrams	
+SP_UPLOADINVENTORY	@parmshipmentno varchar, @parmbranch char, @parmsupplierid varchar, @parminvoiceno varchar, @parmuploadby varchar
+sp_UploadInventoryIN	@parmid varchar, @parmbranchcode char
+sp_UploadInventoryINAdj	@parmid varchar, @parmbranchcode char
+sp_UploadSalesDetails	@parmtransactioncode varchar, @parmtransactiondate date, @parmbranchcode varchar, @parmuser varchar
+sp_UploadTempInventoryIN	@parmid int, @parmuser varchar
+sp_VoidPOSTransaction	@parmorderno varchar, @parmtransno varchar, @parmbranchcode varchar, @parmuser varchar, @parmmachinename varchar
+sp_VoidPOSTransaction_bak	@parmorderno varchar, @parmbranchcode varchar, @parmuser varchar
+sp_VoidSelectedItem	@parmbranchcode varchar, @parmorderno varchar, @parmtransno varchar, @parmcashiertranscode varchar, @parmreturntransno varchar, @parmsequenceno int, @parmuser varchar, @parmoption varchar, @parmmachinename varchar
+spfuncx_getComparativeYearly	@tTranTs varchar, @IsAllBranch bit, @BranchCode varchar
+spfuncx_getDashboardSetting	
+spfuncx_getDashboardSignIn	@Username varchar, @Password varchar
+spfuncx_getSalesSummary	@tTranTs varchar, @IsAllBranch bit, @BranchCode varchar
+spfuncx_getSalesSummary2	@FromDate varchar, @ToDate varchar, @IsAllBranch bit, @BranchCode varchar
+spitcr_001	@parmbranchcode char, @parmmachinname varchar, @parmtransdate date, @parmpercentage float
+spitcr_addCust	@CustomerKey char, @CustomerID varchar, @CustomerName varchar, @CustomerEmail varchar, @CustomerContactNo varchar, @CustomerAddress varchar, @CustomerBirthDate date, @CustomerCreditLimit decimal, @BranchCode char, @Term smallint, @isActive bit, @DateAdded date, @AddedBy varchar, @UpdatedBy varchar, @AccountOfficer varchar, @TinNo varchar, @parmcmd char
+spitcr_AddSalesOrderFinal	@parmpono varchar, @parmuser varchar
+spjob_DeductBranchInventory	@parmdateexecute date
+spjob_DeductBranchInventory03152026	@parmdateexecute date
+spjob_DeductLateUploadCleaner	
+spjob_UploadSalesToXero	@parmdate date
+splist_Accounts	@parmdatefrom date, @parmdateto date, @parmsupplierid varchar, @parmispurchase bit, @parmisexpense bit
+splist_Accounts_10062018	@parmdatefrom date, @parmdateto date, @parmsupplierid varchar, @parmispurchase bit, @parmisexpense bit, @parmisbutchery bit, @parmisfreight bit
+splist_Accounts05142018	@parmdatefrom date, @parmdateto date, @parmsupplierid varchar, @parmispurchase bit, @parmisexpense bit, @parmisbutchery bit, @parmisfreight bit
+splist_ARAccounts	@parmcustkey varchar
+splive_GetDailySTSMonitor	
+spman_apply_and_calculate	@brcode char, @petsa date, @machinename varchar, @Items ManipItemType
+spman_calculate	@brcode char, @petsa date, @machinename varchar
+spout_APAccounts	@parmshipmentno varchar, @parmsupplierid varchar, @parminvoiceno varchar OUT, @parminvoicedate date OUT, @parmvatamount decimal OUT, @parmvatinputamount decimal OUT, @parmvatexemptamount decimal OUT, @parmactualcost decimal OUT
+spp_PrintPallete	@parmpalletnum int
+spr_Aging	@parmdatefrom date, @parmdateto date, @parmreportype varchar
+spr_ARSalesSummary	@parmdatefrom date, @parmdateto date
+spr_CashSales	@invoiceno varchar
+spr_CashSalesReport	@brcode varchar, @datefrom date, @dateto date, @reportype varchar
+spr_comparativeNetReport	@parmdatefrom date, @parmdateto date
+spr_comparativeNetReport2	@parmdatefrom date, @parmdateto date
+spr_DeliveryDetailsSummary	@parmpono varchar
+spr_DepreciationReports	@parmdate date
+spr_ESalesDetails	@parmbranchcode char, @parmdatefrom date, @parmdateto date
+spr_ESalesDetails2	@parmbranchcode char, @parmdatefrom date, @parmdateto date
+spr_EWTReconciliation	@parmdatefrom date, @parmdateto date
+spr_InventoryUnitActivity	@parmbranchcode char, @parmdatefrom date, @parmdateto date
+spr_POSCloseTransaction	@parmbranhcode char, @parmcashiertransno varchar, @parmmachineused varchar, @parmuserid varchar, @parmtransdate char OUT, @parmtransno varchar OUT, @parmbeginsino varchar OUT, @parmendsino varchar OUT, @parmbegintransno varchar OUT, @parmendtransno varchar OUT, @parmbeginrettransno varchar OUT, @parmendrettransno varchar OUT, @parmbeginningcash decimal OUT, @parmnoofsolditem int OUT, @parmnoofcancelleditem int OUT, @parmnoofvoiditem int OUT, @parmnoofdiscount int OUT, @parmnoofvatitems int OUT, @parmnoofreturneditem int OUT, @parmnoofscdisc decimal OUT, @parmnoofpwddisc decimal OUT, @parmnoofregdisc decimal OUT, @parmtotalofcancelleditem decimal OUT, @parmtotalofvoiditem decimal OUT, @parmtotalofdiscountitem decimal OUT, @parmtotalofvatitems decimal OUT, @parmtotalofreturneditems decimal OUT, @parmtotalofscdisc decimal OUT, @parmtotalofpwddisc decimal OUT, @parmtotalofregdisc decimal OUT, @parmvatablesale decimal OUT, @parmvatexemptsale decimal OUT, @parmvatamount decimal OUT, @parmzeroratedsale decimal OUT, @parmtotalcashsales decimal OUT, @parmtotalcreditsales decimal OUT, @parmtotalgrosssales decimal OUT, @parmtotalnetsales decimal OUT
+spr_POSReports	@parmbrcode varchar, @datefrom varchar, @dateto varchar, @parmprocessby varchar, @parmoption int, @parmpercashier bit, @parmispermachine bit, @parmmachinename varchar
+spr_POSReports2	@parmbrcode varchar, @datefrom date, @dateto date, @parmprocessby varchar, @parmoption int, @parmpercashier bit, @parmispermachine bit, @parmmachinename varchar
+spr_POSReports2_09132025	@parmbrcode varchar, @datefrom varchar, @dateto varchar, @parmprocessby varchar, @parmoption varchar, @parmpercashier bit, @parmispermachine bit, @parmmachinename varchar
+spr_POSSalesReportSummary	@parmdatefrom date, @parmdateto date
+spr_POSSalesReportSummary2	@parmdatefrom date, @parmdateto date
+spr_POSZReading	@parmbranchcode varchar, @parmtransno varchar, @parmtransdate char, @parmuser varchar, @parmmachinename varchar
+spr_PurchaseOrder	@refno int
+spr_ReprintCheckVoucher	@parmsupplierid varchar, @voucherid int, @parmvouchertype varchar
+spr_SalesDetailsComparativeAB	@parmbrcode char, @parmmachinename varchar, @datefrom date, @dateto date
+spr_SalesReportSummary	@parmdatefrom date, @parmdateto date
+spr_SalesReportSummary2	@parmdatefrom date, @parmdateto date
+spr_SalesSummary	@branch varchar, @datefrom date, @dateto date, @parmbook int
+spr_SalesTicketing	@parmbranchcode varchar, @parmtransdate varchar, @parmuser varchar, @parmtype varchar
+spr_SalesTicketingBak	@parmbranchcode varchar, @parmtransdate varchar, @parmuser varchar, @parmtype varchar
+spr_SalesTicketingNewEulz	@parmbranchcode varchar, @parmtransdate varchar, @parmuser varchar, @parmtype varchar
+spr_STS	@parmdate date
+spr_STSSummary	@parmpono varchar
+spr_STSSummary02182026	@parmpono varchar
+spr_Ticketing	
+spr_VATInput	@parmdatefrom date, @parmdateto date
+spr_XreadRep2	@parmbrcode varchar, @datefrom varchar, @parmprocessby varchar, @parmoption varchar, @parmpercashier bit, @parmispermachine bit, @parmmachinename varchar
+spr_XreadRep2_01092018	@parmbrcode varchar, @datefrom varchar, @parmprocessby varchar, @parmoption varchar, @parmpercashier bit, @parmispermachine bit, @parmmachinename varchar
+spr_XreadRep2ORIG	@parmbrcode varchar, @datefrom date, @parmprocessby varchar, @parmoption varchar, @parmpercashier bit, @parmispermachine bit, @parmmachinename varchar
+spr_XreadRepEulz	@parmbrcode varchar, @datefrom varchar, @parmprocessby varchar, @parmoption varchar, @parmpercashier bit, @parmispermachine bit, @parmmachinename varchar
+spr_XreadRepEulzORIG	@parmbrcode varchar, @datefrom varchar, @parmprocessby varchar, @parmoption varchar, @parmpercashier bit
+spu_APAccounts	@parmbranchcode char, @parmshipmentno varchar, @parmsupplierid varchar, @parmsuppliername varchar, @parminvoiceno varchar, @parminvoicedate date, @parmvatamount decimal, @parmvatinputamount decimal, @parmvatexemptamount decimal, @parmewtamount decimal, @parmparticulars varchar, @parmuser varchar
+spu_ComputeBatchUpload	@parmbranchcode varchar, @parmrefno varchar, @parmtransno varchar, @parmreferenceno varchar, @parmuser varchar
+spu_ComputeSalesCosting	@parmbranchcode varchar, @parmdate date, @parmuser varchar
+spu_ComputeSalesCostingNewEulz	@parmbranchcode varchar, @parmdate date, @parmuser varchar
+spu_ComputeSalesCostingNewEulz_11292017	@parmbranchcode varchar, @parmdate date, @parmuser varchar
+spu_InventoryCostUpdate	@parmshipmentno varchar
+spu_PostExpense	@parmbranch varchar, @parmticketno varchar, @parmrefno varchar, @parminvoiceno varchar, @parmexpensename varchar, @parmexpdate date, @parmexpamount money, @parmsupplierid varchar, @parmremarks varchar, @parmuser varchar, @parmmode varchar
+spu_postInventory	@parmshipmentno varchar, @parmrefno varchar, @parmuser varchar, @parmbranch varchar, @parminvoiceno varchar, @parminvoicedate date, @parmduedate date
+spu_postInventory_09132018	@parmshipmentno varchar, @parmrefno varchar, @parmuser varchar, @parmbranch varchar, @parminvoiceno varchar, @parminvoicedate date, @parmduedate date
+spu_postInventory2	@parmshipmentno varchar, @parmrefno varchar, @parmfreightcost money, @parmuser varchar, @parmbranch varchar
+spu_postInventory3	@parmshipmentno varchar, @parmrefno varchar, @parmuser varchar, @parmbranch varchar, @parmdevtype varchar
+spu_postInventoryCarcass	@parmshipmentno varchar, @parmrefno varchar, @parmuser varchar, @parmbranch varchar, @parminvoiceno varchar, @parminvoicedate date, @parmduedate date
+spu_postInventoryOLD	@parmshipmentno varchar, @parmrefno varchar, @parmuser varchar, @parmbranch varchar, @parminvoiceno varchar, @parminvoicedate date, @parmduedate date
+spu_postNonTradeOrder	@parmshipmentno varchar, @parmrefno varchar, @parmuser varchar, @parmbranch varchar, @parmdebitacctcode varchar, @parmcreditacctcode varchar
+spu_PostStockOutBarcode	@RefNo varchar, @BranchCode varchar, @Category varchar, @Remarks varchar, @PreparedBy varchar, @Lines tt_StockOutBarcodeLines
+spu_PostTransactionSales	@parmbranchcode varchar, @parmdate date, @parmreferenceno varchar, @parmuser varchar
+spu_PostTransactionSales_10112018	@parmbranchcode varchar, @parmdate date, @parmreferenceno varchar, @parmuser varchar
+spu_PostTransactionSales_11292017	@parmbranchcode varchar, @parmdate date, @parmreferenceno varchar, @parmuser varchar
+spu_PostTransactionSalesNewEulz	@parmbranchcode varchar, @parmdate date, @parmreferenceno varchar, @parmuser varchar
+spu_recalculateInvtoryCost	@parmbranch varchar, @parmshipmentno varchar
+spu_ReverseStockOutBarcode	@RefNo varchar, @ReversedBy varchar
+spu_UpdatePrimalCutCosting	@ShipmentNo varchar, @Branch varchar, @PreparedBy varchar, @Lines tt_PrimalCutCostingLines, @BatchCode int
+spu_UpdatePrimalCutCosting_bak_20260903	@ShipmentNo varchar, @Branch varchar, @PreparedBy varchar, @Lines tt_PrimalCutCostingLines
+spv_GetPrimalCutItems	@refcode varchar
+spview_DeliveryReports	@parmtype varchar, @parmpono varchar
+spview_SalesInvoice	@parmpono varchar
+usp_GetEJournalData	@TransDate date, @BranchCode char, @MachineUsed varchar, @Cashier varchar
+usp_UpdateApprovedTickets	@Branch varchar, @TicketDate varchar, @TicketNumber varchar

@@ -1,0 +1,84 @@
+--- enzo/spjob_UploadSalesToXero.sql	2026-10-15 23:07:09.831073000 +0800
++++ prod/spjob_UploadSalesToXero.sql	2026-10-15 23:07:14.799636300 +0800
+@@ -1,4 +1,4 @@
+---SERVES AS DAILY TRANSACTION UPLOAD exec spjob_UploadSalesToXero '2026-05-25'
++--SERVES AS DAILY TRANSACTION UPLOAD
+ CREATE PROC [dbo].[spjob_UploadSalesToXero]
+ 	@parmdate date
+ AS
+@@ -66,7 +66,7 @@
+ 			[TotalSCDiscount], [TotalPWDDiscount], [TotalRegDiscount], [TotalVatSales], 
+ 			[VatExemptSale], [VatableSale], [VatInput], [ZeroRatedSale], [VatAdjustment], 
+ 			[DateExecute], [ExecuteBy], [TotalNetSales], 0
+-		FROM [dbo].[POSZReadingTransactions] WITH(NOLOCK)  
++		FROM CORECS2026.[dbo].[POSZReadingTransactions] WITH(NOLOCK)  
+ 		WHERE CAST(DateExecute as date) = @parmdate;
+ 
+ 		---------------------------------------------------------------------------
+@@ -86,56 +86,12 @@
+ 			[DiscountAmount], [VatAdjustment], [DiscName], [DiscIDNo], [DiscRemarks], 
+ 			[Cashier], [MachineUsed], [DateExecute], [isErrorCorrect], [VatExemptAdj], 
+ 			[DiscountPercentage], [VatableSalesDiscAmount], [VatDiscAmount], [VatExDiscAmount]
+-		FROM [dbo].[SalesDiscount] WITH(NOLOCK)  
++		FROM CORECS2026.[dbo].[SalesDiscount] WITH(NOLOCK)  
+ 		WHERE CAST(DateExecute as date) = @parmdate;
+ 
+ 		---------------------------------------------------------------------------
+ 		-- 3. SYNC POSSalesSummary (FIXED MISSING DB PREFIX)
+ 		---------------------------------------------------------------------------
+-		-- CHECK IF UPDATE IS NEEDED BEFORE EXECUTING
+-		IF EXISTS (
+-			SELECT 1
+-			FROM [dbo].POSSalesSummary aa
+-			INNER JOIN (
+-				SELECT a.ProductCode,
+-					   a.Description,
+-					   b.Description AS Category,
+-					   a.isVat
+-				FROM [dbo].Products a
+-				INNER JOIN [dbo].ProductCategory b
+-					ON a.ProductCategoryCode = b.ProductCategoryID
+-				WHERE a.BranchCode = '888' 
+-				
+-			) bb
+-			ON aa.ProductCode = bb.ProductCode COLLATE SQL_Latin1_General_CP1_CI_AS
+-			WHERE CAST(aa.DateOrder AS date) = @parmdate
+-				AND ISNULL(aa.Category, '') COLLATE SQL_Latin1_General_CP1_CI_AS
+-				<> ISNULL(bb.Category, '') COLLATE SQL_Latin1_General_CP1_CI_AS
+-		)
+-		BEGIN
+-			-- Records exist - proceed with update
+-			WITH proddesccat AS (
+-						SELECT a.ProductCode,
+-							   a.Description,
+-							   b.Description AS Category,
+-							   a.isVat
+-						FROM [dbo].Products a
+-						INNER JOIN [dbo].ProductCategory b
+-							ON a.ProductCategoryCode = b.ProductCategoryID
+-						WHERE a.BranchCode = '888'
+-			)
+-			UPDATE aa
+-				SET aa.Category = bb.Category,aa.isVat=bb.isVat
+-				FROM [dbo].POSSalesSummary aa
+-					INNER JOIN proddesccat bb
+-					ON aa.ProductCode = bb.ProductCode COLLATE SQL_Latin1_General_CP1_CI_AS
+-				WHERE CAST(aa.DateOrder AS date) = @parmdate
+-					AND ISNULL(aa.Category, '') COLLATE SQL_Latin1_General_CP1_CI_AS
+-					<> ISNULL(bb.Category, '') COLLATE SQL_Latin1_General_CP1_CI_AS;
+-		END
+-
+-
+-
+ 		DELETE FROM [ITCOREPOSENZO].[dbo].[POSSalesSummary] 
+ 		WHERE CAST(DateOrder as date) = @parmdate;
+ 
+@@ -148,7 +104,7 @@
+ 			[BranchCode], [ProductCode], [Description], [Category], [ProcessedBy], 
+ 			[QtySold], [Subtotal], [TotalAmount], [Status], [isVat], [DateOrder], 
+ 			0, [MachineUsed], [Cost]
+-		FROM [dbo].[POSSalesSummary] WITH(NOLOCK) 
++		FROM CORECS2026.[dbo].[POSSalesSummary] WITH(NOLOCK) 
+ 		WHERE CAST(DateOrder as date) = @parmdate;   
+ 
+ 		---------------------------------------------------------------------------
