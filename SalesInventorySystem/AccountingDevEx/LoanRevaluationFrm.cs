@@ -38,6 +38,10 @@ namespace SalesInventorySystem.AccountingDevEx
         private readonly TextEdit txtControlNo = new TextEdit();
         private readonly TextEdit txtDescription = new TextEdit();
         private readonly LabelControl lblPreview = new LabelControl();
+        // [105] 2026-10-17 (user): the automatic entry as a grid (it was lines of text in the preview)
+        private readonly GridControl gridEntry = new GridControl();
+        private readonly GridView viewEntry = new GridView();
+        private readonly DataTable _entry = NewEntryTable();
         private readonly SimpleButton btnPost = new SimpleButton { Text = "Post Revaluation" };
 
         private readonly GridControl gridTxn = new GridControl();
@@ -139,8 +143,9 @@ namespace SalesInventorySystem.AccountingDevEx
             txtDescription.Anchor = AnchorStyles.Left | AnchorStyles.Right;
             txtDescription.Properties.MaxLength = 300;
 
-            lblPreview.AutoSizeMode = LabelAutoSizeMode.None;
-            lblPreview.Dock = DockStyle.Fill;
+            lblPreview.AutoSizeMode = LabelAutoSizeMode.Vertical;   // [105] grows with its lines (5-7 with a payable / control no.)
+            lblPreview.Dock = DockStyle.Top;
+            lblPreview.Padding = new Padding(0, 0, 0, 6);
             lblPreview.Appearance.Font = new Font("Tahoma", 9.75F);
             lblPreview.Appearance.Options.UseFont = true;
             lblPreview.Appearance.TextOptions.VAlignment = DevExpress.Utils.VertAlignment.Top;
@@ -163,7 +168,41 @@ namespace SalesInventorySystem.AccountingDevEx
             form.Controls.Add(txtControlNo, 1, 3);
             form.Controls.Add(Caption("Description (blank = automatic):"), 0, 4);
             form.Controls.Add(txtDescription, 1, 4);
-            form.Controls.Add(lblPreview, 0, 5); form.SetColumnSpan(lblPreview, 2);
+            // [105] the preview text on top, the entry it will post in a grid below it
+            gridEntry.Dock = DockStyle.Fill;
+            gridEntry.MinimumSize = new Size(0, 120);   // header, two lines and the totals always show
+            gridEntry.MainView = viewEntry;
+            gridEntry.ViewCollection.Add(viewEntry);
+            viewEntry.GridControl = gridEntry;
+            viewEntry.OptionsBehavior.Editable = false;
+            viewEntry.OptionsView.ShowGroupPanel = false;
+            viewEntry.OptionsView.ShowFooter = true;
+            viewEntry.OptionsView.ShowIndicator = false;
+            viewEntry.OptionsCustomization.AllowSort = false;
+            viewEntry.OptionsCustomization.AllowGroup = false;
+            Classes.DevXGridViewSettings.ApplyTotalsBandAppearance(viewEntry);
+            // columns added explicitly: PopulateColumns makes none while the grid isn't on a shown form
+            var cAcct = viewEntry.Columns.AddVisible("AccountCode", "Account");
+            cAcct.Width = 110;
+            var cName = viewEntry.Columns.AddVisible("AccountName", "Account Name");
+            cName.Width = 360;
+            foreach (var f in new[] { "Debit", "Credit" })
+            {
+                var c = viewEntry.Columns.AddVisible(f, f);
+                c.Width = 170;
+                c.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+                c.DisplayFormat.FormatString = "N2";
+                c.AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+                c.AppearanceCell.Options.UseTextOptions = true;
+                c.AppearanceHeader.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+                c.AppearanceHeader.Options.UseTextOptions = true;
+                c.Summary.Add(DevExpress.Data.SummaryItemType.Sum, f, "{0:N2}");
+            }
+            gridEntry.DataSource = _entry;
+            var previewPanel = new PanelControl { Dock = DockStyle.Fill, BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder };
+            previewPanel.Controls.Add(gridEntry);    // Fill first (it docks last), then the Top text
+            previewPanel.Controls.Add(lblPreview);
+            form.Controls.Add(previewPanel, 0, 5); form.SetColumnSpan(previewPanel, 2);
             form.Controls.Add(btnPost, 0, 6);
             tabNew.Controls.Add(form);
 
@@ -311,6 +350,7 @@ namespace SalesInventorySystem.AccountingDevEx
         {
             var r = SelectedLoan;
             btnPost.Enabled = HasPosition(r);
+            _entry.Rows.Clear();   // [105]
             if (r == null)
             {
                 lblLoanInfo.Text = lblGLCheck.Text = lblPreview.Text = "";
@@ -331,7 +371,17 @@ namespace SalesInventorySystem.AccountingDevEx
             bool ties = php == gl;
             lblGLCheck.Text = ties ? $"GL {r["LiabilityAccount"]} on branch {r["BranchCode"]}: {gl:N2} (same as the loan)"
                                    : $"GL {r["LiabilityAccount"]} on branch {r["BranchCode"]}: {gl:N2} — differs from the loan by {gl - php:N2}: a principal payment (type the loan's new balance) or something else was posted to that account";
-            lblGLCheck.Appearance.ForeColor = ties ? Color.SeaGreen : Color.Firebrick;
+            // [105] the payable must equal the GL (the post refuses otherwise, 62030)
+            bool payTies = true;
+            if (HasPayable(r))
+            {
+                decimal pay = Dec(r["PayableBalance"]);
+                payTies = pay == gl;
+                lblGLCheck.Text += payTies
+                    ? $"   ·   payable {r["PayableInvoiceNo"]} {pay:N2} (paid so far {Dec(r["PayableAmountPaid"]):N2})"
+                    : $"   ·   payable {r["PayableInvoiceNo"]} {pay:N2} does NOT equal GL: a payment outside Vouchering Telegraphic? (posting is refused until it is sorted out)";
+            }
+            lblGLCheck.Appearance.ForeColor = ties && payTies ? Color.SeaGreen : Color.Firebrick;
             lblGLCheck.Appearance.Options.UseForeColor = true;
 
             // next month end after the last entry, and a fresh entry
@@ -385,11 +435,26 @@ namespace SalesInventorySystem.AccountingDevEx
             }
         }
 
+        private static DataTable NewEntryTable()
+        {
+            var t = new DataTable("Entry");
+            t.Columns.Add("AccountCode", typeof(string));
+            t.Columns.Add("AccountName", typeof(string));
+            t.Columns.Add("Debit", typeof(decimal));
+            t.Columns.Add("Credit", typeof(decimal));
+            return t;
+        }
+
+        // [105] the loan's payable in Vouchering Telegraphic (columns only where [105] is installed)
+        private static bool HasPayable(DataRow r) =>
+            r != null && r.Table.Columns.Contains("PayableBalance") && r["PayableBalance"] != DBNull.Value;
+
         // what the post will do, before it is done
         private void UpdatePreview()
         {
             var r = SelectedLoan;
             lblPreview.Appearance.Options.UseForeColor = false;
+            _entry.Rows.Clear();
             if (!HasPosition(r)) { lblPreview.Text = ""; return; }
             if (!HasDate) { lblPreview.Text = "Pick the revaluation date (a month end)."; return; }
             if (Rate == null) { lblPreview.Text = "Enter the month-end rate to see the entry."; return; }
@@ -401,22 +466,40 @@ namespace SalesInventorySystem.AccountingDevEx
             decimal basis = principalChanged ? Dec(r["GLBalance"]) : php;
             // same rounding as the proc: T-SQL ROUND(@fBal * @Rate, 2) rounds half away from zero
             decimal newBal = Math.Round(fBal * rate, 2, MidpointRounding.AwayFromZero), change = newBal - basis;
-            string liab = $"{r["LiabilityAccount"]} - {r["LiabilityAccountName"]}";
-            string entry = change > 0
-                ? $"DR {r["LossAccount"]} - {r["LossAccountName"]}   {change:N2}\n   CR {liab}   {change:N2}"
-                : $"DR {liab}   {-change:N2}\n   CR {r["GainAccount"]} - {r["GainAccountName"]}   {-change:N2}";
+            // [105] the entry goes to the grid: loss = DR forex loss / CR loan; gain = DR loan / CR forex gain
+            if (change > 0)
+            {
+                _entry.Rows.Add(r["LossAccount"], r["LossAccountName"], change, 0m);
+                _entry.Rows.Add(r["LiabilityAccount"], r["LiabilityAccountName"], 0m, change);
+            }
+            else if (change < 0)
+            {
+                _entry.Rows.Add(r["LiabilityAccount"], r["LiabilityAccountName"], -change, 0m);
+                _entry.Rows.Add(r["GainAccount"], r["GainAccountName"], 0m, -change);
+            }
+            string payable = "";
+            bool payableTies = true;
+            if (HasPayable(r))
+            {
+                decimal pBal = Dec(r["PayableBalance"]);
+                payableTies = pBal == Dec(r["GLBalance"]);
+                payable = payableTies
+                    ? $"Loan payable {r["PayableInvoiceNo"]} (Vouchering Telegraphic): Actual Cost and Balance {pBal:N2} → {pBal + change:N2}\n"
+                    : $"Loan payable {r["PayableInvoiceNo"]} shows {pBal:N2} but GL is {Dec(r["GLBalance"]):N2}: posting is refused until that is sorted out.\n";
+            }
+            btnPost.Enabled = payableTies;
             lblPreview.Text =
                 $"{r["Currency"]} {fBal:N2} × {rate:0.0000##} = new peso balance {newBal:N2}   (was {php:N2} at {lastRate:0.0000##}; rate change {rate - lastRate:+0.0000##;-0.0000##;0})\n" +
                 (principalChanged
                     ? $"Balance changed from {r["Currency"]} {recBal:N2} ({fBal - recBal:+#,##0.00;-#,##0.00}): the entry is measured against GL {r["LiabilityAccount"]} = {basis:N2}, " +
                       "which must already hold the principal payment.\n"
                     : "") +
-                (string.IsNullOrWhiteSpace(txtControlNo.Text) ? "" : $"Control No. {txtControlNo.Text.Trim()}\n") + "\n" +
+                (string.IsNullOrWhiteSpace(txtControlNo.Text) ? "" : $"Control No. {txtControlNo.Text.Trim()}\n") + payable +
                 (change == 0 ? "No change: nothing to post at this rate." :
-                 $"{(change > 0 ? "Forex LOSS" : "Forex GAIN")} {Math.Abs(change):N2}, dated {dtReval.DateTime:MM/dd/yyyy}, branch {r["BranchCode"]}:\n   {entry}");
-            if (change != 0)
+                 $"{(change > 0 ? "Forex LOSS" : "Forex GAIN")} {Math.Abs(change):N2}, dated {dtReval.DateTime:MM/dd/yyyy}, branch {r["BranchCode"]}: the entry below.");
+            if (change != 0 || !payableTies)
             {
-                lblPreview.Appearance.ForeColor = change > 0 ? Color.Firebrick : Color.SeaGreen;
+                lblPreview.Appearance.ForeColor = !payableTies || change > 0 ? Color.Firebrick : Color.SeaGreen;
                 lblPreview.Appearance.Options.UseForeColor = true;
             }
         }
@@ -444,7 +527,16 @@ namespace SalesInventorySystem.AccountingDevEx
                 spnForeign.Focus();
                 return;
             }
-            if (XtraMessageBox.Show($"Post this revaluation?\n\n{lblPreview.Text}", "Confirm Revaluation",
+            if (_entry.Rows.Count == 0)   // [105] no change at this rate (or the preview isn't complete): nothing to post
+            {
+                XtraMessageBox.Show(string.IsNullOrWhiteSpace(lblPreview.Text) ? "Nothing to post." : lblPreview.Text, "Loan Revaluation",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            string lines = "";   // [105] the entry is in the grid now; the confirmation repeats it
+            foreach (DataRow e in _entry.Rows)
+                lines += $"\n   {(Dec(e["Debit"]) > 0 ? "DR" : "CR")} {e["AccountCode"]} - {e["AccountName"]}   {Math.Max(Dec(e["Debit"]), Dec(e["Credit"])):N2}";
+            if (XtraMessageBox.Show($"Post this revaluation?\n\n{lblPreview.Text}{lines}", "Confirm Revaluation",
                     MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                 return;
 

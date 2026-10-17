@@ -24,6 +24,64 @@ namespace SalesInventorySystem.Accounting
             gridView1.OptionsView.ShowFooter = true;
             gridView1.OptionsBehavior.Editable = false;
             gridView1.OptionsView.ColumnAutoWidth = false;
+
+            // 2026-10-17 (Accounting Board): a type from the list only, AR by default; dates default to every open
+            // item up to today (the range filters the invoice / expense date)
+            txtagingtype.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;
+            if (string.IsNullOrWhiteSpace(txtagingtype.Text)) txtagingtype.Text = "AR";
+            if (datefrom.EditValue == null) datefrom.EditValue = new DateTime(2000, 1, 1);
+            if (dateto.EditValue == null) dateto.EditValue = DateTime.Today;
+            Classes.DevXGridViewSettings.ApplyTotalsBandAppearance(gridView1);
+        }
+
+        // 2026-10-17: the figure columns sp_Aging returns. Before [109] it returned them FORMAT()-ed as text, which the
+        // grid can't total; ToNumeric turns such a column into decimal so this screen works on either version.
+        private static readonly string[] FigureColumns =
+            { "Amount", "0 to 30", "31 to 60", "61 to 90", "91 to 120", "Over 90", "Over 120", "CustomerCreditLimit" };
+
+        private static DataTable ToNumeric(DataTable dt)
+        {
+            foreach (string name in FigureColumns)
+            {
+                DataColumn col = dt.Columns[name];
+                if (col == null || col.DataType != typeof(string)) continue;
+
+                int ordinal = col.Ordinal;
+                var num = new DataColumn(name + "__num", typeof(decimal));
+                dt.Columns.Add(num);
+                foreach (DataRow r in dt.Rows)
+                {
+                    string s = r[col] == DBNull.Value ? null : r[col].ToString().Replace(",", "").Trim();
+                    r[num] = decimal.TryParse(s, System.Globalization.NumberStyles.Number,
+                                              System.Globalization.CultureInfo.InvariantCulture, out decimal d)
+                        ? (object)d : DBNull.Value;
+                }
+                dt.Columns.Remove(col);
+                num.ColumnName = name;
+                num.SetOrdinal(ordinal);
+            }
+            return dt;
+        }
+
+        private void FormatFigures()
+        {
+            foreach (DevExpress.XtraGrid.Columns.GridColumn c in gridView1.Columns)
+            {
+                bool money = Array.IndexOf(FigureColumns, c.FieldName) >= 0;
+                if (!money && c.FieldName != "Age") continue;
+                c.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+                c.DisplayFormat.FormatString = money ? "N2" : "N0";
+                c.AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+                c.AppearanceCell.Options.UseTextOptions = true;
+                c.AppearanceHeader.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+                c.AppearanceHeader.Options.UseTextOptions = true;
+            }
+            var dateCol = gridView1.Columns["TransactionDate"];
+            if (dateCol != null)
+            {
+                dateCol.DisplayFormat.FormatType = DevExpress.Utils.FormatType.DateTime;
+                dateCol.DisplayFormat.FormatString = "yyyy-MM-dd";
+            }
         }
         private void ExecuteReport()
         {
@@ -44,12 +102,15 @@ namespace SalesInventorySystem.Accounting
                 }
             }
 
+            ToNumeric(dt);
+
             gridView1.Columns.Clear();
 
             gridControl1.DataSource = null;
             gridControl1.DataSource = dt;
 
             gridView1.PopulateColumns();
+            FormatFigures();
             gridView1.RefreshData();
             gridControl1.Refresh();
 
@@ -81,22 +142,27 @@ namespace SalesInventorySystem.Accounting
 
         private void btnextract_Click(object sender, EventArgs e)
         {
+            if (datefrom.EditValue == null || dateto.EditValue == null || datefrom.DateTime.Date > dateto.DateTime.Date)
+            {
+                XtraMessageBox.Show("Pick a From date on or before the To date.", "Aging", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
             try
             {
                 ExecuteReport();
-              
+
                 gridView1.OptionsView.ShowFooter = true;
                 gridView1.GroupSummary.Clear();
-                 
+
+                // 2026-10-17: AR's last bucket is "Over 90" (it had no total); Amount totals too. AddGroupSum skips a
+                // column the chosen type doesn't return.
+                AddGroupSum(gridView1, "Amount");
                 AddGroupSum(gridView1, "0 to 30");
                 AddGroupSum(gridView1, "31 to 60");
                 AddGroupSum(gridView1, "61 to 90");
-
-                if (gridView1.Columns["91 to 120"] != null)
-                    AddGroupSum(gridView1, "91 to 120");
-
-                if (gridView1.Columns["Over 120"] != null)
-                    AddGroupSum(gridView1, "Over 120");
+                AddGroupSum(gridView1, "Over 90");
+                AddGroupSum(gridView1, "91 to 120");
+                AddGroupSum(gridView1, "Over 120");
 
                 // Group by Customer
                 gridView1.BeginSort();

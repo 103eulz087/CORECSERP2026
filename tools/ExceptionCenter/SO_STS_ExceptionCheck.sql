@@ -255,6 +255,46 @@ WHERE s.PONumber IS NOT NULL
   AND (   ISNULL(s.TotalItem, -1) <> a.Item OR ISNULL(s.TotalItemSold, -1) <> a.Sold OR ISNULL(s.TotalItemReturned, -1) <> a.Ret
        OR s.TotalQtyDelivered <> a.Qty OR ISNULL(s.TotalActualQty, -1) <> a.Act);
 
+-- S10 (2026-10-17, script [104]) a posted AR payment whose Other Collections lines (PaymentType 'OTHER COLLECTION') are
+--     not carried by its own GL ticket (Mnemonic OR-% + ReferenceKey = the reference): the ticket's credit on the line's
+--     account must be at least the lines' total (the same account can also get a mapping leg, e.g. 404 overpay income),
+--     and the line must have no invoice link (PONumber '#OTHER'). 0 rows before any Other Collections payment exists.
+INSERT #X (CheckCode, PONumber, Ref, Expected, Actual, Detail)
+SELECT 'S10', NULL, h.ReferenceNo, l.Amt, ISNULL(k.Net, 0),
+       'customer ' + h.CustomerKey + ', account ' + ISNULL(l.CreditGLCode, '(blank)') + ': Other Collections lines vs the payment ticket'
+       + CASE WHEN l.Linked > 0 THEN ' (a line is linked to a PO)' ELSE '' END
+FROM dbo.PaymentHeader h
+INNER JOIN (SELECT PaymentHeaderID, CreditGLCode, SUM(Amount) AS Amt,
+                   SUM(CASE WHEN ISNULL(PONumber, '') <> '#OTHER' THEN 1 ELSE 0 END) AS Linked
+            FROM dbo.ARPaymentDetails
+            WHERE PaymentType = 'OTHER COLLECTION' AND ISNULL(ErrorTag, 0) = 0
+            GROUP BY PaymentHeaderID, CreditGLCode) l ON l.PaymentHeaderID = h.PaymentHeaderID
+OUTER APPLY (SELECT SUM(td.Credit - td.Debit) AS Net
+             FROM dbo.TicketMaster tm
+             INNER JOIN dbo.TicketDetails td ON td.TicketNumber = tm.TicketNumber AND td.ReferenceNumber = tm.ReferenceNumber
+             WHERE tm.ReferenceNumber = h.ReferenceNo AND tm.ReferenceKey = h.ReferenceNo AND tm.Mnemonic LIKE 'OR-%'
+               AND td.AccountCode = l.CreditGLCode) k
+WHERE ISNULL(h.Status, '') <> 'REVERSED'
+  AND (l.Linked > 0 OR ISNULL(k.Net, 0) < l.Amt - @Tol);
+
+-- S11 (2026-10-18, script [110]) a CR recorded as cancelled (CancelledCollectionReceipt) is also on a live AR payment of
+--     the same branch (customer's branch; same series + number, fn_rpt_DocNoSplit). spu_RecordCancelledCR refuses this
+--     and Client Payments checks before posting, but the payment insert itself has no database guard (a trigger on
+--     PaymentHeader would break the screens' OUTPUT clause), so an old exe / another writer can still do it. Skipped
+--     until [110] is installed.
+IF OBJECT_ID('dbo.CancelledCollectionReceipt', 'U') IS NOT NULL
+INSERT #X (CheckCode, PONumber, Ref, Expected, Actual, Detail)
+SELECT 'S11', NULL, ph.ReferenceNo, 0, ph.TotalAmount,
+       'CR ' + ph.CRNo + ' (branch ' + c.BranchCode + ', customer ' + ph.CustomerKey + ') was recorded as CANCELLED on '
+       + CONVERT(CHAR(10), x.CRDate, 23) + ' (' + x.Reason + ', by ' + x.RecordedBy + ')'
+FROM dbo.CancelledCollectionReceipt x
+CROSS APPLY dbo.fn_rpt_DocNoSplit(x.CRNo) xs
+INNER JOIN dbo.Customers c ON c.BranchCode = x.BranchCode
+INNER JOIN dbo.PaymentHeader ph ON ph.CustomerKey = c.CustomerKey AND ISNULL(ph.Status, '') <> 'REVERSED'
+CROSS APPLY dbo.fn_rpt_DocNoSplit(ph.CRNo) ps
+WHERE CASE WHEN ps.SeqNo IS NULL THEN 'X:' + UPPER(ps.CleanNo) ELSE ps.Series + ':' + CAST(ps.SeqNo AS VARCHAR(20)) END
+    = CASE WHEN xs.SeqNo IS NULL THEN 'X:' + UPPER(xs.CleanNo) ELSE xs.Series + ':' + CAST(xs.SeqNo AS VARCHAR(20)) END;
+
 ------------------------------------------------------------------
 -- T. STS (transfers)
 ------------------------------------------------------------------
@@ -466,6 +506,8 @@ INSERT @Info VALUES
 ('S07', 'Sales',  'HIGH',     'A customer''s account balance differs from the sum of its invoice balances.', 'Find the invoice row edited by hand or the payment posted outside sp_AddPaymentClient ([87] refuses a hand-set balance, 92016); correct the row and let the ledger trigger recompute the account.'),
 ('S08', 'Sales',  'HIGH',     'An invoice row''s Balance does not follow its own columns (all rows, all dates).', 'Correct the row (AmountPaid / EWT / Discount / Offset / Balance) from its payment lines; until then sp_AddPaymentClient refuses a payment on it (92016, since [87]).'),
 ('S09', 'Sales',  'MEDIUM',   'A sales-order delivery''s counters (items / sold / returned / qty / actual qty) differ from its lines.', 'Since [89] the triggers keep them in step: check trg_DeliveryDetails_SOTotals / trg_DeliverySummary_SOTotals are enabled; a one-row UPDATE of any counter on the delivery puts it back.'),
+('S10', 'Sales',  'HIGH',     'An AR payment''s Other Collections lines are not carried by its GL ticket, or a line is linked to an invoice ([104]).', 'Compare the payment''s ARPaymentDetails OTHER COLLECTION lines with its OR ticket; since [104] sp_AddPaymentClient refuses this (92022 / 92024), so a row here came from a hand edit or another writer: reverse the payment and post it again.'),
+('S11', 'Sales',  'HIGH',     'A CR recorded as cancelled ([110]) is also on a live AR payment of the same branch.', 'Check the paper receipt: if the CR was really used, correct the cancelled record (Client Payments › Cancelled CR… › Edit); if it was really spoiled, reverse the payment and post it again with its real CR no.'),
 ('T01', 'STS',    'CRITICAL', 'Saved transfer: head-office In Transit differs from the cost of the stock actually shipped.', 'Run spu_STS_SyncInTransit for the PO after fixing the cause (duplicate Save, missed return).'),
 ('T02', 'STS',    'CRITICAL', 'Received transfer: In Transit did not clear to 0.', 'Look for a missing receipt, short/over ticket or a receipt on the wrong PO.'),
 ('T03', 'STS',    'CRITICAL', 'Transfer received more than once (two IT-BR tickets).', 'Reverse the duplicate receipt and its branch stock.'),

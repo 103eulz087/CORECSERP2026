@@ -36,6 +36,7 @@ namespace SalesInventorySystem.AccountingDevEx
         private AccordionControlElement menuBankRecon;
         private AccordionControlElement menuGLTicketEntries;
         private AccordionControlElement menuGLDetailTransaction;
+        private AccordionControlElement menuAgingReport;
         private AccordionControlElement menuLoanRevaluation;
 
         protected override void Dispose(bool disposing)
@@ -66,6 +67,7 @@ namespace SalesInventorySystem.AccountingDevEx
             this.menuBankRecon = new DevExpress.XtraBars.Navigation.AccordionControlElement();
             this.menuGLTicketEntries = new DevExpress.XtraBars.Navigation.AccordionControlElement();
             this.menuGLDetailTransaction = new DevExpress.XtraBars.Navigation.AccordionControlElement();
+            this.menuAgingReport = new DevExpress.XtraBars.Navigation.AccordionControlElement();
             this.menuLoanRevaluation = new DevExpress.XtraBars.Navigation.AccordionControlElement();
             ((System.ComponentModel.ISupportInitialize)(this.fluentDesignFormControl1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.accordionControl1)).BeginInit();
@@ -102,6 +104,7 @@ namespace SalesInventorySystem.AccountingDevEx
             this.menuBankRecon,
             this.menuGLTicketEntries,
             this.menuGLDetailTransaction,
+            this.menuAgingReport,
             this.menuLoanRevaluation});
             this.accordionControl1.Location = new System.Drawing.Point(0, 39);
             this.accordionControl1.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
@@ -216,6 +219,13 @@ namespace SalesInventorySystem.AccountingDevEx
             this.menuGLDetailTransaction.Style = DevExpress.XtraBars.Navigation.ElementStyle.Item;
             this.menuGLDetailTransaction.Tag = "navGLDetailTransaction";
             this.menuGLDetailTransaction.Text = "GL Detail Transaction";
+            //
+            // menuAgingReport
+            //
+            this.menuAgingReport.Name = "menuAgingReport";
+            this.menuAgingReport.Style = DevExpress.XtraBars.Navigation.ElementStyle.Item;
+            this.menuAgingReport.Tag = "navAgingReport";
+            this.menuAgingReport.Text = "Aging Report";
             //
             // menuLoanRevaluation
             //

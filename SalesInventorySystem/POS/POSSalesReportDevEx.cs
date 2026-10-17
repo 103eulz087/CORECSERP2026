@@ -856,6 +856,14 @@ namespace SalesInventorySystem.POS
                 SetCashReceiptsExportTitle("Cash Receipts");
 
                 gridView1.BestFitColumns();
+                // [106] 2026-10-17: the payment details (cash / cheque / online) + remarks, last column; long cheque lists
+                // would make the best fit very wide, so it opens at most 420 px (resizable; the full text shows as a hint)
+                var colRemarks = gridView1.Columns["Remarks"];
+                if (colRemarks != null)
+                {
+                    colRemarks.Caption = "Remarks (payment details)";
+                    if (colRemarks.Width > 420) colRemarks.Width = 420;
+                }
                 gridView1.ExpandAllGroups();
             }
             catch (Exception ex)

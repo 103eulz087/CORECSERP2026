@@ -996,7 +996,58 @@ namespace SalesInventorySystem.AccountingDevEx
                 return;
             }
 
+            // [108] a CV no. belongs to one cheque voucher: refuse one already used (checked before any number is drawn;
+            // the trigger trg_CheckVoucher_NoDuplicateCVNo refuses it too, 60632)
+            if (radCheckVoucher.Checked)
+            {
+                string cvNo = txtcheckcoding.Text.Trim() + txtcheckno.Text.Trim();
+                string holder;
+                try { holder = FindCVNoHolder(cvNo); }
+                catch (Exception ex)
+                {
+                    XtraMessageBox.Show("Could not check the CV no.: " + ex.Message + "\nNothing was posted.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+                if (holder != null)
+                {
+                    XtraMessageBox.Show($"CV no. {cvNo} is already used by {holder}.\n"
+                        + "Use another CV no. (a CV no. can be issued again only after its voucher is reversed); nothing was posted.",
+                        "Duplicate CV No.", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+            }
+
             PostCombinedVoucher(lines, hasInvoices, hasDebitLines);
+        }
+
+        // [108] who holds this CV no.: a live cheque voucher or a cancelled-cheque record ([55]); a reversed voucher's
+        // number is free again. Same rule as trg_CheckVoucher_NoDuplicateCVNo. Returns null when the number is free.
+        private string FindCVNoHolder(string cvNo)
+        {
+            if (string.IsNullOrWhiteSpace(cvNo)) return null;
+            const string sql = @"
+SELECT TOP (1) c.VoucherID, c.ReferenceNumber, c.PaidTo, c.CheckNo, ISNULL(c.isErrorCorrect, 0) AS isErrorCorrect
+FROM dbo.CheckVoucher AS c
+WHERE LTRIM(RTRIM(c.CVNo)) = @cvno
+  AND (ISNULL(c.isErrorCorrect, 0) = 0
+       OR (c.PaidTo = 'CANCELLED' AND ISNULL(c.Amount, 0) = 0 AND c.isErrorCorrect = 1
+           AND EXISTS (SELECT 1 FROM dbo.CheckVoucherCancelled AS l
+                       WHERE l.VoucherID = c.VoucherID AND l.ReferenceNumber = c.ReferenceNumber AND l.VoucherType = 'CANCELLED CHEQUE')))
+ORDER BY c.VoucherID;";
+
+            using (SqlConnection conn = Database.getConnection())
+            using (SqlCommand cmd = new SqlCommand(sql, conn))
+            {
+                cmd.Parameters.Add("@cvno", SqlDbType.VarChar, 50).Value = cvNo.Trim();
+                conn.Open();
+                using (var rdr = cmd.ExecuteReader())
+                {
+                    if (!rdr.Read()) return null;
+                    bool cancelled = Convert.ToInt32(rdr["isErrorCorrect"]) == 1;
+                    return (cancelled ? "cancelled-cheque record " : "voucher ") + rdr["VoucherID"]
+                        + " (ref " + rdr["ReferenceNumber"] + ", cheque " + rdr["CheckNo"] + ", " + rdr["PaidTo"] + ")";
+                }
+            }
         }
 
         // NEW - client-side mirror of sp_AddPaymentSupplierCompound_V2's
@@ -1828,6 +1879,7 @@ namespace SalesInventorySystem.AccountingDevEx
                 xct.xrLabel3.Text = Database.getSingleQuery("Approvers", "UserID<>''", "UserID");
                 xct.Bands[BandKind.Detail].Controls.Add(HelperFunction.CopyGridControl(gridControlMaster, gridViewMaster, "Pay"));
                 xct.Bands[BandKind.Detail].Font = new System.Drawing.Font("Tahoma", 10);
+                AddExpenseEntriesToPrint(xct);   // 2026-10-18: the EXPENSE ENTRIES lines
                 ReportPrintTool report = new ReportPrintTool(xct);
                 report.ShowRibbonPreviewDialog();
 
@@ -1836,6 +1888,101 @@ namespace SalesInventorySystem.AccountingDevEx
             {
                 XtraMessageBox.Show(ex.Message.ToString());
             }
+        }
+
+        // 2026-10-18 (user): the EXPENSE ENTRIES tab (manual debit lines, posted with the voucher) is printed too, in a
+        // report-footer table after the invoices: Branch, Debit Account (Code - Name), Payee, Particulars, Amount + total.
+        // Only complete lines (account and amount > 0), the same rule the posting uses (HasValidDebitLines).
+        private void AddExpenseEntriesToPrint(XtraReport report)
+        {
+            gridViewLines.CloseEditor();
+            var lines = new List<string[]>();
+            decimal total = 0m;
+            for (int i = 0; i < gridViewLines.RowCount; i++)
+            {
+                string acct = gridViewLines.GetRowCellValue(i, "AccountCode")?.ToString();
+                decimal amount = ToDecimal(gridViewLines.GetRowCellValue(i, "Amount"));
+                if (string.IsNullOrWhiteSpace(acct) || amount <= 0) continue;
+                string branch = gridViewLines.GetRowCellValue(i, "BranchCode")?.ToString();
+                lines.Add(new[]
+                {
+                    LookupCodeName(repBranchLine.DataSource as DataTable, "BranchCode", "BranchName", branch),
+                    LookupCodeName(repDebitAccount.DataSource as DataTable, "AccountCode", "Description", acct),
+                    gridViewLines.GetRowCellValue(i, "PayeeName")?.ToString() ?? "",
+                    gridViewLines.GetRowCellValue(i, "Particulars")?.ToString() ?? "",
+                    amount.ToString("N2")
+                });
+                total += amount;
+            }
+            if (lines.Count == 0) return;
+
+            const float width = 749f;   // page 827 - margins 50 / 28
+            float[] widths = { 110f, 210f, 120f, 199f, 110f };
+            var font = new Font("Tahoma", 9F);
+            var bold = new Font("Tahoma", 9F, FontStyle.Bold);
+
+            var footer = new ReportFooterBand { Name = "ExpenseEntriesFooter", HeightF = 30f };
+            var title = new XRLabel
+            {
+                Text = "EXPENSE ENTRIES",
+                LocationF = new PointF(0f, 8f),
+                SizeF = new SizeF(width, 20f),
+                Font = new Font("Tahoma", 10F, FontStyle.Bold)
+            };
+
+            var table = new XRTable
+            {
+                LocationF = new PointF(0f, 30f),
+                SizeF = new SizeF(width, 20f * (lines.Count + 2)),
+                Borders = DevExpress.XtraPrinting.BorderSide.All,
+                Font = font
+            };
+            table.BeginInit();
+            Func<string[], Font, bool, XRTableRow> makeRow = (cells, f, isTotal) =>
+            {
+                var row = new XRTableRow { HeightF = 20f };
+                for (int c = 0; c < cells.Length; c++)
+                {
+                    var cell = new XRTableCell
+                    {
+                        Text = cells[c],
+                        WidthF = widths[c],
+                        Font = f,
+                        Padding = new DevExpress.XtraPrinting.PaddingInfo(3, 3, 1, 1),
+                        TextAlignment = c == cells.Length - 1
+                            ? DevExpress.XtraPrinting.TextAlignment.MiddleRight     // figures right-aligned
+                            : DevExpress.XtraPrinting.TextAlignment.MiddleLeft,
+                        WordWrap = true,
+                        CanGrow = true
+                    };
+                    if (isTotal && c < cells.Length - 1) cell.Borders = DevExpress.XtraPrinting.BorderSide.Top | DevExpress.XtraPrinting.BorderSide.Bottom;
+                    row.Cells.Add(cell);
+                }
+                return row;
+            };
+            table.Rows.Add(makeRow(new[] { "Branch", "Debit Account", "Payee", "Particulars", "Amount" }, bold, false));
+            foreach (var l in lines) table.Rows.Add(makeRow(l, font, false));
+            table.Rows.Add(makeRow(new[] { "", "", "", "TOTAL EXPENSE ENTRIES", total.ToString("N2") }, bold, true));
+            table.EndInit();
+
+            footer.Controls.Add(title);
+            footer.Controls.Add(table);
+            footer.HeightF = table.TopF + table.HeightF + 6f;
+
+            var existing = report.Bands[BandKind.ReportFooter];
+            if (existing != null) report.Bands.Remove(existing);
+            report.Bands.Add(footer);
+        }
+
+        // "Code - Name" from a lookup's own table (the value itself when it isn't there)
+        private static string LookupCodeName(DataTable dt, string codeField, string nameField, string code)
+        {
+            if (string.IsNullOrWhiteSpace(code)) return "";
+            if (dt != null && dt.Columns.Contains(codeField) && dt.Columns.Contains(nameField))
+                foreach (DataRow r in dt.Rows)
+                    if (string.Equals(Convert.ToString(r[codeField]).Trim(), code.Trim(), StringComparison.OrdinalIgnoreCase))
+                        return code.Trim() + " - " + Convert.ToString(r[nameField]).Trim();
+            return code.Trim();
         }
 
         void printCashVoucher()
@@ -1877,11 +2024,12 @@ namespace SalesInventorySystem.AccountingDevEx
                 gridViewMaster.Columns["Pay"].Visible = false;
                 gridViewMaster.Columns["Variance"].Visible = false;
 
-                xct.xramountinwords.Text = str.ToString().ToUpper(); 
+                xct.xramountinwords.Text = str.ToString().ToUpper();
                 xct.xrpreparedby.Text = Login.Fullname;
                 xct.xrLabel3.Text = Database.getSingleQuery("Approvers", "UserID<>''", "UserID");
                 xct.Bands[BandKind.Detail].Controls.Add(HelperFunction.CopyGridControl(gridControlMaster, gridViewMaster, "Pay"));
                 xct.Bands[BandKind.Detail].Font = new System.Drawing.Font("Tahoma", 10);
+                AddExpenseEntriesToPrint(xct);   // 2026-10-18: the EXPENSE ENTRIES lines
                 ReportPrintTool report = new ReportPrintTool(xct);
                 report.ShowRibbonPreviewDialog();
 

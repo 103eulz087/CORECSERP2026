@@ -22,7 +22,7 @@ with section 6.
 - A shared proc (called by both, e.g. `sp_rpt_ItemCostingRecon_List`, `sp_rpt_ItemCostingReport_Master`) is changed
   only by its owner, keeping its result shape or adding columns at the end; the owner tells the other side in its
   handoff before deploying.
-- Script numbers stay separate: ERP `SQL/[NN]-…` (next free **[100]**; [98] = GL Detail Transaction Owner column, [99] = Bank Recon GL movement `sp_rpt_BankRecon_GLMovement`, 2026-10-16), portal `sql/NN` (next free after **43**).
+- Script numbers stay separate: ERP `SQL/[NN]-…` (next free **[101]**; [100] = user skin per account; [98] = GL Detail Transaction Owner column, [99] = Bank Recon GL movement `sp_rpt_BankRecon_GLMovement`, 2026-10-16), portal `sql/NN` (next free after **43**).
 - Before recreating anything the other side created: re-pull `OBJECT_DEFINITION()` on that tier first (your rule from
   section 1; it saved the Inventory checks once).
 
@@ -140,6 +140,14 @@ Any report over these tables must follow them; the Exception Center codes in bra
 9. **Suppliers:** `Supplier.isPayableBoth` (new); IMPORT = 000121–000129 + 000132, every other supplier LOCAL ([93]).
 10. **Products are the same at every branch** ([94]): a product exists at all 15 branches with the same VAT flag /
     type / price.
+11. **A loan payable is not an expense** (ERP [105], 2026-10-17; DEV first): the PROFOOD EUR loan LOAN051618 is one
+    `ExpenseSummary` row with `PostingMode = 'LOAN'` (PayableAccountCode **20203**, ~57.5M, one `ExpenseMaster` line,
+    supplier-ledger rows), paid in Vouchering Telegraphic and moved by every month's revaluation. **Your reports must
+    leave `PostingMode = 'LOAN'` out of expense figures:** `sp_rpt_APEXP_Aging` (it would show 57.5M as AP-expense
+    aging) and `sp_rpt_DataHealthCheck` check 13 / `sp_rpt_DataHealthCheckDetail` Seq 13 (the AP subledger vs GL
+    20101–20103 gap would show +57.5M CRITICAL; the loan is in 20203). `ISNULL(PostingMode, '') <> 'LOAN'` changes
+    nothing else today (every other row is SINGLE or MULTI-MANUAL, none NULL). The AP Exception Center checks keep
+    the row on purpose (its balance must equal its supplier ledger).
 
 ## 6. What the ERP needs back
 

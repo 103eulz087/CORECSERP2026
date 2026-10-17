@@ -38,6 +38,535 @@ namespace SalesInventorySystem.AccountingDevEx
             // totals band styling" convention.
             Classes.DevXGridViewSettings.ApplyTotalsBandAppearance(gridView2);
             Classes.DevXGridViewSettings.ApplyTotalsBandAppearance(gridViewPaymentDetails);
+
+            BuildEntryTabs();   // [104] Invoices / Other Collections
+            BuildCancelledCRButton();   // [110] cancelled CRs
+        }
+
+        // ── CANCELLED CR ([110], 2026-10-18) ────────────────────────────
+        // Like "Cancelled Cheque…" on Supplier Payment: a collection receipt that was spoiled / misprinted / damaged /
+        // lost / voided and never used for a payment is recorded with its reason (dbo.spu_RecordCancelledCR). It posts
+        // nothing; the Collection Receipt Register lists it in its series (CANCELLED, no GAP). The button opens the list
+        // (sp_GetCancelledCRs) with New… / Edit… (spu_EditCancelledCR, old / new values logged). A CR already used by a
+        // payment is reversed instead.
+        private SimpleButton btnCancelledCR;
+
+        private void BuildCancelledCRButton()
+        {
+            btnCancelledCR = new SimpleButton
+            {
+                Name = "btnCancelledCR",
+                Text = "Cancelled CR…",
+                Location = new Point(346, 207),
+                Size = new Size(130, 30),
+                ToolTip = "Record a spoiled / misprinted / lost collection receipt with its reason. No payment, no GL entry."
+            };
+            btnCancelledCR.Click += BtnCancelledCR_Click;
+            groupBox1.Controls.Add(btnCancelledCR);
+            btnCancelledCR.BringToFront();
+        }
+
+        private static DataTable FetchTable(string sql, Action<SqlCommand> addParams = null, CommandType type = CommandType.Text)
+        {
+            var dt = new DataTable();
+            using (var con = Database.getConnection())
+            using (var cmd = new SqlCommand(sql, con) { CommandType = type })
+            using (var da = new SqlDataAdapter(cmd))
+            {
+                addParams?.Invoke(cmd);
+                da.Fill(dt);
+            }
+            return dt;
+        }
+
+        private void BtnCancelledCR_Click(object sender, EventArgs e)
+        {
+            DataTable branches;
+            try
+            {
+                branches = FetchTable("SELECT BranchCode, BranchCode + ' - ' + ISNULL(BranchName, '') AS DisplayText FROM dbo.Branches ORDER BY BranchCode");
+                // a database without [110]: say so instead of opening a list that can't load
+                if (FetchTable("SELECT OBJECT_ID('dbo.sp_GetCancelledCRs', 'P') AS Id").Rows[0]["Id"] == DBNull.Value)
+                {
+                    XtraMessageBox.Show("Cancelled CR needs script [110] on this database. Ask the administrator to install it.",
+                        "Cancelled CR", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+            }
+            catch (Exception ex) { XtraMessageBox.Show(ex.Message, "Cancelled CR", MessageBoxButtons.OK, MessageBoxIcon.Error); return; }
+
+            using (var dlg = new XtraForm
+            {
+                Text = "Cancelled CRs",
+                StartPosition = FormStartPosition.CenterParent,
+                MinimizeBox = false,
+                ShowInTaskbar = false,
+                ClientSize = new Size(980, 480),
+                MinimumSize = new Size(700, 360)
+            })
+            {
+                var top = new PanelControl { Dock = DockStyle.Top, Height = 44 };
+                var lblFrom = new LabelControl { Text = "CR date from", Location = new Point(10, 14) };
+                var dtFrom = new DateEdit { Location = new Point(90, 10), Width = 110 };
+                var lblTo = new LabelControl { Text = "to", Location = new Point(209, 14) };
+                var dtTo = new DateEdit { Location = new Point(227, 10), Width = 110 };
+                var today = DateTime.Today;
+                dtFrom.EditValue = new DateTime(today.Year, today.Month, 1).AddMonths(-2);
+                dtTo.EditValue = today;
+                var btnShow = new SimpleButton { Text = "Show", Location = new Point(347, 8), Size = new Size(70, 26) };
+                top.Controls.AddRange(new Control[] { lblFrom, dtFrom, lblTo, dtTo, btnShow });
+
+                var bottom = new PanelControl { Dock = DockStyle.Bottom, Height = 44 };
+                var btnNew = new SimpleButton { Text = "New…", Location = new Point(10, 8), Size = new Size(90, 28) };
+                var btnEdit = new SimpleButton { Text = "Edit…", Location = new Point(106, 8), Size = new Size(90, 28) };
+                var btnClose = new SimpleButton { Text = "Close", Size = new Size(90, 28), DialogResult = DialogResult.Cancel,
+                                                  Anchor = AnchorStyles.Top | AnchorStyles.Right };
+                btnClose.Location = new Point(bottom.Width - 100, 8);
+                bottom.Controls.AddRange(new Control[] { btnNew, btnEdit, btnClose });
+
+                var grid = new DevExpress.XtraGrid.GridControl { Dock = DockStyle.Fill };
+                var view = new GridView(grid);
+                grid.MainView = view;
+                view.OptionsBehavior.Editable = false;
+                view.OptionsView.ShowGroupPanel = false;
+                view.OptionsSelection.EnableAppearanceFocusedCell = false;
+                view.BestFitMaxRowCount = 500;
+
+                Action load = () =>
+                {
+                    try
+                    {
+                        var dt = FetchTable("dbo.sp_GetCancelledCRs", cmd =>
+                        {
+                            cmd.Parameters.Add("@DateFrom", SqlDbType.Date).Value = dtFrom.EditValue is DateTime f ? (object)f.Date : DBNull.Value;
+                            cmd.Parameters.Add("@DateTo", SqlDbType.Date).Value = dtTo.EditValue is DateTime t ? (object)t.Date : DBNull.Value;
+                        }, CommandType.StoredProcedure);
+                        grid.DataSource = dt;
+                        view.PopulateColumns();
+                        foreach (string hide in new[] { "CancelledCRID", "BranchCode" })
+                            if (view.Columns[hide] != null) view.Columns[hide].Visible = false;
+                        var captions = new Dictionary<string, string>
+                        {
+                            { "CRNo", "CR No." }, { "CRDate", "CR Date" }, { "RecordedBy", "Recorded By" }, { "RecordedAt", "Recorded" },
+                            { "ModifiedBy", "Last Edited By" }, { "ModifiedAt", "Last Edited" }
+                        };
+                        foreach (var kv in captions)
+                            if (view.Columns[kv.Key] != null) view.Columns[kv.Key].Caption = kv.Value;
+                        if (view.Columns["CRDate"] != null)
+                        {
+                            view.Columns["CRDate"].DisplayFormat.FormatType = DevExpress.Utils.FormatType.DateTime;
+                            view.Columns["CRDate"].DisplayFormat.FormatString = "yyyy-MM-dd";
+                        }
+                        foreach (var dc in new[] { "RecordedAt", "ModifiedAt" })
+                            if (view.Columns[dc] != null)
+                            {
+                                view.Columns[dc].DisplayFormat.FormatType = DevExpress.Utils.FormatType.DateTime;
+                                view.Columns[dc].DisplayFormat.FormatString = "yyyy-MM-dd HH:mm";
+                            }
+                        if (view.Columns["Edits"] != null)
+                        {
+                            view.Columns["Edits"].AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+                            view.Columns["Edits"].AppearanceCell.Options.UseTextOptions = true;
+                            view.Columns["Edits"].AppearanceHeader.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+                            view.Columns["Edits"].AppearanceHeader.Options.UseTextOptions = true;
+                        }
+                        view.BestFitColumns();
+                        if (view.Columns["Remarks"] != null && view.Columns["Remarks"].Width > 320) view.Columns["Remarks"].Width = 320;
+                        btnEdit.Enabled = dt.Rows.Count > 0;
+                    }
+                    catch (Exception ex) { XtraMessageBox.Show(ex.Message, "Cancelled CRs", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
+                };
+                Action edit = () =>
+                {
+                    var row = view.GetFocusedDataRow();
+                    if (row == null) { XtraMessageBox.Show("Select a cancelled CR first.", "Cancelled CRs", MessageBoxButtons.OK, MessageBoxIcon.Information); return; }
+                    if (ShowCancelledCREntry(branches, row)) load();
+                };
+
+                btnShow.Click += (s, a) => load();
+                btnNew.Click += (s, a) => { if (ShowCancelledCREntry(branches, null)) load(); };
+                btnEdit.Click += (s, a) => edit();
+                view.DoubleClick += (s, a) =>
+                {
+                    var hit = view.CalcHitInfo(grid.PointToClient(Control.MousePosition));
+                    if (hit.InRow) edit();
+                };
+
+                dlg.Controls.Add(grid);
+                dlg.Controls.Add(top);
+                dlg.Controls.Add(bottom);
+                grid.BringToFront();
+                dlg.CancelButton = btnClose;
+                dlg.Shown += (s, a) => load();   // the grid gets its columns once the window is on screen
+                dlg.ShowDialog(this);
+            }
+        }
+
+        // The entry window: new (existing == null) or a correction of a recorded cancelled CR. True when saved.
+        private bool ShowCancelledCREntry(DataTable branches, DataRow existing)
+        {
+            bool isEdit = existing != null;
+            using (var dlg = new XtraForm
+            {
+                Text = isEdit ? "Edit Cancelled CR" : "Record Cancelled CR",
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                StartPosition = FormStartPosition.CenterParent,
+                MaximizeBox = false,
+                MinimizeBox = false,
+                ShowInTaskbar = false,
+                ClientSize = new Size(470, 330)
+            })
+            {
+                var info = new LabelControl
+                {
+                    Text = isEdit
+                        ? "Correct the details of this cancelled CR (typos). It stays a cancelled CR:\n" +
+                          "no payment, no GL entry. The old and new values are kept in the edit log."
+                        : "For a collection receipt that was spoiled, misprinted, damaged or lost and never used\n" +
+                          "for a payment. It is listed as CANCELLED in the Collection Receipt Register.\n" +
+                          "A CR already used by a payment is reversed instead (Edit / reverse the payment).",
+                    Location = new Point(14, 10),
+                    AutoSizeMode = LabelAutoSizeMode.Vertical,
+                    Width = 442
+                };
+                var lblBranch = new LabelControl { Text = "Branch", Location = new Point(14, 76) };
+                var cboBranch = new LookUpEdit { Location = new Point(120, 72), Width = 336 };
+                cboBranch.Properties.DataSource = branches;
+                cboBranch.Properties.ValueMember = "BranchCode";
+                cboBranch.Properties.DisplayMember = "DisplayText";
+                cboBranch.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;   // Known Bug #2
+                cboBranch.Properties.ShowHeader = false;
+                cboBranch.Properties.Columns.Add(new DevExpress.XtraEditors.Controls.LookUpColumnInfo("DisplayText", "Branch"));
+                cboBranch.Properties.NullText = "";
+
+                var lblNo = new LabelControl { Text = "CR no.", Location = new Point(14, 108) };
+                var txtNo = new TextEdit { Location = new Point(120, 104), Width = 200 };
+                txtNo.Properties.MaxLength = 20;
+                txtNo.Properties.CharacterCasing = CharacterCasing.Upper;
+                var lblDate = new LabelControl { Text = "CR date", Location = new Point(14, 140) };
+                var dtDate = new DateEdit { Location = new Point(120, 136), Width = 160 };
+                dtDate.Properties.MaxValue = DateTime.Today;
+                dtDate.EditValue = DateTime.Today;
+
+                var lblReason = new LabelControl { Text = "Reason", Location = new Point(14, 172) };
+                var cboReason = new ComboBoxEdit { Location = new Point(120, 168), Width = 200 };
+                cboReason.Properties.Items.AddRange(new object[] { "SPOILED", "MISPRINTED", "DAMAGED", "LOST", "WRONG ENTRY", "VOIDED", "OTHER" });
+                cboReason.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;
+                cboReason.SelectedIndex = 0;
+
+                var lblRemarks = new LabelControl { Text = "Remarks", Location = new Point(14, 204) };
+                var memo = new MemoEdit { Location = new Point(120, 200), Size = new Size(336, 70) };
+                memo.Properties.MaxLength = 1000;
+
+                var btnSave = new SimpleButton { Text = isEdit ? "Save" : "Record", Location = new Point(270, 288), Size = new Size(90, 28) };
+                var btnClose = new SimpleButton { Text = "Close", Location = new Point(366, 288), Size = new Size(90, 28), DialogResult = DialogResult.Cancel };
+
+                if (isEdit)
+                {
+                    cboBranch.EditValue = Convert.ToString(existing["BranchCode"]);
+                    txtNo.Text = Convert.ToString(existing["CRNo"]).Trim();
+                    dtDate.EditValue = existing["CRDate"] is DateTime ed ? ed : (object)DateTime.Today;
+                    string r0 = Convert.ToString(existing["Reason"]).Trim();
+                    if (r0.Length > 0 && !cboReason.Properties.Items.Contains(r0)) cboReason.Properties.Items.Add(r0);
+                    cboReason.EditValue = r0.Length > 0 ? r0 : "SPOILED";
+                    memo.Text = Convert.ToString(existing["Remarks"]);
+                }
+                else
+                {
+                    // start on the CR booklet's branch: the picked customer's, else the user's own; and the CR no. typed
+                    // on the payment, if any
+                    string branch = null;
+                    try { branch = CustomerBranch(txtcustid.Text); }
+                    catch (Exception) { branch = null; }
+                    if (string.IsNullOrWhiteSpace(branch)) branch = Login.assignedBranch;
+                    foreach (DataRow r in branches.Rows)
+                        if (string.Equals(Convert.ToString(r["BranchCode"]).Trim(), (branch ?? "").Trim(), StringComparison.OrdinalIgnoreCase))
+                        { cboBranch.EditValue = Convert.ToString(r["BranchCode"]); break; }
+                    txtNo.Text = txtcrno.Text.Trim().ToUpperInvariant();
+                }
+
+                btnSave.Click += (s, a) =>
+                {
+                    string branch = cboBranch.EditValue?.ToString();
+                    string no = txtNo.Text.Trim();
+                    if (string.IsNullOrWhiteSpace(branch)) { XtraMessageBox.Show("Select the branch whose CR booklet it is.", dlg.Text, MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
+                    if (no.Length == 0) { XtraMessageBox.Show("Enter the CR number.", dlg.Text, MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
+                    if (!(dtDate.EditValue is DateTime date)) { XtraMessageBox.Show("Enter the CR date.", dlg.Text, MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
+                    string reason = cboReason.Text.Trim();
+                    if (reason.Length == 0) { XtraMessageBox.Show("Select the reason.", dlg.Text, MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
+
+                    string ask = isEdit
+                        ? $"Save the corrected details of this cancelled CR?\n\nCR {no}, {cboBranch.Text}, {date:yyyy-MM-dd} ({reason})."
+                        : $"Record CR {no} of {cboBranch.Text} as CANCELLED ({reason}), dated {date:yyyy-MM-dd}?\n\n" +
+                          "It can't be used for a payment afterwards.";
+                    if (XtraMessageBox.Show(ask, dlg.Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                        return;
+
+                    try
+                    {
+                        string message = isEdit ? "Cancelled CR updated." : "Cancelled CR recorded.";
+                        using (var con = Database.getConnection())
+                        using (var cmd = new SqlCommand(isEdit ? "dbo.spu_EditCancelledCR" : "dbo.spu_RecordCancelledCR", con) { CommandType = CommandType.StoredProcedure })
+                        {
+                            if (isEdit)
+                                cmd.Parameters.Add("@CancelledCRID", SqlDbType.Int).Value = Convert.ToInt32(existing["CancelledCRID"]);
+                            cmd.Parameters.Add("@BranchCode", SqlDbType.VarChar, 10).Value = branch;
+                            cmd.Parameters.Add("@CRNo", SqlDbType.VarChar, 20).Value = no;
+                            cmd.Parameters.Add("@CRDate", SqlDbType.Date).Value = date.Date;
+                            cmd.Parameters.Add("@Reason", SqlDbType.VarChar, 100).Value = reason;
+                            cmd.Parameters.Add("@Remarks", SqlDbType.VarChar, 1000).Value = memo.Text.Trim();
+                            cmd.Parameters.Add("@User", SqlDbType.VarChar, 50).Value = Login.Fullname ?? "";
+                            con.Open();
+                            using (var rdr = cmd.ExecuteReader())
+                                if (rdr.Read()) message = rdr["Message"]?.ToString() ?? message;
+                        }
+                        XtraMessageBox.Show(message, dlg.Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        dlg.DialogResult = DialogResult.OK;
+                    }
+                    catch (Exception ex)
+                    {
+                        XtraMessageBox.Show(ex.Message, dlg.Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+                };
+
+                dlg.Controls.AddRange(new Control[] { info, lblBranch, cboBranch, lblNo, txtNo, lblDate, dtDate, lblReason, cboReason, lblRemarks, memo, btnSave, btnClose });
+                dlg.CancelButton = btnClose;
+                return dlg.ShowDialog(this) == DialogResult.OK;
+            }
+        }
+
+        // [110] before posting: a CR no. recorded as cancelled at the customer's branch can't be used. Null = free (or a
+        // database without [110]: nothing to check there).
+        // The CR booklet's branch = the customer's (Customers.BranchCode by CustomerKey, the key this screen posts;
+        // CustomerID differs from it on a few customers)
+        private static string CustomerBranch(string custKey)
+        {
+            if (string.IsNullOrWhiteSpace(custKey)) return null;
+            DataTable t = FetchTable("SELECT TOP (1) BranchCode FROM dbo.Customers WHERE CustomerKey = @key",
+                                     cmd => cmd.Parameters.Add("@key", SqlDbType.VarChar, 20).Value = custKey.Trim());
+            return t.Rows.Count == 0 ? null : Convert.ToString(t.Rows[0]["BranchCode"]).Trim();
+        }
+
+        private string FindCancelledCR(string custKey, string crNo)
+        {
+            if (string.IsNullOrWhiteSpace(crNo) || string.IsNullOrWhiteSpace(custKey)) return null;
+            string branch = CustomerBranch(custKey);
+            if (string.IsNullOrWhiteSpace(branch)) return null;   // no such customer: the payment itself is refused later
+            DataTable t;
+            try
+            {
+                t = FetchTable("dbo.sp_FindCancelledCR", cmd =>
+                {
+                    cmd.Parameters.Add("@BranchCode", SqlDbType.VarChar, 10).Value = branch.Trim();
+                    cmd.Parameters.Add("@CRNo", SqlDbType.VarChar, 20).Value = crNo.Trim();
+                }, CommandType.StoredProcedure);
+            }
+            catch (SqlException ex) when (ex.Number == 2812) { return null; }   // proc not installed ([110] missing)
+            if (t.Rows.Count == 0) return null;
+            DataRow r = t.Rows[0];
+            return $"CR no. {r["CRNo"]} of branch {r["BranchCode"]} was recorded as CANCELLED on " +
+                   $"{Convert.ToDateTime(r["CRDate"]):yyyy-MM-dd} ({r["Reason"]}, by {r["RecordedBy"]}).";
+        }
+
+        // ── OTHER COLLECTIONS ([104], 2026-10-17) ───────────────────────
+        // The entry grid sits in two tabs: Invoices (the customer's invoices and balance-forward credits, as before)
+        // and Other Collections: free lines, each an account from the accountant's list (JournalEntryMapping
+        // OR-OTHERCOLL) + amount + remarks, for money that settles no invoice (a long-term debt paid in parts, or
+        // balance-forward credits that were really interest: tick the credit, put the same amount to Other Income).
+        // They post in the same payment (same control no. / CR no. / GL entry / deposit) as an ARPaymentDetails line
+        // PaymentType 'OTHER COLLECTION', PONumber '#OTHER'; sp_AddPaymentClient re-checks every rule (92020-92024).
+        const string OtherPaymentType = "OTHER COLLECTION";
+        const string OtherPONumber = "#OTHER";
+        private const string OtherAccountsSql =
+            "SELECT M.AccountCode, C.Description, M.AccountCode + ' - ' + C.Description AS Display " +
+            "FROM dbo.JournalEntryMapping M INNER JOIN dbo.ChartOfAccounts C ON C.AccountCode = M.AccountCode " +
+            "WHERE M.Origin = 'OR' AND M.Mnemonic = 'OR-OTHERCOLL' AND M.IsActive = 1 ORDER BY M.Seq, M.AccountCode";
+
+        DevExpress.XtraTab.XtraTabControl tabEntry;
+        DevExpress.XtraTab.XtraTabPage pageInvoices, pageOther;
+        DevExpress.XtraGrid.GridControl gridOther;
+        GridView viewOther;
+        RepositoryItemSearchLookUpEdit repOtherAccount;
+        LabelControl lblOtherHint;
+        readonly DataTable otherLines = NewOtherLinesTable();
+        DataTable otherAccounts = new DataTable();
+
+        static DataTable NewOtherLinesTable()
+        {
+            var t = new DataTable("OtherCollections");
+            t.Columns.Add("AccountCode", typeof(string));
+            t.Columns.Add("Amount", typeof(decimal));
+            t.Columns.Add("Remarks", typeof(string));
+            return t;
+        }
+
+        void BuildEntryTabs()
+        {
+            tabEntry = new DevExpress.XtraTab.XtraTabControl { Dock = DockStyle.Fill };
+            pageInvoices = tabEntry.TabPages.Add("Invoices");
+            pageOther = tabEntry.TabPages.Add("Other Collections");
+
+            groupBox2.Controls.Remove(gridControl2);
+            pageInvoices.Controls.Add(gridControl2);
+
+            repOtherAccount = new RepositoryItemSearchLookUpEdit
+            {
+                ValueMember = "AccountCode",
+                DisplayMember = "Display",
+                NullText = "",
+                TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor   // Known Bug #2 / #14
+            };
+            // popup: Code and Name only (the bound list also carries the Display text the cell shows)
+            repOtherAccount.View.Columns.AddVisible("AccountCode", "Code");
+            repOtherAccount.View.Columns.AddVisible("Description", "Account");
+            var repAmount = new RepositoryItemSpinEdit { IsFloatValue = true, MinValue = 0m, MaxValue = 999999999999m, Increment = 0m };
+            repAmount.Buttons.Clear();
+            repAmount.Mask.EditMask = "n2";
+            repAmount.Mask.UseMaskAsDisplayFormat = true;
+            repAmount.Appearance.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+            repAmount.Appearance.Options.UseTextOptions = true;
+            var repRemarks = new RepositoryItemTextEdit { MaxLength = 50 };
+
+            gridOther = new DevExpress.XtraGrid.GridControl { Dock = DockStyle.Fill };
+            viewOther = new GridView(gridOther);
+            gridOther.MainView = viewOther;
+            gridOther.RepositoryItems.AddRange(new DevExpress.XtraEditors.Repository.RepositoryItem[] { repOtherAccount, repAmount, repRemarks });
+
+            // columns added explicitly: PopulateColumns makes none while the grid isn't on a shown form (work-log gotcha)
+            var colAccount = viewOther.Columns.AddVisible("AccountCode", "Account");
+            colAccount.ColumnEdit = repOtherAccount;
+            colAccount.Width = 320;
+            var colAmount = viewOther.Columns.AddVisible("Amount", "Amount");
+            colAmount.ColumnEdit = repAmount;
+            colAmount.Width = 160;
+            colAmount.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+            colAmount.DisplayFormat.FormatString = "N2";
+            colAmount.AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+            colAmount.AppearanceCell.Options.UseTextOptions = true;
+            colAmount.AppearanceHeader.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+            colAmount.AppearanceHeader.Options.UseTextOptions = true;
+            colAmount.Summary.Add(DevExpress.Data.SummaryItemType.Sum, "Amount", "{0:N2}");
+            var colRemarks = viewOther.Columns.AddVisible("Remarks", "Remarks");
+            colRemarks.ColumnEdit = repRemarks;
+            colRemarks.Width = 420;
+
+            viewOther.OptionsView.ShowGroupPanel = false;
+            viewOther.OptionsView.ShowFooter = true;
+            viewOther.OptionsView.NewItemRowPosition = NewItemRowPosition.Bottom;
+            viewOther.OptionsBehavior.EditorShowMode = DevExpress.Utils.EditorShowMode.Click;
+            viewOther.OptionsCustomization.AllowGroup = false;
+            Classes.DevXGridViewSettings.ApplyTotalsBandAppearance(viewOther);
+            // the total follows the table itself: a line typed on the new-item row only reaches it when the row is committed
+            otherLines.RowChanged += (s, e) => ComputeTotal();
+            otherLines.RowDeleted += (s, e) => ComputeTotal();
+            otherLines.TableCleared += (s, e) => ComputeTotal();
+            viewOther.ValidatingEditor += ViewOther_ValidatingEditor;
+            viewOther.KeyDown += (s, e) =>
+            {
+                if (e.KeyCode == Keys.Delete && viewOther.ActiveEditor == null)
+                {
+                    RemoveFocusedOtherLine();
+                    e.Handled = true;
+                }
+            };
+            gridOther.DataSource = otherLines;
+            // leaving the tab commits the line being typed (the credit is ticked on the Invoices tab and needs it)
+            tabEntry.SelectedPageChanging += (s, e) => CommitOtherLines();
+
+            var top = new PanelControl { Dock = DockStyle.Top, Height = 42 };
+            lblOtherHint = new LabelControl
+            {
+                Text = "Money that settles no invoice: pick the account, type the amount. It posts with this payment (same control no. / CR no.). " +
+                       "To close a balance-forward credit to income, add the line here first, then tick the credit on the Invoices tab.",
+                Dock = DockStyle.Fill,
+                AutoSizeMode = LabelAutoSizeMode.None,
+                Padding = new Padding(6, 4, 6, 0)
+            };
+            lblOtherHint.Appearance.TextOptions.WordWrap = DevExpress.Utils.WordWrap.Wrap;
+            lblOtherHint.Appearance.Options.UseTextOptions = true;
+            var btnRemove = new SimpleButton { Text = "Remove Line", Width = 110, Dock = DockStyle.Right };
+            btnRemove.Click += (s, e) => RemoveFocusedOtherLine();
+            top.Controls.Add(lblOtherHint);   // Fill first, then the Right button
+            top.Controls.Add(btnRemove);
+            pageOther.Controls.Add(gridOther);   // Fill first (it docks last), then the Top panel
+            pageOther.Controls.Add(top);
+
+            groupBox2.Controls.Add(tabEntry);
+        }
+
+        // the accountant's list; empty on a database without [104] (the tab then says so and takes no lines)
+        void BindOtherAccounts(DataTable accounts)
+        {
+            otherAccounts = accounts ?? new DataTable();
+            repOtherAccount.DataSource = otherAccounts;
+            bool available = otherAccounts.Rows.Count > 0;
+            viewOther.OptionsBehavior.Editable = available;
+            viewOther.OptionsView.NewItemRowPosition = available ? NewItemRowPosition.Bottom : NewItemRowPosition.None;
+            if (!available)
+                lblOtherHint.Text = "Other Collections are not available on this database yet (database update [104]); ask the administrator.";
+        }
+
+        private void ViewOther_ValidatingEditor(object sender, DevExpress.XtraEditors.Controls.BaseContainerValidateEditorEventArgs e)
+        {
+            if (viewOther.FocusedColumn?.FieldName != "Amount" || e.Value == null || e.Value == DBNull.Value) return;
+            if (!decimal.TryParse(e.Value.ToString(), out decimal v) || v <= 0)
+            {
+                e.Valid = false;
+                e.ErrorText = "Enter the amount received (more than 0).";
+            }
+        }
+
+        // the lines with anything in them (the empty new-item row and blank rows are left out)
+        IEnumerable<DataRow> OtherLineRows()
+        {
+            foreach (DataRow r in otherLines.Rows)
+            {
+                if (r.RowState == DataRowState.Deleted) continue;
+                bool blank = string.IsNullOrWhiteSpace(r["AccountCode"]?.ToString())
+                             && (r["Amount"] == DBNull.Value || Convert.ToDecimal(r["Amount"]) == 0m)
+                             && string.IsNullOrWhiteSpace(r["Remarks"]?.ToString());
+                if (!blank) yield return r;
+            }
+        }
+
+        double OtherTotal()
+        {
+            double total = 0;
+            foreach (DataRow r in OtherLineRows())
+                if (r["Amount"] != DBNull.Value) total += Convert.ToDouble(r["Amount"]);
+            return Math.Round(total, 2);
+        }
+
+        string OtherAccountDescription(string code)
+        {
+            foreach (DataRow a in otherAccounts.Rows)
+                if (string.Equals(a["AccountCode"]?.ToString(), code, StringComparison.OrdinalIgnoreCase))
+                    return a["Description"]?.ToString() ?? "";
+            return null;   // not on the list (any more)
+        }
+
+        void ClearOtherLines()
+        {
+            viewOther?.CancelUpdateCurrentRow();
+            otherLines.Rows.Clear();
+        }
+
+        // commits the cell being edited and the new-item row into otherLines (its RowChanged recomputes the total)
+        void CommitOtherLines()
+        {
+            if (viewOther == null) return;
+            viewOther.CloseEditor();
+            viewOther.UpdateCurrentRow();
+        }
+
+        void RemoveFocusedOtherLine()
+        {
+            int h = viewOther.FocusedRowHandle;
+            if (h < 0) return;   // nothing focused, or the new-item row
+            string acct = viewOther.GetRowCellDisplayText(h, "AccountCode");
+            if (!HelperFunction.ConfirmDialog($"Remove the Other Collections line {acct} ({viewOther.GetRowCellDisplayText(h, "Amount")})?", "Remove Line"))
+                return;
+            viewOther.DeleteRow(h);
         }
 
         // ── LOAD ────────────────────────────────────────────────────────
@@ -49,10 +578,12 @@ namespace SalesInventorySystem.AccountingDevEx
             // over the network) now fills in the background while the screen is already usable, and the 7
             // account lookups below share one query instead of running it 7 times.
             populateCustnameInBackground();
-            DataTable coa = null;
+            DataTable coa = null, others = null;
             try
             {
-                coa = Database.FetchTables(new Dictionary<string, string> { ["coa"] = CoaDebitSql })["coa"];
+                var lists = Database.FetchTables(new Dictionary<string, string> { ["coa"] = CoaDebitSql, ["oc"] = OtherAccountsSql });   // [104] one round trip
+                coa = lists["coa"];
+                others = lists["oc"];
             }
             catch (SqlException ex)
             {
@@ -63,6 +594,7 @@ namespace SalesInventorySystem.AccountingDevEx
                 populateRepositorySearchLookUp(coa);
                 populateCOA(coa);
             }
+            BindOtherAccounts(others);
             display();
             RefreshAvailableCredit();
 
@@ -439,6 +971,7 @@ namespace SalesInventorySystem.AccountingDevEx
                           - Convert.ToDouble(gridView2.GetRowCellValue(i, "OverPayIncome") ?? 0)
                           - Convert.ToDouble(gridView2.GetRowCellValue(i, "ServicesAmount") ?? 0);
             }
+            room += OtherTotal();   // [104] Other Collections lines can cover credits too (credit + Other Income = no cash)
             return Math.Round(room, 2);
         }
 
@@ -466,6 +999,7 @@ namespace SalesInventorySystem.AccountingDevEx
                 if (Convert.ToBoolean(gridView2.GetRowCellValue(i, "Pay")))
                     total += Convert.ToDouble(gridView2.GetRowCellValue(i, "AmountPaid") ?? 0);
             }
+            total += OtherTotal();   // [104]
             txtamounttopay.Text = total.ToString("N2");
         }
 
@@ -807,9 +1341,33 @@ namespace SalesInventorySystem.AccountingDevEx
                 }
             }
 
-            if (ctr == 0)
+            // [104] Other Collections lines: each needs an account from the list and an amount above 0
+            CommitOtherLines();
+            ComputeTotal();   // the header / cash rows post txtamounttopay: it must include a line just committed
+            int otherCtr = 0;
+            foreach (DataRow r in OtherLineRows())
             {
-                XtraMessageBox.Show("No invoices selected. Please check the 'Pay' checkbox.");
+                string acct = r["AccountCode"]?.ToString()?.Trim();
+                decimal amt = r["Amount"] == DBNull.Value ? 0m : Convert.ToDecimal(r["Amount"]);
+                if (string.IsNullOrEmpty(acct) || OtherAccountDescription(acct) == null)
+                {
+                    XtraMessageBox.Show("Other Collections: every line needs an account from the list.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    tabEntry.SelectedTabPage = pageOther;
+                    return;
+                }
+                if (Math.Round(amt, 2) <= 0)
+                {
+                    XtraMessageBox.Show($"Other Collections: the line for account {acct} needs an amount above 0 (or remove the line).", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    tabEntry.SelectedTabPage = pageOther;
+                    return;
+                }
+                otherCtr++;
+            }
+            double otherTotal = OtherTotal();
+
+            if (ctr == 0 && otherCtr == 0)
+            {
+                XtraMessageBox.Show("No invoices selected and no Other Collections lines. Please check the 'Pay' checkbox or add a line.");
                 return;
             }
 
@@ -822,22 +1380,34 @@ namespace SalesInventorySystem.AccountingDevEx
             // instead of the intended zero-cash confirm prompt.
             // [79] credits need an invoice to go on, and can't take the amount to pay below 0
             // (the server refuses the same, 92014). totalAmtPaid is already net of them.
-            if (totalCredit > 0 && invoiceCtr == 0)
+            if (totalCredit > 0 && invoiceCtr == 0 && otherCtr == 0)
             {
-                XtraMessageBox.Show("A balance-forward credit has to be applied to an invoice: tick the invoice(s) being paid too.",
+                XtraMessageBox.Show("A balance-forward credit has to be applied to an invoice (or closed to an Other Collections line): tick the invoice(s) being paid too, or add the line.",
                     "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            if (Math.Round(totalCredit, 2) > Math.Round(creditRoom, 2))
+            // [104] Other Collections lines can cover credits too (the server's 92014)
+            if (Math.Round(totalCredit, 2) > Math.Round(creditRoom + otherTotal, 2))
             {
                 XtraMessageBox.Show(
-                    $"The balance-forward credits applied ({totalCredit:N2}) are more than the invoices ticked need ({Math.Max(creditRoom, 0):N2}). " +
+                    $"The balance-forward credits applied ({totalCredit:N2}) are more than the invoices ticked and the Other Collections lines cover ({Math.Max(creditRoom + otherTotal, 0):N2}). " +
                     "Use less of a credit or untick one.",
                     "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
+            // [104] credits beyond the invoices: the rest is covered by Other Collections only, so no EWT / discount /
+            // offset / overpay / services on the invoices (the server's 92023)
+            if (Math.Round(totalCredit, 2) > Math.Round(Math.Max(creditRoom, 0), 2)
+                && Math.Round(totalDeductions + totalServicesAmount, 2) > 0)
+            {
+                XtraMessageBox.Show(
+                    "The credits ticked are more than the invoices ticked, so the rest is covered by the Other Collections lines: " +
+                    "remove EWT, discount, offset, overpay and services from the invoices in this payment (post them separately).",
+                    "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
-            double roundedNetCash = Math.Round(totalAmtPaid, 2);
+            double roundedNetCash = Math.Round(totalAmtPaid + otherTotal, 2);   // [104] + Other Collections
             bool hasNetCash = roundedNetCash > 0;
 
             // A checked row with nothing entered anywhere (AmountPaid, EWT,
@@ -848,7 +1418,7 @@ namespace SalesInventorySystem.AccountingDevEx
             // than let it fall into the zero-net-cash confirm path, which is
             // meant for genuine EWT/Discount/Offset-only corrections, not an
             // empty selection.
-            if (!hasNetCash && Math.Round(totalDeductions, 2) == 0 && Math.Round(totalCredit, 2) == 0)
+            if (!hasNetCash && Math.Round(totalDeductions, 2) == 0 && Math.Round(totalCredit, 2) == 0 && otherCtr == 0)
             {
                 XtraMessageBox.Show(
                     "No amount, EWT, Discount, or Offset was entered for the selected invoice(s) - " +
@@ -872,9 +1442,29 @@ namespace SalesInventorySystem.AccountingDevEx
                 XtraMessageBox.Show("Please fill up mandatory fields.");
                 return;
             }
+            // [110] a CR recorded as cancelled (Cancelled CR…) can't be used for a payment
+            if (!string.IsNullOrWhiteSpace(txtcrno.Text))
+            {
+                string cancelled;
+                try { cancelled = FindCancelledCR(txtcustid.Text, txtcrno.Text); }
+                catch (Exception ex)
+                {
+                    XtraMessageBox.Show("Could not check the CR no.: " + ex.Message + "\nNothing was posted.", "CR No.", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+                if (cancelled != null)
+                {
+                    XtraMessageBox.Show(cancelled + "\n\nUse another CR no. (or correct the cancelled record in Cancelled CR… if it was recorded by mistake). Nothing was posted.",
+                        "CR No.", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+            }
             if (!hasNetCash &&
                 !HelperFunction.ConfirmDialog(
-                    totalCredit > 0
+                    totalCredit > 0 && otherCtr > 0
+                        ? $"No cash is received: the balance-forward credits ({totalCredit:N2}) are closed against the invoice(s) and the " +
+                          $"Other Collections line(s) ({otherTotal:N2}). The GL entry debits AR and credits the Other Collections account(s). Continue?"
+                    : totalCredit > 0
                         ? "The balance-forward credits cover the invoice(s) in full - no cash is received and " +
                           "no GL entry is made (the opening AR is already net of these credits). Continue?"
                         : "This payment has no net cash amount (EWT/Discount/Offset only) - " +
@@ -1001,6 +1591,8 @@ namespace SalesInventorySystem.AccountingDevEx
             txtdepbankonline.Text = "";
             txtdatedeponline.EditValue = null;
 
+            ClearOtherLines();   // [104]
+            tabEntry.SelectedTabPage = pageInvoices;
             display();
             RefreshAvailableCredit();
             LoadPostedClientPayments();
@@ -1194,10 +1786,23 @@ namespace SalesInventorySystem.AccountingDevEx
                 if (servicesAmount > 0)
                     InsertDetail(con, tran, paymentHeaderId, orderNo, invoiceNo, transDate, servicesAmount, "SERVICES");
             }
+
+            // [104] Other Collections: PONumber '#OTHER' (no invoice), CreditGLCode = the account, InvoiceNo = the remarks
+            // (the account's name when blank), dated like the payment
+            DateTime payDate = Convert.ToDateTime(txtdate.Text);
+            foreach (DataRow r in OtherLineRows())
+            {
+                string acct = r["AccountCode"].ToString().Trim();
+                string remarks = r["Remarks"]?.ToString()?.Trim();
+                if (string.IsNullOrEmpty(remarks)) remarks = "OTHER COLLECTION - " + (OtherAccountDescription(acct) ?? acct);
+                if (remarks.Length > 50) remarks = remarks.Substring(0, 50);
+                decimal amt = Math.Round(Convert.ToDecimal(r["Amount"]), 2);
+                InsertDetail(con, tran, paymentHeaderId, OtherPONumber, remarks, payDate, amt, OtherPaymentType, acct);
+            }
         }
 
         void InsertDetail(SqlConnection con, SqlTransaction tran, int phid,
-                          string po, string invoice, DateTime date, decimal amount, string type)
+                          string po, string invoice, DateTime date, decimal amount, string type, string creditGLCode = null)
         {
             using (SqlCommand cmd = new SqlCommand(@"
                 INSERT INTO ARPaymentDetails
@@ -1223,8 +1828,9 @@ namespace SalesInventorySystem.AccountingDevEx
                 // check treats it consistently.
                 cmd.Parameters.Add("@debit", SqlDbType.VarChar, 20).Value =
                     string.IsNullOrEmpty(txtdebitglcode.Text) ? (object)DBNull.Value : txtdebitglcode.Text;
+                string credit = creditGLCode ?? txtcreditglcode.Text;   // [104] an Other Collections line carries its own account
                 cmd.Parameters.Add("@credit", SqlDbType.VarChar, 20).Value =
-                    string.IsNullOrEmpty(txtcreditglcode.Text) ? (object)DBNull.Value : txtcreditglcode.Text;
+                    string.IsNullOrEmpty(credit) ? (object)DBNull.Value : credit;
                 cmd.ExecuteNonQuery();
             }
         }
@@ -1335,10 +1941,15 @@ namespace SalesInventorySystem.AccountingDevEx
         }
 
         bool TryLoadPaymentDetails(int paymentHeaderId, out DataTable header, out DataTable glEntries, out DataTable lines)
+            => TryLoadPaymentDetails(paymentHeaderId, out header, out glEntries, out lines, out _);
+
+        // [104] set 4 = the payment's Other Collections lines (empty on a database without [104])
+        bool TryLoadPaymentDetails(int paymentHeaderId, out DataTable header, out DataTable glEntries, out DataTable lines, out DataTable others)
         {
             header = new DataTable();
             glEntries = new DataTable();
             lines = new DataTable();
+            others = new DataTable();
             try
             {
                 using (SqlConnection con = Database.getConnection())
@@ -1355,6 +1966,7 @@ namespace SalesInventorySystem.AccountingDevEx
                         if (ds.Tables.Count > 0) header = ds.Tables[0];
                         if (ds.Tables.Count > 1) glEntries = ds.Tables[1];
                         if (ds.Tables.Count > 2) lines = ds.Tables[2];
+                        if (ds.Tables.Count > 3) others = ds.Tables[3];
                     }
                 }
                 return true;
@@ -1403,8 +2015,8 @@ namespace SalesInventorySystem.AccountingDevEx
                 "Edit Payment"))
                 return;
 
-            DataTable header, glEntries, lines;
-            if (!TryLoadPaymentDetails(paymentHeaderId, out header, out glEntries, out lines))
+            DataTable header, glEntries, lines, others;
+            if (!TryLoadPaymentDetails(paymentHeaderId, out header, out glEntries, out lines, out others))
                 return;
             if (header.Rows.Count == 0)
             {
@@ -1440,6 +2052,7 @@ namespace SalesInventorySystem.AccountingDevEx
                 xtraTabControl1.SelectedTabPage = xtraTabPage1;
                 display();
                 RefreshAvailableCredit();
+                PrefillOtherLines(others);   // [104] before the invoices: a credit closed to Other Income needs the line's room
                 PrefillEntryFromReversedPayment(header.Rows[0], lines);
                 LoadPostedClientPayments();
 
@@ -1541,6 +2154,28 @@ namespace SalesInventorySystem.AccountingDevEx
                     "(may have since been settled by another payment) and were not pre-filled:\n\n" +
                     string.Join(", ", notFound),
                     "Some Invoices Not Pre-filled", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        }
+
+        // [104] the reversed payment's Other Collections lines back on their tab. An account no longer on the list can't
+        // show in the dropdown: its code goes into the remarks and the account is left blank, so Confirm asks for one.
+        void PrefillOtherLines(DataTable others)
+        {
+            ClearOtherLines();
+            if (others == null || !others.Columns.Contains("AccountCode")) return;
+            foreach (DataRow o in others.Rows)
+            {
+                string acct = o["AccountCode"]?.ToString()?.Trim();
+                string remarks = o["Remarks"]?.ToString();
+                if (OtherAccountDescription(acct) == null)
+                {
+                    remarks = $"(was {acct}, no longer on the list) {remarks}";
+                    if (remarks.Length > 50) remarks = remarks.Substring(0, 50);
+                    acct = null;
+                }
+                otherLines.Rows.Add(acct, DBNullToDecimal(o["Amount"]), remarks);
+            }
+            if (otherLines.Rows.Count > 0)
+                tabEntry.SelectedTabPage = pageOther;
         }
 
         // [80] the grid row of one invoice: invoice no. AND PO (OrderNo), never the invoice no. alone
@@ -1692,7 +2327,9 @@ namespace SalesInventorySystem.AccountingDevEx
             // customer from Load.
             custkey = txtcustid.Text;
             groupControl1.Text = custkey;
+            ClearOtherLines();   // [104] lines typed for the previous customer must not post on this one
             display();
+            ComputeTotal();
             RefreshAvailableCredit();
             if (xtraTabControl1.SelectedTabPage == xtraTabPage2)
                 LoadPostedClientPayments();
@@ -1719,7 +2356,7 @@ namespace SalesInventorySystem.AccountingDevEx
                 if (!ticked && CreditRoom(row) <= 0)
                 {
                     e.Cancel = true;
-                    XtraMessageBox.Show("Tick the invoice(s) to be paid first, then the balance-forward credit to apply to them.",
+                    XtraMessageBox.Show("Tick the invoice(s) to be paid first (or add the Other Collections line that the credit closes to, e.g. Other Income), then the balance-forward credit to apply to them.",
                         "Balance-Forward Credit", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 return;

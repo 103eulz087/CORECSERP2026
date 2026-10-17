@@ -36,8 +36,8 @@ result sets (wrappers, `sp_PostCashAdvance`, reversals); accept the noise and re
 the end. Don't wrap them in `INSERT … EXEC` to silence them (nested result sets, 3915 on a refusal).
 
 **Test reference numbers already claimed** (keep new ones out of these; add yours to this list when you finish):
-99901–99902 and 99904–99905 [85] · 99906–99907 [87] · 99911–99918 [88] · 99971–99979 [97] · 99999 [85] [86] [90]
-(shared placeholder). Next free block: 99920–99969, 99980–99998.
+99901–99902 and 99904–99905 [85] · 99906–99907 [87] · 99911–99918 [88] · 99971–99979 [97] · 99920 (reference) + 99930 (voucher id) [103] · 99921 (reference; control no. TEST104 / CR no. TEST104-CR) [104] · 99931–99935 (references; 99935 = adjustment memo) + 99941–99944 (voucher ids) [105] · 99999 [85] [86] [90]
+(shared placeholder). Next free block: 99922–99929, 99936–99940, 99945–99969, 99980–99998.
 
 ## Shape of the file
 

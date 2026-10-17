@@ -38,11 +38,9 @@ namespace SalesInventorySystem
             //UserLookAndFeel.Default.SetSkinStyle(SkinStyle.);
             // Black skin = NOT production, so users can tell at a glance where they are connected.
             // Same value as Main's dbname label (registry "dbname" under ConnSettingsMain).
-            string dbName = Database.getConnectionServerName("dbname").Trim();
-            if (string.Equals(dbName, "PRODJFC_COREX", StringComparison.OrdinalIgnoreCase))
-                UserLookAndFeel.Default.SetSkinStyle(SkinStyle.WXICompact);
-            else
-                UserLookAndFeel.Default.SetSkinStyle(SkinStyle.Black);
+            // 2026-10-16 ([100]): the same default lives in UserSkinPreference; after login the user's saved skin
+            // (if any) replaces it.
+            UserSkinPreference.ApplyDefault();
 
 
             // 1. Load your global cache first!

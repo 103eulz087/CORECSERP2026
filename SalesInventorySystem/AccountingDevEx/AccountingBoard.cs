@@ -40,6 +40,7 @@ namespace SalesInventorySystem.AccountingDevEx
         private const string PageGLTicketEntries = "navGLTicketEntries";
         private const string PageLoanRevaluation = "navLoanRevaluation";   // 2026-10-14: moved here from Accounting Settings
         private const string PageGLDetailTransaction = "navGLDetailTransaction";   // 2026-10-14: tracing right after posting
+        private const string PageAgingReport = "navAgingReport";   // 2026-10-17: AR / AP / AP-EXP aging (Accounting.AgingReports)
         // ---------------------------------------------------------------
         // Content loading — the ONE place to touch (besides the Designer)
         // when you add a new menu item: one dictionary entry, same key as
@@ -140,6 +141,19 @@ namespace SalesInventorySystem.AccountingDevEx
                 _glDetailTransaction.LoadData();   // no-op if Load already did it (guarded)
                 return _glDetailTransaction;
             },
+            // 2026-10-17 (user): the Aging report on the board (its Main menu button is hidden). Same form, hosted as a
+            // child like GL Detail Transaction.
+            [PageAgingReport] = () =>
+            {
+                _agingReport = new Accounting.AgingReports
+                {
+                    TopLevel = false,
+                    FormBorderStyle = FormBorderStyle.None,
+                    Dock = DockStyle.Fill
+                };
+                _agingReport.Show();
+                return _agingReport;
+            },
             // 2026-10-15: the Registers page (invoice / CR / EWT payable) was here for a few hours; moved to Main ›
             // REPORTING › SALES next to Client Sales (user, same day; Main.SetupRegistersMenu)
         };
@@ -196,7 +210,7 @@ namespace SalesInventorySystem.AccountingDevEx
         {
             if (key == PageLoanRevaluation)
                 return IsAdminOrAccounting();
-            if (key == PageGLDetailTransaction)
+            if (key == PageGLDetailTransaction || key == PageAgingReport)   // read-only reports, same rule
                 return IsKeyAllowed(key) || PostingPageKeys.Any(IsKeyAllowed);
             return IsKeyAllowed(key);
         }
@@ -363,6 +377,7 @@ namespace SalesInventorySystem.AccountingDevEx
         private BankReconFormV2 _bankRecon;
         private LoanRevaluationFrm _loanRevaluation;
         private HOFormsDevEx.AccountingReportsFormV2 _glDetailTransaction;
+        private Accounting.AgingReports _agingReport;
         // ---------------------------------------------------------------
         // Form events
         // ---------------------------------------------------------------

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using DevExpress.XtraEditors;
 using DevExpress.XtraGrid.Views.Grid;
+using DevExpress.XtraGrid.Columns;
 
 namespace SalesInventorySystem.AccountingDevEx
 {
@@ -34,6 +35,8 @@ namespace SalesInventorySystem.AccountingDevEx
             // Posted tab: draggable split, expenses grid ~54% / details below.
             Classes.DevXGridViewSettings.KeepSplitterRatio(splitPosted, 0.54);
             BuildReverseControls();
+            // 2026-10-17 (user): Enter moves to the next cell of the GL lines, like Tab
+            gridControlLines.ProcessGridKey += GridControlLines_ProcessGridKey;
         }
 
         // [96] 2026-10-15: Reverse a saved expense (spu_ReverseSingleExpense). Built in code next to
@@ -379,6 +382,57 @@ namespace SalesInventorySystem.AccountingDevEx
             if (col == "AccountTitle") e.Cancel = true;
         }
 
+        // 2026-10-17 (user): Enter = next cell you can type in. Order Account Code → Particulars → Debit → Credit; the
+        // read-only Account Title is skipped, and so is the amount column the row can't use (Credit once Debit has an
+        // amount, Debit while Credit has one: the ShowingEditor rule). From the last cell Enter goes to the next line's
+        // Account Code, adding a line when on the last one. An open dropdown (account search) still takes its own Enter:
+        // the grid only sees the key after the popup has closed.
+        private void GridControlLines_ProcessGridKey(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode != Keys.Enter || e.Modifiers != Keys.None) return;
+            GridView view = gridViewLines;
+            if (view.FocusedColumn == null || !view.IsDataRow(view.FocusedRowHandle)) return;
+
+            e.Handled = true;
+            e.SuppressKeyPress = true;
+            if (view.IsEditing && !view.PostEditor()) return;   // invalid value: stay in the cell
+            view.CloseEditor();                                  // commits; CellValueChanged clears the other amount
+
+            int row = view.FocusedRowHandle;
+            GridColumn next = NextEditableColumn(row, view.FocusedColumn.VisibleIndex + 1);
+            if (next == null)
+            {
+                int nextRow = row + 1;
+                if (!view.IsDataRow(nextRow))
+                {
+                    AddLine();
+                    nextRow = view.GetRowHandle(_linesTable.Rows.Count - 1);
+                }
+                row = nextRow;
+                next = NextEditableColumn(row, 0);
+            }
+            if (next == null) return;
+
+            view.FocusedRowHandle = row;
+            view.FocusedColumn = next;
+            view.ShowEditor();
+        }
+
+        private GridColumn NextEditableColumn(int row, int fromVisibleIndex)
+        {
+            decimal debit = ToDecimal(gridViewLines.GetRowCellValue(row, "Debit"));
+            decimal credit = ToDecimal(gridViewLines.GetRowCellValue(row, "Credit"));
+            for (int i = fromVisibleIndex; i < gridViewLines.VisibleColumns.Count; i++)
+            {
+                GridColumn c = gridViewLines.VisibleColumns[i];
+                if (!c.OptionsColumn.AllowEdit || c.OptionsColumn.ReadOnly || c.FieldName == "AccountTitle") continue;
+                if (c.FieldName == "Debit" && credit > 0) continue;
+                if (c.FieldName == "Credit" && debit > 0) continue;
+                return c;
+            }
+            return null;
+        }
+
         private void GridViewLines_RowCellStyle(object sender, RowCellStyleEventArgs e)
         {
             decimal debit = ToDecimal(gridViewLines.GetRowCellValue(e.RowHandle, "Debit"));
@@ -606,6 +660,12 @@ namespace SalesInventorySystem.AccountingDevEx
 
             for (int i = 0; i < gridViewLines.RowCount; i++)
             {
+                // a blank line (no account, no amount) is not sent: same rule as ValidateLines (2026-10-17, Enter on
+                // the last cell adds a line)
+                if (string.IsNullOrEmpty(gridViewLines.GetRowCellValue(i, "AccountCode")?.ToString())
+                    && ToDecimal(gridViewLines.GetRowCellValue(i, "Debit")) == 0
+                    && ToDecimal(gridViewLines.GetRowCellValue(i, "Credit")) == 0)
+                    continue;
                 dt.Rows.Add(
                     cboBranch.EditValue?.ToString(),
                     gridViewLines.GetRowCellValue(i, "AccountCode"),

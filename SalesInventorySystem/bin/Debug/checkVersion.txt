@@ -1,6 +1,5 @@
-Version=47
+Version=50
 Filename=updated.zip
 Launcher=SalesInventorySystem.exe
-VersionCheckerUrl=https://check-uploader.uat-ph.com/1234567890XX
-DownloadUrlFormat=https://file-uploader.uat-ph.com/1234567890XX/file.zip 
-DownloadUrl=https://file-uploader.uat-ph.com/1234567890XX/file-v47.zip 
+VersionCheckerUrl=https://check-uploader.uat-ph.com/1234567890
+DownloadUrlFormat=https://file-uploader.uat-ph.com/1234567890/file.zip

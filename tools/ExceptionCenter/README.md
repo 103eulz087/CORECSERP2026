@@ -40,6 +40,8 @@ Run it:
 | S07 | HIGH | A customer's account balance differs from the sum of its invoice balances (script [87]) |
 | S08 | HIGH | An invoice row's `Balance` doesn't follow its own columns, all rows and dates (script [87]) |
 | S09 | MEDIUM | A sales-order delivery's `DeliverySummary` counters (items / sold / returned / qty / actual qty) differ from its lines (script [89]; most rows before [89], 0 after) |
+| S10 | HIGH | An AR payment's Other Collections lines (`PaymentType 'OTHER COLLECTION'`, script [104]) are not carried by its own OR ticket, or a line is linked to an invoice (PONumber other than `#OTHER`) |
+| S11 | HIGH | A CR recorded as cancelled (`CancelledCollectionReceipt`, script [110]) is also on a live AR payment of the same branch (customer's branch, same series + number). Skipped until [110] is installed |
 | T01 | CRITICAL | Saved transfer: head-office In Transit ≠ cost of the stock actually shipped |
 | T02 | CRITICAL | Received transfer: In Transit did not clear to 0 |
 | T03 | CRITICAL | Transfer received more than once |
@@ -77,3 +79,9 @@ AMOUNT DIFFERS (e.g. Known Bug #9), OTHER MONTH (item filed under another period
 Set 6 (added by [88], hardening H7): items of a LOCKED month added, changed, cleared or uncleared
 after the lock (every recon writer refuses a locked month since [88]; a row here came from a hand
 edit or an older exe). Should be empty.
+Set 7 (added by [101], 2026-10-17): a bank item still ticked CLEARED although its document (AR
+payment, cash advance, supplier voucher) was reversed. The reversals void open items only, so the
+re-keyed document's new item gets ticked too and the bank side counts the money twice (PRODUCTION
+O-CR-011241, refs 38760 -> 45337). Since [101] an AR payment with a cleared deposit can't be reversed
+(93030); since [103] a cash advance (93031) and a supplier voucher / cheque (93032) with a cleared
+item can't either. Fix a row by setting its ResolvedReason to 'REVERSED' (as [101] did). Should be empty.

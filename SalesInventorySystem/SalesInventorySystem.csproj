@@ -735,6 +735,7 @@
       <DependentUpon>CIFMain.cs</DependentUpon>
     </Compile>
     <Compile Include="Classes\AccountReconReport.cs" />
+    <Compile Include="Classes\UserSkinPreference.cs" />
     <Compile Include="Classes\AutoUpdater.cs" />
     <Compile Include="Classes\BadOrder.cs">
       <SubType>Component</SubType>

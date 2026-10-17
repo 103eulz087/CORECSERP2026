@@ -98,3 +98,33 @@ WHERE h.Status = 'LOCKED' AND h.LockedDate IS NOT NULL
   AND (b.DateTimeAdded > h.LockedDate OR b.DateTimeUpdated > h.LockedDate
        OR (b.ResolvedDate > h.LockedDate AND ISNULL(b.ClearedPeriodEnd, h.PeriodEnd) <= h.PeriodEnd))
 ORDER BY h.AccountCode, h.PeriodEnd, b.ReconID;
+
+-- 7. [101] 2026-10-17: a bank item still ticked as CLEARED although its document was reversed.
+--    The reversals void OPEN items only (AR payment, cash advance, cheque cancel through sp_BankRecon_VoidOC), so a deposit /
+--    cheque ticked before the reversal stays CLEARED, and when the document is keyed again the new item is ticked too: the
+--    bank side counts the money twice (PRODUCTION 2026-10-17: O-CR-011241, refs 38760 -> 45337, PNB PESO August).
+--    Since [101] an AR payment with a cleared deposit can't be reversed (93030); since [103] a cash advance (93031) and a
+--    supplier voucher / cheque (93032) can't either, so a row here came from before those scripts or a hand edit. Fix a row here by
+--    setting the item's ResolvedReason to 'REVERSED' (keep IsResolved / ClearedPeriodEnd), as [101] did. A clean database shows no rows.
+SELECT x.Module, b.ReconID, b.AccountCode, b.BranchCode, CONVERT(VARCHAR(10), h.PeriodEnd, 120) AS PeriodEnd, b.ItemType, b.ReferenceNo, b.ControlNo,
+       b.Payee, b.Amount, b.ResolvedReason, b.ResolvedBy, CONVERT(VARCHAR(10), b.ResolvedDate, 120) AS Resolved,
+       CONVERT(VARCHAR(10), b.ClearedPeriodEnd, 120) AS ClearedIn, x.ReversedOn
+FROM dbo.BankStatementRecon AS b
+LEFT JOIN dbo.BankReconHeader AS h ON h.HeaderID = b.HeaderID
+CROSS APPLY (
+    SELECT TOP (1) 'AR PAYMENT' AS Module, CONVERT(VARCHAR(16), ph.ReversedDate, 120) AS ReversedOn
+    FROM dbo.PaymentHeader AS ph
+    WHERE b.SourceModule = 'AR-PAYMENT' AND ph.ReferenceNo = b.SourceRef AND ph.Status = 'REVERSED'
+      AND NOT EXISTS (SELECT 1 FROM dbo.PaymentHeader AS p2 WHERE p2.ReferenceNo = ph.ReferenceNo AND ISNULL(p2.Status, '') <> 'REVERSED')
+    UNION ALL
+    SELECT TOP (1) 'CASH ADVANCE', NULL
+    FROM dbo.CashAdvance AS ca
+    WHERE b.SourceModule = 'CASH-ADVANCE' AND ca.ReferenceNo = b.SourceRef AND ca.Status = 'REVERSED'
+    UNION ALL
+    SELECT TOP (1) 'SUPPLIER VOUCHER', CONVERT(VARCHAR(16), a.CancelledDate, 120)
+    FROM dbo.PaymentReversalAudit AS a
+    WHERE b.ItemType = 'OC' AND ISNULL(b.SourceModule, '') <> 'CASH-ADVANCE' AND a.ReferenceNumber = b.SourceRef
+) AS x
+WHERE b.IsResolved = 1
+  AND ISNULL(b.ResolvedReason, '') <> 'REVERSED' AND ISNULL(b.ResolvedReason, '') NOT LIKE 'VOIDED%'
+ORDER BY x.Module, b.AccountCode, b.ReconID;

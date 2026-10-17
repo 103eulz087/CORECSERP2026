@@ -300,6 +300,8 @@ namespace SalesInventorySystem
                 if (loginStatus == "SUCCESS")
                 {
                     this.Hide();
+                    // 2026-10-16 ([100]): the skin this user picked last time (else the default)
+                    UserSkinPreference.ApplyForUser(isglobalUserID);
                     Main m = new Main();
                     m.Show();
                     Classes.ApprovalRelaySession.Initialize();

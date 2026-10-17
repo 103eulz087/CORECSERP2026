@@ -26,9 +26,29 @@ namespace SalesInventorySystem
         bool isusedsearchform = false;//, isusedbarcode = false;//, ispriceused=false;
         public static string seqno = "",branchcode="";
         public static bool iswarehouse = false;
+        // [107] 2026-10-17 (user): a Reference Code on the Manual Selection tab, under Cost. It stays filled from line to
+        // line (one code for a batch) and clears on New / Save; blank = the old INVIN-<batch id> (sp_CommitReInventoryINManualEntry).
+        readonly TextEdit tab2refcode = new TextEdit();
+
         public ReInventoryIn()
         {
             InitializeComponent();
+
+            var lblRef = new Label
+            {
+                AutoSize = true,
+                BackColor = Color.Transparent,
+                Font = new Font("Tahoma", 11.25F),
+                Location = new Point(503, 126),
+                Text = "Reference Code:"
+            };
+            tab2refcode.Location = new Point(640, 122);
+            tab2refcode.Size = new Size(220, 28);
+            tab2refcode.Properties.MaxLength = 100;   // = Inventory.ReferenceCode
+            tab2refcode.Properties.Appearance.Font = new Font("Tahoma", 10.25F);
+            tab2refcode.Properties.Appearance.Options.UseFont = true;
+            groupBox3.Controls.Add(lblRef);
+            groupBox3.Controls.Add(tab2refcode);
         }
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
@@ -551,6 +571,7 @@ namespace SalesInventorySystem
         private void tab2btnnew_Click(object sender, EventArgs e)
         {
             tab2batchid.Text = IDGenerator.getIDNumberSP("sp_GetInventoryINNumber", "InventoryID");
+            tab2refcode.Text = "";   // [107]
             txtproduct.Enabled = true;
             txtqty.Enabled = true;
             txtsku.Enabled = true;
@@ -586,6 +607,10 @@ namespace SalesInventorySystem
                 com.Parameters.AddWithValue("@parmcost", tab2cost.Text);                                                                      
                 com.Parameters.AddWithValue("@parmiswarehouse", isWarehouse);
                 com.Parameters.AddWithValue("@parmuser", Login.isglobalUserID);
+                // [107] sent only when typed, so this exe still works on a database without [107]
+                string refCode = tab2refcode.Text.Trim();
+                if (refCode.Length > 0)
+                    com.Parameters.Add("@parmreferencecode", SqlDbType.VarChar, 100).Value = refCode;
 
                 com.CommandType = CommandType.StoredProcedure;
                 com.CommandText = query;
@@ -713,6 +738,7 @@ namespace SalesInventorySystem
                 txtproduct.Text = "";
                 txtqty.Text = "";
                 txtsku.Text = "";
+                tab2refcode.Text = "";   // [107]
 
                 txtproduct.Enabled = false;
                 txtqty.Enabled = false;

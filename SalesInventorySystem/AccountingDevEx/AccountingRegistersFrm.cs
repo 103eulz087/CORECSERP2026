@@ -132,7 +132,8 @@ namespace SalesInventorySystem.AccountingDevEx
                 "GAP / JUMP = numbers skipped in the branch's series (JUMP = more than 50 at once, likely a typing slip).");
             AddTab("Collection Receipt Register", "sp_rpt_CollectionReceiptRegister", "CR_REGISTER",
                 "AR payments by CR No. series and number (payment date in the range; branch = the customer's). DUPLICATE = the CR No. is on " +
-                "more than one payment that is not reversed; GAP / JUMP = numbers skipped in the branch's series.");
+                "more than one payment that is not reversed; GAP / JUMP = numbers skipped in the branch's series; CANCELLED = a CR recorded " +
+                "as cancelled (Client Payments › Cancelled CR…), which fills its place in the series.");
             AddTab("EWT Payable", "sp_rpt_EWTPayableLedger", "EWT_PAYABLE",
                 "The EWT payable ledger (20104 WTAX PAYABLE - EXPANDED) in date order. Remittances pay the oldest withheld amounts first: " +
                 "Paid / Unpaid / Status as of the To date. Remittances and the running balance are company-wide.");
@@ -355,7 +356,10 @@ namespace SalesInventorySystem.AccountingDevEx
             ["CRNo"] = "CR No.", ["PaymentDate"] = "Payment Date", ["ControlNo"] = "Control No.", ["ReferenceNo"] = "Reference No.",
             ["PaymentType"] = "Payment Type", ["AmountReceived"] = "Amount Received", ["AppliedToInvoices"] = "Applied to Invoices",
             ["TicketDate"] = "Date", ["TicketNumber"] = "Ticket No.", ["ReferenceNumber"] = "Reference No.",
-            ["RunningBalance"] = "Balance (all branches)"
+            ["RunningBalance"] = "Balance (all branches)",
+            // 2026-10-17 (user): on the Collection Receipt Register the customer's withholding is CWT (creditable
+            // withholding tax); the proc column stays EWT. No other tab returns an EWT column.
+            ["EWT"] = "CWT"
         };
 
         private static void FormatColumns(Tab t)
@@ -444,7 +448,12 @@ namespace SalesInventorySystem.AccountingDevEx
                     back = Color.FromArgb(253, 222, 222);
                 else if (note.Contains("GAP") || note.Contains("JUMP") || note.Contains("NO NUMBER") || note.Contains("NO CR NO"))
                     back = Color.FromArgb(255, 241, 204);
-                grey = note.Contains("RETURNED") || note.Contains("REVERSED");
+                else if (note.StartsWith("CANCELLED"))   // [110] a recorded cancelled CR: light lavender, grey text
+                {
+                    back = Color.FromArgb(236, 232, 246);
+                    grey = true;
+                }
+                grey = grey || note.Contains("RETURNED") || note.Contains("REVERSED");
             }
             else if (v.Columns["Kind"] != null)
             {

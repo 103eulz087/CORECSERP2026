@@ -56,6 +56,12 @@ namespace SalesInventorySystem
             //DevExpress.UserSkins.BonusSkins.Register();
             //DevExpress.Skins.SkinManager.EnableFormSkins();
             //DevExpress.XtraBars.Helpers.SkinHelper.InitSkinGallery(skinRibbonGalleryBarItem1, true, true);
+
+            // 2026-10-16 ([100]): a skin picked in the ribbon gallery is saved on the user's account and applied at
+            // their next login (UserSkinPreference). Saved after the click is processed, so the new skin is the
+            // one on screen; only this click saves (report screens that switch the skin in code don't).
+            skinRibbonGalleryBarItem1.GalleryItemClick += (s, e) =>
+                BeginInvoke((Action)(() => UserSkinPreference.SaveCurrent(Login.isglobalUserID)));
         }
         private async void Main_Load(object sender, EventArgs e)
         {
